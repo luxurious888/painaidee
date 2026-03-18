@@ -1,0 +1,8 @@
+streamlit
+streamlit-js-eval
+streamlit-folium
+folium
+googlemaps
+pandas
+st-gsheets-connection
+requests
