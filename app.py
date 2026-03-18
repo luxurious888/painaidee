@@ -28,7 +28,7 @@ try:
     LINE_CLIENT_SECRET = st.secrets["line_login"]["client_secret"]
     
     # URL ของแอปคุณบน Streamlit Cloud
-    REDIRECT_URI = "https://painaidee.streamlit.app/" 
+    REDIRECT_URI = "https://ominous-broccoli-....app.github.dev/"
 except Exception as e:
     st.error(f"⚠️ ตรวจสอบการตั้งค่า Secrets ให้ครบถ้วน: {e}")
     st.stop()
