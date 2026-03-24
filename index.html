@@ -23,7 +23,6 @@
         select { width: 45%; }
         input[type="text"] { width: 55%; }
 
-        /* ปรับเมนูให้เลื่อนดูหมวดหมู่ได้เยอะๆ */
         .category-container { display: flex; gap: 8px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; }
         .category-chip { padding: 8px 16px; background: white; border: 1px solid #ddd; border-radius: 20px; white-space: nowrap; cursor: pointer; font-size: 14px; transition: 0.3s; }
         .category-chip.active { background: #00b900; color: white; border-color: #00b900; font-weight: 600; box-shadow: 0 2px 8px rgba(0,185,0,0.3); }
@@ -61,21 +60,21 @@
 
         <div class="category-container">
             <div class="category-chip active" onclick="setCategory('ร้านอาหาร', this)">🌈 ทั้งหมด</div>
-            <div class="category-chip" onclick="setCategory('หมูกระทะ แจ่วฮ้อน', this)">🥩 หมูกระทะ/แจ๋วฮ้อน</div>
-            <div class="category-chip" onclick="setCategory('ชาบู สุกี้', this)">🍲 ชาบู/สุกี้</div>
-            <div class="category-chip" onclick="setCategory('ปิ้งย่าง ยากินิกุ', this)">🥓 ปิ้งย่าง</div>
+            <div class="category-chip" onclick="setCategory('หมูกระทะ', this)">🥩 หมูกระทะ/แจ่วฮ้อน</div>
+            <div class="category-chip" onclick="setCategory('ชาบู', this)">🍲 ชาบู/สุกี้</div>
+            <div class="category-chip" onclick="setCategory('ปิ้งย่าง', this)">🥓 ปิ้งย่าง</div>
             <div class="category-chip" onclick="setCategory('อาหารตามสั่ง', this)">🍳 อาหารตามสั่ง</div>
-            <div class="category-chip" onclick="setCategory('ก๋วยเตี๋ยว ก๋วยจั๊บ', this)">🍜 ก๋วยเตี๋ยว/เส้น</div>
-            <div class="category-chip" onclick="setCategory('ส้มตำ ยำ', this)">🥗 ส้มตำ/ยำ</div>
-            <div class="category-chip" onclick="setCategory('สตรีทฟู้ด ของกินเล่น', this)">🍡 สตรีทฟู้ด</div>
-            <div class="category-chip" onclick="setCategory('คาเฟ่ กาแฟ ของหวาน', this)">☕ คาเฟ่/ขนม</div>
-            <div class="category-chip" onclick="setCategory('บาร์ นั่งชิล', this)">🍺 บาร์/นั่งชิลล์</div>
-            <div class="category-chip" onclick="setCategory('ลานกางเต็นท์ แคมป์ปิ้ง', this)">⛺ แคมป์ปิ้ง</div>
+            <div class="category-chip" onclick="setCategory('ก๋วยเตี๋ยว', this)">🍜 ก๋วยเตี๋ยว/เส้น</div>
+            <div class="category-chip" onclick="setCategory('ส้มตำ', this)">🥗 ส้มตำ/ยำ</div>
+            <div class="category-chip" onclick="setCategory('สตรีทฟู้ด', this)">🍡 สตรีทฟู้ด</div>
+            <div class="category-chip" onclick="setCategory('คาเฟ่', this)">☕ คาเฟ่/ขนม</div>
+            <div class="category-chip" onclick="setCategory('บาร์', this)">🍺 บาร์/นั่งชิลล์</div>
+            <div class="category-chip" onclick="setCategory('แคมป์ปิ้ง', this)">⛺ แคมป์ปิ้ง</div>
         </div>
     </div>
 
     <div id="placeList" class="place-grid">
-        <p id="status-text" style="text-align:center; grid-column: 1/-1; padding: 40px; color: #666;">กำลังเตรียมข้อมูลและระบบ GPS...</p>
+        <p id="status-text" style="text-align:center; grid-column: 1/-1; padding: 40px; color: #666;">กำลังเตรียมข้อมูลแผนที่...</p>
     </div>
 </div>
 
@@ -85,8 +84,8 @@
 <script>
     let map, infoWindow, service;
     let googlePlaces = [];
-    let currentCoords = null; 
-    let currentKeyword = 'ร้านอาหาร'; // ค่าเริ่มต้นคือค้นหา "ร้านอาหาร"
+    let currentCoords = { lat: 15.2287, lng: 104.8564 }; // ให้มีค่าเริ่มต้นเป็นอุบลไว้ก่อน ป้องกันหน้าขาว
+    let currentKeyword = 'ร้านอาหาร'; 
     let markers = [];
 
     // รายชื่อ 77 จังหวัดครบถ้วน
@@ -130,7 +129,7 @@
 
         // ใช้ Classic API มั่นคงสุดๆ ไม่มีค้าง
         map = new google.maps.Map(document.getElementById("map"), {
-            center: { lat: 15.2287, lng: 104.8564 }, // อุบลราชธานีสำรอง
+            center: currentCoords,
             zoom: 14,
             mapTypeControl: false
         });
@@ -138,7 +137,10 @@
         infoWindow = new google.maps.InfoWindow();
         service = new google.maps.places.PlacesService(map);
 
-        // เริ่มต้นด้วยการขอ GPS
+        // ดึงข้อมูลอุบลขึ้นมาโชว์ก่อนเลย 1 รอบ กันหน้าขาว
+        fetchPlaces(currentCoords, currentKeyword);
+        
+        // แล้วค่อยพยายามดึงพิกัด GPS ทับอีกที
         changeProvince();
     }
 
@@ -146,13 +148,11 @@
         const val = document.getElementById('provinceSelect').value;
         const list = document.getElementById('placeList');
         
-        list.innerHTML = '';
-        
         if (val === 'current') {
             if (navigator.geolocation) {
-                document.getElementById('status-text').innerText = '📍 กำลังขออนุญาตและค้นหาตำแหน่งของคุณ...';
-                document.getElementById('status-text').style.display = 'block';
+                list.innerHTML = '<p style="text-align:center; grid-column: 1/-1; padding: 40px;">📍 กำลังขอตำแหน่ง GPS ของคุณ (รอสักครู่)...</p>';
                 
+                // 💡 แก้ปัญหา GPS ค้าง ด้วยการตั้งเวลา Timeout (ถ้าเกิน 8 วินาทีให้ตัดจบ)
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
                         currentCoords = { lat: position.coords.latitude, lng: position.coords.longitude };
@@ -164,12 +164,17 @@
                         fetchPlaces(currentCoords, currentKeyword);
                     },
                     (error) => {
-                        alert("อนุญาต GPS ไม่สำเร็จ ระบบจะแสดงแผนที่อุบลราชธานีเป็นค่าเริ่มต้นครับ");
+                        // ถ้า GPS พัง หรือผู้ใช้ไม่อนุญาต ให้ใช้อุบลเป็นหลัก
                         document.getElementById('provinceSelect').value = 'ubon';
-                        changeProvince();
-                    }
+                        currentCoords = provinces.find(p => p.id === 'ubon');
+                        fetchPlaces(currentCoords, currentKeyword);
+                    },
+                    { timeout: 8000 } // <-- นี่คือจุดสำคัญที่ทำให้ไม่ค้างตลอดกาล
                 );
-            } else { alert("อุปกรณ์ไม่รองรับ GPS"); }
+            } else { 
+                alert("เบราว์เซอร์ไม่รองรับ GPS");
+                document.getElementById('provinceSelect').value = 'ubon';
+            }
         } else {
             const selected = provinces.find(p => p.id === val);
             if (selected) { 
@@ -179,7 +184,6 @@
         }
     }
 
-    // 💡 ฟังก์ชันนี้ถูกอัปเกรดให้ค้นหาด้วย Keyword โดยตรง งัดร้านเล็กๆ ได้แน่นอน
     function fetchPlaces(coords, keyword) {
         if (!coords) return;
         
@@ -187,37 +191,37 @@
         clearMarkers();
         map.setCenter(coords);
         
-        document.getElementById('status-text').innerText = `กำลังค้นหา "${keyword}" ในรัศมี 5 กิโลเมตร...`;
-        document.getElementById('status-text').style.display = 'block';
-        document.getElementById('placeList').innerHTML = '';
+        document.getElementById('placeList').innerHTML = `<p style="text-align:center; grid-column: 1/-1; padding: 40px;">กำลังค้นหา "${keyword}" ในบริเวณนี้...</p>`;
 
         const request = {
             location: coords,
             radius: 5000,
-            keyword: keyword // ใช้ keyword หาสิ่งที่ต้องการตรงๆ เช่น "หมูกระทะ" หรือ "ร้านอาหาร"
+            keyword: keyword // ค้นหาด้วยคำสั้นๆ ตรงๆ Google หาเจอแน่นอน
         };
 
         service.nearbySearch(request, (results, status) => {
-            document.getElementById('status-text').style.display = 'none';
             if (status === google.maps.places.PlacesServiceStatus.OK && results) {
                 googlePlaces = results;
                 renderCards(googlePlaces);
                 createMarkers(googlePlaces);
+            } else if (status === google.maps.places.PlacesServiceStatus.ZERO_RESULTS) {
+                // ถ้าค้นหาไม่เจอ ให้บอกชัดเจน
+                document.getElementById('placeList').innerHTML = `<p style="text-align:center; grid-column: 1/-1; padding: 40px;">ไม่พบ "${keyword}" ในรัศมี 5 กิโลเมตร ลองเปลี่ยนหมวดหมู่ดูครับ 😅</p>`;
             } else {
-                document.getElementById('placeList').innerHTML = `<p style="text-align:center; grid-column: 1/-1; padding: 40px;">ไม่พบ "${keyword}" ในบริเวณนี้ ลองเปลี่ยนหมวดหมู่ดูครับ</p>`;
+                // ถ้า Error ให้แจ้งตรงๆ จะได้รู้ว่าเกิดอะไรขึ้น
+                document.getElementById('placeList').innerHTML = `<p style="text-align:center; color: red; grid-column: 1/-1; padding: 40px;">เกิดข้อผิดพลาดในการเชื่อมต่อ Google Maps (${status})</p>`;
             }
         });
     }
 
-    // เมื่อกดเปลี่ยนหมวดหมู่ (Chips) จะไปสั่งดึง API จาก Google ใหม่เลย
     function setCategory(keyword, el) {
         document.querySelectorAll('.category-chip').forEach(chip => chip.classList.remove('active'));
         el.classList.add('active');
         
-        currentKeyword = keyword; // เปลี่ยนคำค้นหา (เช่น จากร้านอาหาร -> หมูกระทะ)
-        document.getElementById('searchBox').value = ''; // เคลียร์ช่องค้นหา
+        currentKeyword = keyword; // เปลี่ยนคำค้นหา 
+        document.getElementById('searchBox').value = ''; // เคลียร์ช่องพิมพ์
         
-        // สั่งกวาดร้านใหม่ทันทีด้วยคำที่เราเลือก!
+        // สั่งดึงข้อมูลใหม่ตามคำที่กดทันที
         fetchPlaces(currentCoords, currentKeyword);
     }
 
@@ -231,7 +235,6 @@
         list.innerHTML = places.map(p => {
             const lat = p.geometry.location.lat();
             const lng = p.geometry.location.lng();
-            // ใช้ลิงก์มาตรฐานที่เปิด Google Maps นำทางได้ 100%
             const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
             
             let imgUrl = 'https://via.placeholder.com/400x200?text=Painaidee+No+Photo';
@@ -255,7 +258,7 @@
         }).join('');
     }
 
-    // ค้นหาข้อความในช่อง Input (กรองจากผลลัพธ์ที่ดึงมาแล้ว)
+    // กรองร้านค้าที่ดึงมาแล้วผ่านช่อง Search
     function filterBySearch() {
         const val = document.getElementById('searchBox').value.toLowerCase();
         const filtered = googlePlaces.filter(p => {
