@@ -53,6 +53,14 @@
         .price-list { list-style: none; padding: 0; margin: 0; }
         .price-list li { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; align-items: center; }
         .status-tag { display: inline-block; padding: 3px 8px; border-radius: 15px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+
+        /* 💡 ซีเอสเอสสำหรับระบบ Popup ขยายภาพ (Image Modal) */
+        .img-modal { display: none; position: fixed; z-index: 9999; padding-top: 50px; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.85); backdrop-filter: blur(5px); }
+        .img-modal-content { margin: auto; display: block; max-width: 90%; max-height: 80vh; border-radius: 10px; box-shadow: 0 5px 25px rgba(0,0,0,0.5); object-fit: contain; }
+        .img-modal-close { position: absolute; top: 20px; right: 35px; color: #fff; font-size: 40px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .img-modal-close:hover { color: #f44336; }
+        .clickable-img { cursor: pointer; transition: 0.2s; }
+        .clickable-img:hover { opacity: 0.8; transform: scale(1.05); }
     </style>
 </head>
 <body>
@@ -167,11 +175,13 @@
 
     <div class="dashboard-card" style="border-color: #ff9800; border-width: 2px;">
         <h3 style="border-bottom-color: #ff9800;">📢 คำขอลงโปรโมชั่น (รอตรวจสอบ)</h3>
+        <p style="font-size:12px; color:#666; margin-top:-5px;">*คลิกที่รูปภาพเพื่อขยายดูรายละเอียด</p>
         <div id="adminPromoRequests"></div>
     </div>
 
     <div class="dashboard-card">
         <h3>📋 คำขอลงทะเบียนร้านค้า (รอตรวจสอบ)</h3>
+        <p style="font-size:12px; color:#666; margin-top:-5px;">*คลิกที่รูปภาพเอกสารเพื่อขยายตรวจสอบ</p>
         <div id="adminRegistrationRequests"></div>
     </div>
     
@@ -205,6 +215,11 @@
     <button class="btn-red" style="width: 100%; padding: 15px;" onclick="clearAllData()">🗑 ล้างข้อมูลระบบทั้งหมด (Reset)</button>
 </div>
 
+<div id="imageViewerModal" class="img-modal" onclick="closeImageViewer()">
+    <span class="img-modal-close">&times;</span>
+    <img class="img-modal-content" id="expandedImage">
+</div>
+
 <script>
     // --------------------------------------------------
     // 1. ระบบจัดการข้อมูล LocalStorage
@@ -224,6 +239,17 @@
     function saveData() {
         localStorage.setItem('painaidee_auth', JSON.stringify(appData));
         renderUI();
+    }
+
+    // 💡 ฟังก์ชันขยายรูปภาพ
+    function openImageViewer(src, event) {
+        if(event) event.stopPropagation(); // กันการกดปุ่มอื่นซ้อน
+        document.getElementById('imageViewerModal').style.display = 'block';
+        document.getElementById('expandedImage').src = src;
+    }
+    
+    function closeImageViewer() {
+        document.getElementById('imageViewerModal').style.display = 'none';
     }
 
     function renderUI() {
@@ -248,11 +274,12 @@
             }).join('');
         } else { banner.style.display = 'none'; }
 
-        // คำขอโปรโมชั่น
+        // คำขอโปรโมชั่น (แอดมิน)
         const promoReqList = document.getElementById('adminPromoRequests');
         if(appData.pendingPromotions.length > 0) {
             promoReqList.innerHTML = appData.pendingPromotions.map(p => {
-                const imgTag = p.image ? `<img src="${p.image}" style="width:100px; height:80px; object-fit:cover; border-radius:8px; margin-bottom:10px;">` : '';
+                // 💡 เพิ่มคลาส clickable-img และ onclick
+                const imgTag = p.image ? `<img src="${p.image}" class="clickable-img" style="width:120px; height:80px; object-fit:cover; border-radius:8px; margin-bottom:10px; border: 1px solid #ccc;" title="คลิกเพื่อขยายรูป" onclick="openImageViewer('${p.image}', event)">` : '';
                 return `
                 <div style="border:1px solid #ddd; padding:15px; border-radius:10px; margin-bottom:10px; background:#fff9e6;">
                     <h4 style="margin:0 0 5px 0;">🔥 ${p.storeName}</h4>
@@ -265,18 +292,19 @@
             }).join('');
         } else { promoReqList.innerHTML = '<p style="color:#888;">ไม่มีโปรโมชั่นรอตรวจสอบ</p>'; }
 
-        // 💡 แสดงผลคำขอลงทะเบียน (แสดงรูปเอกสารให้แอดมินดู)
+        // คำขอลงทะเบียนร้านค้า (แอดมิน)
         const reqList = document.getElementById('adminRegistrationRequests');
         if(appData.registrationRequests.length > 0) {
             reqList.innerHTML = appData.registrationRequests.map(req => {
-                const idImg = req.idCard ? `<img src="${req.idCard}" style="height:50px; border-radius:5px; border:1px solid #ccc; margin-right:5px; background:#fff;" title="บัตรประชาชน">` : '';
-                const photoImg = req.storePhoto ? `<img src="${req.storePhoto}" style="height:50px; border-radius:5px; border:1px solid #ccc; margin-right:5px; background:#fff;" title="รูปหน้าร้าน">` : '';
-                const commImg = req.commercial ? `<img src="${req.commercial}" style="height:50px; border-radius:5px; border:1px solid #ccc; margin-right:5px; background:#fff;" title="ทะเบียนพาณิชย์">` : '';
+                // 💡 เพิ่มระบบคลิกขยายรูปเอกสาร
+                const idImg = req.idCard ? `<img src="${req.idCard}" class="clickable-img" style="height:60px; width:90px; object-fit:cover; border-radius:5px; border:1px solid #ccc; margin-right:10px; background:#fff;" title="บัตรประชาชน (คลิกขยาย)" onclick="openImageViewer('${req.idCard}', event)">` : '';
+                const photoImg = req.storePhoto ? `<img src="${req.storePhoto}" class="clickable-img" style="height:60px; width:90px; object-fit:cover; border-radius:5px; border:1px solid #ccc; margin-right:10px; background:#fff;" title="รูปหน้าร้าน (คลิกขยาย)" onclick="openImageViewer('${req.storePhoto}', event)">` : '';
+                const commImg = req.commercial ? `<img src="${req.commercial}" class="clickable-img" style="height:60px; width:90px; object-fit:cover; border-radius:5px; border:1px solid #ccc; margin-right:10px; background:#fff;" title="ทะเบียนพาณิชย์ (คลิกขยาย)" onclick="openImageViewer('${req.commercial}', event)">` : '';
 
                 return `
                 <div style="border:1px solid #ddd; padding:15px; border-radius:10px; margin-bottom:10px; background:#fafafa;">
                     <h4 style="margin:0 0 10px 0;">🏪 ${req.storeName}</h4>
-                    <div style="display:flex; margin-bottom:15px; overflow-x:auto;">
+                    <div style="display:flex; margin-bottom:15px; overflow-x:auto; padding-bottom:5px;">
                         ${idImg} ${photoImg} ${commImg}
                     </div>
                     <button class="btn-green" style="padding:5px 10px;" onclick="approveRegistration(${req.id}, '${req.storeName}')">✅ อนุมัติ & สร้างรหัส PIN</button>
@@ -295,7 +323,7 @@
         // โปรโมชั่นที่กำลังแสดง
         document.getElementById('activePromoList').innerHTML = appData.activePromotions.length > 0 ? 
             appData.activePromotions.map(p => {
-                const imgTag = p.image ? `<img src="${p.image}" style="width:60px; height:60px; object-fit:cover; border-radius:8px; margin-right:15px;">` : '';
+                const imgTag = p.image ? `<img src="${p.image}" class="clickable-img" style="width:60px; height:60px; object-fit:cover; border-radius:8px; margin-right:15px;" title="คลิกเพื่อขยายรูป" onclick="openImageViewer('${p.image}', event)">` : '';
                 return `
                 <li style="display:block; background:#f0fcf0; margin-bottom:10px; border-radius:8px; padding:15px; border:1px solid #c8e6c9;">
                     <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
@@ -333,7 +361,6 @@
     }
     function deleteService(id) { if(confirm("ลบแพ็กเกจนี้?")) { appData.services = appData.services.filter(s => s.id !== id); saveData(); } }
 
-    // 💡 ฟังก์ชันใหม่: ค้นหาพิกัดร้านตอนลงทะเบียน
     let regMiniMap, regMiniMarker;
     function searchRegStore() {
         const query = document.getElementById('regStoreName').value.trim();
@@ -346,7 +373,6 @@
                 document.getElementById('regVerifyStoreName').innerText = "✅ ค้นพบ: " + place.name;
                 document.getElementById('regVerifyStoreAddress').innerText = "📍 " + place.formatted_address;
                 
-                // ล็อคชื่อร้านให้ตรงกับ Google Maps
                 document.getElementById('regStoreName').value = place.name;
 
                 if (!regMiniMap) {
@@ -362,7 +388,6 @@
         });
     }
 
-    // 💡 ปรับปรุงฟังก์ชันบันทึกการลงทะเบียน (อ่านไฟล์ภาพเป็น Base64)
     async function submitStoreRegistration() {
         const name = document.getElementById('regStoreName').value.trim();
         const idCardFile = document.getElementById('regIdCard').files[0];
@@ -371,7 +396,6 @@
 
         if (!name || !idCardFile || !photoFile) return alert("กรุณาค้นหาชื่อร้าน และแนบไฟล์ที่จำเป็นให้ครบครับ");
 
-        // Helper function แปลงรูปเป็นรหัส Base64
         const getBase64 = (file) => new Promise(resolve => {
             if (!file) return resolve(null);
             const reader = new FileReader();
@@ -379,21 +403,15 @@
             reader.readAsDataURL(file);
         });
 
-        // รอให้แปลงรูปทั้งหมดเสร็จก่อนบันทึก
         const idCardBase64 = await getBase64(idCardFile);
         const photoBase64 = await getBase64(photoFile);
         const commBase64 = await getBase64(commFile);
 
         appData.registrationRequests.push({ 
-            id: Date.now(), 
-            storeName: name,
-            idCard: idCardBase64,
-            storePhoto: photoBase64,
-            commercial: commBase64
+            id: Date.now(), storeName: name, idCard: idCardBase64, storePhoto: photoBase64, commercial: commBase64
         }); 
         saveData();
 
-        // เคลียร์ฟอร์ม
         document.getElementById('regStoreName').value = '';
         document.getElementById('regIdCard').value = ''; 
         document.getElementById('regStorePhoto').value = ''; 
@@ -420,7 +438,6 @@
     }
     function deleteStore(id) { if(confirm("ลบร้านค้านี้?")) { appData.registeredStores = appData.registeredStores.filter(s => s.id !== id); saveData(); } }
 
-    // --- จัดการส่งโปรโมชั่น ---
     let miniMap, miniMarker;
     function verifyStore() {
         const pin = document.getElementById('storePinInput').value.trim();
