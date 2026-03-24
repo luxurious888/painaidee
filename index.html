@@ -94,7 +94,8 @@
 
     <div id="promoBanner" class="highlight-banner">
         <h3>🌟 ร้านแนะนำ & โปรโมชั่น</h3>
-        <div id="approvedPromoList" class="place-grid" style="margin-top: 10px;"></div>
+        <p style="font-size: 12px; margin:0 0 10px 0; color:#fff;">(แสดงผลล่าสุด 10 รายการ)</p>
+        <div id="approvedPromoList" class="place-grid"></div>
     </div>
 
     <div id="placeList" class="place-grid">
@@ -106,11 +107,10 @@
     
     <div class="dashboard-card" style="background: #fff; border-color: #00b900; border-width: 2px;">
         <h3 style="border-bottom: none; margin-bottom: 0;">📝 ลงทะเบียนยืนยันตัวตนร้านค้า</h3>
-        <p style="font-size: 14px; color: #555;">ส่งเอกสารให้แอดมินตรวจสอบ เพื่อรับ "รหัสลับ (Store PIN)" ในการลงโปรโมชั่น</p>
+        <p style="font-size: 14px; color: #555;">ส่งเอกสารให้แอดมินตรวจสอบ เพื่อรับ "รหัสลับ (Store PIN)"</p>
         <div class="form-group"><label>1. ชื่อร้านค้า (ให้ตรงกับบนแผนที่)</label><input type="text" id="regStoreName" placeholder="เช่น สมหมายหมูกระทะ"></div>
         <div class="form-group"><label>2. อัปโหลดสำเนาบัตรประชาชน (จำเป็น)</label><input type="file" id="regIdCard" accept="image/*"></div>
         <div class="form-group"><label>3. รูปถ่ายหน้าร้านคู่เจ้าของร้าน (จำเป็น)</label><input type="file" id="regStorePhoto" accept="image/*"></div>
-        <div class="form-group"><label>4. ใบทะเบียนพาณิชย์ (ไม่บังคับ)</label><input type="file" id="regCommercial" accept="image/*"></div>
         <button class="btn-blue" style="width: 100%;" onclick="submitStoreRegistration()">ส่งข้อมูลให้แอดมินตรวจสอบ</button>
     </div>
 
@@ -131,21 +131,23 @@
         </div>
 
         <div class="form-group">
+            <label>🛒 เลือกแพ็กเกจค่าบริการ</label>
+            <select id="promoServiceSelect">
+                </select>
+        </div>
+
+        <div class="form-group">
             <label>🖼 อัปโหลดรูปภาพโปรโมชั่น</label>
             <input type="file" id="promoImageInput" accept="image/*">
         </div>
 
         <div class="form-group">
             <label>รายละเอียดโปรโมชั่น / ข่าวสาร</label>
-            <textarea id="promoDetail" rows="3" placeholder="เช่น โปรวันเกิดลด 20%, ฟรีโค้ก 1 เหยือก..."></textarea>
+            <textarea id="promoDetail" rows="3" placeholder="เช่น โปรวันเกิดลด 20%..."></textarea>
         </div>
         <button class="btn-green" onclick="submitPromoWithPIN()">🚀 ส่งโปรโมชั่นให้แอดมินอนุมัติ</button>
     </div>
 
-    <div class="dashboard-card">
-        <h3>💰 อัตราค่าบริการโปรโมท</h3>
-        <ul id="displayServiceList" class="price-list"></ul>
-    </div>
 </div>
 
 <div id="page-admin" class="page">
@@ -172,7 +174,7 @@
     </div>
 
     <div class="dashboard-card">
-        <h3>✅ โปรโมชั่นที่กำลังแสดง (อนุมัติแล้ว)</h3>
+        <h3>✅ โปรโมชั่นที่กำลังแสดง (สูงสุด 10 รายการ)</h3>
         <ul id="activePromoList" class="price-list"></ul>
     </div>
     
@@ -192,21 +194,20 @@
 
 <script>
     // --------------------------------------------------
-    // 1. ระบบจัดการหลังบ้าน (Admin/Partner)
+    // 1. ระบบจัดการข้อมูลแบบป้องกัน Error (Safe Initialization)
     // --------------------------------------------------
-    let appData = JSON.parse(localStorage.getItem('painaidee_auth')) || {
-        registrationRequests: [], 
-        registeredStores: [],
-        pendingPromotions: [], // 💡 เพิ่มฐานข้อมูลส่วนโปรที่รออนุมัติ
-        activePromotions: [],
-        services: [
-            { id: 1, name: 'ปักหมุดโปรโมชั่นหน้าแรก (รายเดือน)', price: 500 },
-            { id: 2, name: 'แก้ไขอัปเดตแบนเนอร์ (ต่อครั้ง)', price: 150 }
-        ]
-    };
-    
-    // สำรองไว้เผื่อใช้โค้ดเก่าที่ไม่มี pendingPromotions
-    if(!appData.pendingPromotions) appData.pendingPromotions = [];
+    let rawData = localStorage.getItem('painaidee_auth');
+    let appData = rawData ? JSON.parse(rawData) : {};
+
+    // 💡 ป้องกันอาการแผนที่หายด้วยการเช็คว่ามี Array ครบทุกตัวไหม ถ้าไม่มีให้สร้างใหม่
+    appData.registrationRequests = appData.registrationRequests || [];
+    appData.registeredStores = appData.registeredStores || [];
+    appData.pendingPromotions = appData.pendingPromotions || [];
+    appData.activePromotions = appData.activePromotions || [];
+    appData.services = appData.services || [
+        { id: 1, name: 'ปักหมุดโปรโมชั่นหน้าแรก (รายเดือน)', price: 500 },
+        { id: 2, name: 'แก้ไขอัปเดตแบนเนอร์ (ต่อครั้ง)', price: 150 }
+    ];
 
     function saveData() {
         localStorage.setItem('painaidee_auth', JSON.stringify(appData));
@@ -214,7 +215,7 @@
     }
 
     function renderUI() {
-        // แบนเนอร์หน้าแรก (ดึงเฉพาะที่ activePromotions)
+        // แบนเนอร์หน้าแรก (ดึงมาแสดงสูงสุด 10 อัน)
         const banner = document.getElementById('promoBanner');
         const promoList = document.getElementById('approvedPromoList');
         if (appData.activePromotions.length > 0) {
@@ -235,14 +236,15 @@
             }).join('');
         } else { banner.style.display = 'none'; }
 
-        // 💡 เรนเดอร์คำขอ "โปรโมชั่น" ฝั่งแอดมิน
+        // คำขอโปรโมชั่นฝั่งแอดมิน
         const promoReqList = document.getElementById('adminPromoRequests');
-        if(appData.pendingPromotions && appData.pendingPromotions.length > 0) {
+        if(appData.pendingPromotions.length > 0) {
             promoReqList.innerHTML = appData.pendingPromotions.map(p => {
                 const imgTag = p.image ? `<img src="${p.image}" style="width:100px; height:80px; object-fit:cover; border-radius:8px; margin-bottom:10px;">` : '';
                 return `
                 <div style="border:1px solid #ddd; padding:15px; border-radius:10px; margin-bottom:10px; background:#fff9e6;">
-                    <h4 style="margin:0 0 10px 0;">🔥 ${p.storeName}</h4>
+                    <h4 style="margin:0 0 5px 0;">🔥 ${p.storeName}</h4>
+                    <p style="font-size:13px; color:#00b900; margin:0 0 10px 0;">📦 แพ็กเกจที่เลือก: ${p.service || 'ไม่ระบุ'}</p>
                     ${imgTag}
                     <p style="font-size:14px; color:#555; margin:0 0 15px 0;">"${p.detail}"</p>
                     <button class="btn-green" style="padding:5px 10px;" onclick="approvePendingPromo('${p.id}')">✅ อนุมัติขึ้นหน้าแรก</button>
@@ -252,15 +254,14 @@
             }).join('');
         } else { promoReqList.innerHTML = '<p style="color:#888;">ไม่มีโปรโมชั่นรอตรวจสอบ</p>'; }
 
-        // คำขอลงทะเบียนร้านค้าฝั่งแอดมิน
+        // คำขอลงทะเบียนร้านค้า
         const reqList = document.getElementById('adminRegistrationRequests');
         if(appData.registrationRequests.length > 0) {
             reqList.innerHTML = appData.registrationRequests.map(req => `
                 <div style="border:1px solid #ddd; padding:15px; border-radius:10px; margin-bottom:10px; background:#fafafa;">
                     <h4 style="margin:0 0 10px 0;">🏪 ${req.storeName}</h4>
-                    <p style="font-size:12px; color:#555; margin:0 0 5px 0;">📄 แนบไฟล์เอกสารแล้ว</p>
                     <button class="btn-green" style="padding:5px 10px;" onclick="approveRegistration(${req.id}, '${req.storeName}')">✅ อนุมัติ & สร้างรหัส PIN</button>
-                    <button class="btn-red" style="padding:5px 10px; margin-top:5px;" onclick="rejectRegistration(${req.id})">❌ ปฏิเสธ</button>
+                    <button class="btn-red" style="padding:5px 10px;" onclick="rejectRegistration(${req.id})">❌ ปฏิเสธ</button>
                 </div>
             `).join('');
         } else { reqList.innerHTML = '<p style="color:#888;">ไม่มีคำขอใหม่</p>'; }
@@ -289,42 +290,47 @@
                 </li>`;
             }).join('') : '<li style="color:#888;">ยังไม่มีโปรโมชั่น</li>';
 
-        // อัปเดตราคาค่าบริการ
-        const displayList = document.getElementById('displayServiceList');
+        // 💡 อัปเดตรายการแพ็กเกจค่าบริการ (ใส่ลง Dropdown ในหน้าร้านค้า)
+        const serviceSelect = document.getElementById('promoServiceSelect');
         const adminServList = document.getElementById('adminServiceList');
-        displayList.innerHTML = ''; adminServList.innerHTML = '';
+        adminServList.innerHTML = '';
         
+        if (serviceSelect) {
+            serviceSelect.innerHTML = appData.services.map(s => `<option value="${s.name}">${s.name} - ${s.price} ฿</option>`).join('');
+        }
+
         appData.services.forEach(s => {
-            displayList.innerHTML += `<li><span>${s.name}</span> <strong style="color:#00b900;">${s.price} ฿</strong></li>`;
             adminServList.innerHTML += `<li><span>${s.name} <strong>(${s.price} ฿)</strong></span><button class="btn-red" onclick="deleteService(${s.id})">ลบ</button></li>`;
         });
     }
 
-    // --- จัดการ Services ---
+    // --- จัดการแพ็กเกจ (Admin) ---
     function addService() {
         const name = document.getElementById('newServiceName').value.trim();
         const price = document.getElementById('newServicePrice').value.trim();
         if (!name || !price) return alert("กรุณากรอกชื่อบริการและราคาครับ");
-        appData.services.push({ id: Date.now(), name: name, price: parseInt(price) }); saveData();
-        document.getElementById('newServiceName').value = ''; document.getElementById('newServicePrice').value = '';
+        
+        appData.services.push({ id: Date.now(), name: name, price: parseInt(price) }); 
+        saveData();
+        
+        document.getElementById('newServiceName').value = ''; 
+        document.getElementById('newServicePrice').value = '';
     }
     function deleteService(id) { if(confirm("ลบแพ็กเกจนี้?")) { appData.services = appData.services.filter(s => s.id !== id); saveData(); } }
 
-    // --- จัดการ ร้านค้า ---
+    // --- ลงทะเบียนร้าน ---
     function submitStoreRegistration() {
         const name = document.getElementById('regStoreName').value.trim();
-        const idCard = document.getElementById('regIdCard').value;
-        const photo = document.getElementById('regStorePhoto').value;
-        if (!name || !idCard || !photo) return alert("กรุณากรอกชื่อร้าน และแนบไฟล์เอกสารที่จำเป็นให้ครบครับ");
+        if (!name) return alert("กรุณากรอกชื่อร้านครับ");
         appData.registrationRequests.push({ id: Date.now(), storeName: name }); saveData();
-        document.getElementById('regStoreName').value = ''; document.getElementById('regIdCard').value = ''; document.getElementById('regStorePhoto').value = ''; document.getElementById('regCommercial').value = '';
-        alert("ส่งเอกสารให้แอดมินเรียบร้อยแล้วครับ! โปรดรอการอนุมัติ");
+        document.getElementById('regStoreName').value = '';
+        alert("ส่งข้อมูลให้แอดมินเรียบร้อยแล้วครับ! โปรดรอการอนุมัติ");
     }
     function approveRegistration(reqId, storeName) {
         const generatedPin = Math.floor(1000 + Math.random() * 9000).toString(); 
         appData.registeredStores.push({ id: Date.now(), name: storeName, pin: generatedPin });
         appData.registrationRequests = appData.registrationRequests.filter(r => r.id !== reqId); saveData();
-        alert(`✅ อนุมัติสำเร็จ!\nระบบสร้างรหัส PIN: [${generatedPin}] ให้ร้าน ${storeName} แล้ว`);
+        alert(`✅ อนุมัติสำเร็จ! ระบบสร้างรหัส PIN: [${generatedPin}] ให้ร้าน ${storeName} แล้ว`);
     }
     function rejectRegistration(reqId) { if(confirm("ปฏิเสธคำขอนี้?")) { appData.registrationRequests = appData.registrationRequests.filter(r => r.id !== reqId); saveData(); } }
     function createStoreAccount() {
@@ -335,9 +341,9 @@
         document.getElementById('newStoreName').value = ''; document.getElementById('newStorePin').value = '';
         alert(`สร้างบัญชีสำเร็จ! รหัส PIN: [${pin}]`);
     }
-    function deleteStore(id) { if(confirm("ลบร้านค้านี้? โปรโมชั่นที่โชว์อยู่จะโดนลบด้วย")) { appData.registeredStores = appData.registeredStores.filter(s => s.id !== id); saveData(); } }
+    function deleteStore(id) { if(confirm("ลบร้านค้านี้?")) { appData.registeredStores = appData.registeredStores.filter(s => s.id !== id); saveData(); } }
 
-    // --- จัดการโปรโมชั่น ---
+    // --- จัดการส่งโปรโมชั่น (Partner -> Admin) ---
     let miniMap, miniMarker;
     function verifyStore() {
         const pin = document.getElementById('storePinInput').value.trim();
@@ -360,11 +366,11 @@
         });
     }
 
-    // 💡 ปรับให้ร้านค้าส่งไป "รออนุมัติ" ก่อน
     function submitPromoWithPIN() {
         const pin = document.getElementById('storePinInput').value.trim();
         const detail = document.getElementById('promoDetail').value.trim();
         const imageInput = document.getElementById('promoImageInput');
+        const selectedService = document.getElementById('promoServiceSelect').value;
         
         if (!pin || !detail) return alert("กรอกรหัสร้านค้าและรายละเอียดให้ครบครับ");
 
@@ -372,10 +378,14 @@
         if (!store) return alert("❌ รหัส PIN ไม่ถูกต้อง!");
 
         const savePromoData = (base64Image) => {
-            // ลบของเก่าที่กำลังรออนุมัติของร้านนี้ออก (ให้มีคำขอเดียว)
             appData.pendingPromotions = appData.pendingPromotions.filter(p => p.storeName !== store.name);
             appData.pendingPromotions.push({ 
-                id: Date.now().toString(), storeName: store.name, detail: detail, image: base64Image, date: new Date().toLocaleString('th-TH') 
+                id: Date.now().toString(), 
+                storeName: store.name, 
+                detail: detail, 
+                image: base64Image, 
+                service: selectedService, // 💡 บันทึกแพ็กเกจที่เลือกลงไปด้วย
+                date: new Date().toLocaleString('th-TH') 
             });
             saveData();
             
@@ -393,33 +403,27 @@
         } else { savePromoData(''); }
     }
 
-    // 💡 แอดมินจัดการโปรโมชั่น
+    // 💡 แอดมินจัดการโปรโมชั่น (จำกัด 10 อันดับ)
     function approvePendingPromo(id) {
         const promo = appData.pendingPromotions.find(p => p.id === id);
         if(promo) {
-            // ลบโปรโมชั่นเก่าที่โชว์อยู่หน้าแรกของร้านนี้ออกก่อนอัปเดตอันใหม่
             appData.activePromotions = appData.activePromotions.filter(p => p.storeName !== promo.storeName);
-            appData.activePromotions.push(promo); // ย้ายไป active
-            appData.pendingPromotions = appData.pendingPromotions.filter(p => p.id !== id); // ลบออกจาก pending
-            saveData();
-            alert("✅ อนุมัติสำเร็จ! โปรโมชั่นนี้แสดงผลบนหน้าแรกแล้ว");
-        }
-    }
-    
-    function rejectPendingPromo(id) {
-        if(confirm("ปฏิเสธโปรโมชั่นนี้ใช่หรือไม่?")) {
-            appData.pendingPromotions = appData.pendingPromotions.filter(p => p.id !== id);
-            saveData();
-        }
-    }
+            appData.activePromotions.push(promo); 
+            
+            // 💡 จำกัดจำนวนให้มีแค่ 10 รายการล่าสุดเท่านั้น
+            if (appData.activePromotions.length > 10) {
+                appData.activePromotions.shift(); // ลบอันเก่าสุดออก
+            }
 
-    function deleteActivePromo(id) { 
-        if(confirm("ลบโปรโมชั่นนี้ออกจากหน้าแรก?")) {
-            appData.activePromotions = appData.activePromotions.filter(p => p.id !== id); saveData(); 
+            appData.pendingPromotions = appData.pendingPromotions.filter(p => p.id !== id); 
+            saveData();
+            alert("✅ อนุมัติสำเร็จ! โปรโมชั่นนี้แสดงผลบนหน้าแรกแล้ว (ระบบจะเก็บ 10 รายการล่าสุด)");
         }
     }
     
-    function clearAllData() { if(confirm("ล้างข้อมูลทั้งหมด? (กู้คืนไม่ได้)")) { localStorage.removeItem('painaidee_auth'); location.reload(); } }
+    function rejectPendingPromo(id) { if(confirm("ปฏิเสธโปรโมชั่นนี้ใช่หรือไม่?")) { appData.pendingPromotions = appData.pendingPromotions.filter(p => p.id !== id); saveData(); } }
+    function deleteActivePromo(id) { if(confirm("ลบโปรโมชั่นนี้ออกจากหน้าแรก?")) { appData.activePromotions = appData.activePromotions.filter(p => p.id !== id); saveData(); } }
+    function clearAllData() { if(confirm("ล้างข้อมูลทั้งหมด? (กู้คืนไม่ได้)")) { localStorage.clear(); location.reload(); } }
 
     function switchPage(p) {
         document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
