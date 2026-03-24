@@ -13,17 +13,22 @@
         header { background: #00b900; color: white; padding: 20px; text-align: center; border-radius: 0 0 20px 20px; }
         .page { display: none; padding: 20px; max-width: 900px; margin: 0 auto; }
         .page.active { display: block; }
-        #map { width: 100%; height: 350px; border-radius: 15px; border: 2px solid #00b900; background: #eee; }
+        #map { width: 100%; height: 350px; border-radius: 15px; border: 2px solid #00b900; }
+        
         .search-area { background: white; padding: 15px; border-radius: 15px; margin-top: -30px; position: relative; z-index: 10; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .input-group { display: flex; gap: 10px; margin-bottom: 10px; }
-        select, input[type="text"] { padding: 12px; border-radius: 10px; border: 2px solid #00b900; font-family: 'Kanit'; outline: none; }
+        select, input[type="text"] { padding: 12px; border-radius: 10px; border: 2px solid #00b900; font-family: 'Kanit'; font-size: 15px; outline: none; }
+        
         .category-container { display: flex; gap: 8px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; }
         .category-chip { padding: 8px 16px; background: #f0f0f0; border-radius: 20px; white-space: nowrap; cursor: pointer; font-size: 13px; border: 1px solid #ddd; }
         .category-chip.active { background: #00b900; color: white; border-color: #00b900; }
+
         .place-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-top: 20px; }
         .place-card { background: white; border-radius: 18px; overflow: hidden; box-shadow: 0 3px 10px rgba(0,0,0,0.05); border: 1px solid #eee; transition: 0.3s; }
         .place-card img { width: 100%; height: 160px; object-fit: cover; }
         .place-info { padding: 15px; }
+        
+        .btn-load { width: 100%; padding: 15px; background: white; border: 2px solid #00b900; color: #00b900; border-radius: 30px; font-weight: 600; cursor: pointer; margin-top: 20px; }
         .btn-nav { display: block; text-align: center; background: #00b900; color: white; text-decoration: none; padding: 10px; border-radius: 10px; margin-top: 10px; font-weight: 600; }
     </style>
 </head>
@@ -36,29 +41,35 @@
 </nav>
 
 <div id="page-home" class="page active">
-    <header><h1>ไปไหนดี? (Painaidee)</h1><p>กวาดร้านเด็ด หมูกระทะ สตรีทฟู้ดให้ครบ!</p></header>
+    <header><h1>ไปไหนดี? (Painaidee)</h1><p>กวาดร้านเด็ด หมูกระทะ แจ๋วฮ้อน สตรีทฟู้ด</p></header>
     <div id="map"></div>
+
     <div class="search-area">
         <div class="input-group">
             <select id="provinceSelect" onchange="changeProvince()">
                 <option value="ubon">อุบลราชธานี</option>
                 <option value="sisaket">ศรีสะเกษ</option>
             </select>
-            <input type="text" id="searchBox" placeholder="🔍 ค้นช้าชื่อร้าน/เมนู (เช่น หมูกระทะ)..." style="width: 65%;" oninput="filterByBoth()">
+            <input type="text" id="searchBox" placeholder="🔍 ค้นหาชื่อร้าน/เมนู..." style="width: 65%;" oninput="filterByBoth()">
         </div>
         <div class="category-container">
             <div class="category-chip active" onclick="setCategory('all', this)">🌈 ทั้งหมด</div>
-            <div class="category-chip" onclick="setCategory('หมูกระทะ', this)">🥩 หมูกระทะ/แจ๋วฮ้อน</div>
+            <div class="category-chip" onclick="setCategory('หมูกระทะ', this)">🥩 หมูกระทะ</div>
             <div class="category-chip" onclick="setCategory('อาหารตามสั่ง', this)">🍳 ตามสั่ง</div>
             <div class="category-chip" onclick="setCategory('ก๋วยจั๊บ', this)">🍜 ก๋วยจั๊บ/เส้น</div>
             <div class="category-chip" onclick="setCategory('street food', this)">🍡 สตรีทฟู้ด</div>
         </div>
     </div>
-    <div id="placeList" class="place-grid"><p id="status-text" style="text-align:center; grid-column: 1/-1; padding: 40px;">กำลังกวาดข้อมูลร้านค้าใกล้ตัวคุณ...</p></div>
+
+    <div id="placeList" class="place-grid">
+        <p id="status-text" style="text-align:center; grid-column: 1/-1; padding: 40px;">กำลังกวาดข้อมูลร้านค้า...</p>
+    </div>
+    <button id="loadMoreBtn" class="btn-load" style="display:none;" onclick="loadMorePlaces()">🔍 โหลดร้านอร่อยเพิ่มอีก...</button>
 </div>
 
 <script>
-    let map, infoWindow, googlePlaces = [];
+    let map, infoWindow, service, nextPager;
+    let googlePlaces = [];
     let currentCategory = 'all';
     let markers = [];
     
@@ -75,50 +86,64 @@
     }
 
     async function initMap() {
-        const { Map, InfoWindow } = await google.maps.importLibrary("maps");
-        map = new Map(document.getElementById("map"), { center: locations.ubon, zoom: 15, mapId: "SCAN_ALL_STORES" });
-        infoWindow = new InfoWindow();
+        const ubon = locations.ubon;
+        map = new google.maps.Map(document.getElementById("map"), { center: ubon, zoom: 15 });
+        infoWindow = new google.maps.InfoWindow();
+        service = new google.maps.places.PlacesService(map);
         fetchPlaces('ubon');
     }
 
-    async function fetchPlaces(provKey) {
-        const { Place } = await google.maps.importLibrary("places");
+    function fetchPlaces(provKey) {
+        googlePlaces = []; // ล้างข้อมูลเก่า
         const center = locations[provKey];
         map.setCenter(center);
 
-        // --- เทคนิคกวาดร้าน: ดึงข้อมูลแบบกว้าง และใช้ Keyword ช่วย ---
+        // ดึงแบบกวาดกว้างที่สุด (Keyword Search)
         const request = {
-            fields: ["displayName", "location", "rating", "formattedAddress", "photos", "types", "id"],
-            locationRestriction: { center: center, radius: 5000 },
-            // ดึงหมดทุกอย่างที่อาจเป็นอาหาร
-            includedPrimaryTypes: ["restaurant", "meal_takeaway", "cafe", "bar", "food", "establishment", "bakery"],
-            maxResultCount: 20 
+            location: center,
+            radius: 5000,
+            type: ['restaurant', 'food', 'point_of_interest'] // กวาดทุกจุดที่น่าสนใจ
         };
 
-        try {
-            const { places } = await Place.searchNearby(request);
-            if (places) {
-                googlePlaces = places;
-                renderCards(places);
-                createMarkers(places);
+        service.nearbySearch(request, (results, status, pagination) => {
+            if (status === google.maps.places.PlacesServiceStatus.OK) {
+                googlePlaces = results;
+                renderCards(results);
+                createMarkers(results);
                 document.getElementById('status-text').style.display = 'none';
+                
+                // จัดการเรื่องปุ่มโหลดเพิ่ม
+                const btn = document.getElementById('loadMoreBtn');
+                if (pagination.hasNextPage) {
+                    btn.style.display = 'block';
+                    nextPager = pagination;
+                } else {
+                    btn.style.display = 'none';
+                }
             }
-        } catch (e) { console.error(e); }
+        });
+    }
+
+    function loadMorePlaces() {
+        if (nextPager) {
+            nextPager.nextPage();
+            // เมื่อโหลดมาใหม่ จะมาเข้า callback เดิมและ append ข้อมูล
+        }
     }
 
     function renderCards(places) {
         const list = document.getElementById('placeList');
         list.innerHTML = places.map(p => {
-            const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${p.location.lat()},${p.location.lng()}`;
+            const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${p.geometry.location.lat()},${p.geometry.location.lng()}`;
             return `
-            <div class="place-card" onclick="focusPlace('${p.id}')">
-                <img src="${p.photos ? p.photos[0].getURI({maxWidth: 400}) : 'https://via.placeholder.com/400x200?text=Painaidee+Food'}">
+            <div class="place-card" onclick="focusPlace('${p.place_id}')">
+                <img src="${p.photos ? p.photos[0].getUrl({maxWidth: 400}) : 'https://via.placeholder.com/400x200?text=Painaidee+Food'}">
                 <div class="place-info">
-                    <h3 style="margin:0; font-size:16px;">${p.displayName}</h3>
-                    <p style="font-size:12px; color:#666; margin:5px 0;">📍 ${p.formattedAddress.split(',')[0]}</p>
+                    <h3 style="margin:0; font-size:16px;">${p.name}</h3>
+                    <p style="font-size:12px; color:#666; margin:5px 0;">📍 ${p.vicinity}</p>
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                         <span style="color:#fbc02d; font-weight:bold;">⭐ ${p.rating || 'แนะนำ'}</span>
-                        <a href="${navUrl}" target="_blank" class="btn-nav" style="margin-top:0; padding:4px 12px;" onclick="event.stopPropagation()">นำทาง</a>
+                        <a href="${navUrl}" target="_blank" class="btn-nav" style="margin:0; padding:5px 12px;" onclick="event.stopPropagation()">นำทาง</a>
                     </div>
                 </div>
             </div>`;
@@ -129,9 +154,9 @@
         markers.forEach(m => m.setMap(null));
         markers = [];
         places.forEach(p => {
-            const marker = new google.maps.marker.AdvancedMarkerElement({ map, position: p.location, title: p.displayName });
+            const marker = new google.maps.Marker({ map, position: p.geometry.location, title: p.name });
             marker.addListener("click", () => {
-                infoWindow.setContent(`<strong>${p.displayName}</strong>`);
+                infoWindow.setContent(`<strong>${p.name}</strong>`);
                 infoWindow.open(map, marker);
             });
             p.markerRef = marker;
@@ -149,7 +174,7 @@
     function filterByBoth() {
         const val = document.getElementById('searchBox').value.toLowerCase();
         const filtered = googlePlaces.filter(p => {
-            const name = p.displayName.toLowerCase();
+            const name = p.name.toLowerCase();
             const matchSearch = name.includes(val);
             let matchCat = true;
             if (currentCategory !== 'all') {
@@ -162,8 +187,14 @@
 
     function changeProvince() { fetchPlaces(document.getElementById('provinceSelect').value); }
     function focusPlace(id) {
-        const p = googlePlaces.find(x => x.id === id);
-        if(p) { map.panTo(p.location); map.setZoom(17); infoWindow.setContent(`<strong>${p.displayName}</strong>`); infoWindow.open(map, p.markerRef); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        const p = googlePlaces.find(x => x.place_id === id);
+        if(p) { 
+            map.panTo(p.geometry.location); 
+            map.setZoom(17); 
+            infoWindow.setContent(`<strong>${p.name}</strong>`); 
+            infoWindow.open(map, p.markerRef); 
+            window.scrollTo({ top: 0, behavior: 'smooth' }); 
+        }
     }
     function checkAdminAccess() { if(prompt("Pass:") === "1234") switchPage('admin'); }
 </script>
