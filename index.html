@@ -157,6 +157,7 @@
                 <option value="ส้มตำ ยำ">ส้มตำ / ยำ</option>
                 <option value="คาเฟ่ ร้านกาแฟ">คาเฟ่ / ขนม</option>
                 <option value="บาร์ นั่งชิล">บาร์ / นั่งชิลล์</option>
+                <option value="สถานบันเทิง ผับ">สถานบันเทิง / ผับ</option>
                 <option value="แคมป์ปิ้ง ลานกางเต็นท์">แคมป์ปิ้ง</option>
             </select>
         </div>
@@ -230,6 +231,7 @@
                 <option value="ส้มตำ ยำ">ส้มตำ / ยำ</option>
                 <option value="คาเฟ่ ร้านกาแฟ">คาเฟ่ / ขนม</option>
                 <option value="บาร์ นั่งชิล">บาร์ / นั่งชิลล์</option>
+                <option value="สถานบันเทิง ผับ">สถานบันเทิง / ผับ</option>
                 <option value="แคมป์ปิ้ง ลานกางเต็นท์">แคมป์ปิ้ง</option>
             </select>
         </div>
@@ -278,7 +280,7 @@
             <input type="text" id="newStorePin" placeholder="รหัส PIN" style="flex: 1;">
         </div>
         <button class="btn-secondary" style="width: 100%;" onclick="createStoreAccount()">สร้างบัญชี</button>
-        <h4 style="margin-top: 25px; color:#FFF; font-weight:500;">ร้านที่ยืนยันแล้วในระบบ:</h4>
+        <h4 style="margin-top: 25px; color:var(--dark); font-weight:500;">ร้านที่ยืนยันแล้วในระบบ:</h4>
         <ul id="adminStoreList" class="price-list"></ul>
     </div>
 
@@ -294,7 +296,7 @@
             <input type="number" id="newServicePrice" placeholder="ราคา (฿)" style="width: 30%;">
         </div>
         <button class="btn-primary" onclick="addService()">เพิ่มแพ็กเกจ</button>
-        <h4 style="margin-top: 25px; color:#FFF; font-weight:500;">แพ็กเกจปัจจุบัน:</h4>
+        <h4 style="margin-top: 25px; color:var(--dark); font-weight:500;">แพ็กเกจปัจจุบัน:</h4>
         <ul id="adminServiceList" class="price-list"></ul>
     </div>
 
@@ -307,9 +309,6 @@
 </div>
 
 <script>
-    // --------------------------------------------------
-    // 1. ระบบจัดการข้อมูล LocalStorage
-    // --------------------------------------------------
     let rawData = localStorage.getItem('painaidee_auth');
     let appData = rawData ? JSON.parse(rawData) : {};
 
@@ -338,7 +337,6 @@
     }
 
     function renderUI() {
-        // แบนเนอร์หน้าแรก (พร้อมป้าย Tag หมวดหมู่)
         const banner = document.getElementById('promoBanner');
         const promoList = document.getElementById('approvedPromoList');
         if (appData.activePromotions.length > 0) {
@@ -362,7 +360,6 @@
             }).join('');
         } else { banner.style.display = 'none'; }
 
-        // คำขอโปรโมชั่น (แอดมิน)
         const promoReqList = document.getElementById('adminPromoRequests');
         if(appData.pendingPromotions.length > 0) {
             promoReqList.innerHTML = appData.pendingPromotions.map(p => {
@@ -381,7 +378,6 @@
             }).join('');
         } else { promoReqList.innerHTML = '<p style="color:var(--text-muted); font-size:14px; text-align:center;">ไม่มีโปรโมชั่นรอตรวจสอบ</p>'; }
 
-        // คำขอลงทะเบียนร้านค้า (แอดมิน)
         const reqList = document.getElementById('adminRegistrationRequests');
         if(appData.registrationRequests.length > 0) {
             reqList.innerHTML = appData.registrationRequests.map(req => {
@@ -403,14 +399,12 @@
             }).join('');
         } else { reqList.innerHTML = '<p style="color:var(--text-muted); font-size:14px; text-align:center;">ไม่มีคำขอใหม่</p>'; }
 
-        // ร้านที่อนุมัติแล้ว
         document.getElementById('adminStoreList').innerHTML = appData.registeredStores.length > 0 ? 
             appData.registeredStores.map(s => `
                 <li><span><b style="color:var(--primary);">${s.name}</b> <br><small style="color:var(--text-muted);">PIN: <span style="color:var(--primary-light); font-weight:600;">${s.pin}</span></small></span>
                 <button class="btn-danger" style="padding:5px 12px; font-size:12px;" onclick="deleteStore(${s.id})">ลบ</button></li>`).join('') 
             : '<li style="color:var(--text-muted); font-size:14px; text-align:center;">ยังไม่มีร้านในระบบ</li>';
 
-        // โปรโมชั่นที่กำลังแสดง
         document.getElementById('activePromoList').innerHTML = appData.activePromotions.length > 0 ? 
             appData.activePromotions.map(p => {
                 const imgTag = p.image ? `<img src="${p.image}" class="clickable-img" style="width:65px; height:65px; object-fit:cover; border-radius:8px; margin-right:15px; border:1px solid var(--border); border-color:var(--primary);" onclick="openImageViewer('${p.image}', event)">` : '';
@@ -427,7 +421,6 @@
                 </li>`;
             }).join('') : '<li style="color:var(--text-muted); font-size:14px; text-align:center;">ยังไม่มีโปรโมชั่น</li>';
 
-        // อัปเดตราคาแพ็กเกจ
         const serviceSelect = document.getElementById('promoServiceSelect');
         const adminServList = document.getElementById('adminServiceList');
         adminServList.innerHTML = '';
@@ -446,7 +439,6 @@
         }
     }
 
-    // --- จัดการแพ็กเกจ ---
     function addService() {
         const name = document.getElementById('newServiceName').value.trim();
         const price = document.getElementById('newServicePrice').value.trim();
