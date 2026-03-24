@@ -1,42 +1,103 @@
-// 1. ข้อมูลสถานที่ (รวมเป็นชุดเดียว)
-const places = [
-    { id: 1, name: "G2 Snooker", type: "Sport", image: "g2.jpg", desc: "สนุกเกอร์คลับระดับพรีเมียมในอุบล" },
-    { id: 2, name: "Larn Sook Camp", type: "Camping", image: "camp.jpg", desc: "ลานกางเต็นท์ บรรยากาศดี ดนตรีสด" },
-    { id: 3, name: "AutoGlow Ubon", type: "Service", image: "car.jpg", desc: "ศูนย์ดูแลรถยนต์ครบวงจร" },
-    { id: 4, name: "Master Maid", type: "Service", image: "https://via.placeholder.com/300x180?text=Master+Maid", desc: "บริการทำความสะอาดมืออาชีพ" }
-];
+/**
+ * โปรเจกต์: ไปไหนดี (Painaidee)
+ * ฟังก์ชัน: ดึงข้อมูลร้านอาหาร/ร้านนั่งชิลล์ จาก Google Maps API
+ */
 
-// ดึง Element จาก HTML
-const placeList = document.getElementById('placeList');
-const searchInput = document.getElementById('searchInput');
+let map;
+let service;
+let infowindow;
+let allPlaces = []; // เก็บข้อมูลร้านทั้งหมดที่ดึงมาได้เพื่อใช้ในการค้นหา (Search)
 
-// 2. ฟังก์ชันแสดงผลการ์ด (ใส่ data เข้าไปเพื่อให้กรองข้อมูลได้)
-function displayPlaces(dataToShow) {
-    if (!placeList) return; // กัน Error ถ้าหา Element ไม่เจอ
+/**
+ * 1. ฟังก์ชันเริ่มต้นแผนที่
+ */
+function initMap() {
+    // กำหนดพิกัดเริ่มต้น (ตัวอย่าง: ตัวเมืองอุบลราชธานี)
+    const ubonCoord = new google.maps.LatLng(15.2287, 104.8564);
 
-    placeList.innerHTML = dataToShow.map(place => `
-        <div class="card">
-            <img src="${place.image || place.img}" alt="${place.name}" onerror="this.src='https://via.placeholder.com/300x180?text=No+Image'">
-            <div class="card-content">
-                <h3>${place.name}</h3>
-                <span class="tag">${place.type}</span>
-                <p>${place.desc}</p>
-            </div>
-        </div>
-    `).join('');
-}
-
-// 3. ระบบค้นหา (กรองจากชื่อ หรือ ประเภท)
-if (searchInput) {
-    searchInput.addEventListener('input', (e) => {
-        const term = e.target.value.toLowerCase();
-        const filtered = places.filter(p => 
-            p.name.toLowerCase().includes(term) || 
-            p.type.toLowerCase().includes(term)
-        );
-        displayPlaces(filtered);
+    // สร้างแผนที่
+    map = new google.maps.Map(document.getElementById("map"), {
+        center: ubonCoord,
+        zoom: 15,
+        mapTypeControl: false // ปิดปุ่มเปลี่ยนประเภทแผนที่เพื่อความสะอาด
     });
+
+    // ตั้งค่าคำขอข้อมูล (ค้นหาร้านอาหาร, บาร์, คาเฟ่ ในรัศมี 3 กม.)
+    const request = {
+        location: ubonCoord,
+        radius: '3000', 
+        type: ['restaurant', 'bar', 'cafe']
+    };
+
+    infowindow = new google.maps.InfoWindow();
+    service = new google.maps.places.PlacesService(map);
+    
+    // เรียกใช้คำขอค้นหาสถานที่รอบข้าง
+    service.nearbySearch(request, callback);
 }
 
-// 4. สั่งให้แสดงผลครั้งแรกทันทีที่โหลดหน้าเว็บ
-displayPlaces(places);
+/**
+ * 2. ฟังก์ชัน Callback เมื่อได้รับข้อมูลจาก Google
+ */
+function callback(results, status) {
+    if (status === google.maps.places.PlacesServiceStatus.OK) {
+        allPlaces = results; // บันทึกข้อมูลเข้าตัวแปรหลัก
+        renderPlaces(results); // แสดงผลรายการการ์ด
+        
+        // ปักหมุด (Marker) ทุกร้านลงบนแผนที่
+        for (let i = 0; i < results.length; i++) {
+            createMarker(results[i]);
+        }
+    } else {
+        console.error("Google Places Service Error:", status);
+    }
+}
+
+/**
+ * 3. ฟังก์ชันสร้างการ์ดรายการ (Card) แสดงผลด้านล่างแผนที่
+ */
+function renderPlaces(places) {
+    const listDiv = document.getElementById('placeList');
+    if (!listDiv) return;
+
+    if (places.length === 0) {
+        listDiv.innerHTML = '<p style="text-align:center; width:100%;">ไม่พบสถานที่ที่ระบุ...</p>';
+        return;
+    }
+
+    listDiv.innerHTML = places.map(p => {
+        // ดึงรูปภาพ (ถ้าไม่มีให้ใช้รูปสำรอง)
+        const photoUrl = p.photos ? p.photos[0].getUrl({ maxWidth: 400, maxHeight: 250 }) : 'https://via.placeholder.com/300x180?text=No+Image';
+        
+        // เช็กว่าเป็นร้านประเภทไหน (นั่งชิลล์ หรือ ร้านอาหาร)
+        const isBar = p.types.includes('bar') || p.types.includes('night_club');
+        const tagLabel = isBar ? '🍺 ร้านนั่งชิลล์' : '🍽️ ร้านอาหาร/คาเฟ่';
+
+        return `
+            <div class="card" onclick="focusMap(${p.geometry.location.lat()}, ${p.geometry.location.lng()})">
+                <img src="${photoUrl}" alt="${p.name}">
+                <div class="card-info">
+                    <h3>${p.name}</h3>
+                    <p class="rating">⭐ ${p.rating || 'N/A'} (${p.user_ratings_total || 0} รีวิว)</p>
+                    <p>📍 ${p.vicinity}</p>
+                    <span class="tag">${tagLabel}</span>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+/**
+ * 4. ฟังก์ชันสร้างหมุด (Marker) บนแผนที่
+ */
+function createMarker(place) {
+    const marker = new google.maps.Marker({
+        map,
+        position: place.geometry.location,
+        title: place.name
+    });
+
+    // เมื่อคลิกที่หมุด ให้แสดงชื่อร้าน
+    google.maps.event.addListener(marker, "click", () => {
+        infowindow.setContent(`<strong>${place.name}</strong><br>${place.vicinity}`);
+        infow
