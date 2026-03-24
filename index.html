@@ -3,141 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ไปไหนดี - Painaidee</title>
+    <title>ไปไหนดี - Painaidee (Partner Mode)</title>
     
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBHY6nSriufUS2NKndb88lKnNEvAJ2-ukc&libraries=places"></script>
 
     <style>
-        /* ส่วนตกแต่งหน้าจอ (CSS) */
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap');
+        body { font-family: 'Kanit', sans-serif; margin: 0; background-color: #f0f2f5; }
+        header { background: #00b900; color: white; padding: 20px; text-align: center; }
+        #map { width: 100%; height: 300px; }
+        .container { padding: 20px; max-width: 800px; margin: 0 auto; }
         
-        body { font-family: 'Kanit', sans-serif; margin: 0; background-color: #f7f9fc; color: #333; }
-        header { background: #00b900; color: white; padding: 25px 20px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        header h1 { margin: 0; font-size: 28px; }
+        /* สไตล์ฟอร์มเจ้าของร้าน */
+        .partner-section { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 30px; border: 2px solid #00b900; }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; }
+        input, select, textarea { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ddd; box-sizing: border-box; font-family: 'Kanit'; }
         
-        #map { width: 100%; height: 380px; background-color: #ddd; border-bottom: 3px solid #00b900; }
+        .btn-pay { width: 100%; padding: 15px; background: #00b900; color: white; border: none; border-radius: 30px; font-size: 18px; font-weight: 600; cursor: pointer; transition: 0.3s; }
+        .btn-pay:hover { background: #009800; }
+
+        /* ส่วนแสดง QR Code */
+        #qrcode-container { text-align: center; display: none; margin-top: 20px; padding: 20px; border: 1px dashed #ccc; border-radius: 15px; }
+        #qrcode-img { max-width: 250px; margin-bottom: 10px; }
         
-        .container { padding: 20px; max-width: 1200px; margin: 0 auto; }
-        .search-box { width: 100%; padding: 15px 20px; border-radius: 30px; border: 2px solid #eee; margin-bottom: 25px; box-sizing: border-box; font-size: 16px; outline: none; transition: 0.3s; }
-        .search-box:focus { border-color: #00b900; box-shadow: 0 0 10px rgba(0,185,0,0.1); }
-        
-        .place-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
-        .card { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); transition: 0.3s; cursor: pointer; }
-        .card:hover { transform: translateY(-8px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        .card img { width: 100%; height: 200px; object-fit: cover; }
-        .card-info { padding: 18px; }
-        .card-info h3 { margin: 0 0 8px 0; font-size: 19px; color: #222; }
-        .card-info p { margin: 4px 0; color: #777; font-size: 14px; display: flex; align-items: center; }
-        .rating { color: #f1c40f; font-weight: 600; font-size: 15px; margin-bottom: 10px !important; }
-        .tag { display: inline-block; background: #f0fff0; color: #00b900; padding: 5px 12px; border-radius: 12px; font-size: 13px; font-weight: 600; margin-top: 10px; }
+        .place-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .card { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .card img { width: 100%; height: 150px; object-fit: cover; }
+        .card-info { padding: 15px; }
+        .premium-badge { background: gold; color: black; padding: 2px 8px; border-radius: 5px; font-size: 12px; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <header>
     <h1>ไปไหนดี? (Painaidee)</h1>
-    <p>รวมร้านกิน-ดื่ม ในจังหวัดอุบลราชธานี</p>
+    <p>ค้นหา หรือ โปรโมทธุรกิจของคุณในอุบลฯ</p>
 </header>
 
 <div id="map"></div>
 
 <div class="container">
-    <input type="text" id="searchInput" class="search-box" placeholder="🔍 ค้นหาชื่อร้านอาหาร หรือ ร้านนั่งชิลล์...">
-    
-    <div id="placeList" class="place-list">
-        <p style="text-align:center; width:100%;">กำลังโหลดข้อมูลจาก Google...</p>
+    <div class="partner-section">
+        <h3>📢 ระบบเจ้าของร้าน (Partner)</h3>
+        <p style="font-size: 14px; color: #666;">อัปเดตโปรโมชั่น หรือ ดันขึ้น Top 10 อัตโนมัติ</p>
+        
+        <div class="input-group">
+            <label>เลือกแพ็กเกจ</label>
+            <select id="package" onchange="updateAmount()">
+                <option value="50">อัปเดตโปรโมชั่น (50 บาท)</option>
+                <option value="300">โฆษณา Top 10 รายเดือน (300 บาท)</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label>ชื่อร้าน (ต้องตรงกับใน Google Maps)</label>
+            <input type="text" id="storeName" placeholder="ระบุชื่อร้านของคุณ">
+        </div>
+
+        <div class="input-group">
+            <label>ข้อความโปรโมชั่น / รายละเอียดโฆษณา</label>
+            <textarea id="promoDetails" rows="3" placeholder="เช่น ลด 10% เมื่อเช็คอิน..."></textarea>
+        </div>
+
+        <button class="btn-pay" onclick="generatePayment()">ยืนยันและชำระเงิน <span id="displayAmount">50</span> บาท</button>
+
+        <div id="qrcode-container">
+            <h4>สแกนชำระเงินผ่าน PromptPay</h4>
+            <img id="qrcode-img" src="" alt="PromptPay QR Code">
+            <p>ยอดชำระ: <strong id="payAmount">0</strong> บาท</p>
+            <p style="color: red; font-size: 12px;">*เมื่อโอนแล้ว ระบบจะอัปเดตข้อมูลภายใน 5-10 นาที</p>
+        </div>
     </div>
+
+    <hr>
+    <h3>📍 ร้านค้าแนะนำในพื้นที่</h3>
+    <div id="placeList" class="place-list"></div>
 </div>
 
 <script>
-    // ส่วนควบคุมระบบ (JavaScript)
     let map;
     let service;
-    let infowindow;
-    let allPlaces = [];
-
-    function initMap() {
-        // พิกัดเริ่มต้น: จ.อุบลราชธานี
-        const ubonLocation = { lat: 15.2287, lng: 104.8564 };
-
-        map = new google.maps.Map(document.getElementById("map"), {
-            center: ubonLocation,
-            zoom: 15,
-            mapTypeControl: false,
-            streetViewControl: false
-        });
-
-        const request = {
-            location: ubonLocation,
-            radius: '3500', // รัศมี 3.5 กิโลเมตร
-            type: ['restaurant', 'bar', 'cafe']
-        };
-
-        infowindow = new google.maps.InfoWindow();
-        service = new google.maps.places.PlacesService(map);
-        service.nearbySearch(request, callback);
+    
+    function updateAmount() {
+        const amt = document.getElementById('package').value;
+        document.getElementById('displayAmount').innerText = amt;
     }
 
-    function callback(results, status) {
-        if (status === google.maps.places.PlacesServiceStatus.OK) {
-            allPlaces = results;
-            renderPlaces(results);
-            for (let i = 0; i < results.length; i++) {
-                createMarker(results[i]);
+    function generatePayment() {
+        const amount = document.getElementById('package').value;
+        const store = document.getElementById('storeName').value;
+        
+        if(!store) { alert('กรุณาระบุชื่อร้าน'); return; }
+
+        // สร้าง QR Code PromptPay (ตัวอย่างใช้หมายเลขพร้อมเพย์ของคุณ)
+        // หมายเหตุ: ต้องเปลี่ยน 0812345678 เป็นหมายเลขพร้อมเพย์จริงของคุณ
+        const myPromptPay = "0812345678"; 
+        const qrUrl = `https://promptpay.io/${myPromptPay}/${amount}.png`;
+        
+        document.getElementById('qrcode-img').src = qrUrl;
+        document.getElementById('payAmount').innerText = amount;
+        document.getElementById('qrcode-container').style.display = 'block';
+        
+        // เลื่อนจอลงมาดู QR Code
+        document.getElementById('qrcode-container').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function initMap() {
+        const ubon = { lat: 15.2287, lng: 104.8564 };
+        map = new google.maps.Map(document.getElementById("map"), { center: ubon, zoom: 15 });
+
+        const request = { location: ubon, radius: '3000', type: ['restaurant', 'bar'] };
+        service = new google.maps.places.PlacesService(map);
+        service.nearbySearch(request, (results, status) => {
+            if (status === google.maps.places.PlacesServiceStatus.OK) {
+                renderPlaces(results);
             }
-        } else {
-            document.getElementById('placeList').innerHTML = '<p>เกิดข้อผิดพลาดในการโหลดข้อมูลจาก Google</p>';
-        }
+        });
     }
 
     function renderPlaces(places) {
         const listDiv = document.getElementById('placeList');
-        if (places.length === 0) {
-            listDiv.innerHTML = '<p>ไม่พบสถานที่ที่คุณค้นหา</p>';
-            return;
-        }
-
-        listDiv.innerHTML = places.map(p => {
-            const photo = p.photos ? p.photos[0].getUrl({maxWidth: 400}) : 'https://via.placeholder.com/400x250?text=No+Image';
-            const isBar = p.types.includes('bar') || p.types.includes('night_club');
-            
-            return `
-                <div class="card" onclick="focusOnMap(${p.geometry.location.lat()}, ${p.geometry.location.lng()})">
-                    <img src="${photo}" alt="${p.name}">
-                    <div class="card-info">
-                        <h3>${p.name}</h3>
-                        <p class="rating">⭐ ${p.rating || 'N/A'} (${p.user_ratings_total || 0} รีวิว)</p>
-                        <p>📍 ${p.vicinity}</p>
-                        <span class="tag">${isBar ? '🍺 ร้านนั่งชิลล์ / บาร์' : '🍽️ ร้านอาหาร / คาเฟ่'}</span>
-                    </div>
+        listDiv.innerHTML = places.map(p => `
+            <div class="card">
+                <img src="${p.photos ? p.photos[0].getUrl() : 'https://via.placeholder.com/300x150'}" alt="${p.name}">
+                <div class="card-info">
+                    <h3>${p.name}</h3>
+                    <p>⭐ ${p.rating || 'N/A'}</p>
+                    <p>📍 ${p.vicinity}</p>
                 </div>
-            `;
-        }).join('');
+            </div>
+        `).join('');
     }
-
-    function createMarker(place) {
-        const marker = new google.maps.Marker({
-            map,
-            position: place.geometry.location,
-        });
-
-        google.maps.event.addListener(marker, "click", () => {
-            infowindow.setContent(`<strong>${place.name}</strong><br>${place.vicinity}`);
-            infowindow.open(map, marker);
-        });
-    }
-
-    function focusOnMap(lat, lng) {
-        map.setCenter({ lat, lng });
-        map.setZoom(18);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    document.getElementById('searchInput').addEventListener('input', (e) => {
-        const term = e.target.value.toLowerCase();
-        const filtered = allPlaces.filter(p => p.name.toLowerCase().includes(term));
-        renderPlaces(filtered);
-    });
 
     window.onload = initMap;
 </script>
