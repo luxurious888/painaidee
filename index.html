@@ -7,106 +7,109 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap');
         
-        /* 🎨 กำหนดตัวแปรสีระดับพรีเมียม */
+        /* 🎨 กำหนดตัวแปรสีระดับพรีเมียม ดำทอง */
         :root {
             --primary: #C5A059;       /* สีทองแชมเปญ */
+            --primary-light: #DFBF8B; /* สีทองอ่อน */
             --primary-hover: #AF8B48; /* สีทองเข้ม */
-            --dark: #1A1C20;          /* สีดำชาร์โคล */
-            --dark-light: #2A2D34;    /* สีเทาเข้ม */
-            --bg-light: #F8F9FA;      /* สีพื้นหลังสว่าง */
-            --surface: #FFFFFF;       /* สีพื้นผิวการ์ด */
-            --border: #E0E4E8;        /* สีเส้นขอบ */
-            --text-main: #222222;     /* สีข้อความหลัก */
-            --text-muted: #777777;    /* สีข้อความรอง */
-            --danger: #D9534F;        /* สีแดงแบบนุ่มนวล */
+            --dark: #121418;          /* สีดำออบซิเดียนหลัก */
+            --dark-light: #1A1D23;    /* สีดำชาร์โคล */
+            --dark-muted: #2A2E36;    /* สีเทาเข้ม */
+            --bg-light: #121418;      /* สีพื้นหลังสว่าง (เปลี่ยนเป็นดำ) */
+            --surface: #1A1D23;       /* สีพื้นผิวการ์ด */
+            --border: rgba(197, 160, 89, 0.2); /* สีเส้นขอบทองจางๆ */
+            --text-main: #FFFFFF;     /* สีข้อความหลัก */
+            --text-gold: #C5A059;     /* สีข้อความทองหลัก */
+            --text-muted: #999999;    /* สีข้อความรอง */
+            --danger: #D9534F;        /* สีแดง */
         }
 
-        body { font-family: 'Kanit', sans-serif; margin: 0; background-color: var(--bg-light); padding-bottom: 50px; color: var(--text-main); }
+        body { font-family: 'Kanit', sans-serif; margin: 0; background-color: var(--bg-light); padding-bottom: 50px; color: var(--text-gold); }
         
         /* 🌟 เมนูนำทาง (Navigation) */
-        nav { display: flex; justify-content: space-around; background: var(--surface); padding: 10px 0; position: sticky; top: 0; z-index: 2000; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
-        nav div { cursor: pointer; font-weight: 500; color: var(--text-muted); padding: 12px 20px; transition: 0.3s; position: relative; }
+        nav { display: flex; justify-content: space-around; background: var(--surface); padding: 12px 0; position: sticky; top: 0; z-index: 2000; box-shadow: 0 4px 20px rgba(0,0,0,0.1); border-bottom: 1px solid var(--border); }
+        nav div { cursor: pointer; font-weight: 500; color: var(--text-muted); padding: 12px 20px; transition: 0.3s; position: relative; letter-spacing: 0.5px; }
         nav div.active { color: var(--primary); font-weight: 600; }
-        nav div.active::after { content: ''; position: absolute; bottom: 0; left: 15%; width: 70%; height: 3px; background: var(--primary); border-radius: 3px 3px 0 0; }
+        nav div.active::after { content: ''; position: absolute; bottom: 0; left: 15%; width: 70%; height: 3px; background: var(--primary); border-radius: 3px 3px 0 0; box-shadow: 0 -3px 10px rgba(197, 160, 89, 0.5); }
 
         /* 🌟 ส่วนหัว (Header) */
-        header { background: var(--dark); color: var(--surface); padding: 30px 20px; text-align: center; border-radius: 0 0 24px 24px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(26, 28, 32, 0.15); }
+        header { background: var(--dark); color: var(--surface); padding: 30px 20px; text-align: center; border-radius: 0 0 24px 24px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(26, 28, 32, 0.3); border: 1px solid var(--border); border-top: none; }
         header h1 { margin: 0; color: var(--primary); font-weight: 600; letter-spacing: 1px; }
-        header p { margin: 5px 0 0 0; font-weight: 300; opacity: 0.8; font-size: 14px; }
+        header p { margin: 8px 0 0 0; font-weight: 300; opacity: 0.8; font-size: 14px; color: #FFF; }
 
         .page { display: none; padding: 15px; max-width: 900px; margin: 0 auto; animation: fadeIn 0.4s ease; }
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
         /* 🌟 แผนที่และกล่องค้นหา */
-        #map { width: 100%; height: 320px; border-radius: 16px; border: 1px solid var(--border); background: #eee; box-shadow: 0 8px 25px rgba(0,0,0,0.04); }
-        .search-area { background: var(--surface); padding: 20px; border-radius: 16px; margin-top: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.03); border: 1px solid var(--border); }
+        #map { width: 100%; height: 320px; border-radius: 16px; border: 1px solid var(--border); background: #eee; box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
+        .search-area { background: var(--surface); padding: 25px; border-radius: 16px; margin-top: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); border: 1px solid var(--border); }
         .input-row { display: flex; gap: 12px; margin-bottom: 12px; }
         
         select, input[type="text"], input[type="password"], input[type="number"], input[type="file"], textarea { 
-            padding: 14px; border-radius: 10px; border: 1px solid var(--border); font-family: 'Kanit'; font-size: 15px; outline: none; box-sizing: border-box; width: 100%; background: #FCFCFC; transition: 0.3s; color: var(--text-main);
+            padding: 14px; border-radius: 10px; border: 1px solid var(--border); font-family: 'Kanit'; font-size: 15px; outline: none; box-sizing: border-box; width: 100%; background: rgba(0,0,0,0.2); transition: 0.3s; color: var(--text-gold);
         }
-        select:focus, input:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(197, 160, 89, 0.1); background: var(--surface); }
+        select:focus, input:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(197, 160, 89, 0.15); background: rgba(0,0,0,0.3); }
         .input-row select { flex: 1; width: 50%; }
         
         .search-box-container { display: flex; gap: 12px; width: 100%; }
 
         /* 🌟 ปุ่มกด (Buttons) */
-        .btn-primary { padding: 14px 24px; background: var(--primary); color: white; border: none; border-radius: 10px; font-family: 'Kanit'; font-weight: 500; font-size: 15px; cursor: pointer; transition: 0.3s; white-space: nowrap; width: 100%; letter-spacing: 0.5px; }
-        .btn-primary:hover { background: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(197, 160, 89, 0.3); }
+        .btn-primary { padding: 14px 24px; background: var(--primary); color: white; border: none; border-radius: 10px; font-family: 'Kanit'; font-weight: 500; font-size: 15px; cursor: pointer; transition: 0.3s; white-space: nowrap; width: 100%; letter-spacing: 0.5px; box-shadow: 0 4px 10px rgba(197, 160, 89, 0.3); }
+        .btn-primary:hover { background: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(197, 160, 89, 0.5); }
         
-        .btn-secondary { background: var(--dark); color: white; padding: 12px 15px; border-radius: 10px; border: none; cursor: pointer; font-family: 'Kanit'; font-weight: 500; text-decoration: none; display: inline-block; text-align: center; transition: 0.3s; }
-        .btn-secondary:hover { background: var(--dark-light); transform: translateY(-2px); }
+        .btn-secondary { background: var(--dark); color: var(--primary); padding: 12px 15px; border-radius: 10px; border: 1px solid var(--primary); cursor: pointer; font-family: 'Kanit'; font-weight: 500; text-decoration: none; display: inline-block; text-align: center; transition: 0.3s; }
+        .btn-secondary:hover { background: var(--primary); color: white; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(197, 160, 89, 0.3); }
         
         .btn-danger { background: var(--danger); color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-family: 'Kanit'; transition: 0.2s; }
         .btn-danger:hover { background: #C9302C; }
         
-        .btn-outline { background: transparent; color: var(--dark); border: 1px solid var(--border); padding: 10px 15px; border-radius: 10px; cursor: pointer; font-family: 'Kanit'; font-weight: 500; transition: 0.3s; }
-        .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+        .btn-outline { background: transparent; color: var(--text-main); border: 1px solid var(--border); padding: 10px 15px; border-radius: 10px; cursor: pointer; font-family: 'Kanit'; font-weight: 500; transition: 0.3s; }
+        .btn-outline:hover { border-color: var(--primary); color: var(--primary); background: rgba(197, 160, 89, 0.1); }
 
         /* 🌟 การ์ดร้านค้า (Place Cards) */
         .place-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; margin-top: 24px; }
-        .place-card { background: var(--surface); border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.02); transition: 0.4s; cursor: pointer; position: relative; display: flex; flex-direction: column; }
-        .place-card:hover { transform: translateY(-6px); box-shadow: 0 15px 40px rgba(197, 160, 89, 0.15); border-color: rgba(197, 160, 89, 0.3); }
-        .place-card img { width: 100%; height: 180px; object-fit: cover; background-color: #F0F0F0; }
+        .place-card { background: var(--surface); border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid rgba(197,160,89,0.15); transition: 0.4s; cursor: pointer; position: relative; display: flex; flex-direction: column; }
+        .place-card:hover { transform: translateY(-6px); box-shadow: 0 15px 40px rgba(197, 160, 89, 0.25); border-color: rgba(197, 160, 89, 0.5); }
+        .place-card img { width: 100%; height: 180px; object-fit: cover; background-color: var(--dark-muted); }
         .place-info { padding: 20px; display: flex; flex-direction: column; flex-grow: 1; }
         
-        .distance-badge { position: absolute; top: 15px; right: 15px; background: rgba(26, 28, 32, 0.85); color: var(--primary); padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; backdrop-filter: blur(5px); border: 1px solid rgba(197, 160, 89, 0.2); }
+        .distance-badge { position: absolute; top: 15px; right: 15px; background: rgba(26, 28, 32, 0.9); color: var(--primary-light); padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; backdrop-filter: blur(5px); border: 1px solid rgba(197, 160, 89, 0.3); box-shadow: 0 3px 10px rgba(0,0,0,0.2); }
         
         .action-buttons { display: flex; gap: 10px; margin-top: auto; padding-top: 15px; }
         .btn-action { flex: 1; text-align: center; color: white; text-decoration: none; padding: 10px 5px; border-radius: 10px; font-weight: 500; font-size: 13px; transition: 0.3s; border: none; cursor: pointer; font-family: 'Kanit'; }
-        .btn-nav { background: var(--dark); color: var(--primary); border: 1px solid var(--dark); }
+        .btn-nav { background: var(--dark-muted); color: var(--surface); border: 1px solid var(--border); }
         .btn-nav:hover { background: var(--primary); color: white; border-color: var(--primary); }
         .btn-call { background: var(--primary); color: white; }
         .btn-call:hover { background: var(--primary-hover); }
-        .btn-share { background: transparent; color: var(--text-main); border: 1px solid var(--border); }
-        .btn-share:hover { background: #f0f0f0; }
+        .btn-share { background: transparent; color: var(--text-gold); border: 1px solid var(--border); }
+        .btn-share:hover { background: rgba(197, 160, 89, 0.1); }
 
         /* 🌟 แบนเนอร์พรีเมียม (Highlight Banner) */
-        .highlight-banner { background: linear-gradient(135deg, var(--dark), var(--dark-light)); color: white; padding: 25px; border-radius: 16px; margin-top: 24px; box-shadow: 0 15px 35px rgba(26, 28, 32, 0.2); display: none; position: relative; overflow: hidden; }
-        .highlight-banner::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(197,160,89,0.1) 0%, transparent 60%); pointer-events: none; }
+        .highlight-banner { background: linear-gradient(135deg, var(--dark), var(--dark-light)); color: white; padding: 25px; border-radius: 16px; margin-top: 24px; box-shadow: 0 15px 35px rgba(26, 28, 32, 0.4); display: none; position: relative; overflow: hidden; border: 1px solid var(--border); }
+        .highlight-banner::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(197,160,89,0.15) 0%, transparent 60%); pointer-events: none; }
         .highlight-banner h3 { margin: 0 0 5px 0; font-size: 20px; color: var(--primary); font-weight: 500; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
 
         /* 🌟 การ์ดแอดมิน / ร้านค้า */
-        .dashboard-card { background: var(--surface); padding: 25px; border-radius: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.03); margin-bottom: 24px; border: 1px solid var(--border); }
-        .dashboard-card h3 { margin-top: 0; color: var(--dark); border-bottom: 2px solid var(--border); padding-bottom: 12px; font-weight: 500; }
+        .dashboard-card { background: var(--surface); padding: 25px; border-radius: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); margin-bottom: 24px; border: 1px solid var(--border); }
+        .dashboard-card h3 { margin-top: 0; color: var(--primary-light); border-bottom: 2px solid var(--border); padding-bottom: 12px; font-weight: 500; }
         .dashboard-card h3 span { color: var(--primary); }
         
         .form-group { margin-bottom: 18px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px; color: var(--dark); }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px; color: #FFF; }
         
         .price-list { list-style: none; padding: 0; margin: 0; }
         .price-list li { display: flex; justify-content: space-between; padding: 15px 10px; border-bottom: 1px solid var(--border); align-items: center; transition: 0.2s; }
-        .price-list li:hover { background: var(--bg-light); border-radius: 8px; }
-        .status-tag { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; white-space: nowrap; }
+        .price-list li:hover { background: rgba(197, 160, 89, 0.05); border-radius: 8px; }
+        .status-tag { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; white-space: nowrap; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
 
         /* 🌟 Popup ขยายภาพ */
-        .img-modal { display: none; position: fixed; z-index: 9999; padding-top: 50px; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(26,28,32,0.9); backdrop-filter: blur(8px); }
-        .img-modal-content { margin: auto; display: block; max-width: 90%; max-height: 80vh; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); object-fit: contain; border: 2px solid rgba(197, 160, 89, 0.3); }
+        .img-modal { display: none; position: fixed; z-index: 9999; padding-top: 50px; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(18, 20, 24, 0.95); backdrop-filter: blur(8px); }
+        .img-modal-content { margin: auto; display: block; max-width: 90%; max-height: 80vh; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); object-fit: contain; border: 2px solid var(--primary-light); }
         .img-modal-close { position: absolute; top: 20px; right: 35px; color: var(--primary); font-size: 40px; font-weight: 300; cursor: pointer; transition: 0.3s; }
-        .img-modal-close:hover { color: #FFF; transform: scale(1.1); }
-        .clickable-img { cursor: pointer; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .clickable-img:hover { opacity: 0.85; transform: scale(1.05); box-shadow: 0 8px 20px rgba(197, 160, 89, 0.3); border-color: var(--primary) !important; }
+        .img-modal-close:hover { color: #FFF; transform: scale(1.1); text-shadow: 0 0 10px var(--primary); }
+        .clickable-img { cursor: pointer; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-color: var(--primary); }
+        .clickable-img:hover { opacity: 0.85; transform: scale(1.05); box-shadow: 0 8px 20px rgba(197, 160, 89, 0.4); border-color: var(--primary) !important; }
     </style>
 </head>
 <body>
@@ -119,6 +122,13 @@
 
 <div id="page-home" class="page active">
     <header>
+        <div style="margin: 0 auto 15px; display: flex; justify-content: center;">
+            <div style="width:100px; height:100px; border-radius:50%; background:var(--surface); border: 2px solid var(--primary); box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: flex; flex-direction: column; align-items:center; justify-content:center; padding: 10px; position:relative; overflow:hidden;">
+                <p style="margin: 0; color:var(--text-gold); font-family: 'Kanit'; font-weight: 600; font-size: 18px; line-height: 1.1; font-style: italic; letter-spacing: 0.5px;">ไป<br>ไหนดี</p>
+                <div style="width: 25px; height:2px; background:var(--primary); margin: 3px 0;"></div>
+                <p style="margin: 0; color:#FFF; font-size: 10px; font-weight: 300; letter-spacing: 1px;">PAINAIDEE</p>
+            </div>
+        </div>
         <h1>ไปไหนดี</h1>
         <p>ค้นหาร้านอาหารและสถานที่น่าสนใจทั่วไทย</p>
     </header>
@@ -162,7 +172,7 @@
 
 <div id="page-partner" class="page">
     
-    <div class="dashboard-card" style="border-top: 3px solid var(--primary);">
+    <div class="dashboard-card" style="border-top: 3px solid var(--primary); border-bottom: 3px solid var(--primary);">
         <h3 style="border:none;">ลงทะเบียนร้านค้าใหม่</h3>
         <p style="font-size: 14px; color: var(--text-muted);">ส่งเอกสารให้แอดมินตรวจสอบ เพื่อรับ "รหัสลับ (Store PIN)"</p>
         
@@ -226,7 +236,7 @@
 
 <div id="page-admin" class="page">
 
-    <div class="dashboard-card" style="border-top: 3px solid var(--primary);">
+    <div class="dashboard-card" style="border-top: 3px solid var(--primary); border-bottom: 3px solid var(--primary);">
         <h3 style="border:none;">คำขอโปรโมชั่น <span>(รอตรวจสอบ)</span></h3>
         <p style="font-size:12px; color:var(--text-muted); margin-top:-10px; margin-bottom:15px;">*คลิกที่รูปภาพเพื่อขยายดูรายละเอียด</p>
         <div id="adminPromoRequests"></div>
@@ -245,7 +255,7 @@
             <input type="text" id="newStorePin" placeholder="รหัส PIN" style="flex: 1;">
         </div>
         <button class="btn-secondary" style="width: 100%;" onclick="createStoreAccount()">สร้างบัญชี</button>
-        <h4 style="margin-top: 25px; color:var(--dark); font-weight:500;">ร้านที่ยืนยันแล้วในระบบ:</h4>
+        <h4 style="margin-top: 25px; color:#FFF; font-weight:500;">ร้านที่ยืนยันแล้วในระบบ:</h4>
         <ul id="adminStoreList" class="price-list"></ul>
     </div>
 
@@ -261,7 +271,7 @@
             <input type="number" id="newServicePrice" placeholder="ราคา (฿)" style="width: 30%;">
         </div>
         <button class="btn-primary" onclick="addService()">เพิ่มแพ็กเกจ</button>
-        <h4 style="margin-top: 25px; color:var(--dark); font-weight:500;">แพ็กเกจปัจจุบัน:</h4>
+        <h4 style="margin-top: 25px; color:#FFF; font-weight:500;">แพ็กเกจปัจจุบัน:</h4>
         <ul id="adminServiceList" class="price-list"></ul>
     </div>
 
@@ -305,7 +315,7 @@
     }
 
     function renderUI() {
-        // 🌟 แบนเนอร์หน้าแรก (Premium Style)
+        // แบนเนอร์หน้าแรก (Premium Style)
         const banner = document.getElementById('promoBanner');
         const promoList = document.getElementById('approvedPromoList');
         if (appData.activePromotions.length > 0) {
@@ -316,82 +326,82 @@
                     : `<div style="width: 100%; height: 160px; background-color: var(--dark-light); display: flex; align-items: center; justify-content: center; color: var(--primary);">Painaidee</div>`;
                 
                 return `
-                <div style="background: var(--surface); border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2); border: 1px solid rgba(197,160,89,0.3); display: flex; flex-direction: column;">
+                <div style="background: var(--surface); border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 1px solid rgba(197,160,89,0.3); display: flex; flex-direction: column;">
                     ${imgTag}
                     <div style="padding: 18px; display: flex; flex-direction: column; flex-grow: 1;">
-                        <h3 style="margin:0 0 8px 0; font-size: 16px; color: var(--dark); font-weight: 600;">✨ ${p.storeName}</h3>
-                        <p style="font-size:14px; color:var(--text-muted); margin:0;">${p.detail}</p>
+                        <h3 style="margin:0 0 8px 0; font-size: 16px; color: var(--primary); font-weight: 600;">✨ ${p.storeName}</h3>
+                        <p style="font-size:14px; color:var(--text-gold); margin:0;">${p.detail}</p>
                     </div>
                 </div>`;
             }).join('');
         } else { banner.style.display = 'none'; }
 
-        // 🌟 คำขอโปรโมชั่น (แอดมิน)
+        // คำขอโปรโมชั่น (แอดมิน)
         const promoReqList = document.getElementById('adminPromoRequests');
         if(appData.pendingPromotions.length > 0) {
             promoReqList.innerHTML = appData.pendingPromotions.map(p => {
                 const imgTag = p.image ? `<img src="${p.image}" class="clickable-img" style="width:120px; height:80px; object-fit:cover; border-radius:8px; margin-bottom:12px; border: 1px solid var(--border);" title="คลิกขยายภาพ" onclick="openImageViewer('${p.image}', event)">` : '';
                 return `
-                <div style="border:1px solid var(--border); padding:18px; border-radius:12px; margin-bottom:15px; background: var(--surface); box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
-                    <h4 style="margin:0 0 5px 0; color:var(--dark);">📋 ${p.storeName}</h4>
-                    <p style="font-size:13px; color:var(--primary); font-weight:500; margin:0 0 12px 0;">📦 แพ็กเกจ: ${p.service || 'ไม่ระบุ'}</p>
+                <div style="border:1px solid var(--border); padding:18px; border-radius:12px; margin-bottom:15px; background: var(--surface); box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                    <h4 style="margin:0 0 5px 0; color:var(--primary);">📋 ${p.storeName}</h4>
+                    <p style="font-size:13px; color:var(--primary-light); font-weight:500; margin:0 0 12px 0;">📦 แพ็กเกจ: ${p.service || 'ไม่ระบุ'}</p>
                     ${imgTag}
-                    <p style="font-size:14px; color:var(--text-main); margin:0 0 15px 0; background:var(--bg-light); padding:10px; border-radius:8px;">"${p.detail}"</p>
+                    <p style="font-size:14px; color:var(--text-gold); margin:0 0 15px 0; background:rgba(0,0,0,0.2); padding:10px; border-radius:8px;">"${p.detail}"</p>
                     <div style="display:flex; gap:10px;">
                         <button class="btn-primary" style="padding:8px; flex:2;" onclick="approvePendingPromo('${p.id}')">อนุมัติ</button>
-                        <button class="btn-outline" style="padding:8px; flex:1; color:var(--danger); border-color:var(--danger);" onclick="rejectPendingPromo('${p.id}')">ปฏิเสธ</button>
+                        <button class="btn-outline" style="padding:8px; flex:1; color:var(--danger); border-color:var(--danger); background:transparent;" onclick="rejectPendingPromo('${p.id}')">ปฏิเสธ</button>
                     </div>
                 </div>`;
             }).join('');
-        } else { promoReqList.innerHTML = '<p style="color:var(--text-muted); font-size:14px;">ไม่มีโปรโมชั่นรอตรวจสอบ</p>'; }
+        } else { promoReqList.innerHTML = '<p style="color:var(--text-muted); font-size:14px; text-align:center;">ไม่มีโปรโมชั่นรอตรวจสอบ</p>'; }
 
-        // 🌟 คำขอลงทะเบียนร้านค้า (แอดมิน)
+        // คำขอลงทะเบียนร้านค้า (แอดมิน)
         const reqList = document.getElementById('adminRegistrationRequests');
         if(appData.registrationRequests.length > 0) {
             reqList.innerHTML = appData.registrationRequests.map(req => {
-                const idImg = req.idCard ? `<img src="${req.idCard}" class="clickable-img" style="height:65px; width:100px; object-fit:cover; border-radius:6px; border:1px solid var(--border); margin-right:10px;" onclick="openImageViewer('${req.idCard}', event)">` : '';
-                const photoImg = req.storePhoto ? `<img src="${req.storePhoto}" class="clickable-img" style="height:65px; width:100px; object-fit:cover; border-radius:6px; border:1px solid var(--border); margin-right:10px;" onclick="openImageViewer('${req.storePhoto}', event)">` : '';
-                const commImg = req.commercial ? `<img src="${req.commercial}" class="clickable-img" style="height:65px; width:100px; object-fit:cover; border-radius:6px; border:1px solid var(--border); margin-right:10px;" onclick="openImageViewer('${req.commercial}', event)">` : '';
+                const idImg = req.idCard ? `<img src="${req.idCard}" class="clickable-img" style="height:65px; width:100px; object-fit:cover; border-radius:6px; border:1px solid var(--border); margin-right:10px; border-color:var(--primary);" onclick="openImageViewer('${req.idCard}', event)">` : '';
+                const photoImg = req.storePhoto ? `<img src="${req.storePhoto}" class="clickable-img" style="height:65px; width:100px; object-fit:cover; border-radius:6px; border:1px solid var(--border); margin-right:10px; border-color:var(--primary);" onclick="openImageViewer('${req.storePhoto}', event)">` : '';
+                const commImg = req.commercial ? `<img src="${req.commercial}" class="clickable-img" style="height:65px; width:100px; object-fit:cover; border-radius:6px; border:1px solid var(--border); margin-right:10px; border-color:var(--primary);" onclick="openImageViewer('${req.commercial}', event)">` : '';
 
                 return `
                 <div style="border:1px solid var(--border); padding:18px; border-radius:12px; margin-bottom:15px; background: var(--surface);">
-                    <h4 style="margin:0 0 12px 0; color:var(--dark);">🏪 ${req.storeName}</h4>
+                    <h4 style="margin:0 0 12px 0; color:var(--primary);">🏪 ${req.storeName}</h4>
                     <div style="display:flex; margin-bottom:15px; overflow-x:auto; padding-bottom:5px;">
                         ${idImg} ${photoImg} ${commImg}
                     </div>
                     <div style="display:flex; gap:10px;">
                         <button class="btn-primary" style="padding:8px; flex:2;" onclick="approveRegistration(${req.id}, '${req.storeName}')">อนุมัติ & สร้าง PIN</button>
-                        <button class="btn-outline" style="padding:8px; flex:1; color:var(--danger); border-color:var(--danger);" onclick="rejectRegistration(${req.id})">ปฏิเสธ</button>
+                        <button class="btn-outline" style="padding:8px; flex:1; color:var(--danger); border-color:var(--danger); background:transparent;" onclick="rejectRegistration(${req.id})">ปฏิเสธ</button>
                     </div>
                 </div>`;
             }).join('');
-        } else { reqList.innerHTML = '<p style="color:var(--text-muted); font-size:14px;">ไม่มีคำขอใหม่</p>'; }
+        } else { reqList.innerHTML = '<p style="color:var(--text-muted); font-size:14px; text-align:center;">ไม่มีคำขอใหม่</p>'; }
 
-        // 🌟 ร้านที่อนุมัติแล้ว
+        // ร้านที่อนุมัติแล้ว
         document.getElementById('adminStoreList').innerHTML = appData.registeredStores.length > 0 ? 
             appData.registeredStores.map(s => `
-                <li><span><b style="color:var(--dark);">${s.name}</b> <br><small style="color:var(--text-muted);">PIN: <span style="color:var(--primary); font-weight:600;">${s.pin}</span></small></span>
+                <li><span><b style="color:var(--primary);">${s.name}</b> <br><small style="color:var(--text-muted);">PIN: <span style="color:var(--primary-light); font-weight:600;">${s.pin}</span></small></span>
                 <button class="btn-danger" style="padding:5px 12px; font-size:12px;" onclick="deleteStore(${s.id})">ลบ</button></li>`).join('') 
-            : '<li style="color:var(--text-muted); font-size:14px;">ยังไม่มีร้านในระบบ</li>';
+            : '<li style="color:var(--text-muted); font-size:14px; text-align:center;">ยังไม่มีร้านในระบบ</li>';
 
-        // 🌟 โปรโมชั่นที่กำลังแสดง (Active)
+        // โปรโมชั่นที่กำลังแสดง
         document.getElementById('activePromoList').innerHTML = appData.activePromotions.length > 0 ? 
             appData.activePromotions.map(p => {
-                const imgTag = p.image ? `<img src="${p.image}" class="clickable-img" style="width:65px; height:65px; object-fit:cover; border-radius:8px; margin-right:15px; border:1px solid var(--border);" onclick="openImageViewer('${p.image}', event)">` : '';
+                const imgTag = p.image ? `<img src="${p.image}" class="clickable-img" style="width:65px; height:65px; object-fit:cover; border-radius:8px; margin-right:15px; border:1px solid var(--border); border-color:var(--primary);" onclick="openImageViewer('${p.image}', event)">` : '';
                 return `
-                <li style="display:block; background:var(--surface); margin-bottom:12px; border-radius:12px; padding:18px; border:1px solid var(--border); box-shadow: 0 4px 10px rgba(0,0,0,0.02);">
+                <li style="display:block; background:var(--surface); margin-bottom:12px; border-radius:12px; padding:18px; border:1px solid var(--border); box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
                     <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
                         <strong style="color:var(--primary); font-size:15px;">✨ ${p.storeName}</strong>
-                        <button class="btn-outline" style="padding: 2px 8px; font-size:12px; color:var(--danger); border-color:var(--danger);" onclick="deleteActivePromo('${p.id}')">ลบออก</button>
+                        <button class="btn-outline" style="padding: 2px 8px; font-size:12px; color:var(--danger); border-color:var(--danger); background:transparent;" onclick="deleteActivePromo('${p.id}')">ลบออก</button>
                     </div>
                     <div style="display:flex; align-items:start;">
                         ${imgTag}
-                        <p style="margin:0; font-size:13px; flex:1; color:var(--text-muted);">${p.detail}</p>
+                        <p style="margin:0; font-size:13px; flex:1; color:var(--text-gold);">${p.detail}</p>
                     </div>
                 </li>`;
-            }).join('') : '<li style="color:var(--text-muted); font-size:14px;">ยังไม่มีโปรโมชั่น</li>';
+            }).join('') : '<li style="color:var(--text-muted); font-size:14px; text-align:center;">ยังไม่มีโปรโมชั่น</li>';
 
-        // 🌟 อัปเดตราคาแพ็กเกจ
+        // อัปเดตราคาแพ็กเกจ
         const serviceSelect = document.getElementById('promoServiceSelect');
         const adminServList = document.getElementById('adminServiceList');
         adminServList.innerHTML = '';
@@ -401,7 +411,7 @@
         }
 
         appData.services.forEach(s => {
-            adminServList.innerHTML += `<li><span>${s.name} <br><strong style="color:var(--primary); font-size:14px;">${s.price} ฿</strong></span><button class="btn-outline" style="padding:5px 10px; font-size:12px; color:var(--danger); border-color:var(--danger);" onclick="deleteService(${s.id})">ลบ</button></li>`;
+            adminServList.innerHTML += `<li><span>${s.name} <br><strong style="color:var(--primary); font-size:14px;">${s.price} ฿</strong></span><button class="btn-outline" style="padding:5px 10px; font-size:12px; color:var(--danger); border-color:var(--danger); background:transparent;" onclick="deleteService(${s.id})">ลบ</button></li>`;
         });
         
         const displayList = document.getElementById('displayServiceList');
@@ -721,7 +731,7 @@
                     <img src="${imgUrl}" alt="${p.name}">
                     <div class="place-info">
                         <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:5px;">
-                            <h3 style="margin:0; font-size: 16px; width:65%; color:var(--dark); font-weight:600;">${p.name}</h3>
+                            <h3 style="margin:0; font-size: 16px; width:65%; color:var(--text-gold); font-weight:600;">${p.name}</h3>
                             <div style="text-align:right; width:35%;">${openStatusHtml}</div>
                         </div>
                         <p style="font-size:13px; color:var(--text-muted); margin:0 0 10px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.vicinity}</p>
