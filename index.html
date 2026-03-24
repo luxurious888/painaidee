@@ -5,37 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ไปไหนดี - Painaidee</title>
     
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBHY6nSriufUS2NKndb88lKnNEvAJ2-ukc&libraries=places"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBHY6nSriufUS2NKndb88lKnNEvAJ2-ukc&libraries=places&callback=initMap" async defer></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap');
         
-        body { font-family: 'Kanit', sans-serif; margin: 0; background-color: #f7f9fc; padding-bottom: 30px; }
+        body { font-family: 'Kanit', sans-serif; margin: 0; background-color: #f7f9fc; padding-bottom: 50px; }
         
-        /* Navigation Bar */
+        /* Navigation */
         nav { display: flex; justify-content: space-around; background: white; padding: 15px 0; border-bottom: 1px solid #ddd; position: sticky; top: 0; z-index: 2000; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         nav div { cursor: pointer; font-weight: 600; color: #666; padding: 8px 18px; border-radius: 25px; transition: 0.3s; }
         nav div.active { color: #00b900; background: #e8f5e9; }
 
         header { background: #00b900; color: white; padding: 25px; text-align: center; border-radius: 0 0 20px 20px; margin-bottom: 20px; }
-        .page { display: none; padding: 20px; max-width: 900px; margin: 0 auto; animation: fadeIn 0.5s; }
+        .page { display: none; padding: 20px; max-width: 900px; margin: 0 auto; }
         .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         #map { width: 100%; height: 350px; border-radius: 15px; border: 2px solid #00b900; box-sizing: border-box; }
 
-        /* Card & UI */
+        /* Form & Cards */
         .card-box { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
         .input-group { margin-bottom: 18px; text-align: left; }
         label { display: block; margin-bottom: 6px; font-weight: 600; color: #444; }
-        input, select, textarea { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #ddd; box-sizing: border-box; font-family: 'Kanit'; font-size: 16px; outline: none; }
-        input:focus { border-color: #00b900; }
+        input, select, textarea { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ddd; box-sizing: border-box; font-family: 'Kanit'; font-size: 16px; }
         
         .btn { width: 100%; padding: 15px; background: #00b900; color: white; border: none; border-radius: 35px; font-size: 18px; font-weight: 600; cursor: pointer; transition: 0.3s; }
         .btn:hover { background: #009800; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,185,0,0.3); }
 
         .place-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-top: 25px; }
-        .place-card { background: white; border-radius: 18px; overflow: hidden; box-shadow: 0 3px 10px rgba(0,0,0,0.05); transition: 0.3s; }
+        .place-card { background: white; border-radius: 18px; overflow: hidden; box-shadow: 0 3px 10px rgba(0,0,0,0.05); }
         .place-card img { width: 100%; height: 170px; object-fit: cover; }
         .place-info { padding: 15px; }
 
@@ -43,8 +41,7 @@
         #payment-area { display: none; text-align: center; margin-top: 20px; padding-top: 20px; border-top: 2px dashed #00b900; }
         #qr-img { width: 230px; border: 8px solid white; box-shadow: 0 0 15px rgba(0,0,0,0.1); border-radius: 10px; margin-bottom: 15px; }
 
-        /* Admin */
-        .admin-item { border-left: 5px solid #00b900; background: #fff; padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .admin-item { border-left: 5px solid #00b900; background: #fff; padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
     </style>
 </head>
 <body>
@@ -68,181 +65,131 @@
     </div>
 
     <div id="placeList" class="place-grid">
-        <p style="text-align:center; grid-column: 1/-1; padding: 40px; color: #999;">กำลังดึงข้อมูลจาก Google Maps...</p>
+        <p style="text-align:center; grid-column: 1/-1; padding: 40px; color: #999;">กำลังโหลดพิกัดร้าน...</p>
     </div>
 </div>
 
 <div id="page-partner" class="page">
     <div class="card-box">
-        <h2 style="color:#00b900; margin-top:0; border-bottom: 2px solid #e8f5e9; padding-bottom: 10px;">ระบบเจ้าของร้าน</h2>
-        <p>อัปเดตโปรโมชั่น (50.-) หรือ ซื้อโฆษณา Top 10 (300.-)</p>
-
+        <h2 style="color:#00b900; margin-top:0;">ระบบเจ้าของร้าน</h2>
         <div class="input-group">
-            <label>เลือกแพ็กเกจที่ต้องการ</label>
+            <label>เลือกแพ็กเกจ</label>
             <select id="packageSelect" onchange="updatePrice()">
-                <option value="50">อัปเดตโปรโมชั่นพิเศษ (50.-)</option>
-                <option value="300">โฆษณาแนะนำอันดับต้นๆ Top 10 (300.-/เดือน)</option>
+                <option value="50">อัปเดตโปรโมชั่น (50.-)</option>
+                <option value="300">โฆษณาแนะนำ Top 10 (300.-/เดือน)</option>
             </select>
         </div>
-
         <div class="input-group">
-            <label>ชื่อร้านค้า (ให้ตรงกับใน Google Maps)</label>
-            <input type="text" id="partnerShopName" placeholder="เช่น ร้านกาแฟไปไหนดี">
+            <label>ชื่อร้านค้า</label>
+            <input type="text" id="partnerShopName" placeholder="ชื่อร้านตาม Google Maps">
         </div>
-
         <div class="input-group">
-            <label>รายละเอียดโปรโมชั่น / ข้อมูลแนะนำร้าน</label>
-            <textarea id="partnerDetail" rows="3" placeholder="ระบุข้อความโปรโมชั่นของคุณที่นี่..."></textarea>
+            <label>รายละเอียดโปรโมชั่น</label>
+            <textarea id="partnerDetail" rows="3"></textarea>
         </div>
-
-        <button class="btn" onclick="generateQR()">สร้าง QR สแกนจ่ายเงิน</button>
+        <button class="btn" onclick="generateQR()">สร้าง QR ชำระเงิน</button>
 
         <div id="payment-area">
-            <h3>ยอดที่ต้องชำระ: <span id="amountTxt" style="color:#00b900;">50</span> บาท</h3>
-            <img id="qr-img" src="" alt="PromptPay QR Code">
-            <p style="font-size:14px; color:#666;">โอนเงินแล้ว กรุณาแนบสลิปด้านล่าง</p>
-            
+            <h3>ยอดชำระ: <span id="amountTxt">50</span> บาท</h3>
+            <img id="qr-img" src="" alt="QR">
             <div class="input-group">
-                <label>อัปโหลดสลิปยืนยันการโอน</label>
+                <label>แนบสลิปโอนเงิน</label>
                 <input type="file" id="slipUpload" accept="image/*">
             </div>
-            <button class="btn" style="background:#333;" onclick="submitRequest()">ส่งข้อมูลให้แอดมินอนุมัติ</button>
+            <button class="btn" style="background:#333;" onclick="submitRequest()">ส่งข้อมูลให้แอดมิน</button>
         </div>
     </div>
 </div>
 
 <div id="page-admin" class="page">
     <div class="card-box" style="border-top: 5px solid #333;">
-        <h2 style="margin-top:0;">Admin Dashboard</h2>
-        <p>รายการที่รอการอนุมัติ (Pending Requests)</p>
-        <hr>
-        <div id="adminListContainer">
-            </div>
+        <h2>Admin Dashboard</h2>
+        <div id="adminListContainer"></div>
     </div>
 </div>
 
 <script>
     let map, service, infowindow;
     let googlePlaces = [];
-    
-    // ข้อมูลจำลองสำหรับรออนุมัติ
-    let pendingData = [
-        { id: 1, shop: "ตัวอย่างร้าน A", type: "Promo", price: 50, detail: "ลด 10% ทั้งร้าน" },
-        { id: 2, shop: "ตัวอย่างร้าน B", type: "Top 10", price: 300, detail: "แนะนำร้านอันดับ 1" }
-    ];
+    let pendingData = [{ id: 1, shop: "ตัวอย่างร้าน", type: "Promo", price: 50, detail: "ลด 10%" }];
 
-    // 🔄 ระบบสลับหน้า
     function switchPage(pageId) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.querySelectorAll('nav div').forEach(t => t.classList.remove('active'));
-        
         document.getElementById('page-' + pageId).classList.add('active');
         document.getElementById('tab-' + pageId).classList.add('active');
-        
-        if(pageId === 'home' && map) {
-            setTimeout(() => { google.maps.event.trigger(map, 'resize'); }, 300);
-        }
     }
 
-    // 💰 ระบบเจ้าของร้าน
     function updatePrice() {
         document.getElementById('amountTxt').innerText = document.getElementById('packageSelect').value;
     }
 
     function generateQR() {
         const amt = document.getElementById('packageSelect').value;
-        const shop = document.getElementById('partnerShopName').value;
-        if(!shop) return alert('กรุณาระบุชื่อร้านค้า');
-
-        const promptpayID = "0812345678"; // <--- เปลี่ยนเป็นเบอร์พร้อมเพย์ของคุณ
+        const promptpayID = "0812345678"; // <--- เปลี่ยนเบอร์ของคุณ
         document.getElementById('qr-img').src = `https://promptpay.io/${promptpayID}/${amt}.png`;
         document.getElementById('payment-area').style.display = 'block';
     }
 
     function submitRequest() {
-        alert('ส่งข้อมูลสำเร็จ! ระบบจะทำการตรวจสอบสลิปอัตโนมัติ และอัปเดตข้อมูลให้คุณโดยเร็ว');
+        alert('ส่งข้อมูลสำเร็จ! รอการตรวจสอบจากแอดมิน');
         location.reload();
     }
 
-    // 🔑 ระบบแอดมิน
     function checkAdminAccess() {
-        const pin = prompt("กรุณาใส่รหัสผ่านแอดมิน:");
-        if(pin === "1234") { // <--- เปลี่ยนรหัสผ่านตรงนี้
+        const pin = prompt("รหัสผ่านแอดมิน:");
+        if(pin === "1234") { // <--- รหัสผ่าน
             switchPage('admin');
-            renderAdminDashboard();
-        } else {
-            alert("รหัสไม่ถูกต้อง!");
-        }
+            renderAdmin();
+        } else { alert("รหัสผิด!"); }
     }
 
-    function renderAdminDashboard() {
+    function renderAdmin() {
         const container = document.getElementById('adminListContainer');
-        if(pendingData.length === 0) {
-            container.innerHTML = "<p style='text-align:center; color:#999;'>ไม่มีรายการรออนุมัติ</p>";
-            return;
-        }
         container.innerHTML = pendingData.map(item => `
             <div class="admin-item">
-                <div>
-                    <strong style="font-size:18px;">${item.shop}</strong> (${item.type})<br>
-                    <small style="color:#666;">ยอดเงิน: ${item.price} บาท | รายละเอียด: ${item.detail}</small>
-                </div>
-                <div>
-                    <button onclick="approveRequest(${item.id})" style="background:#00b900; color:white; border:none; padding:10px 15px; border-radius:10px; cursor:pointer; font-weight:600;">อนุมัติ</button>
-                </div>
+                <div><strong>${item.shop}</strong> (${item.price}.-)</div>
+                <button onclick="approve(${item.id})" style="background:#00b900; color:white; border:none; padding:8px; border-radius:5px;">อนุมัติ</button>
             </div>
         `).join('');
     }
 
-    function approveRequest(id) {
-        if(confirm('ยืนยันการอนุมัติร้านค้า?')) {
-            pendingData = pendingData.filter(i => i.id !== id);
-            alert('อนุมัติเรียบร้อย!');
-            renderAdminDashboard();
-        }
+    function approve(id) {
+        pendingData = pendingData.filter(i => i.id !== id);
+        renderAdmin();
+        alert('อนุมัติแล้ว');
     }
 
-    // 📍 ระบบ Google Maps (หน้าแรก)
+    // --- Google Maps ---
     function initMap() {
-        const ubonCoords = { lat: 15.2287, lng: 104.8564 }; // พิกัดอุบลฯ
-        map = new google.maps.Map(document.getElementById("map"), {
-            center: ubonCoords, zoom: 15, mapTypeControl: false, streetViewControl: false
-        });
-
+        const ubon = { lat: 15.2287, lng: 104.8564 };
+        map = new google.maps.Map(document.getElementById("map"), { center: ubon, zoom: 15 });
         infowindow = new google.maps.InfoWindow();
         service = new google.maps.places.PlacesService(map);
         
-        const request = {
-            location: ubonCoords, radius: 3000, type: ['restaurant', 'bar', 'cafe']
-        };
-
-        service.nearbySearch(request, (results, status) => {
+        service.nearbySearch({ location: ubon, radius: 3000, type: ['restaurant', 'bar'] }, (results, status) => {
             if (status === google.maps.places.PlacesServiceStatus.OK) {
                 googlePlaces = results;
-                renderPlaceCards(results);
-                results.forEach(createMarker);
-            } else {
-                document.getElementById('placeList').innerHTML = "<p style='text-align:center; grid-column:1/-1;'>ไม่สามารถโหลดข้อมูลได้ กรุณาตรวจสอบ API Key</p>";
+                renderCards(results);
+                results.forEach(p => {
+                    const marker = new google.maps.Marker({ map, position: p.geometry.location });
+                    marker.addListener("click", () => {
+                        infowindow.setContent(p.name);
+                        infowindow.open(map, marker);
+                    });
+                });
             }
         });
     }
 
-    function createMarker(place) {
-        const marker = new google.maps.Marker({ map, position: place.geometry.location });
-        google.maps.event.addListener(marker, "click", () => {
-            infowindow.setContent(`<b>${place.name}</b><br>${place.vicinity}`);
-            infowindow.open(map, marker);
-        });
-    }
-
-    function renderPlaceCards(places) {
+    function renderCards(places) {
         const list = document.getElementById('placeList');
         list.innerHTML = places.map(p => `
             <div class="place-card">
-                <img src="${p.photos ? p.photos[0].getUrl() : 'https://via.placeholder.com/300x160?text=Painaidee'}" alt="${p.name}">
+                <img src="${p.photos ? p.photos[0].getUrl() : 'https://via.placeholder.com/300x160'}">
                 <div class="place-info">
-                    <h3 style="margin:0 0 5px 0; font-size:18px;">${p.name}</h3>
-                    <p style="font-size:14px; color:#666; margin:0;">⭐ ${p.rating || 'N/A'} | 📍 ${p.vicinity}</p>
+                    <h3>${p.name}</h3>
+                    <p>⭐ ${p.rating || 'N/A'} | 📍 ${p.vicinity}</p>
                 </div>
             </div>
         `).join('');
@@ -250,11 +197,8 @@
 
     function filterPlaces() {
         const val = document.getElementById('searchBox').value.toLowerCase();
-        const filtered = googlePlaces.filter(p => p.name.toLowerCase().includes(val));
-        renderPlaceCards(filtered);
+        renderCards(googlePlaces.filter(p => p.name.toLowerCase().includes(val)));
     }
-
-    window.onload = initMap;
 </script>
 
 </body>
