@@ -13,12 +13,13 @@
         header { background: #00b900; color: white; padding: 25px; text-align: center; border-radius: 0 0 20px 20px; margin-bottom: 20px; }
         .page { display: none; padding: 20px; max-width: 900px; margin: 0 auto; }
         .page.active { display: block; }
-        #map { width: 100%; height: 350px; border-radius: 15px; border: 2px solid #00b900; }
+        #map { width: 100%; height: 350px; border-radius: 15px; border: 2px solid #00b900; background: #eee; }
         .place-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-top: 25px; }
-        .place-card { background: white; border-radius: 18px; overflow: hidden; box-shadow: 0 3px 10px rgba(0,0,0,0.05); border: 1px solid #eee; }
+        .place-card { background: white; border-radius: 18px; overflow: hidden; box-shadow: 0 3px 10px rgba(0,0,0,0.05); border: 1px solid #eee; transition: 0.3s; }
+        .place-card:hover { transform: translateY(-5px); }
         .place-card img { width: 100%; height: 170px; object-fit: cover; }
         .place-info { padding: 15px; }
-        input[type="text"] { width: 100%; padding: 15px; border-radius: 25px; border: 2px solid #00b900; box-sizing: border-box; font-family: 'Kanit'; font-size: 16px; margin-top: 20px; outline: none; }
+        input[type="text"] { width: 100%; padding: 15px; border-radius: 30px; border: 2px solid #00b900; box-sizing: border-box; font-family: 'Kanit'; font-size: 16px; margin-top: 20px; outline: none; }
     </style>
 </head>
 <body>
@@ -34,12 +35,12 @@
     <div id="map"></div>
     <input type="text" id="searchBox" placeholder="🔍 ค้นหาชื่อร้าน เช่น ลานสุข, G2..." oninput="filterPlaces()">
     <div id="placeList" class="place-grid">
-        <p id="status-text" style="text-align:center; grid-column: 1/-1; padding: 20px;">กำลังดึงข้อมูลร้านค้า...</p>
+        <p id="status-text" style="text-align:center; grid-column: 1/-1; padding: 40px; color: #666;">กำลังดึงข้อมูลร้านค้าจากอุบลราชธานี...</p>
     </div>
 </div>
 
-<div id="page-partner" class="page"><div style="background:white; padding:20px; border-radius:15px;"><h2>ระบบเจ้าของร้าน</h2><p>ระบบชำระเงินและค้นหาพิกัดกำลังเปิดใช้งาน...</p></div></div>
-<div id="page-admin" class="page"><div style="background:white; padding:20px; border-radius:15px;"><h2>Admin Panel</h2><p>รหัสผ่านคือ 1234</p></div></div>
+<div id="page-partner" class="page"><div style="background:white; padding:20px; border-radius:15px;"><h2>ระบบเจ้าของร้าน</h2><p>กำลังเตรียมฟังก์ชันค้นหาพิกัด...</p></div></div>
+<div id="page-admin" class="page"><div style="background:white; padding:20px; border-radius:15px;"><h2>Admin Dashboard</h2><p>รหัสผ่านคือ 1234</p></div></div>
 
 <script>
     let map, service, infowindow;
@@ -52,80 +53,83 @@
         document.getElementById('tab-' + p).classList.add('active');
     }
 
-    // ฟังก์ชันเริ่มต้นแผนที่
-    function initMap() {
-        const ubon = { lat: 15.2287, lng: 104.8564 };
+    // ฟังก์ชันเริ่มต้นที่เสถียรกว่าเดิม
+    async function initMap() {
+        const ubonCoords = { lat: 15.2287, lng: 104.8564 };
         
-        // สร้างแผนที่
         map = new google.maps.Map(document.getElementById("map"), {
-            center: ubon,
+            center: ubonCoords,
             zoom: 15,
-            mapId: "Painaidee_Map_01"
+            mapId: "PAINAIDEE_MOBILE_MAP"
         });
 
         infowindow = new google.maps.InfoWindow();
-        
-        // เรียกใช้ Places Service
         service = new google.maps.places.PlacesService(map);
         
-        // ค้นหาร้านอาหารและคาเฟ่ในระยะ 3 กม.
+        // ค้นหาร้านอาหารและคาเฟ่
         const request = {
-            location: ubon,
+            location: ubonCoords,
             radius: '3000',
             type: ['restaurant', 'cafe', 'bar']
         };
 
         service.nearbySearch(request, (results, status) => {
+            const statusText = document.getElementById('status-text');
+            
             if (status === google.maps.places.PlacesServiceStatus.OK) {
                 googlePlaces = results;
                 renderCards(results);
-                document.getElementById('status-text').style.display = 'none';
+                statusText.style.display = 'none';
                 
-                // ปักหมุดในแผนที่
                 results.forEach(place => {
                     const marker = new google.maps.Marker({
                         map,
                         position: place.geometry.location,
-                        title: place.name
+                        title: place.name,
+                        animation: google.maps.Animation.DROP
                     });
-                    google.maps.event.addListener(marker, "click", () => {
-                        infowindow.setContent("<div><strong>" + place.name + "</strong><br>" + place.vicinity + "</div>");
+                    
+                    marker.addListener("click", () => {
+                        infowindow.setContent(`
+                            <div style="padding:5px;">
+                                <strong style="display:block; margin-bottom:3px;">${place.name}</strong>
+                                <span style="font-size:12px; color:#666;">${place.vicinity}</span>
+                            </div>
+                        `);
                         infowindow.open(map, marker);
                     });
                 });
             } else {
-                document.getElementById('status-text').innerText = "ไม่สามารถโหลดข้อมูลร้านค้าได้ (Status: " + status + ")";
+                statusText.innerText = "ไม่พบข้อมูลร้านค้าในบริเวณนี้ หรือติดปัญหาเรื่อง API (Status: " + status + ")";
             }
         });
     }
 
-    // ฟังก์ชันแสดงการ์ดร้านค้า
     function renderCards(places) {
         const list = document.getElementById('placeList');
         if (places.length === 0) {
-            list.innerHTML = '<p style="text-align:center; grid-column: 1/-1;">ไม่พบร้านที่ค้นหา</p>';
+            list.innerHTML = '<p style="text-align:center; grid-column: 1/-1;">ไม่พบร้านที่คุณต้องการ</p>';
             return;
         }
         
         list.innerHTML = places.map(p => `
             <div class="place-card">
-                <img src="${p.photos ? p.photos[0].getUrl({maxWidth: 400}) : 'https://via.placeholder.com/400x200?text=Painaidee'}" alt="${p.name}">
+                <img src="${p.photos ? p.photos[0].getUrl({maxWidth: 400}) : 'https://via.placeholder.com/400x200?text=No+Photo'}" alt="${p.name}">
                 <div class="place-info">
-                    <h3 style="margin:0 0 5px 0;">${p.name}</h3>
+                    <h3 style="margin:0 0 5px 0; font-size:18px;">${p.name}</h3>
                     <p style="font-size:14px; color:#666; margin:0;">⭐ ${p.rating || 'N/A'} | 📍 ${p.vicinity}</p>
                 </div>
             </div>
         `).join('');
     }
 
-    // ฟังก์ชันค้นหา (Filter)
     function filterPlaces() {
         const val = document.getElementById('searchBox').value.toLowerCase();
         const filtered = googlePlaces.filter(p => p.name.toLowerCase().includes(val));
         renderCards(filtered);
     }
 
-    function checkAdminAccess() { if(prompt("รหัสผ่าน:") === "1234") switchPage('admin'); }
+    function checkAdminAccess() { if(prompt("รหัสผ่านแอดมิน:") === "1234") switchPage('admin'); }
 </script>
 
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD7Qqf1Z9KQBuvipDzgIc5laJLz9SiOBH8&libraries=places&callback=initMap" async defer></script>
