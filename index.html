@@ -5,46 +5,52 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ไปไหนดี - Painaidee</title>
     
-    <script src="https://maps.googleapis.com/maps/api/js?key=ใส่_API_KEY_ตรงนี้&libraries=places"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBHY6nSriufUS2NKndb88lKnNEvAJ2-ukc&libraries=places"></script>
 
     <style>
-        /* 2. ส่วนของ CSS ตกแต่งหน้าตา */
-        body { font-family: 'Kanit', sans-serif; margin: 0; background-color: #f0f2f5; }
-        header { background: #00b900; color: white; padding: 20px; text-align: center; sticky; top: 0; z-index: 1000; }
-        #map { width: 100%; height: 350px; background-color: #e5e3df; }
-        .container { padding: 20px; }
-        .search-box { width: 100%; padding: 12px; border-radius: 25px; border: 1px solid #ddd; margin-bottom: 20px; box-sizing: border-box; font-size: 16px; }
+        /* ส่วนตกแต่งหน้าจอ (CSS) */
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap');
         
-        /* สไตล์การ์ดร้านอาหาร */
-        .place-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-        .card { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: 0.3s; }
-        .card:hover { transform: translateY(-5px); }
-        .card img { width: 100%; height: 180px; object-fit: cover; }
-        .card-info { padding: 15px; }
-        .card-info h3 { margin: 0 0 10px 0; font-size: 18px; color: #333; }
-        .card-info p { margin: 5px 0; color: #666; font-size: 14px; }
-        .rating { color: #f1c40f; font-weight: bold; }
-        .tag { display: inline-block; background: #e8f5e9; color: #2e7d32; padding: 4px 10px; border-radius: 10px; font-size: 12px; margin-top: 10px; }
+        body { font-family: 'Kanit', sans-serif; margin: 0; background-color: #f7f9fc; color: #333; }
+        header { background: #00b900; color: white; padding: 25px 20px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        header h1 { margin: 0; font-size: 28px; }
+        
+        #map { width: 100%; height: 380px; background-color: #ddd; border-bottom: 3px solid #00b900; }
+        
+        .container { padding: 20px; max-width: 1200px; margin: 0 auto; }
+        .search-box { width: 100%; padding: 15px 20px; border-radius: 30px; border: 2px solid #eee; margin-bottom: 25px; box-sizing: border-box; font-size: 16px; outline: none; transition: 0.3s; }
+        .search-box:focus { border-color: #00b900; box-shadow: 0 0 10px rgba(0,185,0,0.1); }
+        
+        .place-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
+        .card { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); transition: 0.3s; cursor: pointer; }
+        .card:hover { transform: translateY(-8px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .card img { width: 100%; height: 200px; object-fit: cover; }
+        .card-info { padding: 18px; }
+        .card-info h3 { margin: 0 0 8px 0; font-size: 19px; color: #222; }
+        .card-info p { margin: 4px 0; color: #777; font-size: 14px; display: flex; align-items: center; }
+        .rating { color: #f1c40f; font-weight: 600; font-size: 15px; margin-bottom: 10px !important; }
+        .tag { display: inline-block; background: #f0fff0; color: #00b900; padding: 5px 12px; border-radius: 12px; font-size: 13px; font-weight: 600; margin-top: 10px; }
     </style>
 </head>
 <body>
 
 <header>
     <h1>ไปไหนดี? (Painaidee)</h1>
-    <p>ค้นหาร้านอาหารและร้านนั่งชิลล์รอบตัวคุณ</p>
+    <p>รวมร้านกิน-ดื่ม ในจังหวัดอุบลราชธานี</p>
 </header>
 
 <div id="map"></div>
 
 <div class="container">
-    <input type="text" id="searchInput" class="search-box" placeholder="🔍 พิมพ์ชื่อร้านที่ต้องการค้นหา...">
+    <input type="text" id="searchInput" class="search-box" placeholder="🔍 ค้นหาชื่อร้านอาหาร หรือ ร้านนั่งชิลล์...">
     
     <div id="placeList" class="place-list">
-        </div>
+        <p style="text-align:center; width:100%;">กำลังโหลดข้อมูลจาก Google...</p>
+    </div>
 </div>
 
 <script>
-    // 3. ส่วนของ JavaScript ระบบดึงข้อมูล Google
+    // ส่วนควบคุมระบบ (JavaScript)
     let map;
     let service;
     let infowindow;
@@ -52,11 +58,89 @@
 
     function initMap() {
         // พิกัดเริ่มต้น: จ.อุบลราชธานี
-        const ubon = new google.maps.LatLng(15.2287, 104.8564);
+        const ubonLocation = { lat: 15.2287, lng: 104.8564 };
 
         map = new google.maps.Map(document.getElementById("map"), {
-            center: ubon,
-            zoom: 14
+            center: ubonLocation,
+            zoom: 15,
+            mapTypeControl: false,
+            streetViewControl: false
         });
 
-        // คำขอข้อมูลร้านอาหารและบ
+        const request = {
+            location: ubonLocation,
+            radius: '3500', // รัศมี 3.5 กิโลเมตร
+            type: ['restaurant', 'bar', 'cafe']
+        };
+
+        infowindow = new google.maps.InfoWindow();
+        service = new google.maps.places.PlacesService(map);
+        service.nearbySearch(request, callback);
+    }
+
+    function callback(results, status) {
+        if (status === google.maps.places.PlacesServiceStatus.OK) {
+            allPlaces = results;
+            renderPlaces(results);
+            for (let i = 0; i < results.length; i++) {
+                createMarker(results[i]);
+            }
+        } else {
+            document.getElementById('placeList').innerHTML = '<p>เกิดข้อผิดพลาดในการโหลดข้อมูลจาก Google</p>';
+        }
+    }
+
+    function renderPlaces(places) {
+        const listDiv = document.getElementById('placeList');
+        if (places.length === 0) {
+            listDiv.innerHTML = '<p>ไม่พบสถานที่ที่คุณค้นหา</p>';
+            return;
+        }
+
+        listDiv.innerHTML = places.map(p => {
+            const photo = p.photos ? p.photos[0].getUrl({maxWidth: 400}) : 'https://via.placeholder.com/400x250?text=No+Image';
+            const isBar = p.types.includes('bar') || p.types.includes('night_club');
+            
+            return `
+                <div class="card" onclick="focusOnMap(${p.geometry.location.lat()}, ${p.geometry.location.lng()})">
+                    <img src="${photo}" alt="${p.name}">
+                    <div class="card-info">
+                        <h3>${p.name}</h3>
+                        <p class="rating">⭐ ${p.rating || 'N/A'} (${p.user_ratings_total || 0} รีวิว)</p>
+                        <p>📍 ${p.vicinity}</p>
+                        <span class="tag">${isBar ? '🍺 ร้านนั่งชิลล์ / บาร์' : '🍽️ ร้านอาหาร / คาเฟ่'}</span>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function createMarker(place) {
+        const marker = new google.maps.Marker({
+            map,
+            position: place.geometry.location,
+        });
+
+        google.maps.event.addListener(marker, "click", () => {
+            infowindow.setContent(`<strong>${place.name}</strong><br>${place.vicinity}`);
+            infowindow.open(map, marker);
+        });
+    }
+
+    function focusOnMap(lat, lng) {
+        map.setCenter({ lat, lng });
+        map.setZoom(18);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase();
+        const filtered = allPlaces.filter(p => p.name.toLowerCase().includes(term));
+        renderPlaces(filtered);
+    });
+
+    window.onload = initMap;
+</script>
+
+</body>
+</html>
