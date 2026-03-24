@@ -4,19 +4,59 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ไปไหนดี - Painaidee</title>
-    <link rel="stylesheet" href="style.css">
+    
+    <script src="https://maps.googleapis.com/maps/api/js?key=ใส่_API_KEY_ตรงนี้&libraries=places"></script>
+
+    <style>
+        /* 2. ส่วนของ CSS ตกแต่งหน้าตา */
+        body { font-family: 'Kanit', sans-serif; margin: 0; background-color: #f0f2f5; }
+        header { background: #00b900; color: white; padding: 20px; text-align: center; sticky; top: 0; z-index: 1000; }
+        #map { width: 100%; height: 350px; background-color: #e5e3df; }
+        .container { padding: 20px; }
+        .search-box { width: 100%; padding: 12px; border-radius: 25px; border: 1px solid #ddd; margin-bottom: 20px; box-sizing: border-box; font-size: 16px; }
+        
+        /* สไตล์การ์ดร้านอาหาร */
+        .place-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .card { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: 0.3s; }
+        .card:hover { transform: translateY(-5px); }
+        .card img { width: 100%; height: 180px; object-fit: cover; }
+        .card-info { padding: 15px; }
+        .card-info h3 { margin: 0 0 10px 0; font-size: 18px; color: #333; }
+        .card-info p { margin: 5px 0; color: #666; font-size: 14px; }
+        .rating { color: #f1c40f; font-weight: bold; }
+        .tag { display: inline-block; background: #e8f5e9; color: #2e7d32; padding: 4px 10px; border-radius: 10px; font-size: 12px; margin-top: 10px; }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>ไปไหนดี? (Painaidee)</h1>
-        <div class="search-container">
-            <input type="text" id="searchInput" placeholder="ค้นหาสถานที่ในอุบล...">
+
+<header>
+    <h1>ไปไหนดี? (Painaidee)</h1>
+    <p>ค้นหาร้านอาหารและร้านนั่งชิลล์รอบตัวคุณ</p>
+</header>
+
+<div id="map"></div>
+
+<div class="container">
+    <input type="text" id="searchInput" class="search-box" placeholder="🔍 พิมพ์ชื่อร้านที่ต้องการค้นหา...">
+    
+    <div id="placeList" class="place-list">
         </div>
-    </header>
+</div>
 
-    <main id="placeList">
-        </main>
+<script>
+    // 3. ส่วนของ JavaScript ระบบดึงข้อมูล Google
+    let map;
+    let service;
+    let infowindow;
+    let allPlaces = [];
 
-    <script src="script.js"></script>
-</body>
-</html>
+    function initMap() {
+        // พิกัดเริ่มต้น: จ.อุบลราชธานี
+        const ubon = new google.maps.LatLng(15.2287, 104.8564);
+
+        map = new google.maps.Map(document.getElementById("map"), {
+            center: ubon,
+            zoom: 14
+        });
+
+        // คำขอข้อมูลร้านอาหารและบ
