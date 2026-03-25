@@ -250,9 +250,14 @@
 
 <div id="page-admin" class="page">
 
+    <div class="dashboard-card" style="border-top: 3px solid var(--danger); border-bottom: 3px solid var(--danger);">
+        <h3 style="border:none; color: var(--danger);">ตรวจสอบร้านปิดถาวร <span>(แจ้งจากผู้ใช้)</span></h3>
+        <p style="font-size:12px; color:var(--text-muted); margin-top:-10px; margin-bottom:15px;">*หากยืนยัน ร้านจะถูกลบและไม่แสดงบนแผนที่อีก</p>
+        <div id="adminClosedReports"></div>
+    </div>
+
     <div class="dashboard-card" style="border-top: 3px solid var(--primary); border-bottom: 3px solid var(--primary);">
         <h3 style="border:none;">คำขอโปรโมชั่น <span>(รอตรวจสอบ)</span></h3>
-        <p style="font-size:12px; color:var(--text-muted); margin-top:-10px; margin-bottom:15px;">*ระบุจำนวนวันแสดงผล และคลิกที่รูปภาพเพื่อขยายดูรายละเอียด</p>
         <div id="adminPromoRequests"></div>
     </div>
 
@@ -263,7 +268,6 @@
 
     <div class="dashboard-card">
         <h3>คำขอลงทะเบียนร้าน <span>(รอตรวจสอบ)</span></h3>
-        <p style="font-size:12px; color:var(--text-muted); margin-top:-10px; margin-bottom:15px;">*คลิกที่รูปภาพเพื่อขยายเอกสาร</p>
         <div id="adminRegistrationRequests"></div>
     </div>
     
@@ -298,6 +302,9 @@
 </div>
 
 <script>
+    // --------------------------------------------------
+    // 1. ระบบจัดการข้อมูล LocalStorage
+    // --------------------------------------------------
     let rawData = localStorage.getItem('painaidee_auth');
     let appData = rawData ? JSON.parse(rawData) : {};
 
@@ -305,6 +312,11 @@
     appData.registeredStores = appData.registeredStores || [];
     appData.pendingPromotions = appData.pendingPromotions || [];
     appData.activePromotions = appData.activePromotions || [];
+    
+    // 💡 เพิ่มฐานข้อมูลใหม่ 2 ตัวสำหรับเก็บ Report ร้านปิด และ Blacklist
+    appData.closedReports = appData.closedReports || [];
+    appData.blacklistedPlaces = appData.blacklistedPlaces || [];
+
     appData.services = appData.services || [
         { id: 1, name: 'ปักหมุดโปรโมชั่นหน้าแรก (30 วัน)', price: 500 },
         { id: 2, name: 'อัปเดตแบนเนอร์ (ต่อครั้ง)', price: 150 }
@@ -320,13 +332,45 @@
         document.getElementById('imageViewerModal').style.display = 'block';
         document.getElementById('expandedImage').src = src;
     }
-    
-    function closeImageViewer() {
-        document.getElementById('imageViewerModal').style.display = 'none';
+    function closeImageViewer() { document.getElementById('imageViewerModal').style.display = 'none'; }
+
+    // 💡 ฟังก์ชันส่งรายงานแจ้งร้านปิด (ทำงานที่การ์ดหน้าแรก)
+    function reportClosed(placeId, placeName, event) {
+        event.stopPropagation();
+        if(confirm(`คุณแน่ใจหรือไม่ว่าร้าน "${placeName}" ปิดกิจการถาวรแล้ว?`)) {
+            // เช็คว่าเคยแจ้งไปหรือยัง
+            if(appData.closedReports.find(r => r.placeId === placeId)) {
+                return alert("ร้านนี้ได้รับการแจ้งไปแล้ว แอดมินกำลังตรวจสอบครับ ขอบคุณมากครับ");
+            }
+            appData.closedReports.push({ id: Date.now(), placeId: placeId, storeName: placeName, date: new Date().toLocaleString('th-TH') });
+            saveData();
+            alert("ส่งเรื่องแจ้งแอดมินเรียบร้อยแล้ว ขอบคุณที่ร่วมแบ่งปันข้อมูลครับ!");
+        }
+    }
+
+    // 💡 ฟังก์ชันฝั่งแอดมิน: ยืนยันแบนร้านที่ปิดไปแล้ว
+    function confirmClosedReport(reportId, placeId) {
+        if(confirm("ต้องการแบนร้านนี้เพื่อไม่ให้แสดงในระบบอีกใช่หรือไม่?")) {
+            if(!appData.blacklistedPlaces.includes(placeId)) {
+                appData.blacklistedPlaces.push(placeId);
+            }
+            appData.closedReports = appData.closedReports.filter(r => r.id != reportId);
+            saveData();
+            alert("นำร้านนี้ออกจากระบบเรียบร้อยแล้วครับ");
+            executeSearch(); // รีเฟรชการค้นหาใหม่ทันที
+        }
+    }
+
+    // 💡 ฟังก์ชันฝั่งแอดมิน: ปฏิเสธคำแจ้ง (ร้านยังเปิดอยู่)
+    function rejectClosedReport(reportId) {
+        if(confirm("ต้องการลบคำแจ้งเตือนนี้ทิ้งใช่หรือไม่?")) {
+            appData.closedReports = appData.closedReports.filter(r => r.id != reportId);
+            saveData();
+        }
     }
 
     function renderUI() {
-        // 💡 เช็ควันหมดอายุอัตโนมัติ (Auto-Delete Expired Promos)
+        // เช็ควันหมดอายุอัตโนมัติ (Auto-Delete Expired Promos)
         const now = Date.now();
         const initialCount = appData.activePromotions.length;
         appData.activePromotions = appData.activePromotions.filter(p => !p.expireTimestamp || p.expireTimestamp > now);
@@ -335,6 +379,23 @@
         }
 
         document.getElementById('activePromoTitle').innerHTML = `โปรโมชั่นที่กำลังแสดง <span>(Active: ${appData.activePromotions.length}/10)</span>`;
+
+        // 🌟 เรนเดอร์กล่องแจ้งเตือนร้านปิดถาวร (แอดมิน)
+        const closedList = document.getElementById('adminClosedReports');
+        if(appData.closedReports && appData.closedReports.length > 0) {
+            closedList.innerHTML = appData.closedReports.map(r => `
+                <div style="border:1px solid var(--border); padding:15px; border-radius:10px; margin-bottom:12px; background: rgba(217, 83, 79, 0.1);">
+                    <h4 style="margin:0 0 5px 0; color:var(--danger);">🚩 ${r.storeName}</h4>
+                    <p style="font-size:12px; color:var(--text-muted); margin:0 0 10px 0;">แจ้งเตือนเมื่อ: ${r.date}</p>
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn-primary" style="padding:6px; flex:2; background:var(--danger); box-shadow:none;" onclick="confirmClosedReport('${r.id}', '${r.placeId}')">แบนซ่อนจากระบบ</button>
+                        <button class="btn-outline" style="padding:6px; flex:1;" onclick="rejectClosedReport('${r.id}')">ปฏิเสธ</button>
+                    </div>
+                </div>
+            `).join('');
+        } else {
+            closedList.innerHTML = '<p style="color:var(--text-muted); font-size:14px; text-align:center; padding:10px;">ไม่มีรายการแจ้งเตือน</p>';
+        }
 
         const banner = document.getElementById('promoBanner');
         const promoList = document.getElementById('approvedPromoList');
@@ -431,6 +492,7 @@
         adminServList.innerHTML = '';
         if (serviceSelect) { serviceSelect.innerHTML = appData.services.map(s => `<option value="${s.name}">${s.name} - ${s.price} ฿</option>`).join(''); }
         appData.services.forEach(s => { adminServList.innerHTML += `<li><span>${s.name} <br><strong style="color:var(--primary); font-size:14px;">${s.price} ฿</strong></span><button class="btn-outline" style="padding:5px 10px; font-size:12px; color:var(--danger); border-color:var(--danger); background:transparent;" onclick="deleteService(${s.id})">ลบ</button></li>`; });
+        
         const displayList = document.getElementById('displayServiceList');
         if(displayList){ displayList.innerHTML = appData.services.map(s => `<li><span>${s.name}</span> <strong style="color:var(--primary);">${s.price} ฿</strong></li>`).join(''); }
     }
@@ -448,16 +510,13 @@
     function searchRegStore() {
         const query = document.getElementById('regStoreName').value.trim();
         if (!query) return alert("กรุณาพิมพ์ชื่อร้าน");
-
         service.textSearch({ query: query, location: currentCoords, radius: 50000 }, (results, status) => {
             if (status === google.maps.places.PlacesServiceStatus.OK && results.length > 0) {
                 const place = results[0];
                 document.getElementById('regStoreVerifyCard').style.display = 'block';
                 document.getElementById('regVerifyStoreName').innerText = "✅ " + place.name;
                 document.getElementById('regVerifyStoreAddress').innerText = "📍 " + place.formatted_address;
-                
                 document.getElementById('regStoreName').value = place.name;
-
                 if (!regMiniMap) {
                     regMiniMap = new google.maps.Map(document.getElementById("regMiniMap"), { center: place.geometry.location, zoom: 16, mapTypeControl: false, streetViewControl: false });
                     regMiniMarker = new google.maps.Marker({ map: regMiniMap });
@@ -476,7 +535,6 @@
         const idCardFile = document.getElementById('regIdCard').files[0];
         const photoFile = document.getElementById('regStorePhoto').files[0];
         const commFile = document.getElementById('regCommercial').files[0];
-
         if (!name || !idCardFile || !photoFile) return alert("กรุณาค้นหาชื่อร้าน และแนบไฟล์สำคัญให้ครบครับ");
 
         const getBase64 = (file) => new Promise(resolve => {
@@ -485,41 +543,23 @@
             reader.onload = e => resolve(e.target.result);
             reader.readAsDataURL(file);
         });
-
         const idCardBase64 = await getBase64(idCardFile);
         const photoBase64 = await getBase64(photoFile);
         const commBase64 = await getBase64(commFile);
 
-        appData.registrationRequests.push({ 
-            id: Date.now(), storeName: name, idCard: idCardBase64, storePhoto: photoBase64, commercial: commBase64
-        }); 
+        appData.registrationRequests.push({ id: Date.now(), storeName: name, idCard: idCardBase64, storePhoto: photoBase64, commercial: commBase64 }); 
         saveData();
 
-        document.getElementById('regStoreName').value = '';
-        document.getElementById('regIdCard').value = ''; 
-        document.getElementById('regStorePhoto').value = ''; 
-        document.getElementById('regCommercial').value = '';
+        document.getElementById('regStoreName').value = ''; document.getElementById('regIdCard').value = ''; 
+        document.getElementById('regStorePhoto').value = ''; document.getElementById('regCommercial').value = '';
         document.getElementById('regStoreVerifyCard').style.display = 'none';
-        
         alert("ส่งข้อมูลให้ผู้ดูแลระบบเรียบร้อยแล้ว");
     }
 
-    function approveRegistration(reqId, storeName) {
-        const generatedPin = Math.floor(1000 + Math.random() * 9000).toString(); 
-        appData.registeredStores.push({ id: Date.now(), name: storeName, pin: generatedPin });
-        appData.registrationRequests = appData.registrationRequests.filter(r => r.id !== reqId); saveData();
-        alert(`อนุมัติสำเร็จ! PIN ร้านค้าคือ: [${generatedPin}]`);
-    }
+    function approveRegistration(reqId, storeName) { const generatedPin = Math.floor(1000 + Math.random() * 9000).toString(); appData.registeredStores.push({ id: Date.now(), name: storeName, pin: generatedPin }); appData.registrationRequests = appData.registrationRequests.filter(r => r.id !== reqId); saveData(); alert(`อนุมัติสำเร็จ! PIN ร้านค้าคือ: [${generatedPin}]`); }
     function rejectRegistration(reqId) { if(confirm("ปฏิเสธคำขอนี้?")) { appData.registrationRequests = appData.registrationRequests.filter(r => r.id !== reqId); saveData(); } }
     
-    function createStoreAccount() {
-        const name = document.getElementById('newStoreName').value.trim();
-        const pin = document.getElementById('newStorePin').value.trim();
-        if (!name || !pin) return alert("กรอกข้อมูลให้ครบ");
-        appData.registeredStores.push({ id: Date.now(), name: name, pin: pin }); saveData();
-        document.getElementById('newStoreName').value = ''; document.getElementById('newStorePin').value = '';
-        alert(`สร้างสำเร็จ! PIN: [${pin}]`);
-    }
+    function createStoreAccount() { const name = document.getElementById('newStoreName').value.trim(); const pin = document.getElementById('newStorePin').value.trim(); if (!name || !pin) return alert("กรอกข้อมูลให้ครบ"); appData.registeredStores.push({ id: Date.now(), name: name, pin: pin }); saveData(); document.getElementById('newStoreName').value = ''; document.getElementById('newStorePin').value = ''; alert(`สร้างสำเร็จ! PIN: [${pin}]`); }
     function deleteStore(id) { if(confirm("ยืนยันการลบร้านค้า?")) { appData.registeredStores = appData.registeredStores.filter(s => s.id !== id); saveData(); } }
 
     let miniMap, miniMarker;
@@ -556,7 +596,7 @@
         const store = appData.registeredStores.find(s => s.pin === pin);
         if (!store) return alert("❌ รหัส PIN ไม่ถูกต้อง");
 
-        // 💡 เช็คกติกาการต่ออายุ (ถ้ามีโปรเดิมอยู่ ห้ามเหลือต่ำกว่า 24 ชม.)
+        // เช็คกติกาการต่ออายุ (ถ้ามีโปรเดิมอยู่ ห้ามเหลือต่ำกว่า 24 ชม.)
         const existingActive = appData.activePromotions.find(p => p.storeName === store.name);
         if (existingActive && existingActive.expireTimestamp) {
             const timeLeft = existingActive.expireTimestamp - Date.now();
@@ -569,27 +609,16 @@
         const savePromoData = (base64Image) => {
             appData.pendingPromotions = appData.pendingPromotions.filter(p => p.storeName !== store.name);
             appData.pendingPromotions.push({ 
-                id: Date.now().toString(), 
-                storeName: store.name, 
-                detail: detail, 
-                image: base64Image, 
-                service: selectedService, 
-                category: selectedCategory, 
-                date: new Date().toLocaleString('th-TH') 
+                id: Date.now().toString(), storeName: store.name, detail: detail, image: base64Image, service: selectedService, category: selectedCategory, date: new Date().toLocaleString('th-TH') 
             });
             saveData();
             
-            document.getElementById('storePinInput').value = ''; 
-            document.getElementById('promoDetail').value = '';
-            document.getElementById('promoImageInput').value = '';
-            document.getElementById('storeVerifyCard').style.display = 'none';
+            document.getElementById('storePinInput').value = ''; document.getElementById('promoDetail').value = ''; document.getElementById('promoImageInput').value = ''; document.getElementById('storeVerifyCard').style.display = 'none';
             alert(`ส่งข้อมูลสำเร็จ! กรุณารอการตรวจสอบจากผู้ดูแลระบบ`);
         };
 
         if (imageInput.files && imageInput.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) { savePromoData(e.target.result); };
-            reader.readAsDataURL(imageInput.files[0]);
+            const reader = new FileReader(); reader.onload = function(e) { savePromoData(e.target.result); }; reader.readAsDataURL(imageInput.files[0]);
         } else { savePromoData(''); }
     }
 
@@ -598,13 +627,10 @@
         if(!promo) return;
 
         const existingPromo = appData.activePromotions.find(p => p.storeName === promo.storeName);
-        
-        // 💡 เช็คโควต้า 10 โพสต์ (ถ้าร้านใหม่และโควต้าเต็ม บล็อกการอนุมัติ)
         if (!existingPromo && appData.activePromotions.length >= 10) {
             return alert("⚠️ โควต้าหน้าแรกเต็ม 10 รายการแล้ว!\nไม่สามารถอนุมัติร้านใหม่ได้ กรุณารอให้มีร้านหมดอายุหรือลบรายการเดิมออกก่อนครับ");
         }
 
-        // 💡 ดึงเวลาที่แอดมินตั้งและคำนวณวันหมดอายุ
         const daysInput = document.getElementById('duration_' + id);
         const days = daysInput ? parseInt(daysInput.value) : 30;
         const expireTime = Date.now() + (days * 24 * 60 * 60 * 1000);
@@ -717,7 +743,8 @@
         service.nearbySearch({ location: coords, radius: 5000, keyword: keyword }, (results, status) => {
             if (status === google.maps.places.PlacesServiceStatus.OK && results) {
                 
-                const activePlaces = results.filter(p => p.business_status === 'OPERATIONAL');
+                // 💡 กรองร้านที่ปิดแล้ว หรือร้านที่ติดอยู่ใน Blacklist ออกไป
+                const activePlaces = results.filter(p => p.business_status === 'OPERATIONAL' && !appData.blacklistedPlaces.includes(p.place_id));
 
                 if(activePlaces.length > 0) {
                     googlePlaces = activePlaces; 
@@ -799,6 +826,9 @@
                             <button class="btn-action btn-nav" onclick="window.open('${navUrl}', '_blank'); event.stopPropagation();">นำทาง</button>
                             <button class="btn-action btn-call" onclick="callPlace('${p.place_id}', event)">โทร</button>
                             <button class="btn-action btn-share" onclick="sharePlace('${p.name.replace(/'/g, "\\'")}', ${lat}, ${lng}, event)">แชร์</button>
+                        </div>
+                        <div style="margin-top: 15px; text-align: right;">
+                            <span style="font-size: 11px; color: var(--danger); cursor: pointer; border-bottom: 1px dotted var(--danger); transition: 0.2s;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" onclick="reportClosed('${p.place_id}', '${p.name.replace(/'/g, "\\'")}', event)">🚩 แจ้งร้านปิดถาวร</span>
                         </div>
                     </div>
                 </div>`;
