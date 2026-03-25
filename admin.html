@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบหลังบ้าน - Painaidee Admin</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap');
+        :root {
+            --primary: #C5A059; --primary-light: #DFBF8B; --primary-hover: #AF8B48; 
+            --dark: #121418; --dark-light: #1A1D23; --dark-muted: #2A2E36;    
+            --bg-light: #121418; --surface: #1A1D23; --border: rgba(197, 160, 89, 0.2); 
+            --text-main: #FFFFFF; --text-gold: #C5A059; --text-muted: #999999; --danger: #D9534F;        
+        }
+        body { font-family: 'Kanit', sans-serif; margin: 0; background-color: var(--bg-light); padding-bottom: 50px; color: var(--text-gold); }
+        
+        nav { display: flex; justify-content: space-around; background: var(--surface); padding: 12px 0; position: sticky; top: 0; z-index: 2000; box-shadow: 0 4px 20px rgba(0,0,0,0.1); border-bottom: 1px solid var(--border); }
+        nav div { cursor: pointer; font-weight: 500; color: var(--text-muted); padding: 12px 20px; transition: 0.3s; position: relative; letter-spacing: 0.5px; }
+        nav div.active { color: var(--primary); font-weight: 600; }
+        nav div.active::after { content: ''; position: absolute; bottom: 0; left: 15%; width: 70%; height: 3px; background: var(--primary); border-radius: 3px 3px 0 0; }
+
+        header { background: var(--dark); color: var(--surface); padding: 30px 20px; text-align: center; border-radius: 0 0 24px 24px; margin-bottom: 20px; border: 1px solid var(--border); border-top: none; }
+        header h1 { margin: 0; color: var(--primary); font-weight: 600; letter-spacing: 1px; }
+
+        .page { padding: 15px; max-width: 900px; margin: 0 auto; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .input-row { display: flex; gap: 12px; margin-bottom: 12px; }
+        input[type="text"], input[type="number"] { padding: 14px; border-radius: 10px; border: 1px solid var(--border); font-family: 'Kanit'; font-size: 15px; outline: none; box-sizing: border-box; width: 100%; background: var(--dark); color: var(--primary-light); transition: 0.3s; }
+        input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(197, 160, 89, 0.15); background: var(--dark-light); }
+        
+        .btn-primary { padding: 14px 24px; background: var(--primary); color: white; border: none; border-radius: 10px; font-family: 'Kanit'; font-weight: 500; font-size: 15px; cursor: pointer; transition: 0.3s; width: 100%; box-shadow: 0 4px 10px rgba(197, 160, 89, 0.3); }
+        .btn-primary:hover { background: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(197, 160, 89, 0.5); }
+        .btn-secondary { background: var(--dark); color: var(--primary); padding: 12px 15px; border-radius: 10px; border: 1px solid var(--primary); cursor: pointer; font-family: 'Kanit'; font-weight: 500; text-align: center; transition: 0.3s; width: 100%;}
+        .btn-secondary:hover { background: var(--primary); color: white; transform: translateY(-2px); }
+        .btn-outline { background: transparent; color: var(--text-main); border: 1px solid var(--border); padding: 10px 15px; border-radius: 10px; cursor: pointer; font-family: 'Kanit'; font-weight: 500; transition: 0.3s; }
+        .btn-outline:hover { border-color: var(--primary); color: var(--primary); background: rgba(197, 160, 89, 0.1); }
+
+        .dashboard-card { background: var(--surface); padding: 25px; border-radius: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); margin-bottom: 24px; border: 1px solid var(--border); }
+        .dashboard-card h3 { margin-top: 0; color: var(--primary-light); border-bottom: 2px solid var(--border); padding-bottom: 12px; font-weight: 500; }
+        .price-list { list-style: none; padding: 0; margin: 0; }
+        .price-list li { display: flex; justify-content: space-between; padding: 15px 10px; border-bottom: 1px solid var(--border); align-items: center; transition: 0.2s; }
+        .price-list li:hover { background: rgba(197, 160, 89, 0.05); border-radius: 8px; }
+
+        .img-modal { display: none; position: fixed; z-index: 9999; padding-top: 50px; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(18, 20, 24, 0.95); backdrop-filter: blur(8px); }
+        .img-modal-content { margin: auto; display: block; max-width: 90%; max-height: 80vh; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); object-fit: contain; border: 2px solid var(--primary-light); }
+        .img-modal-close { position: absolute; top: 20px; right: 35px; color: var(--primary); font-size: 40px; font-weight: 300; cursor: pointer; transition: 0.3s; }
+        .img-modal-close:hover { color: #FFF; transform: scale(1.1); }
+        .clickable-img { cursor: pointer; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-color: var(--primary); }
+        .clickable-img:hover { opacity: 0.85; transform: scale(1.05); }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div onclick="window.location.href='index.html'">⬅️ กลับแอปหลัก</div>
+    <div class="active">⚙️ ระบบจัดการหลังบ้าน</div>
+</nav>
+
+<div class="page">
+    <header><h1>Painaidee Admin</h1><p>แผงควบคุมผู้ดูแลระบบ</p></header>
+
+    <div class="dashboard-card" style="border-top: 3px solid var(--danger); border-bottom: 3px solid var(--danger);">
+        <h3 style="border:none; color: var(--danger);">ตรวจสอบร้านปิดถาวร <span>(แจ้งจากผู้ใช้)</span></h3>
+        <p style="font-size:12px; color:var(--text-muted); margin-top:-10px; margin-bottom:15px;">*หากยืนยัน ร้านจะถูกลบและไม่แสดงบนแผนที่อีก</p>
+        <div id="adminClosedReports"></div>
+    </div>
+
+    <div class="dashboard-card" style="border-top: 3px solid var(--primary); border-bottom: 3px solid var(--primary);">
+        <h3 style="border:none;">คำขอโปรโมชั่น <span>(รอตรวจสอบ)</span></h3>
+        <p style="font-size:12px; color:var(--text-muted); margin-top:-10px; margin-bottom:15px;">*ระบุจำนวนวันแสดงผล และคลิกที่รูปภาพเพื่อขยายดูรายละเอียด</p>
+        <div id="adminPromoRequests"></div>
+    </div>
+
+    <div class="dashboard-card">
+        <h3 id="activePromoTitle">โปรโมชั่นที่กำลังแสดง <span>(Active: 0/10)</span></h3>
+        <ul id="activePromoList" class="price-list"></ul>
+    </div>
+
+    <div class="dashboard-card">
+        <h3>คำขอลงทะเบียนร้าน <span>(รอตรวจสอบ)</span></h3>
+        <div id="adminRegistrationRequests"></div>
+    </div>
+    
+    <div class="dashboard-card">
+        <h3>สร้างรหัสลับร้านค้า (Store PIN)</h3>
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <input type="text" id="newStoreName" placeholder="ชื่อร้านค้า" style="flex: 2;">
+            <input type="text" id="newStorePin" placeholder="รหัส PIN" style="flex: 1;">
+        </div>
+        <button class="btn-secondary" onclick="createStoreAccount()">สร้างบัญชี</button>
+        <h4 style="margin-top: 25px; color:var(--text-main); font-weight:500;">ร้านที่ยืนยันแล้วในระบบ:</h4>
+        <ul id="adminStoreList" class="price-list"></ul>
+    </div>
+    
+    <div class="dashboard-card">
+        <h3>ตั้งค่าแพ็กเกจโฆษณา</h3>
+        <div class="input-row">
+            <input type="text" id="newServiceName" placeholder="ชื่อบริการ">
+            <input type="number" id="newServicePrice" placeholder="ราคา (฿)" style="width: 30%;">
+        </div>
+        <button class="btn-primary" onclick="addService()">เพิ่มแพ็กเกจ</button>
+        <h4 style="margin-top: 25px; color:var(--text-main); font-weight:500;">แพ็กเกจปัจจุบัน:</h4>
+        <ul id="adminServiceList" class="price-list"></ul>
+    </div>
+
+    <button class="btn-outline" style="width: 100%; padding: 15px; color: var(--danger); border-color: var(--danger);" onclick="clearAllData()">ล้างข้อมูลระบบทั้งหมด (Reset Data)</button>
+</div>
+
+<div id="imageViewerModal" class="img-modal" onclick="closeImageViewer()">
+    <span class="img-modal-close">×</span>
+    <img class="img-modal-content" id="expandedImage">
+</div>
+
+<script>
+    let appData = JSON.parse(localStorage.getItem('painaidee_auth')) || { registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], closedReports: [], blacklistedPlaces: [], services: [] };
+
+    function saveData() { localStorage.setItem('painaidee_auth', JSON.stringify(appData)); renderUI(); }
+    function openImageViewer(src, event) { if(event) event.stopPropagation(); document.getElementById('imageViewerModal').style.display = 'block'; document.getElementById('expandedImage').src = src; }
+    function closeImageViewer() { document.getElementById('imageViewerModal').style.display = 'none'; }
+
+    function renderUI() {
+        const now = Date.now();
+        appData.activePromotions = appData.activePromotions.filter(p => !p.expireTimestamp || p.expireTimestamp > now);
+
+        document.getElementById('activePromoTitle').innerHTML = `โปรโมชั่นที่กำลังแสดง <span>(Active: ${appData.activePromotions.length}/10)</span>`;
+
+        const closedList = document.getElementById('adminClosedReports');
+        if(appData.closedReports && appData.closedReports.length > 0) {
+            closedList.innerHTML = appData.closedReports.map(r => `
+                <div style="border:1px solid var(--border); padding:15px; border-radius:10px; margin-bottom:12px; background: rgba(217, 83, 79, 0.1);">
+                    <h4 style="margin:0 0 5px 0; color:var(--danger);">🚩 ${r.storeName}</h4>
+                    <p style="font-size:12px; color:var(--text-muted); margin:0 0 10px 0;">แจ้งเตือนเมื่อ: ${r.date}</p>
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn-primary" style="padding:6px; flex:2; background:var(--danger); box-shadow:none;" onclick="confirmClosedReport('${r.id}', '${r.placeId}')">แบนซ่อนจากระบบ</button>
+                        <button class="btn-outline" style="padding:6px; flex:1;" onclick="rejectClosedReport('${r.id}')">ปฏิเสธ</button>
+                    </div>
+                </div>
+            `).join('');
+        } else { closedList.innerHTML = '<p style="color:var(--text-muted); font-size:14px; text-align:center;">ไม่มีรายการแจ้งเตือน</p>'; }
+
+        const promoReqList = document.getElementById('adminPromoRequests');
+        if(appData.pendingPromotions.length > 0) {
+            promoReqList.innerHTML = appData.pendingPromotions.map(p => {
+                const imgTag = p.image ? `<img src="${p.image}" class="clickable-img" style="width:120px; height:80px; object-fit:cover; border-radius:8px; margin-bottom:12px; border: 1px solid var(--border);" onclick="openImageViewer('${p.image}', event)">` : '';
+                return `
+                <div style="border:1px solid var(--border); padding:18px; border-radius:12px; margin-bottom:15px; background: var(--surface);">
+                    <h4 style="margin:0 0 5px 0; color:var(--primary);">📋 ${p.storeName} <span style="font-size:12px; color:var(--text-muted);">(${p.category || 'ไม่ระบุ'})</span></h4>
+                    <p style="font-size:13px; color:var(--primary-light); margin:0 0 12px 0;">📦 แพ็กเกจ: ${p.service || 'ไม่ระบุ'}</p>
+                    ${imgTag}
+                    <p style="font-size:14px; color:var(--text-gold); margin:0 0 15px 0; background:rgba(0,0,0,0.2); padding:10px; border-radius:8px;">"${p.detail}"</p>
+                    <div style="display:flex; gap:10px; align-items:center; margin-bottom: 12px; background:rgba(197, 160, 89, 0.05); padding:8px; border-radius:8px;">
+                        <label style="color:var(--text-main); font-size:13px; margin:0;">เวลา (วัน):</label>
+                        <input type="number" id="duration_${p.id}" value="30" min="1" style="width: 80px; padding: 6px;">
+                    </div>
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn-primary" style="padding:8px; flex:2;" onclick="approvePendingPromo('${p.id}')">อนุมัติขึ้นระบบ</button>
+                        <button class="btn-outline" style="padding:8px; flex:1; color:var(--danger); border-color:var(--danger);" onclick="rejectPendingPromo('${p.id}')">ปฏิเสธ</button>
+                    </div>
+                </div>`;
+            }).join('');
+        } else { promoReqList.innerHTML = '<p style="color:var(--text-muted); font-size:14px; text-align:center;">ไม่มีโปรโมชั่นรอตรวจสอบ</p>'; }
+
+        document.getElementById('activePromoList').innerHTML = appData.activePromotions.length > 0 ? appData.activePromotions.map(p => {
+            const imgTag = p.image ? `<img src="${p.image}" class="clickable-img" style="width:65px; height:65px; object-fit:cover; border-radius:8px; margin-right:15px; border:1px solid var(--border);" onclick="openImageViewer('${p.image}', event)">` : '';
+            return `<li style="display:block; background:var(--surface); margin-bottom:12px; border-radius:12px; padding:18px; border:1px solid var(--border);"><div style="display:flex; justify-content:space-between; margin-bottom:12px;"><strong style="color:var(--primary); font-size:15px;">✨ ${p.storeName}</strong><button class="btn-outline" style="padding: 2px 8px; font-size:12px; color:var(--danger); border-color:var(--danger);" onclick="deleteActivePromo('${p.id}')">ลบออก</button></div><div style="display:flex; align-items:start;">${imgTag}<div style="flex:1;"><p style="margin:0; font-size:13px; color:var(--text-gold);">${p.detail}</p><p style="margin:8px 0 0 0; font-size:11px; color:var(--primary-light); background:rgba(197, 160, 89, 0.1); padding:4px 8px; border-radius:4px; display:inline-block;">⏳ หมดอายุ: ${p.expireDateStr || 'ไม่ระบุ'}</p></div></div></li>`;
+        }).join('') : '<li style="color:var(--text-muted); font-size:14px; text-align:center;">ยังไม่มีโปรโมชั่น</li>';
+
+        const reqList = document.getElementById('adminRegistrationRequests');
+        if(appData.registrationRequests.length > 0) {
+            reqList.innerHTML = appData.registrationRequests.map(req => {
+                const idImg = req.idCard ? `<img src="${req.idCard}" class="clickable-img" style="height:65px; width:90px; object-fit:cover; border-radius:6px; border:1px solid var(--border); margin-right:5px;" onclick="openImageViewer('${req.idCard}', event)">` : '';
+                const photoImg = req.storePhoto ? `<img src="${req.storePhoto}" class="clickable-img" style="height:65px; width:90px; object-fit:cover; border-radius:6px; border:1px solid var(--border); margin-right:5px;" onclick="openImageViewer('${req.storePhoto}', event)">` : '';
+                const commImg = req.commercial ? `<img src="${req.commercial}" class="clickable-img" style="height:65px; width:90px; object-fit:cover; border-radius:6px; border:1px solid var(--border); margin-right:5px;" onclick="openImageViewer('${req.commercial}', event)">` : '';
+                return `<div style="border:1px solid var(--border); padding:18px; border-radius:12px; margin-bottom:15px; background: var(--surface);"><h4 style="margin:0 0 12px 0; color:var(--primary);">🏪 ${req.storeName}</h4><div style="display:flex; margin-bottom:15px; overflow-x:auto; padding-bottom:5px;">${idImg} ${photoImg} ${commImg}</div><div style="display:flex; gap:10px;"><button class="btn-primary" style="padding:8px; flex:2;" onclick="approveRegistration(${req.id}, '${req.storeName}')">อนุมัติ & สร้าง PIN</button><button class="btn-outline" style="padding:8px; flex:1; color:var(--danger); border-color:var(--danger);" onclick="rejectRegistration(${req.id})">ปฏิเสธ</button></div></div>`;
+            }).join('');
+        } else { reqList.innerHTML = '<p style="color:var(--text-muted); font-size:14px; text-align:center;">ไม่มีคำขอใหม่</p>'; }
+
+        document.getElementById('adminStoreList').innerHTML = appData.registeredStores.length > 0 ? appData.registeredStores.map(s => `<li><span><b style="color:var(--primary);">${s.name}</b> <br><small style="color:var(--text-muted);">PIN: <span style="color:var(--primary-light); font-weight:600;">${s.pin}</span></small></span><button class="btn-danger" style="padding:5px 12px; font-size:12px;" onclick="deleteStore(${s.id})">ลบ</button></li>`).join('') : '<li style="color:var(--text-muted); font-size:14px; text-align:center;">ยังไม่มีร้านในระบบ</li>';
+
+        const adminServList = document.getElementById('adminServiceList');
+        adminServList.innerHTML = '';
+        appData.services.forEach(s => { adminServList.innerHTML += `<li><span>${s.name} <br><strong style="color:var(--primary); font-size:14px;">${s.price} ฿</strong></span><button class="btn-outline" style="padding:5px 10px; font-size:12px; color:var(--danger); border-color:var(--danger);" onclick="deleteService(${s.id})">ลบ</button></li>`; });
+    }
+
+    function confirmClosedReport(reportId, placeId) {
+        if(confirm("ต้องการแบนร้านนี้เพื่อไม่ให้แสดงในแอปหลักอีกใช่หรือไม่?")) {
+            if(!appData.blacklistedPlaces.includes(placeId)) appData.blacklistedPlaces.push(placeId);
+            appData.closedReports = appData.closedReports.filter(r => r.id != reportId); saveData(); alert("แบนร้านออกจากระบบสำเร็จ");
+        }
+    }
+    function rejectClosedReport(reportId) { if(confirm("ลบคำแจ้งเตือนนี้ทิ้ง?")) { appData.closedReports = appData.closedReports.filter(r => r.id != reportId); saveData(); } }
+
+    function approvePendingPromo(id) {
+        const promo = appData.pendingPromotions.find(p => p.id === id);
+        if(!promo) return;
+        const existingPromo = appData.activePromotions.find(p => p.storeName === promo.storeName);
+        if (!existingPromo && appData.activePromotions.length >= 10) return alert("⚠️ โควต้าหน้าแรกเต็ม 10 รายการแล้ว!\nกรุณารอให้มีร้านหมดอายุก่อนครับ");
+        const daysInput = document.getElementById('duration_' + id);
+        const days = daysInput ? parseInt(daysInput.value) : 30;
+        const expireTime = Date.now() + (days * 24 * 60 * 60 * 1000);
+        promo.expireTimestamp = expireTime; promo.expireDateStr = new Date(expireTime).toLocaleString('th-TH');
+        appData.activePromotions = appData.activePromotions.filter(p => p.storeName !== promo.storeName);
+        appData.activePromotions.push(promo); appData.pendingPromotions = appData.pendingPromotions.filter(p => p.id !== id); saveData();
+        alert(`✅ อนุมัติสำเร็จ! โพสต์แสดงผล ${days} วัน\n(หมดอายุ: ${promo.expireDateStr})`);
+    }
+    
+    function rejectPendingPromo(id) { if(confirm("ปฏิเสธโปรโมชั่นนี้?")) { appData.pendingPromotions = appData.pendingPromotions.filter(p => p.id !== id); saveData(); } }
+    function deleteActivePromo(id) { if(confirm("ลบออกจากหน้าแรก?")) { appData.activePromotions = appData.activePromotions.filter(p => p.id !== id); saveData(); } }
+    function approveRegistration(reqId, storeName) { const generatedPin = Math.floor(1000 + Math.random() * 9000).toString(); appData.registeredStores.push({ id: Date.now(), name: storeName, pin: generatedPin }); appData.registrationRequests = appData.registrationRequests.filter(r => r.id !== reqId); saveData(); alert(`อนุมัติสำเร็จ! PIN ร้านค้า: [${generatedPin}]`); }
+    function rejectRegistration(reqId) { if(confirm("ปฏิเสธคำขอนี้?")) { appData.registrationRequests = appData.registrationRequests.filter(r => r.id !== reqId); saveData(); } }
+    function createStoreAccount() { const name = document.getElementById('newStoreName').value.trim(), pin = document.getElementById('newStorePin').value.trim(); if (!name || !pin) return alert("กรอกข้อมูลให้ครบ"); appData.registeredStores.push({ id: Date.now(), name: name, pin: pin }); saveData(); document.getElementById('newStoreName').value = ''; document.getElementById('newStorePin').value = ''; alert(`สร้างสำเร็จ! PIN: [${pin}]`); }
+    function deleteStore(id) { if(confirm("ยืนยันการลบร้านค้า?")) { appData.registeredStores = appData.registeredStores.filter(s => s.id !== id); saveData(); } }
+    function addService() { const name = document.getElementById('newServiceName').value.trim(), price = document.getElementById('newServicePrice').value.trim(); if (!name || !price) return alert("กรุณากรอกข้อมูล"); appData.services.push({ id: Date.now(), name: name, price: parseInt(price) }); saveData(); document.getElementById('newServiceName').value = ''; document.getElementById('newServicePrice').value = ''; }
+    function deleteService(id) { if(confirm("ลบแพ็กเกจนี้?")) { appData.services = appData.services.filter(s => s.id !== id); saveData(); } }
+    function clearAllData() { if(confirm("ล้างข้อมูลทั้งหมด? (ข้อมูลจะหายไปถาวร)")) { localStorage.clear(); location.reload(); } }
+
+    window.onload = renderUI;
+</script>
+</body>
+</html>
