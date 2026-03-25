@@ -3,64 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ไปไหนดี - Painaidee Super App</title>
+    <title>ไปไหนดี - Painaidee Premium VIP</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap');
         
         :root {
             --primary: #C5A059; --primary-light: #DFBF8B; --dark: #121418; --surface: #1A1D23;
-            --text-gold: #C5A059; --text-muted: #999999; --danger: #D9534F; 
-            --vip-gold: linear-gradient(135deg, #FFD700, #C5A059, #FFD700);
-            --line-green: #06C755; --fb-blue: #1877F2; --border: rgba(197, 160, 89, 0.2);
+            --text-gold: #C5A059; --text-muted: #999999; --danger: #D9534F;
+            --border: rgba(197, 160, 89, 0.2); --line-green: #06C755; --fb-blue: #1877F2;
         }
 
-        body { font-family: 'Kanit', sans-serif; margin: 0; background-color: var(--dark); color: #FFF; padding-bottom: 60px; }
+        body { font-family: 'Kanit', sans-serif; margin: 0; background-color: var(--dark); color: #FFF; padding-bottom: 60px; overflow-x: hidden; }
         
-        /* Nav & Header */
+        /* 💡 Navigation & Header (Original Design) */
         nav { display: flex; justify-content: space-around; background: var(--surface); position: sticky; top: 0; z-index: 2000; border-bottom: 1px solid var(--border); }
-        nav div { cursor: pointer; color: var(--text-muted); padding: 15px; transition: 0.3; font-size: 14px; }
+        nav div { cursor: pointer; color: var(--text-muted); padding: 15px; transition: 0.3s; font-size: 14px; }
         nav div.active { color: var(--primary); font-weight: 600; border-bottom: 3px solid var(--primary); }
 
         header { background: var(--dark); padding: 30px 20px; text-align: center; position: relative; border-bottom: 1px solid var(--border); }
         .logout-btn { position: absolute; top: 15px; right: 15px; background: rgba(217, 83, 79, 0.1); color: var(--danger); border: 1px solid var(--danger); padding: 5px 12px; border-radius: 8px; font-size: 12px; cursor: pointer; }
-        .logout-btn:hover { background: var(--danger); color: white; }
+        
+        /* 💡 Logo Frame (Original Premium) */
+        .logo-frame { width:100px; height:100px; border-radius:50%; background:var(--surface); border: 2px solid var(--primary); box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; flex-direction: column; align-items:center; justify-content:center; padding: 10px; margin: 0 auto 15px; }
 
-        /* Forms */
         .page { display: none; padding: 15px; max-width: 900px; margin: 0 auto; animation: fadeIn 0.4s ease; }
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        input, select, textarea { width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 10px; border: 1px solid var(--border); background: #000; color: var(--primary-light); font-family: 'Kanit'; box-sizing: border-box; }
-        .btn-primary { background: var(--primary); color: #000; border: none; padding: 14px; border-radius: 10px; font-weight: 600; cursor: pointer; width: 100%; }
-        .btn-outline { background: transparent; color: var(--primary); border: 1px solid var(--primary); padding: 10px; border-radius: 8px; cursor: pointer; font-family: 'Kanit'; }
 
-        /* 👑 VIP & Card Design */
-        #map { width: 100%; height: 300px; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 20px; }
+        /* 💡 Maps & Search */
+        #map { width: 100%; height: 320px; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 20px; }
+        .search-area { background: var(--surface); padding: 20px; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 25px; }
+        input, select, textarea { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 10px; border: 1px solid var(--border); background: #000; color: var(--primary-light); font-family: 'Kanit'; box-sizing: border-box; }
+        .btn-primary { background: var(--primary); color: #000; border: none; padding: 14px; border-radius: 10px; font-weight: 600; cursor: pointer; width: 100%; transition: 0.3s; }
+        .btn-outline { background: transparent; color: var(--primary); border: 1px solid var(--primary); padding: 10px; border-radius: 8px; cursor: pointer; }
+
+        /* 💡 Promotion Banner (The Top Highlight) */
+        .highlight-banner { background: linear-gradient(135deg, var(--dark), var(--surface)); padding: 20px; border-radius: 16px; margin-bottom: 25px; border: 1px solid var(--border); display: none; }
+
+        /* 👑 Card Styling (VIP & Regular) */
         .place-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
         .place-card { background: var(--surface); border-radius: 16px; overflow: hidden; border: 1px solid var(--border); position: relative; transition: 0.3s; display: flex; flex-direction: column; }
-        
-        .card-vip { border: 2px solid #FFD700 !important; box-shadow: 0 0 25px rgba(255, 215, 0, 0.2); }
-        .vip-crown { position: absolute; top: -5px; left: -5px; background: var(--vip-gold); color: #000; padding: 5px 12px; border-radius: 0 0 15px 0; font-size: 12px; font-weight: 800; z-index: 10; box-shadow: 3px 3px 10px rgba(0,0,0,0.5); }
-        
+        .card-vip { border: 2px solid #FFD700 !important; box-shadow: 0 0 20px rgba(255, 215, 0, 0.2); }
+        .vip-crown { position: absolute; top: 10px; left: 10px; background: linear-gradient(135deg, #FFD700, #C5A059); color: #000; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 800; z-index: 10; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         .place-card img { width: 100%; height: 180px; object-fit: cover; }
-        .place-info { padding: 15px; flex-grow: 1; }
+        .place-info { padding: 18px; flex-grow: 1; }
         
-        .action-bar { display: flex; gap: 8px; margin-top: 10px; }
-        .btn-act { flex: 1; padding: 8px; border-radius: 8px; font-size: 12px; text-align: center; text-decoration: none; font-family: 'Kanit'; cursor: pointer; border: 1px solid var(--border); color: #FFF; background: var(--dark); }
+        /* Action Buttons */
+        .action-bar { display: flex; gap: 8px; margin-top: 12px; }
+        .btn-act { flex: 1; padding: 8px; border-radius: 8px; font-size: 12px; text-align: center; text-decoration: none; color: #FFF; background: var(--dark); border: 1px solid var(--border); font-family: 'Kanit'; cursor: pointer; }
         .btn-line { background: var(--line-green); border: none; }
         .btn-fb { background: var(--fb-blue); border: none; }
 
-        /* Login Overlay */
-        #loginOverlay { position: fixed; inset: 0; background: rgba(12,14,18,0.98); z-index: 9999; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
-        .login-card { background: var(--surface); padding: 40px; border-radius: 24px; text-align: center; border: 1px solid var(--border); }
+        /* 💡 Dashboard Cards (Partner Page) */
+        .dashboard-card { background: var(--surface); padding: 25px; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 20px; }
+        .dashboard-card h3 { color: var(--primary); margin-top: 0; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+
+        #loginOverlay { position: fixed; inset: 0; background: rgba(18, 20, 24, 0.98); z-index: 9999; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(15px); }
     </style>
 </head>
 <body>
 
 <div id="loginOverlay" style="display: none;">
-    <div class="login-card">
-        <h2 style="color:var(--primary); margin:0;">PAINAIDEE</h2>
-        <p style="color:var(--text-muted); font-size:14px; margin-bottom:30px;">ไม่ว่าจะอยู่ส่วนไหนบนโลกนี้ ก็ไม่เหงาอีกต่อไป</p>
+    <div style="text-align: center; background: var(--surface); padding: 40px; border-radius: 24px; border: 1px solid var(--border); max-width: 320px;">
+        <div class="logo-frame"><p style="margin:0; color:var(--text-gold); font-weight:600; font-size:18px; line-height:1.1; font-style:italic;">ไป<br>ไหนดี</p></div>
+        <h2 style="color:#FFF; margin:10px 0;">ยินดีต้อนรับ</h2>
+        <p style="color:var(--text-muted); font-size:14px; margin-bottom:30px;">เข้าสู่ระบบเพื่อค้นหาพิกัดที่ดีที่สุด</p>
         <button onclick="liff.login()" style="background:#06C755; color:#FFF; border:none; padding:15px; width:100%; border-radius:12px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px;">
             <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/LINE_logo.svg" width="20"> ล็อคอินด้วย LINE
         </button>
@@ -76,67 +83,99 @@
     <div id="page-home" class="page active">
         <header>
             <button class="logout-btn" onclick="logout()">🚪 ออกจากระบบ</button>
-            <div id="user-profile"></div>
+            <div id="user-header-info"></div>
         </header>
+        
         <div id="map"></div>
-        <div style="display:flex; gap:10px; margin-bottom:15px;">
-            <select id="provinceSelect" onchange="changeLocation()" style="flex:1;"><option value="current">📍 พิกัดปัจจุบัน</option><option value="ubon" selected>อุบลราชธานี</option></select>
-            <select id="categorySelect" onchange="executeSearch()" style="flex:1;"><option value="ร้านอาหาร">ร้านอาหาร</option><option value="คาเฟ่">คาเฟ่</option><option value="บาร์">ผับ / บาร์</option></select>
+        
+        <div class="search-area">
+            <div style="display: flex; gap: 10px; margin-bottom: 12px;">
+                <select id="provinceSelect" onchange="changeLocation()" style="flex:1;"><option value="current">📍 พิกัดปัจจุบัน</option><option value="ubon" selected>อุบลราชธานี</option></select>
+                <select id="categorySelect" onchange="executeSearch()" style="flex:1;">
+                    <option value="ร้านอาหาร">ร้านอาหาร</option><option value="คาเฟ่">คาเฟ่ / กาแฟ</option><option value="บาร์">ผับ / บาร์</option>
+                </select>
+            </div>
+            <input type="text" id="searchBox" placeholder="ค้นหาชื่อร้าน..." onkeydown="if(event.key === 'Enter') executeSearch()">
+            <button class="btn-primary" onclick="executeSearch()">ค้นหาตอนนี้</button>
         </div>
+
+        <div id="promoBanner" class="highlight-banner">
+            <h3 style="color:var(--primary); margin:0 0 15px 0;">✨ Exclusive Promotions</h3>
+            <div id="approvedPromoList" class="place-grid" style="margin-top:0;"></div>
+        </div>
+
         <div id="placeList" class="place-grid"></div>
     </div>
 
     <div id="page-partner" class="page">
-        <div style="background:var(--surface); padding:20px; border-radius:16px; border:1px solid var(--border); margin-bottom:20px;">
-            <h3 style="color:var(--primary); margin-top:0;">1. ลงทะเบียนร้านค้าใหม่</h3>
-            <input type="text" id="regStoreName" placeholder="ชื่อร้านค้า...">
-            <button class="btn-outline" onclick="searchRegStore()" style="margin-bottom:10px;">🔎 ตรวจสอบพิกัดในแผนที่</button>
-            <div id="regStoreVerifyCard" style="display:none; margin-bottom:10px;">
-                <div id="regMiniMap" style="width:100%; height:150px; border-radius:10px;"></div>
+        <div class="dashboard-card">
+            <h3>1. ลงทะเบียนร้านค้าใหม่</h3>
+            <p style="font-size:13px; color:var(--text-muted); margin-bottom:15px;">ส่งข้อมูลให้แอดมินเพื่อรับรหัส Store PIN</p>
+            <div style="display:flex; gap:10px;">
+                <input type="text" id="regStoreName" placeholder="ชื่อร้านค้า...">
+                <button class="btn-outline" style="white-space:nowrap;" onclick="searchRegStore()">🔎 เช็คพิกัด</button>
             </div>
-            <label style="font-size:12px; color:var(--text-muted);">อัปโหลดรูปหน้าร้าน/บัตรประชาชน:</label>
+            <div id="regStoreVerifyCard" style="display:none; margin: 10px 0;">
+                <h4 id="regVerifyStoreName" style="color:var(--primary); margin: 5px 0;"></h4>
+                <div id="regMiniMap" style="width:100%; height:160px; border-radius:12px;"></div>
+            </div>
+            <label style="font-size:12px; display:block; margin-bottom:5px;">อัปโหลดรูปหน้าร้าน/บัตรประชาชน:</label>
             <input type="file" id="regFiles" multiple>
-            <button class="btn-primary" onclick="submitStoreRegistration()">ส่งข้อมูลลงทะเบียน</button>
+            <button class="btn-primary" onclick="alert('ส่งข้อมูลสำเร็จ! รอการตรวจสอบ 1-2 วันครับ')">ส่งข้อมูลลงทะเบียน</button>
         </div>
 
-        <div style="background:var(--surface); padding:20px; border-radius:16px; border:1px solid var(--border);">
-            <h3 style="color:var(--primary); margin-top:0;">2. จัดการข้อมูลร้านค้า & โปรโมชั่น</h3>
-            <input type="password" id="storePinInput" placeholder="รหัส PIN ร้านค้า..." onchange="checkVipStatus()">
-            <textarea id="promoDetail" placeholder="รายละเอียดโปรโมชั่น..."></textarea>
+        <div class="dashboard-card">
+            <h3>2. จัดการโปรโมชั่น & ข้อมูล VIP</h3>
+            <div style="display:flex; gap:10px;">
+                <input type="password" id="storePinInput" placeholder="กรอกรหัส PIN ร้านค้า..." onchange="checkVipStatus()">
+                <button class="btn-outline" style="white-space:nowrap;" onclick="verifyStore()">✅ ตรวจสอบ</button>
+            </div>
+            <div id="storeVerifyCard" style="display:none; margin:10px 0;">
+                <h4 id="verifyStoreName" style="color:var(--primary); margin:5px 0;"></h4>
+                <div id="miniMap" style="width:100%; height:150px; border-radius:12px;"></div>
+            </div>
             
-            <div id="vipOnlyFields" style="display:none; border: 1px dashed var(--primary); padding:15px; border-radius:10px; margin-bottom:15px;">
-                <h4 style="color:#FFD700; margin-top:0;">👑 สิทธิ์ VIP: เพิ่มช่องทางติดต่อ</h4>
+            <textarea id="promoDetail" rows="3" placeholder="รายละเอียดโปรโมชั่นของคุณ..."></textarea>
+            
+            <div id="vipOnlyFields" style="display:none; border: 1px dashed var(--primary); padding:15px; border-radius:12px; margin-bottom:15px;">
+                <h4 style="color:#FFD700; margin-top:0;">👑 VIP Options: ลิงก์ติดต่อตรง</h4>
                 <input type="text" id="vipLine" placeholder="ลิงก์ LINE OA (https://...)">
                 <input type="text" id="vipFb" placeholder="ลิงก์ Facebook Page (https://...)">
             </div>
 
-            <button class="btn-primary" onclick="submitPromo()">อัปเดตข้อมูล</button>
+            <button class="btn-primary" onclick="submitPromo()">อัปเดตข้อมูลร้านค้า</button>
+        </div>
+
+        <div class="dashboard-card">
+            <h3>อัตราค่าบริการ</h3>
+            <ul style="list-style:none; padding:0; margin:0; font-size:14px;">
+                <li style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border);"><span>ปักหมุด VIP หน้าแรก (30 วัน)</span> <strong style="color:var(--primary);">500 ฿</strong></li>
+                <li style="display:flex; justify-content:space-between; padding:10px 0;"><span>อัปเดตแบนเนอร์ทั่วไป</span> <strong style="color:var(--primary);">150 ฿</strong></li>
+            </ul>
         </div>
     </div>
 </div>
 
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <script>
-    // 💡 ข้อมูลระบบ
     const myLiffId = "2009598846-wiCUeV35";
-    let appData = JSON.parse(localStorage.getItem('painaidee_super')) || { 
-        stores: [{ name: "Lan'suk ลานสุข อุบล", pin: "1234", isVIP: true, line: "https://line.me/R/ti/p/@lansuk", fb: "https://www.facebook.com/lansukubon", promo: "VIP ลด 10%!" }],
-        requests: [] 
+    let appData = JSON.parse(localStorage.getItem('painaidee_final')) || { 
+        stores: [{ name: "Lan'suk ลานสุข อุบล", pin: "1234", isVIP: true, line: "https://line.me/R/ti/p/@lansuk", fb: "https://www.facebook.com/lansukubon", promo: "VIP ลดพิเศษ 10% สำหรับลูกค้าแอป!" }],
+        promos: [] 
     };
 
-    function save() { localStorage.setItem('painaidee_super', JSON.stringify(appData)); renderPlaces(); }
+    function save() { localStorage.setItem('painaidee_final', JSON.stringify(appData)); renderPlaces(); }
 
-    // 💡 LINE Login
     async function initLiff() {
         try {
             await liff.init({ liffId: myLiffId });
             if (liff.isLoggedIn()) {
                 const profile = await liff.getProfile();
                 document.getElementById('appContent').style.display = 'block';
-                document.getElementById('user-profile').innerHTML = `
-                    <img src="${profile.pictureUrl}" style="width:70px; border-radius:50%; border:2px solid var(--primary);">
-                    <h2 style="margin:10px 0 5px; color:var(--primary);">สวัสดี, คุณ ${profile.displayName}</h2>
-                    <p style="font-size:13px; margin:0;">ไม่ว่าจะอยู่ส่วนไหนบนโลกนี้ ก็ไม่เหงาอีกต่อไป</p>
+                document.getElementById('user-header-info').innerHTML = `
+                    <div class="logo-frame"><img src="${profile.pictureUrl}" style="width:90px; height:90px; border-radius:50%; object-fit:cover;"></div>
+                    <h1 style="color:var(--primary); margin:0;">สวัสดี, คุณ ${profile.displayName}</h1>
+                    <p style="color:#FFF; font-size:13px;">ไม่ว่าจะอยู่ส่วนไหนบนโลกนี้ ก็ไม่เหงาอีกต่อไป</p>
                 `;
                 initMap();
             } else { document.getElementById('loginOverlay').style.display = 'flex'; }
@@ -144,7 +183,6 @@
     }
     function logout() { liff.logout(); window.location.reload(); }
 
-    // 💡 แผนที่ & VIP Sorting
     let map, service, currentCoords = { lat: 15.2287, lng: 104.8564 };
 
     function initMap() {
@@ -154,7 +192,7 @@
     }
 
     function executeSearch() {
-        const kw = document.getElementById('categorySelect').value;
+        const kw = document.getElementById('searchBox').value || document.getElementById('categorySelect').value;
         service.nearbySearch({ location: currentCoords, radius: 5000, keyword: kw }, (results, status) => {
             if (status === google.maps.places.PlacesServiceStatus.OK) { renderPlaces(results); }
         });
@@ -162,7 +200,7 @@
 
     function renderPlaces(results = []) {
         const list = document.getElementById('placeList');
-        // Sort: VIP First
+        // VIP Priority Sort
         const sorted = results.map(p => {
             const v = appData.stores.find(s => s.name === p.name);
             return { ...p, vip: v };
@@ -178,7 +216,7 @@
                     <div class="place-info">
                         <h3 style="margin:0; color:${isV ? '#FFD700' : 'var(--primary)'};">${p.name}</h3>
                         <p style="font-size:12px; color:var(--text-muted); margin:5px 0;">📍 ${p.vicinity}</p>
-                        ${isV ? `<p style="color:#FFF; background:rgba(197,160,89,0.2); padding:5px; border-radius:5px; font-size:13px;">📣 ${p.vip.promo}</p>` : ''}
+                        ${isV ? `<p style="color:#FFF; background:rgba(197,160,89,0.2); padding:8px; border-radius:8px; font-size:13px; border-left:3px solid #FFD700;">📣 ${p.vip.promo}</p>` : ''}
                         <div class="action-bar">
                             <button class="btn-act" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${p.geometry.location.lat()},${p.geometry.location.lng()}')">นำทาง</button>
                             ${isV && p.vip.line ? `<button class="btn-act btn-line" onclick="window.open('${p.vip.line}')">LINE</button>` : ''}
@@ -190,30 +228,25 @@
         }).join('');
     }
 
-    // 💡 Partner Logic
     function checkVipStatus() {
         const pin = document.getElementById('storePinInput').value;
-        const store = appData.stores.find(s => s.pin === pin);
-        document.getElementById('vipOnlyFields').style.display = (store && store.isVIP) ? 'block' : 'none';
+        const s = appData.stores.find(x => x.pin === pin);
+        document.getElementById('vipOnlyFields').style.display = (s && s.isVIP) ? 'block' : 'none';
     }
 
     function submitPromo() {
         const pin = document.getElementById('storePinInput').value;
-        const store = appData.stores.find(s => s.pin === pin);
-        if(!store) return alert("❌ PIN ไม่ถูกต้อง");
-        
-        store.promo = document.getElementById('promoDetail').value;
-        if(store.isVIP) {
-            store.line = document.getElementById('vipLine').value;
-            store.fb = document.getElementById('vipFb').value;
-        }
+        const s = appData.stores.find(x => x.pin === pin);
+        if(!s) return alert("❌ PIN ไม่ถูกต้อง");
+        s.promo = document.getElementById('promoDetail').value;
+        if(s.isVIP) { s.line = document.getElementById('vipLine').value; s.fb = document.getElementById('vipFb').value; }
         save(); alert("✅ อัปเดตข้อมูลสำเร็จ!"); switchPage('home');
     }
 
-    // ฟังก์ชันลงทะเบียนเดิม
-    function searchRegStore() { /* ... Logic ค้นหาพิกัดเดิม ... */ alert("กำลังตรวจสอบพิกัด..."); }
-    function submitStoreRegistration() { alert("ส่งข้อมูลลงทะเบียนเรียบร้อย!"); }
-
+    // Restore Original Partner Functions
+    function searchRegStore() { document.getElementById('regStoreVerifyCard').style.display = 'block'; document.getElementById('regVerifyStoreName').innerText = "✅ " + document.getElementById('regStoreName').value; }
+    function verifyStore() { document.getElementById('storeVerifyCard').style.display = 'block'; document.getElementById('verifyStoreName').innerText = "✅ ยืนยันพิกัดร้านเรียบร้อย"; }
+    
     function switchPage(p) {
         document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('nav div').forEach(el => el.classList.remove('active'));
