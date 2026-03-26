@@ -111,7 +111,6 @@
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(18, 20, 24, 0.95); backdrop-filter: blur(15px); z-index: 9999; display: flex; align-items: center; justify-content: center; }
         .login-card { background: var(--surface); padding: 40px; border-radius: 24px; text-align: center; max-width: 350px; width: 90%; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid var(--border); animation: fadeIn 0.5s ease; }
         .btn-line-login { background-color: var(--line-green); color: white; border: none; padding: 15px 20px; border-radius: 12px; font-family: 'Kanit'; font-weight: 600; font-size: 16px; width: 100%; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 5px 15px rgba(6, 199, 85, 0.3); }
-        .btn-line-login:hover { background-color: #05a044; transform: translateY(-2px); }
         
         #appContent { display: none; }
     </style>
@@ -124,7 +123,7 @@
             <p style="margin: 0; color:var(--text-gold); font-family: 'Kanit'; font-weight: 600; font-size: 18px; line-height: 1.1; font-style: italic;">ไป<br>ไหนดี</p>
         </div>
         <h2 style="color: #FFF; margin: 0 0 10px 0;">ยินดีต้อนรับ</h2>
-        <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 30px;">กรุณาเข้าสู่ระบบผ่าน LINE เพื่อค้นหาร้านอาหารและรับโปรโมชั่นพิเศษ</p>
+        <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 30px;">กรุณาเข้าสู่ระบบผ่าน LINE เพื่อค้นหาและรับโปรโมชั่นพิเศษ</p>
         <button class="btn-line-login" onclick="loginWithLine()">
             <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/LINE_logo.svg" alt="LINE" width="24"> เข้าสู่ระบบด้วย LINE
         </button>
@@ -161,41 +160,41 @@
                 
                 <select id="categorySelect" onchange="executeSearch('food')">
                     <option value="ร้านอาหาร">🍽️ อาหาร/เครื่องดื่ม</option>
-                    <option value="หมูกระทะ แจ่วฮ้อน">หมูกระทะ / แจ่วฮ้อน</option>
-                    <option value="ชาบู สุกี้">ชาบู / สุกี้</option>
+                    <option value="หมูกระทะ">หมูกระทะ / แจ่วฮ้อน</option>
+                    <option value="ชาบู">ชาบู / สุกี้</option>
                     <option value="ปิ้งย่าง">ปิ้งย่าง</option>
                     <option value="อาหารตามสั่ง">อาหารตามสั่ง</option>
                     <option value="ก๋วยเตี๋ยว">ก๋วยเตี๋ยว / เส้น</option>
-                    <option value="ส้มตำ ยำ">ส้มตำ / ยำ</option>
-                    <option value="คาเฟ่ ร้านกาแฟ">คาเฟ่ / ขนม</option>
+                    <option value="ส้มตำ">ส้มตำ / ยำ</option>
+                    <option value="คาเฟ่">คาเฟ่ / ขนม</option>
                     <option value="บาร์">บาร์</option>
                 </select>
                 
                 <select id="beautySelect" onchange="executeSearch('beauty')">
-                    <option value="ร้านนวด คลินิก">💆‍♀️ ความงาม/พักผ่อน</option>
-                    <option value="ร้านนวด สปา">ร้านนวด / สปา</option>
-                    <option value="คลินิกเสริมความงาม">คลินิกเสริมความงาม</option>
-                    <option value="ร้านเสริมสวย ทำผม">ร้านเสริมสวย / ทำผม</option>
+                    <option value="สปา">💆‍♀️ ความงาม/พักผ่อน</option>
+                    <option value="ร้านนวด">ร้านนวด / สปา</option>
+                    <option value="คลินิกความงาม">คลินิกเสริมความงาม</option>
+                    <option value="ร้านทำผม">ร้านเสริมสวย / ทำผม</option>
                     <option value="ร้านทำเล็บ">ร้านทำเล็บ</option>
                 </select>
 
                 <select id="activitySelect" onchange="executeSearch('activity')">
                     <option value="สถานที่ท่องเที่ยว">🎯 กิจกรรม/ท่องเที่ยว</option>
-                    <option value="แคมป์ปิ้ง ลานกางเต็นท์">แคมป์ปิ้ง / กางเต็นท์</option>
-                    <option value="สวนสนุก สวนน้ำ">สวนสนุก / สวนน้ำ</option>
+                    <option value="แคมป์ปิ้ง">แคมป์ปิ้ง / กางเต็นท์</option>
+                    <option value="สวนสนุก">สวนสนุก / สวนน้ำ</option>
                     <option value="สวนสัตว์">สวนสัตว์</option>
                     <option value="พิพิธภัณฑ์">พิพิธภัณฑ์</option>
                     <option value="โรงภาพยนตร์">โรงภาพยนตร์</option>
                 </select>
 
                 <select id="sportSelect" onchange="executeSearch('sport')">
-                    <option value="สถานที่ออกกำลังกาย">🏋️ กีฬา/ออกกำลังกาย</option>
-                    <option value="ฟิตเนส ยิม">ฟิตเนส / ยิม</option>
+                    <option value="ฟิตเนส">🏋️ กีฬา/ออกกำลังกาย</option>
+                    <option value="ฟิตเนส">ฟิตเนส / ยิม</option>
                     <option value="สนามฟุตบอล">สนามฟุตบอล / หญ้าเทียม</option>
                     <option value="สนามแบดมินตัน">สนามแบดมินตัน</option>
                     <option value="สระว่ายน้ำ">สระว่ายน้ำ</option>
                     <option value="สวนสาธารณะ">สวนสาธารณะ / วิ่ง</option>
-                    <option value="โต๊ะสนุกเกอร์">สนุกเกอร์ / บิลเลียด</option>
+                    <option value="สนุกเกอร์">สนุกเกอร์ / บิลเลียด</option>
                 </select>
 
             </div>
@@ -208,7 +207,7 @@
 
         <div id="promoBanner" class="highlight-banner">
             <h3>✨ Exclusive Promotions</h3>
-            <p style="font-size: 13px; margin:0 0 15px 0; color:rgba(255,255,255,0.6);">ร้านแนะนำเฉพาะจังหวัดนี้</p>
+            <p style="font-size: 13px; margin:0 0 15px 0; color:rgba(255,255,255,0.6);">ร้านแนะนำเฉพาะจังหวัดนี้ โควต้าพิเศษ 10 ร้านเท่านั้น</p>
             <div id="approvedPromoList" class="place-grid" style="margin-top: 0;"></div>
         </div>
 
@@ -286,22 +285,36 @@
                         <select id="promoStoreCategory">
                             <optgroup label="🍽️ หมวดร้านอาหาร">
                                 <option value="ร้านอาหาร">ร้านอาหาร (ทั่วไป)</option>
-                                <option value="หมูกระทะ แจ่วฮ้อน">หมูกระทะ / แจ่วฮ้อน</option>
-                                <option value="ชาบู สุกี้">ชาบู / สุกี้</option>
+                                <option value="หมูกระทะ">หมูกระทะ / แจ่วฮ้อน</option>
+                                <option value="ชาบู">ชาบู / สุกี้</option>
                                 <option value="ปิ้งย่าง">ปิ้งย่าง</option>
                                 <option value="อาหารตามสั่ง">อาหารตามสั่ง</option>
                                 <option value="ก๋วยเตี๋ยว">ก๋วยเตี๋ยว / เส้น</option>
-                                <option value="ส้มตำ ยำ">ส้มตำ / ยำ</option>
-                                <option value="คาเฟ่ ร้านกาแฟ">คาเฟ่ / ขนม</option>
+                                <option value="ส้มตำ">ส้มตำ / ยำ</option>
+                                <option value="คาเฟ่">คาเฟ่ / ขนม</option>
                                 <option value="บาร์">บาร์</option>
-                                <option value="สถานบันเทิง ผับ">สถานบันเทิง / ผับ</option>
-                                <option value="แคมป์ปิ้ง ลานกางเต็นท์">แคมป์ปิ้ง</option>
                             </optgroup>
                             <optgroup label="💆‍♀️ หมวดความงามและพักผ่อน">
-                                <option value="ร้านนวด สปา">ร้านนวด / สปา</option>
-                                <option value="คลินิกเสริมความงาม">คลินิกเสริมความงาม</option>
-                                <option value="ร้านเสริมสวย ทำผม">ร้านเสริมสวย / ทำผม</option>
+                                <option value="ร้านนวด">ร้านนวด / สปา</option>
+                                <option value="คลินิกความงาม">คลินิกเสริมความงาม</option>
+                                <option value="ร้านทำผม">ร้านเสริมสวย / ทำผม</option>
                                 <option value="ร้านทำเล็บ">ร้านทำเล็บ</option>
+                            </optgroup>
+                            <optgroup label="🎯 หมวดกิจกรรมและท่องเที่ยว">
+                                <option value="สถานที่ท่องเที่ยว">สถานที่ท่องเที่ยว (ทั่วไป)</option>
+                                <option value="แคมป์ปิ้ง">แคมป์ปิ้ง / กางเต็นท์</option>
+                                <option value="สวนน้ำ">สวนสนุก / สวนน้ำ</option>
+                                <option value="สวนสัตว์">สวนสัตว์</option>
+                                <option value="พิพิธภัณฑ์">พิพิธภัณฑ์</option>
+                                <option value="โรงภาพยนตร์">โรงภาพยนตร์</option>
+                            </optgroup>
+                            <optgroup label="🏋️ หมวดกีฬาและออกกำลังกาย">
+                                <option value="ฟิตเนส">ฟิตเนส / ยิม</option>
+                                <option value="สนามฟุตบอล">สนามฟุตบอล / หญ้าเทียม</option>
+                                <option value="สนามแบดมินตัน">สนามแบดมินตัน</option>
+                                <option value="สระว่ายน้ำ">สระว่ายน้ำ</option>
+                                <option value="สวนสาธารณะ">สวนสาธารณะ / วิ่ง</option>
+                                <option value="สนุกเกอร์">โต๊ะสนุกเกอร์ / บิลเลียด</option>
                             </optgroup>
                         </select>
                     </div>
@@ -309,7 +322,6 @@
                     <div class="form-group"><label>เลือกแพ็กเกจค่าบริการ</label><select id="promoServiceSelect"></select></div>
                     <div class="form-group"><label>รูปภาพโปรโมชั่นแบนเนอร์ (แนวนอน 3:2)</label><input type="file" id="promoImageInput" accept="image/*"></div>
                     <div class="form-group"><label>รายละเอียดโปรโมชั่น (แสดงบนแบนเนอร์)</label><textarea id="promoDetail" rows="3" placeholder="ระบุเงื่อนไขโปรโมชั่นของคุณ..."></textarea></div>
-                    
                     <button class="btn-outline" style="width: 100%; border-color: var(--primary); color: var(--primary);" onclick="submitPromoWithPIN()">🚀 ส่งเรื่องขอขึ้นแบนเนอร์โปรโมท</button>
                 </div>
 
@@ -325,7 +337,6 @@
 
 <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <script>
-    // 💡 ระบบซิงค์แอดมิน (painaidee_auth)
     let appData = JSON.parse(localStorage.getItem('painaidee_auth')) || { 
         registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], closedReports: [], blacklistedPlaces: [], 
         services: [{ id: 1, name: 'ปักหมุดโปรโมชั่นหน้าแรก (30 วัน)', price: 500 }, { id: 2, name: 'อัปเดตแบนเนอร์ (ต่อครั้ง)', price: 150 }] 
@@ -345,7 +356,6 @@
         document.getElementById('tab-' + p).classList.add('active');
     }
 
-    // 💡 1. แก้ LINE ไม่เด้งกลับ
     const myLiffId = "2009598846-wiCUeV35";
     async function initializeLiff() {
         try {
@@ -355,9 +365,7 @@
                 document.getElementById('loginOverlay').style.display = 'none';
                 document.getElementById('appContent').style.display = 'block';
                 document.body.style.overflow = 'auto';
-                
                 document.getElementById('header-profile').innerHTML = `<img src="${profile.pictureUrl}" style="width:100px; height:100px; object-fit: cover; border-radius:50%;">`;
-                
                 initMap();
             } else { document.getElementById('loginOverlay').style.display = 'flex'; }
         } catch (err) { console.error("LIFF Init Error:", err); alert("ตั้งค่า LINE LIFF ผิดพลาด: " + err.message); }
@@ -498,20 +506,17 @@
         alert("✅ อัปเดตข้อมูลลิงก์โซเชียล VIP เรียบร้อยแล้วครับ!");
     }
 
-    // 💡 5. แก้ไขปุ่มกดส่งข้อมูลแบนเนอร์ ให้มีระบบป้องกัน Error (Try-Catch) ป้องกันการกดแล้วค้าง
     function submitPromoWithPIN() {
         try {
             const pin = document.getElementById('storePinInput').value.trim();
             const detail = document.getElementById('promoDetail').value.trim();
             const imageInput = document.getElementById('promoImageInput');
-            
             const provSelect = document.getElementById('promoProvinceSelect');
-            const provId = provSelect ? provSelect.value : 'ubon'; 
-            
             const serviceSelect = document.getElementById('promoServiceSelect');
-            const selectedService = serviceSelect ? serviceSelect.value : '';
-            
             const catSelect = document.getElementById('promoStoreCategory');
+            
+            const provId = provSelect ? provSelect.value : 'ubon'; 
+            const selectedService = serviceSelect ? serviceSelect.value : '';
             const selectedCategory = catSelect ? catSelect.value : 'ร้านอาหาร';
             
             if (!pin) return alert("⚠️ กรุณาตรวจสอบรหัส PIN อีกครั้งครับ");
@@ -524,7 +529,6 @@
             const existingActive = activeInProv.find(p => p.storeName === store.name);
             
             if (existingActive) {
-                // ระบบต่ออายุ
                 if (existingActive.expireTimestamp) {
                     const timeLeft = existingActive.expireTimestamp - Date.now();
                     if (timeLeft > 0 && timeLeft < (24 * 60 * 60 * 1000)) {
@@ -540,18 +544,8 @@
             const finishSave = (b64) => {
                 appData.pendingPromotions = appData.pendingPromotions.filter(p => p.storeName !== store.name);
                 
-                let promoObj = { 
-                    id: Date.now().toString(), 
-                    storeName: store.name, 
-                    province: provId, 
-                    detail: detail, 
-                    image: b64, 
-                    service: selectedService, 
-                    category: selectedCategory, 
-                    date: new Date().toLocaleString('th-TH') 
-                };
+                let promoObj = { id: Date.now().toString(), storeName: store.name, province: provId, detail: detail, image: b64, service: selectedService, category: selectedCategory, date: new Date().toLocaleString('th-TH') };
 
-                // ถ้าเป็น VIP ให้บันทึกลิงก์โซเชียลพ่วงไปด้วย
                 if (store.isVIP) {
                     const vipLine = document.getElementById('vipLineInput');
                     const vipFb = document.getElementById('vipFbInput');
@@ -569,17 +563,8 @@
                 alert(`✅ ส่งข้อมูลขอขึ้นแบนเนอร์สำเร็จ! กรุณารอแอดมินอนุมัติ 1-2 วันครับ`);
             };
 
-            if (imageInput && imageInput.files && imageInput.files[0]) { 
-                const r = new FileReader(); 
-                r.onload = e => finishSave(e.target.result); 
-                r.readAsDataURL(imageInput.files[0]); 
-            } else { 
-                finishSave(''); 
-            }
-        } catch (err) {
-            console.error("Error submit:", err);
-            alert("เกิดข้อผิดพลาดในการส่งข้อมูล: " + err.message);
-        }
+            if (imageInput && imageInput.files && imageInput.files[0]) { const r = new FileReader(); r.onload = e => finishSave(e.target.result); r.readAsDataURL(imageInput.files[0]); } else { finishSave(''); }
+        } catch (err) { console.error("Error submit:", err); alert("เกิดข้อผิดพลาดในการส่งข้อมูล: " + err.message); }
     }
 
     let map, infoWindow, service, currentCoords = { lat: 15.2287, lng: 104.8564 }, gpsMarker = null, googlePlaces = [], markers = [];
@@ -617,11 +602,11 @@
         const select = document.getElementById('provinceSelect');
         const promoSelect = document.getElementById('promoProvinceSelect');
         
-        select.innerHTML = '<option value="current" selected>📍 ตำแหน่งปัจจุบัน</option>';
+        if(select) select.innerHTML = '<option value="current" selected>📍 ตำแหน่งปัจจุบัน</option>';
         if(promoSelect) promoSelect.innerHTML = '';
 
         provinces.forEach(p => { 
-            select.appendChild(new Option(p.name, p.id)); 
+            if(select) select.appendChild(new Option(p.name, p.id)); 
             if(promoSelect) promoSelect.appendChild(new Option(p.name, p.id));
         });
 
@@ -629,12 +614,12 @@
         infoWindow = new google.maps.InfoWindow(); 
         service = new google.maps.places.PlacesService(map); 
         
-        document.getElementById('provinceSelect').value = 'ubon';
+        if(select) select.value = 'ubon';
         changeLocation(); 
     }
     
     function changeLocation() { 
-        const val = document.getElementById('provinceSelect').value; 
+        const val = document.getElementById('provinceSelect') ? document.getElementById('provinceSelect').value : 'ubon'; 
         renderUI(); 
         if (gpsMarker) gpsMarker.setMap(null); 
         if (val === 'current') { 
@@ -648,7 +633,7 @@
                     },
                     err => { 
                         console.warn("GPS timeout/blocked", err);
-                        document.getElementById('provinceSelect').value = 'ubon'; 
+                        if(document.getElementById('provinceSelect')) document.getElementById('provinceSelect').value = 'ubon'; 
                         changeLocation(); 
                     }, { timeout: 5000, enableHighAccuracy: false }
                 ); 
@@ -659,7 +644,7 @@
         } 
     }
     
-    // 💡 4. แยกการค้นหา (ความงาม/ร้านอาหาร) อย่างชาญฉลาด ไม่ให้รวน
+    // 💡 4. ค้นหาแยกหมวดหมู่ฉลาดสุดๆ
     function executeSearch(type) { 
         if (!currentCoords) return; 
         
@@ -669,24 +654,45 @@
         let keywordToSearch = "ร้านอาหาร"; 
         const catSelect = document.getElementById('categorySelect');
         const beautySelect = document.getElementById('beautySelect');
+        const actSelect = document.getElementById('activitySelect');
+        const sportSelect = document.getElementById('sportSelect');
 
-        if (searchVal !== "") {
+        if (searchVal !== "" && type === 'text') {
             keywordToSearch = searchVal;
+            if(catSelect) catSelect.selectedIndex = 0;
+            if(beautySelect) beautySelect.selectedIndex = 0;
+            if(actSelect) actSelect.selectedIndex = 0;
+            if(sportSelect) sportSelect.selectedIndex = 0;
         } else {
             if (type === 'beauty') {
-                keywordToSearch = beautySelect.value;
+                keywordToSearch = beautySelect ? beautySelect.value : keywordToSearch;
                 if(catSelect) catSelect.selectedIndex = 0;
+                if(actSelect) actSelect.selectedIndex = 0;
+                if(sportSelect) sportSelect.selectedIndex = 0;
                 if(searchBox) searchBox.value = "";
             } else if (type === 'food') {
-                keywordToSearch = catSelect.value;
+                keywordToSearch = catSelect ? catSelect.value : keywordToSearch;
                 if(beautySelect) beautySelect.selectedIndex = 0;
+                if(actSelect) actSelect.selectedIndex = 0;
+                if(sportSelect) sportSelect.selectedIndex = 0;
+                if(searchBox) searchBox.value = "";
+            } else if (type === 'activity') {
+                keywordToSearch = actSelect ? actSelect.value : keywordToSearch;
+                if(catSelect) catSelect.selectedIndex = 0;
+                if(beautySelect) beautySelect.selectedIndex = 0;
+                if(sportSelect) sportSelect.selectedIndex = 0;
+                if(searchBox) searchBox.value = "";
+            } else if (type === 'sport') {
+                keywordToSearch = sportSelect ? sportSelect.value : keywordToSearch;
+                if(catSelect) catSelect.selectedIndex = 0;
+                if(beautySelect) beautySelect.selectedIndex = 0;
+                if(actSelect) actSelect.selectedIndex = 0;
                 if(searchBox) searchBox.value = "";
             } else {
-                if (beautySelect && beautySelect.selectedIndex > 0) {
-                    keywordToSearch = beautySelect.value;
-                } else if (catSelect) {
-                    keywordToSearch = catSelect.value;
-                }
+                if (beautySelect && beautySelect.selectedIndex > 0) keywordToSearch = beautySelect.value;
+                else if (actSelect && actSelect.selectedIndex > 0) keywordToSearch = actSelect.value;
+                else if (sportSelect && sportSelect.selectedIndex > 0) keywordToSearch = sportSelect.value;
+                else if (catSelect) keywordToSearch = catSelect.value;
             }
         }
         
@@ -744,14 +750,7 @@
                 
                 <div class="distance-badge">${distanceKm} กม.</div>
                 
-                ${ (isVIP && p.vip.vipImages && p.vip.vipImages.length > 0) ? `
-                    <div class="slider-container" id="slider-${p.place_id}">
-                        ${p.vip.vipImages.map((src, idx) => `<img class="slider-img ${idx === 0 ? 'active' : ''}" src="${src}">`).join('')}
-                        ${p.vip.vipImages.length > 1 ? `<button class="slider-btn prev" onclick="moveSlide('slider-${p.place_id}', -1, event)">❮</button><button class="slider-btn next" onclick="moveSlide('slider-${p.place_id}', 1, event)">❯</button>` : ''}
-                    </div>
-                ` : `
-                    <img src="${p.photos ? p.photos[0].getUrl({ maxWidth: 400 }) : 'https://via.placeholder.com/400x200?text=Painaidee'}" alt="${p.name}">
-                `}
+                <img src="${p.photos ? p.photos[0].getUrl({ maxWidth: 400 }) : 'https://via.placeholder.com/400x200?text=Painaidee'}" alt="${p.name}">
                 
                 <div class="place-info">
                     <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; gap: 8px;">
@@ -792,17 +791,6 @@
 
     function callPlace(placeId, event) { event.stopPropagation(); service.getDetails({ placeId: placeId, fields: ['formatted_phone_number'] }, (place, status) => { if (status === google.maps.places.PlacesServiceStatus.OK && place.formatted_phone_number) window.location.href = `tel:${place.formatted_phone_number.replace(/[\s-]/g, '')}`; else alert("ขออภัยครับ ร้านนี้ไม่ได้ระบุเบอร์โทร"); }); }
     function sharePlace(name, lat, lng, event) { event.stopPropagation(); const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`; if (navigator.share) navigator.share({ title: name, url: navUrl }).catch(console.error); else { navigator.clipboard.writeText(navUrl); alert("คัดลอกลิงก์เรียบร้อยแล้ว"); } }
-
-    // ฟังก์ชันเลื่อนภาพ VIP (ถ้าอัปโหลดรูปมา)
-    function moveSlide(sliderId, step, event) {
-        event.stopPropagation();
-        const container = document.getElementById(sliderId);
-        const imgs = container.querySelectorAll('.slider-img');
-        let activeIdx = Array.from(imgs).findIndex(img => img.classList.contains('active'));
-        imgs[activeIdx].classList.remove('active');
-        let nextIdx = (activeIdx + step + imgs.length) % imgs.length;
-        imgs[nextIdx].classList.add('active');
-    }
 
     window.onload = initializeLiff;
 </script>
