@@ -49,9 +49,9 @@
 
     <div class="card" style="border-left: 4px solid #06C755;">
         <h2>✨ 2. สถานะแบนเนอร์โปรโมชั่น (กำลังแสดงหน้าแอป) <span class="badge" style="background:#06C755;" id="activeCount">0</span></h2>
-        <p style="font-size: 13px; color: #666; margin-top: -10px;">* ระบบจะลบแบนเนอร์ที่หมดอายุออกจากหน้าแอปให้อัตโนมัติ</p>
+        <p style="font-size: 13px; color: #666; margin-top: -10px;">* ระบบจะลบแบนเนอร์ที่หมดอายุออกจากหน้าแอปให้อัตโนมัติ สามารถกดปิดซ่อนชั่วคราว หรือแก้ไขเวลาได้</p>
         <table id="activePromoTable">
-            <tr><th>ชื่อร้าน (หมวดหมู่)</th><th>รายละเอียดแบนเนอร์</th><th>เวลาหมดอายุ</th><th>สถานะ</th><th>จัดการ</th></tr>
+            <tr><th>ชื่อร้าน (จังหวัด)</th><th>รายละเอียดแบนเนอร์</th><th>เวลาหมดอายุ</th><th>สถานะ</th><th>จัดการ</th></tr>
         </table>
         <div id="emptyActive" class="empty-state" style="display:none;">ไม่มีแบนเนอร์ที่กำลังแสดงผล</div>
     </div>
@@ -75,7 +75,7 @@
 </div>
 
 <script>
-    // 💡 ฟังก์ชันดึงข้อมูลอย่างปลอดภัย ป้องกัน Error ถ้าระบบส่งหมวดหมู่ใหม่ๆ เข้ามา
+    // 💡 ฟังก์ชันดึงข้อมูลอย่างปลอดภัย ป้องกัน Error
     let appData = { registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [] };
 
     function loadFromStorage() {
@@ -101,7 +101,7 @@
         return new Date(timestamp).toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' });
     }
 
-    // 💡 อัปเดต UI หน้าจอ
+    // 💡 อัปเดต UI หน้าแอดมิน
     function renderAdminUI() {
         loadFromStorage();
         const now = Date.now();
@@ -122,7 +122,7 @@
                         <span style="background:#eee; padding:2px 6px; border-radius:4px; font-size:11px;">${p.category || 'ทั่วไป'}</span><br>
                         <span style="color:#17a2b8; font-size:12px;">${p.service || '-'}</span>
                     </td>
-                    <td style="max-width: 200px;">${p.detail || ''}</td>
+                    <td style="max-width: 200px; font-size: 13px;">${p.detail || ''}</td>
                     <td style="font-size: 12px;">${p.date || '-'}</td>
                     <td style="min-width: 150px;">
                         <button class="btn btn-approve" onclick="approvePromo(${index})">✅ อนุมัติ</button>
@@ -142,7 +142,7 @@
         if(appData.activePromotions.length > 0) {
             activePromoTable.style.display = 'table';
             emptyActive.style.display = 'none';
-            activePromoTable.innerHTML = '<tr><th>ชื่อร้าน (หมวดหมู่)</th><th>รายละเอียดแบนเนอร์</th><th>เวลาหมดอายุ</th><th>สถานะ</th><th>จัดการ</th></tr>' + 
+            activePromoTable.innerHTML = '<tr><th>ชื่อร้าน (จังหวัด)</th><th>รายละเอียดแบนเนอร์</th><th>เวลาหมดอายุ</th><th>สถานะ</th><th>จัดการ</th></tr>' + 
                 appData.activePromotions.map((p, index) => {
                     const prov = p.province || '';
                     const isPaused = prov.startsWith('_PAUSED_');
@@ -153,9 +153,12 @@
                     else if (isPaused) statusHtml = '<span class="status-off">⏸️ ปิดซ่อน</span>';
                     else statusHtml = '<span class="status-on">✅ กำลังแสดง</span>';
 
+                    // ดึงชื่อจังหวัดมาแสดงแบบไม่มีคำว่า _PAUSED_
+                    let cleanProvince = prov.replace('_PAUSED_', '');
+
                     return `
                     <tr style="${isExpired ? 'opacity: 0.6; background: #fff5f5;' : ''}">
-                        <td><strong>${p.storeName || 'ไม่ระบุ'}</strong><br><span style="font-size:11px; color:#888;">${p.category || 'ทั่วไป'}</span></td>
+                        <td><strong>${p.storeName || 'ไม่ระบุ'}</strong><br><span style="font-size:11px; color:#888;">${cleanProvince}</span></td>
                         <td style="max-width: 200px; font-size: 12px;">${p.detail || ''}</td>
                         <td style="font-size: 12px; color: ${isExpired ? '#D9534F' : '#06C755'}; font-weight: bold;">${formatTime(p.expireTimestamp)}</td>
                         <td>${statusHtml}</td>
@@ -225,7 +228,7 @@
     // ==================================================
     function approvePromo(index) {
         const promo = appData.pendingPromotions[index];
-        let daysInput = prompt(`✅ อนุมัติแบนเนอร์ของร้าน: ${promo.storeName}\n\nกรุณาระบุจำนวนวันที่จะให้โปรโมชั่นนี้แสดงผลบนหน้าแอป (ค่าเริ่มต้น 30 วัน):`, "30");
+        let daysInput = prompt(`✅ อนุมัติแบนเนอร์ของร้าน: ${promo.storeName}\n\nกรุณาระบุจำนวนวันที่จะให้โปรโมชั่นนี้แสดงผลบนหน้าแอป (เช่น 30):`, "30");
         
         if (daysInput === null) return; 
         
@@ -233,22 +236,26 @@
         const durationMs = days * 24 * 60 * 60 * 1000;
         const now = Date.now();
 
+        // เช็คว่ามีร้านนี้กำลังแสดงผลอยู่แล้วหรือไม่
         const existingPromo = appData.activePromotions.find(p => p.storeName === promo.storeName);
         
         if (existingPromo) {
+            // ถ้าร้านเดิมส่งมาต่ออายุ จะบวกเวลาเพิ่มจากเวลาที่เหลืออยู่
             existingPromo.expireTimestamp = Math.max(existingPromo.expireTimestamp || now, now) + durationMs;
             if(promo.image) existingPromo.image = promo.image; 
             existingPromo.detail = promo.detail;
             existingPromo.category = promo.category;
             existingPromo.service = promo.service;
             
+            // ถ้าแบนเนอร์ถูกหยุดพักไว้ (Paused) ให้ปลดล็อคกลับมาแสดงผลปกติ
             if(existingPromo.province && existingPromo.province.startsWith('_PAUSED_')) {
                 existingPromo.province = existingPromo.province.replace('_PAUSED_', '');
             }
         } else {
+            // ถ้าร้านใหม่ เริ่มนับเวลาใหม่
             promo.startDate = now;
             promo.expireTimestamp = now + durationMs;
-            appData.activePromotions.unshift(promo);
+            appData.activePromotions.unshift(promo); // เอาขึ้นบนสุด
         }
         
         appData.pendingPromotions.splice(index, 1);
@@ -261,12 +268,13 @@
     }
 
     // ==================================================
-    // ฟังก์ชันสำหรับ 2. แบนเนอร์ที่กำลังแสดง (Active)
+    // ฟังก์ชันสำหรับ 2. แบนเนอร์ที่กำลังแสดง (Active) - [ปิด/เปิด, แก้ไข, ลบ]
     // ==================================================
     function toggleActivePromo(index) {
         let p = appData.activePromotions[index];
-        if(!p.province) p.province = 'ubon'; // เผื่อกรณีข้อมูลเก่าไม่มีจังหวัด
+        if(!p.province) p.province = 'ubon';
 
+        // ใช้เทคนิคเติมคำว่า _PAUSED_ นำหน้าตัวแปรจังหวัด เพื่อหลอกหน้าแอปให้ค้นหาไม่เจอ (โดยไม่ต้องลบข้อมูล)
         if (p.province.startsWith('_PAUSED_')) {
             p.province = p.province.replace('_PAUSED_', '');
         } else {
@@ -277,10 +285,12 @@
 
     function editActivePromo(index) {
         let p = appData.activePromotions[index];
+        // 1. ให้แก้ข้อความได้
         let newDetail = prompt("✏️ แก้ไขรายละเอียดโปรโมชั่น:", p.detail);
         if (newDetail !== null) {
             p.detail = newDetail;
-            let addDays = prompt("⏳ ต้องการเพิ่ม/ลด วันหมดอายุหรือไม่?\n(ใส่จำนวนวัน เช่น 15 เพื่อต่อเวลา, หรือใส่ 0 เพื่อไม่เปลี่ยนแปลงเวลา):", "0");
+            // 2. ให้เพิ่มหรือลดวันหมดอายุได้
+            let addDays = prompt("⏳ ต้องการเพิ่ม/ลด วันหมดอายุหรือไม่?\n(ใส่จำนวนวัน เช่น 15 เพื่อต่อเวลา หรือ -5 เพื่อลดเวลา หรือใส่ 0 หากไม่ต้องการเปลี่ยน):", "0");
             if (addDays !== null && !isNaN(addDays)) {
                 let extraMs = parseInt(addDays) * 24 * 60 * 60 * 1000;
                 if (extraMs !== 0) {
@@ -288,11 +298,12 @@
                 }
             }
             saveData();
+            alert("✅ อัปเดตข้อมูลแบนเนอร์เรียบร้อยแล้ว");
         }
     }
 
     function deleteActivePromo(index) {
-        if(confirm('🚨 แน่ใจหรือไม่ที่จะลบแบนเนอร์นี้ทิ้งถาวร? (ข้อมูลจะหายไปจากหน้าแอปทันที)')) {
+        if(confirm('🚨 คำเตือน: แน่ใจหรือไม่ที่จะลบแบนเนอร์นี้ทิ้งถาวร?\n(ข้อมูลจะหายไปจากหน้าแอปทันที ไม่สามารถกู้คืนได้)')) {
             appData.activePromotions.splice(index, 1);
             saveData();
         }
@@ -313,10 +324,10 @@
     function toggleVIP(index) { appData.registeredStores[index].isVIP = !appData.registeredStores[index].isVIP; saveData(); }
     function deleteStore(index) { if(confirm('🚨 ลบร้านค้านี้ออกจากระบบ? (พินจะใช้ไม่ได้อีกต่อไป)')) { appData.registeredStores.splice(index, 1); saveData(); } }
 
-    // 💡 ระบบตรวจสอบการเปลี่ยนแปลงแบบ Real-time!
+    // 💡 ระบบรีเฟรชหน้าจออัตโนมัติ เมื่อมีข้อมูลเข้ามาใหม่
     window.addEventListener('storage', function(e) {
         if (e.key === 'painaidee_auth') {
-            console.log("มีการส่งข้อมูลใหม่เข้ามา อัปเดตหน้าแอดมินอัตโนมัติ!");
+            console.log("Data updated from another tab. Refreshing...");
             renderAdminUI();
         }
     });
