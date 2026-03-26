@@ -71,8 +71,8 @@
         
         .distance-badge { position: absolute; top: 15px; right: 15px; background: rgba(26, 28, 32, 0.9); color: var(--primary-light); padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; backdrop-filter: blur(5px); border: 1px solid rgba(197, 160, 89, 0.3); box-shadow: 0 3px 10px rgba(0,0,0,0.2); z-index: 10; }
         
-        .action-buttons { display: flex; gap: 10px; margin-top: auto; padding-top: 15px; flex-wrap: wrap; }
-        .btn-action { flex: 1; text-align: center; color: white; text-decoration: none; padding: 10px 5px; border-radius: 10px; font-weight: 500; font-size: 13px; transition: 0.3s; border: none; cursor: pointer; font-family: 'Kanit'; min-width: 30%; }
+        .action-buttons { display: flex; gap: 8px; margin-top: auto; padding-top: 15px; flex-wrap: wrap; }
+        .btn-action { flex: 1; text-align: center; color: white; text-decoration: none; padding: 10px 5px; border-radius: 10px; font-weight: 500; font-size: 12px; transition: 0.3s; border: none; cursor: pointer; font-family: 'Kanit'; min-width: 30%; }
         .btn-nav { background: var(--dark-muted); color: var(--surface); border: 1px solid var(--border); }
         .btn-nav:hover { background: var(--primary); color: white; border-color: var(--primary); }
         .btn-call { background: var(--primary); color: white; }
@@ -82,13 +82,23 @@
         
         .status-tag { display: inline-flex; align-items: center; justify-content: center; padding: 4px 8px; border-radius: 20px; font-size: 11px; font-weight: 500; white-space: nowrap; box-shadow: 0 2px 5px rgba(0,0,0,0.2); line-height: 1.2; }
 
-        /* 👑 อัปเกรด VIP Aura (3) */
+        /* 👑 อัปเกรด VIP Aura */
         .card-vip { border: 2px solid #FFD700 !important; box-shadow: 0 0 20px rgba(255, 215, 0, 0.25) !important; transform: translateY(-2px); }
         .card-vip:hover { box-shadow: 0 15px 40px rgba(255, 215, 0, 0.4) !important; border-color: #FFF !important; }
         .vip-crown-badge { position: absolute; top: -10px; left: -10px; background: linear-gradient(135deg, #FFD700, #C5A059, #FFD700); color: #000; padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: 800; z-index: 15; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border: 2px solid #FFF; animation: pulseGlow 2s infinite; }
         @keyframes pulseGlow { 0% { box-shadow: 0 0 10px rgba(255,215,0,0.4); } 50% { box-shadow: 0 0 20px rgba(255,215,0,0.8); } 100% { box-shadow: 0 0 10px rgba(255,215,0,0.4); } }
-        .btn-line { background: #06C755 !important; color: #FFF !important; border: none !important; }
-        .btn-fb { background: #1877F2 !important; color: #FFF !important; border: none !important; }
+        .btn-line { background: #06C755 !important; color: #FFF !important; border: none !important; font-weight: 600;}
+        .btn-fb { background: #1877F2 !important; color: #FFF !important; border: none !important; font-weight: 600;}
+
+        /* 📸 ระบบสไลด์ VIP */
+        .slider-container { position: relative; width: 100%; height: 180px; overflow: hidden; background: var(--dark-muted); border-radius: 14px 14px 0 0; }
+        .slider-img { width: 100%; height: 100%; object-fit: cover; display: none; }
+        .slider-img.active { display: block; animation: fadeSlide 0.3s ease-in-out; }
+        @keyframes fadeSlide { from { opacity: 0.8; } to { opacity: 1; } }
+        .slider-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.6); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; z-index: 5; transition: 0.2s; }
+        .slider-btn:hover { background: var(--primary); }
+        .slider-btn.prev { left: 10px; }
+        .slider-btn.next { right: 10px; }
 
         .highlight-banner { background: linear-gradient(135deg, var(--dark), var(--dark-light)); color: white; padding: 25px; border-radius: 16px; margin-top: 24px; box-shadow: 0 15px 35px rgba(26, 28, 32, 0.4); display: none; position: relative; overflow: hidden; border: 1px solid var(--border); }
         .highlight-banner::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(197,160,89,0.15) 0%, transparent 60%); pointer-events: none; }
@@ -105,6 +115,7 @@
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(18, 20, 24, 0.95); backdrop-filter: blur(15px); z-index: 9999; display: flex; align-items: center; justify-content: center; }
         .login-card { background: var(--surface); padding: 40px; border-radius: 24px; text-align: center; max-width: 350px; width: 90%; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid var(--border); animation: fadeIn 0.5s ease; }
         .btn-line-login { background-color: var(--line-green); color: white; border: none; padding: 15px 20px; border-radius: 12px; font-family: 'Kanit'; font-weight: 600; font-size: 16px; width: 100%; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 5px 15px rgba(6, 199, 85, 0.3); }
+        .btn-line-login:hover { background-color: #05a044; transform: translateY(-2px); }
         
         #appContent { display: none; }
     </style>
@@ -133,12 +144,12 @@
     <div id="page-home" class="page active">
         <header>
             <div style="margin: 0 auto 15px; display: flex; justify-content: center;">
-                <div id="header-profile" style="width:100px; height:100px; border-radius:50%; background:var(--surface); border: 2px solid var(--primary); box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: flex; flex-direction: column; align-items:center; justify-content:center; padding: 10px; position:relative; overflow:hidden;">
+                <div id="header-profile" style="width:100px; height:100px; border-radius:50%; background:var(--surface); border: 2px solid var(--primary); box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: flex; flex-direction: column; align-items:center; justify-content:center; padding: 10px; overflow: hidden;">
                     <p style="margin: 0; color:var(--text-gold); font-weight: 600; font-size: 18px; line-height: 1.1; font-style: italic;">ไป<br>ไหนดี</p>
                 </div>
             </div>
             <h1 id="header-name">ไปไหนดี</h1>
-            <p>ค้นหาร้านอาหารและสถานที่น่าสนใจทั่วไทย</p>
+            <p>ไม่ว่าจะอยู่ส่วนไหนบนโลกนี้ ก็ไม่เหงาอีกต่อไป</p>
         </header>
         
         <div id="map"></div>
@@ -204,7 +215,6 @@
         <div class="dashboard-card">
             <h3>จัดการร้านค้า / อัปเดตโปรโมชั่น</h3>
             <p style="font-size: 12px; color: var(--danger); margin-top: -10px;">*กรุณายืนยันรหัส PIN เพื่อปลดล็อคเมนูจัดการทั้งหมด</p>
-            
             <div class="form-group">
                 <label>รหัสลับร้านค้า (Store PIN)</label>
                 <div style="display: flex; gap: 10px;">
@@ -212,7 +222,6 @@
                     <button class="btn-outline" style="width: auto; white-space: nowrap;" onclick="verifyStore()">ตรวจสอบ</button>
                 </div>
             </div>
-
             <div id="storeVerifyCard" style="display:none; background:var(--bg-light); padding:15px; border-radius:10px; margin-bottom:15px; border:1px solid var(--border);">
                 <h4 id="verifyStoreName" style="margin:0 0 10px 0; color:var(--primary);"></h4>
                 <div id="miniMap" style="width:100%; height:150px; border-radius:10px; border:1px solid var(--border);"></div>
@@ -233,11 +242,10 @@
                         <label style="font-size: 12px;">ลิงก์ Facebook Page</label>
                         <input type="text" id="vipFbInput" placeholder="กรุณาอัปเกรด VIP..." disabled style="opacity: 0.5;">
                     </div>
-                    <button id="btnSaveVip" class="btn-primary" style="background: linear-gradient(135deg, #FFD700, #C5A059); color: #000; opacity: 0.5;" disabled onclick="updateVipData()">💾 บันทึกข้อมูล VIP</button>
                 </div>
 
                 <div style="padding: 15px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface);">
-                    <h4 style="margin: 0 0 10px 0; color: var(--primary); font-size: 16px;">📌 ซื้อพื้นที่โปรโมทหน้าแรก (แบนเนอร์)</h4>
+                    <h4 style="margin: 0 0 10px 0; color: var(--primary); font-size: 16px;">📌 โปรโมทหน้าแรก (แบนเนอร์)</h4>
                     <div class="form-group">
                         <label>📍 จังหวัดที่จะโปรโมท (โควต้า 10 ร้าน/จังหวัด)</label>
                         <select id="promoProvinceSelect"></select>
@@ -254,7 +262,7 @@
                     <div class="form-group"><label>เลือกแพ็กเกจค่าบริการ</label><select id="promoServiceSelect"></select></div>
                     <div class="form-group"><label>รูปภาพโปรโมชั่นแบนเนอร์ (แนวนอน 3:2)</label><input type="file" id="promoImageInput" accept="image/*"></div>
                     <div class="form-group"><label>รายละเอียดโปรโมชั่น (แสดงบนแบนเนอร์)</label><textarea id="promoDetail" rows="3" placeholder="ระบุเงื่อนไขโปรโมชั่นของคุณ..."></textarea></div>
-                    <button class="btn-outline" style="width: 100%; border-color: var(--primary); color: var(--primary);" onclick="submitPromoBanner()">🚀 ส่งเรื่องขอขึ้นแบนเนอร์โปรโมท</button>
+                    <button class="btn-primary" style="width: 100%;" onclick="submitPromoWithPIN()">ส่งข้อมูลเพื่อขึ้นโปรโมท / ต่ออายุ</button>
                 </div>
 
             </div>
@@ -269,7 +277,7 @@
 
 <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <script>
-    // 💡 5. ระบบซิงค์แอดมินสมบูรณ์ (ใช้ Key painaidee_auth)
+    // 💡 ระบบฐานข้อมูล Sync กับ Admin (ใช้ painaidee_auth)
     let appData = JSON.parse(localStorage.getItem('painaidee_auth')) || { 
         registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], closedReports: [], blacklistedPlaces: [], 
         services: [{ id: 1, name: 'ปักหมุดโปรโมชั่นหน้าแรก (30 วัน)', price: 500 }, { id: 2, name: 'อัปเดตแบนเนอร์ (ต่อครั้ง)', price: 150 }] 
@@ -290,7 +298,7 @@
         document.getElementById('tab-' + p).classList.add('active');
     }
 
-    // 💡 1. แก้ LINE ไม่เด้งกลับ
+    // 💡 1. แก้ LINE ไม่เด้งกลับ (ใส่ redirectUri)
     const myLiffId = "2009598846-wiCUeV35";
     async function initializeLiff() {
         try {
@@ -302,7 +310,6 @@
                 document.body.style.overflow = 'auto';
                 
                 document.getElementById('header-profile').innerHTML = `<img src="${profile.pictureUrl}" style="width:100px; height:100px; object-fit: cover; border-radius:50%;">`;
-                document.getElementById('header-name').innerText = `สวัสดี, คุณ ${profile.displayName}`;
                 
                 initMap();
             } else { document.getElementById('loginOverlay').style.display = 'flex'; }
@@ -367,14 +374,14 @@
 
     async function submitStoreRegistration() {
         const name = document.getElementById('regStoreName').value.trim(), idCardFile = document.getElementById('regIdCard').files[0], photoFile = document.getElementById('regStorePhoto').files[0], commFile = document.getElementById('regCommercial').files[0];
-        if (!name || !idCardFile || !photoFile) return alert("กรุณาค้นหาชื่อร้าน และแนบไฟล์ให้ครบ");
+        if (!name || !idCardFile || !photoFile) return alert("กรุณาค้นหาชื่อร้าน และแนบไฟล์ให้ครบ (บัตรประชาชน/หน้าร้าน)");
         const getBase64 = (file) => new Promise(resolve => { if (!file) return resolve(null); const reader = new FileReader(); reader.onload = e => resolve(e.target.result); reader.readAsDataURL(file); });
         
         appData.registrationRequests.push({ id: Date.now(), storeName: name, idCard: await getBase64(idCardFile), storePhoto: await getBase64(photoFile), commercial: await getBase64(commFile) }); 
         saveData();
         
         document.getElementById('regStoreName').value = ''; document.getElementById('regIdCard').value = ''; document.getElementById('regStorePhoto').value = ''; document.getElementById('regCommercial').value = ''; document.getElementById('regStoreVerifyCard').style.display = 'none';
-        alert("✅ ส่งข้อมูลให้ผู้ดูแลระบบเรียบร้อยแล้ว");
+        alert("✅ ส่งข้อมูลให้ผู้ดูแลระบบเรียบร้อยแล้ว แอดมินจะตรวจสอบและส่งรหัส PIN ให้ครับ");
     }
 
     let miniMap, miniMarker;
@@ -408,11 +415,9 @@
                     vipSection.style.border = '2px solid #FFD700';
                     document.getElementById('vipLineInput').disabled = false;
                     document.getElementById('vipFbInput').disabled = false;
-                    document.getElementById('btnSaveVip').disabled = false;
                     
                     document.getElementById('vipLineInput').style.opacity = '1';
                     document.getElementById('vipFbInput').style.opacity = '1';
-                    document.getElementById('btnSaveVip').style.opacity = '1';
                     
                     document.getElementById('vipLockMessage').style.display = 'none';
                     
@@ -422,11 +427,9 @@
                     vipSection.style.border = '1px dashed var(--primary)';
                     document.getElementById('vipLineInput').disabled = true;
                     document.getElementById('vipFbInput').disabled = true;
-                    document.getElementById('btnSaveVip').disabled = true;
                     
                     document.getElementById('vipLineInput').style.opacity = '0.5';
                     document.getElementById('vipFbInput').style.opacity = '0.5';
-                    document.getElementById('btnSaveVip').style.opacity = '0.5';
                     
                     document.getElementById('vipLockMessage').style.display = 'block';
                 }
@@ -436,18 +439,7 @@
         });
     }
 
-    function updateVipData() {
-        const pin = document.getElementById('storePinInput').value.trim();
-        const store = appData.registeredStores.find(s => s.pin === pin);
-        if (!store || !store.isVIP) return;
-
-        store.lineUrl = document.getElementById('vipLineInput').value.trim();
-        store.fbUrl = document.getElementById('vipFbInput').value.trim();
-        saveData();
-        alert("✅ อัปเดตข้อมูลลิงก์ VIP เรียบร้อย!");
-    }
-
-    function submitPromoBanner() {
+    function submitPromoWithPIN() {
         const pin = document.getElementById('storePinInput').value.trim();
         const store = appData.registeredStores.find(s => s.pin === pin);
         if (!store) return alert("กรุณาตรวจสอบ PIN ก่อน");
@@ -457,7 +449,7 @@
         const imgFile = document.getElementById('promoImageInput').files[0];
         const selectedService = document.getElementById('promoServiceSelect').value;
         const selectedCategory = document.getElementById('promoStoreCategory').value;
-        if (!detail) return alert("⚠️ กรุณากรอกรายละเอียดแบนเนอร์");
+        if (!detail) return alert("⚠️ กรุณากรอกรายละเอียดโปรโมชั่น");
 
         const activeInProv = appData.activePromotions.filter(p => p.province === provId && (!p.expireTimestamp || p.expireTimestamp > Date.now()));
         if (activeInProv.find(p => p.storeName === store.name)) return alert("❌ ร้านของคุณกำลังขึ้นโปรโมทในจังหวัดนี้อยู่แล้ว");
@@ -465,17 +457,32 @@
 
         const finishSave = (b64) => {
             appData.pendingPromotions = appData.pendingPromotions.filter(p => p.storeName !== store.name);
-            appData.pendingPromotions.push({ id: Date.now().toString(), storeName: store.name, province: provId, detail: detail, image: b64, service: selectedService, category: selectedCategory, date: new Date().toLocaleString('th-TH') });
+            
+            let promoObj = { id: Date.now().toString(), storeName: store.name, province: provId, detail: detail, image: b64, service: selectedService, category: selectedCategory, date: new Date().toLocaleString('th-TH') };
+            
+            // ถ้าเป็น VIP ให้เซฟลิงก์ไปด้วย
+            if (store.isVIP) {
+                promoObj.lineUrl = document.getElementById('vipLineInput').value.trim();
+                promoObj.fbUrl = document.getElementById('vipFbInput').value.trim();
+                store.lineUrl = promoObj.lineUrl;
+                store.fbUrl = promoObj.fbUrl;
+            }
+
+            appData.pendingPromotions.push(promoObj);
             
             saveData();
             document.getElementById('promoDetail').value = ''; document.getElementById('promoImageInput').value = '';
+            document.getElementById('storeVerifyCard').style.display = 'none';
+            document.getElementById('lockedFeatures').style.display = 'none';
+            document.getElementById('serviceRatesCard').style.display = 'none';
+            document.getElementById('registerNewStoreCard').style.display = 'block';
             alert(`✅ ส่งข้อมูลขอขึ้นแบนเนอร์สำเร็จ! กรุณารอแอดมินอนุมัติครับ`);
         };
         if(imgFile) { const r = new FileReader(); r.onload = e => finishSave(e.target.result); r.readAsDataURL(imgFile); } else finishSave('');
     }
 
-    // 💡 จัดเต็ม 77 จังหวัด
-    let map, infoWindow, service, currentCoords = { lat: 15.2287, lng: 104.8564 }, gpsMarker = null, googlePlaces = [];
+    // 💡 กลับมาครบ 77 จังหวัด และแก้บั๊ก markers = [] ให้สมบูรณ์แล้ว
+    let map, infoWindow, service, currentCoords = { lat: 15.2287, lng: 104.8564 }, gpsMarker = null, googlePlaces = [], markers = [];
     const provinces = [
         {id:'bkk',name:'กรุงเทพมหานคร',lat:13.7563,lng:100.5018},{id:'krabi',name:'กระบี่',lat:8.0863,lng:98.9063},{id:'kanchanaburi',name:'กาญจนบุรี',lat:14.0159,lng:99.5336},
         {id:'kalasin',name:'กาฬสินธุ์',lat:16.4322,lng:103.5061},{id:'kamphaengphet',name:'กำแพงเพชร',lat:16.4828,lng:99.5227},{id:'khonkaen',name:'ขอนแก่น',lat:16.4322,lng:102.8236},
@@ -646,6 +653,7 @@
     }
 
     function createMarkers(places) { places.forEach(p => { const marker = new google.maps.Marker({ map, position: p.geometry.location, title: p.name }); marker.addListener("click", () => { infoWindow.setContent(`<div style="padding:8px 12px; font-family:Kanit; color:#333;"><strong>${p.name}</strong></div>`); infoWindow.open(map, marker); }); p.markerRef = marker; markers.push(marker); }); }
+    
     function clearMarkers() { markers.forEach(m => m.setMap(null)); markers = []; }
     
     function focusPlace(id) { const p = googlePlaces.find(x => x.place_id === id); if(p) { map.panTo(p.geometry.location); map.setZoom(17); infoWindow.setContent(`<div style="padding:8px 12px; font-family:Kanit; color:#333;"><strong>${p.name}</strong></div>`); infoWindow.open(map, p.markerRef); window.scrollTo({ top: 0, behavior: 'smooth' }); } }
