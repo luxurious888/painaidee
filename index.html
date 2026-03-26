@@ -85,13 +85,9 @@
         .btn-line { background: #06C755 !important; color: #FFF !important; border: none !important; font-weight: 600;}
         .btn-fb { background: #1877F2 !important; color: #FFF !important; border: none !important; font-weight: 600;}
 
-        /* 🚀 เอฟเฟกต์แสงสะท้อน แบนเนอร์โปรโมชั่น */
+        /* 🚀 เอฟเฟกต์แสงสะท้อน */
         @keyframes shine { 100% { left: 125%; } }
-        .shine-effect::after {
-            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
-            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
-            transform: skewX(-25deg); animation: shine 3s infinite; pointer-events: none;
-        }
+        .shine-effect::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%); transform: skewX(-25deg); animation: shine 3s infinite; pointer-events: none; }
         .promo-btn-hover:hover { filter: brightness(1.1); transform: translateY(-2px); }
 
         .highlight-banner { background: linear-gradient(135deg, var(--dark), var(--dark-light)); color: white; padding: 25px; border-radius: 16px; margin-top: 24px; box-shadow: 0 15px 35px rgba(26, 28, 32, 0.4); display: none; position: relative; overflow: hidden; border: 1px solid var(--border); }
@@ -174,6 +170,7 @@
     <div id="page-partner" class="page">
         <div class="dashboard-card" id="registerNewStoreCard" style="border-top: 3px solid var(--primary); border-bottom: 3px solid var(--primary);">
             <h3 style="border:none;">ลงทะเบียนร้านค้าใหม่</h3>
+            <p style="font-size: 14px; color: var(--text-muted); margin-top: -10px;">ส่งเอกสารให้แอดมินตรวจสอบ เพื่อรับ "รหัสลับ (Store PIN)"</p>
             <div class="form-group">
                 <label>1. ค้นหาพิกัดร้านจากแผนที่</label>
                 <div style="display: flex; gap: 10px;">
@@ -185,8 +182,8 @@
                     <div id="regMiniMap" style="width:100%; height:150px; border-radius:10px;"></div>
                 </div>
             </div>
-            <div class="form-group"><label>2. รูปถ่ายหน้าร้านคู่เจ้าของร้าน</label><input type="file" id="regStorePhoto" accept="image/*"></div>
-            <div class="form-group"><label>3. สำเนาบัตรประชาชน/พาสปอร์ต</label><input type="file" id="regIdCard" accept="image/*"></div>
+            <div class="form-group"><label>2. รูปถ่ายหน้าร้านคู่เจ้าของร้าน <span style="color:var(--danger);">*</span></label><input type="file" id="regStorePhoto" accept="image/*"></div>
+            <div class="form-group"><label>3. สำเนาบัตรประชาชน/พาสปอร์ต <span style="color:var(--danger);">*</span></label><input type="file" id="regIdCard" accept="image/*"></div>
             <div class="form-group"><label>4. ใบทะเบียนพาณิชย์ (ถ้ามี)</label><input type="file" id="regCommercial" accept="image/*"></div>
             <button class="btn-secondary" style="width: 100%; margin-top: 10px;" onclick="submitStoreRegistration()">ส่งข้อมูลเพื่อตรวจสอบ</button>
         </div>
@@ -216,16 +213,13 @@
 
                 <div style="padding: 20px; border: 2px solid var(--primary); border-radius: 16px; background: linear-gradient(180deg, rgba(197, 160, 89, 0.1) 0%, var(--surface) 100%); position: relative; overflow: hidden; margin-top: 30px;">
                     <div style="position: absolute; top: 20px; right: -35px; background: #D9534F; color: white; padding: 5px 40px; transform: rotate(45deg); font-size: 12px; font-weight: bold; box-shadow: 0 2px 10px rgba(0,0,0,0.5);">HOT 🔥</div>
-
                     <h4 style="margin: 0 0 5px 0; color: var(--primary); font-size: 18px; text-align: center;">🚀 ดันยอดขายพุ่ง! พื้นที่โปรโมทหน้าแรก</h4>
                     <p style="text-align: center; font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">ให้ลูกค้าในจังหวัดเห็นร้านคุณเป็นอันดับแรก ทันทีที่เปิดแอป</p>
-
                     <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; margin-bottom: 20px; font-size: 13px; border: 1px solid rgba(197,160,89,0.2);">
                         <div style="display: flex; align-items: flex-start; margin-bottom: 12px;"><span style="font-size:18px; margin-right:10px; line-height: 1;">👁️</span> <div><strong>การมองเห็นสูงสุด:</strong> โชว์เด่นที่สุด ด้านบนสุดของหน้าค้นหา</div></div>
                         <div style="display: flex; align-items: flex-start; margin-bottom: 12px;"><span style="font-size:18px; margin-right:10px; line-height: 1;">🎯</span> <div><strong>ตรงกลุ่มเป้าหมาย:</strong> แสดงผลเฉพาะจังหวัดที่คุณต้องการเจาะตลาด</div></div>
                         <div style="display: flex; align-items: flex-start;"><span style="font-size:18px; margin-right:10px; line-height: 1;">⏳</span> <div><strong>รับจำนวนจำกัด:</strong> โควต้าสุด Exclusive เพียง <b style="color:#D9534F;">10 ร้าน/จังหวัด</b> เท่านั้น!</div></div>
                     </div>
-
                     <div style="text-align: center; color: #f0ad4e; font-size: 13px; margin-bottom: 20px; font-weight: 500;">⚠️ พื้นที่มีจำกัด รีบจองก่อนโดนคู่แข่งแย่งตำแหน่ง!</div>
 
                     <div class="form-group"><label>📍 เลือกจังหวัดที่จะโปรโมท</label><select id="promoProvinceSelect"></select></div>
@@ -234,7 +228,7 @@
                     
                     <div class="form-group">
                         <label>🖼️ รูปภาพป้ายโฆษณา (แนวนอน 3:2)</label>
-                        <p style="font-size: 11px; color: var(--text-muted); margin: -5px 0 8px 0;">* แนะนำรูปภาพที่มีความคมชัด สีสันสะดุดตา และมีข้อความชัดเจน</p>
+                        <p style="font-size: 11px; color: var(--text-muted); margin: -5px 0 8px 0;">* แนะนำรูปภาพที่มีความคมชัด สีสันสะดุดตา</p>
                         <input type="file" id="promoImageInput" accept="image/*">
                     </div>
                     
@@ -271,7 +265,6 @@
         { id: 14, group: 'sport', label: 'สระว่ายน้ำ', keyword: 'สระว่ายน้ำ' }
     ];
 
-    // 💡 เพิ่มค่าเริ่มต้นสำหรับค่าบริการ
     const defaultServices = [
         { id: 1, name: 'ปักหมุดโปรโมชั่นหน้าแรก (รายเดือน)', price: 500 },
         { id: 2, name: 'อัปเดตแก้ไขแบนเนอร์ (ต่อครั้ง)', price: 150 }
@@ -279,7 +272,7 @@
 
     let appData = { 
         registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], 
-        categories: [], closedReports: [], blacklistedPlaces: [], services: [] 
+        categories: [], closedReports: [], blacklistedPlaces: [], services: []
     };
 
     function loadFromStorage() {
@@ -294,10 +287,10 @@
                 appData.closedReports = parsed.closedReports || [];
                 appData.blacklistedPlaces = parsed.blacklistedPlaces || [];
                 appData.categories = parsed.categories && parsed.categories.length > 0 ? parsed.categories : defaultCategories;
-                appData.services = parsed.services && parsed.services.length > 0 ? parsed.services : defaultServices; // 💡 ดึงค่าบริการ
-            } else { 
-                appData.categories = defaultCategories; 
-                appData.services = defaultServices; 
+                appData.services = parsed.services && parsed.services.length > 0 ? parsed.services : defaultServices;
+            } else {
+                appData.categories = defaultCategories;
+                appData.services = defaultServices;
             }
             if (!appData.registeredStores.find(s => s.pin === "1234")) {
                 appData.registeredStores.push({ name: "Lan'suk ลานสุข อุบล", pin: "1234", isVIP: true });
@@ -314,7 +307,6 @@
         document.getElementById('tab-' + p).classList.add('active');
     }
 
-    // --- LIFF ---
     const myLiffId = "2009598846-wiCUeV35";
     async function initializeLiff() {
         loadFromStorage();
@@ -357,7 +349,6 @@
             promoCatSelect.innerHTML = promoHtml;
         }
 
-        // 💡 อัปเดต Dropdown ค่าบริการ
         const serviceSelect = document.getElementById('promoServiceSelect');
         if (serviceSelect && appData.services) {
             serviceSelect.innerHTML = appData.services.map(s => `<option value="${s.name} - ${s.price} ฿">${s.name} - ${s.price} ฿</option>`).join('');
@@ -392,7 +383,6 @@
                     : `<div style="position:relative; width: 100%; height: 180px; background-color: var(--dark-light); display: flex; align-items: center; justify-content: center; color: var(--primary);"><div class="shine-effect"></div>Painaidee</div>`;
                 
                 const categoryBadge = p.category ? `<span style="background:var(--primary); color:#000; padding:2px 10px; border-radius:12px; font-size:11px; font-weight:600; display:inline-block; margin-bottom:8px;">📌 ${p.category}</span>` : '';
-                
                 let lineBtn = p.lineUrl ? `<button onclick="window.open('${p.lineUrl}', '_blank')" class="promo-btn-hover" style="flex:1; background:var(--line-green); color:white; border:none; padding:10px; border-radius:8px; font-family:'Kanit'; font-weight:600; font-size:13px; cursor:pointer; transition:0.2s;">💬 ทัก LINE เลย</button>` : '';
 
                 return `<div style="background: var(--surface); border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(197,160,89,0.15); border: 2px solid var(--primary); display: flex; flex-direction: column; position: relative;">
@@ -628,7 +618,29 @@
         }
     }
 
-    // --- ส่วนจัดการร้านค้า (Partner) ---
+    // 💡 ฟังก์ชันย่อรูปอัตโนมัติ (หัวใจสำคัญแก้บั๊กกดส่งมือถือไม่ได้)
+    const resizeImage = (file) => new Promise(resolve => {
+        if (!file) return resolve(null);
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = e => {
+            const img = new Image();
+            img.src = e.target.result;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let MAX_WIDTH = 800; // ย่อกว้างสุด 800px ก็พอ
+                let scaleSize = MAX_WIDTH / img.width;
+                if (scaleSize > 1) scaleSize = 1; // รูปเล็กอยู่แล้วไม่ขยาย
+                canvas.width = img.width * scaleSize;
+                canvas.height = img.height * scaleSize;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                resolve(canvas.toDataURL('image/jpeg', 0.6)); // บีบเป็น JPEG 60%
+            };
+            img.onerror = () => resolve(null);
+        };
+    });
+
     let regMiniMap, regMiniMarker;
     function searchRegStore() {
         const query = document.getElementById('regStoreName').value.trim();
@@ -646,31 +658,44 @@
     }
 
     async function submitStoreRegistration() {
-        const name = document.getElementById('regStoreName').value.trim();
-        const idCardFile = document.getElementById('regIdCard').files[0];
-        const photoFile = document.getElementById('regStorePhoto').files[0];
-        const commFile = document.getElementById('regCommercial').files[0];
-        
-        if (!name || !idCardFile || !photoFile) return alert("กรุณาค้นหาชื่อร้าน และแนบไฟล์ให้ครบ (บัตรประชาชน/หน้าร้าน)");
-        
-        const getBase64 = (file) => new Promise(resolve => { if (!file) return resolve(null); const reader = new FileReader(); reader.onload = e => resolve(e.target.result); reader.readAsDataURL(file); });
-        
-        appData.registrationRequests.push({ 
-            id: Date.now(), 
-            storeName: name, 
-            idCard: await getBase64(idCardFile), 
-            storePhoto: await getBase64(photoFile), 
-            commercial: await getBase64(commFile) 
-        }); 
-        saveData();
-        
-        document.getElementById('regStoreName').value = ''; 
-        document.getElementById('regIdCard').value = ''; 
-        document.getElementById('regStorePhoto').value = ''; 
-        document.getElementById('regCommercial').value = ''; 
-        document.getElementById('regStoreVerifyCard').style.display = 'none';
-        
-        alert("✅ ส่งข้อมูลให้ผู้ดูแลระบบเรียบร้อยแล้ว แอดมินจะตรวจสอบและส่งรหัส PIN ให้ครับ");
+        try {
+            const name = document.getElementById('regStoreName').value.trim();
+            const idCardFile = document.getElementById('regIdCard').files[0];
+            const photoFile = document.getElementById('regStorePhoto').files[0];
+            const commFile = document.getElementById('regCommercial').files[0];
+            
+            if (!name || !idCardFile || !photoFile) return alert("⚠️ กรุณาค้นหาชื่อร้าน และแนบไฟล์ให้ครบ (บัตรประชาชน/หน้าร้าน)");
+            
+            const btn = document.querySelector('#registerNewStoreCard .btn-secondary');
+            const originalText = btn.innerText;
+            btn.innerText = "กำลังประมวลผลไฟล์ภาพ... ⏳";
+            btn.disabled = true;
+
+            // บีบอัดรูปก่อนเซฟ ไม่ให้เบราว์เซอร์ล่ม
+            const idCardBase64 = await resizeImage(idCardFile);
+            const photoBase64 = await resizeImage(photoFile);
+            const commBase64 = await resizeImage(commFile);
+            
+            appData.registrationRequests.push({ 
+                id: Date.now(), storeName: name, idCard: idCardBase64, storePhoto: photoBase64, commercial: commBase64 
+            }); 
+            saveData();
+            
+            document.getElementById('regStoreName').value = ''; 
+            document.getElementById('regIdCard').value = ''; 
+            document.getElementById('regStorePhoto').value = ''; 
+            document.getElementById('regCommercial').value = ''; 
+            document.getElementById('regStoreVerifyCard').style.display = 'none';
+            
+            btn.innerText = originalText;
+            btn.disabled = false;
+            alert("✅ ส่งข้อมูลให้ผู้ดูแลระบบเรียบร้อยแล้ว แอดมินจะตรวจสอบและส่งรหัส PIN ให้ครับ");
+        } catch (error) {
+            console.error(error);
+            alert("❌ เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง");
+            const btn = document.querySelector('#registerNewStoreCard .btn-secondary');
+            if(btn) { btn.innerText = "ส่งข้อมูลเพื่อตรวจสอบ"; btn.disabled = false; }
+        }
     }
 
     let miniMap, miniMarker;
@@ -725,8 +750,7 @@
         alert("✅ อัปเดตข้อมูลลิงก์โซเชียล VIP เรียบร้อยแล้วครับ!");
     }
 
-    // 💡 ส่งข้อมูลซื้อโปรโมชั่น
-    function submitPromoWithPIN() {
+    async function submitPromoWithPIN() {
         try {
             const pin = document.getElementById('storePinInput').value.trim();
             const detail = document.getElementById('promoDetail').value.trim();
@@ -734,51 +758,48 @@
             const provId = document.getElementById('promoProvinceSelect') ? document.getElementById('promoProvinceSelect').value : 'ubon'; 
             const selectedCategory = document.getElementById('promoStoreCategory') ? document.getElementById('promoStoreCategory').value : 'ร้านอาหาร';
             
-            // ดึงค่าแพ็กเกจที่ลูกค้าเลือก
             const serviceSelect = document.getElementById('promoServiceSelect');
             const selectedService = serviceSelect ? serviceSelect.value : '';
-            
+
             if (!pin || !detail) return alert("⚠️ กรุณาตรวจสอบรหัส PIN และกรอกรายละเอียดให้ครบครับ");
             const store = appData.registeredStores.find(s => s.pin === pin);
             if (!store) return alert("❌ รหัส PIN ไม่ถูกต้องครับ");
 
-            const finishSave = (b64) => {
-                appData.pendingPromotions = appData.pendingPromotions.filter(p => p.storeName !== store.name);
-                
-                let promoObj = { 
-                    id: Date.now().toString(), 
-                    storeName: store.name, 
-                    province: provId, 
-                    detail: detail, 
-                    image: b64, 
-                    category: selectedCategory,
-                    service: selectedService, // 💡 บันทึกแพ็กเกจค่าบริการลงฐานข้อมูล
-                    date: new Date().toLocaleString('th-TH') 
-                };
+            const btn = document.querySelector('.promo-btn-hover');
+            const originalText = btn.innerText;
+            btn.innerText = "กำลังประมวลผลไฟล์ภาพ... ⏳";
+            btn.disabled = true;
 
-                if(store.isVIP) {
-                    promoObj.lineUrl = store.lineUrl || '';
-                    promoObj.fbUrl = store.fbUrl || '';
-                }
+            let b64 = '';
+            if (imageInput && imageInput.files && imageInput.files[0]) { 
+                b64 = await resizeImage(imageInput.files[0]); 
+            }
 
-                appData.pendingPromotions.push(promoObj);
-                saveData();
-                document.getElementById('promoDetail').value = ''; 
-                if(imageInput) imageInput.value = '';
-                alert(`✅ ส่งข้อมูลขอขึ้นแบนเนอร์สำเร็จ! กรุณารอแอดมินอนุมัติ 1-2 วันครับ`);
+            appData.pendingPromotions = appData.pendingPromotions.filter(p => p.storeName !== store.name);
+            let promoObj = { 
+                id: Date.now().toString(), storeName: store.name, province: provId, detail: detail, 
+                image: b64, category: selectedCategory, service: selectedService, date: new Date().toLocaleString('th-TH') 
             };
 
-            if (imageInput && imageInput.files && imageInput.files[0]) { 
-                const r = new FileReader(); 
-                r.onload = e => finishSave(e.target.result); 
-                r.readAsDataURL(imageInput.files[0]); 
-            } else { 
-                finishSave(''); 
-            }
-        } catch (err) { alert("เกิดข้อผิดพลาดในการส่งข้อมูล: " + err.message); }
+            if(store.isVIP) { promoObj.lineUrl = store.lineUrl || ''; promoObj.fbUrl = store.fbUrl || ''; }
+
+            appData.pendingPromotions.push(promoObj);
+            saveData();
+            document.getElementById('promoDetail').value = ''; 
+            if(imageInput) imageInput.value = '';
+            
+            btn.innerText = originalText;
+            btn.disabled = false;
+            alert(`✅ ส่งข้อมูลขอขึ้นแบนเนอร์สำเร็จ! กรุณารอแอดมินอนุมัติ 1-2 วันครับ`);
+
+        } catch (err) { 
+            console.error(err);
+            alert("เกิดข้อผิดพลาดในการส่งข้อมูล: " + err.message); 
+            const btn = document.querySelector('.promo-btn-hover');
+            if(btn) { btn.innerText = "🚀 สั่งซื้อและส่งเรื่องขอโปรโมท"; btn.disabled = false; }
+        }
     }
 
-    // ซิงค์เวลามีการอัปเดตข้อมูลจากหน้า Admin
     window.addEventListener('storage', function(e) {
         if (e.key === 'painaidee_auth') { renderUI(); }
     });
