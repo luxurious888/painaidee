@@ -102,9 +102,7 @@
         .dashboard-card h3 { margin-top: 0; color: var(--primary-light); border-bottom: 2px solid var(--border); padding-bottom: 12px; font-weight: 500; }
         .form-group { margin-bottom: 18px; }
         .form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px; color: #FFF; }
-        .price-list { list-style: none; padding: 0; margin: 0; }
-        .price-list li { display: flex; justify-content: space-between; padding: 15px 10px; border-bottom: 1px solid var(--border); align-items: center; transition: 0.2s; }
-
+        
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(18, 20, 24, 0.95); backdrop-filter: blur(15px); z-index: 9999; display: flex; align-items: center; justify-content: center; }
         .login-card { background: var(--surface); padding: 40px; border-radius: 24px; text-align: center; max-width: 350px; width: 90%; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid var(--border); animation: fadeIn 0.5s ease; }
         .btn-line-login { background-color: var(--line-green); color: white; border: none; padding: 15px 20px; border-radius: 12px; font-family: 'Kanit'; font-weight: 600; font-size: 16px; width: 100%; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 5px 15px rgba(6, 199, 85, 0.3); }
@@ -273,9 +271,15 @@
         { id: 14, group: 'sport', label: 'สระว่ายน้ำ', keyword: 'สระว่ายน้ำ' }
     ];
 
+    // 💡 เพิ่มค่าเริ่มต้นสำหรับค่าบริการ
+    const defaultServices = [
+        { id: 1, name: 'ปักหมุดโปรโมชั่นหน้าแรก (รายเดือน)', price: 500 },
+        { id: 2, name: 'อัปเดตแก้ไขแบนเนอร์ (ต่อครั้ง)', price: 150 }
+    ];
+
     let appData = { 
         registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], 
-        categories: [], closedReports: [], blacklistedPlaces: [] 
+        categories: [], closedReports: [], blacklistedPlaces: [], services: [] 
     };
 
     function loadFromStorage() {
@@ -290,7 +294,11 @@
                 appData.closedReports = parsed.closedReports || [];
                 appData.blacklistedPlaces = parsed.blacklistedPlaces || [];
                 appData.categories = parsed.categories && parsed.categories.length > 0 ? parsed.categories : defaultCategories;
-            } else { appData.categories = defaultCategories; }
+                appData.services = parsed.services && parsed.services.length > 0 ? parsed.services : defaultServices; // 💡 ดึงค่าบริการ
+            } else { 
+                appData.categories = defaultCategories; 
+                appData.services = defaultServices; 
+            }
             if (!appData.registeredStores.find(s => s.pin === "1234")) {
                 appData.registeredStores.push({ name: "Lan'suk ลานสุข อุบล", pin: "1234", isVIP: true });
             }
@@ -306,6 +314,7 @@
         document.getElementById('tab-' + p).classList.add('active');
     }
 
+    // --- LIFF ---
     const myLiffId = "2009598846-wiCUeV35";
     async function initializeLiff() {
         loadFromStorage();
@@ -347,9 +356,14 @@
             });
             promoCatSelect.innerHTML = promoHtml;
         }
+
+        // 💡 อัปเดต Dropdown ค่าบริการ
+        const serviceSelect = document.getElementById('promoServiceSelect');
+        if (serviceSelect && appData.services) {
+            serviceSelect.innerHTML = appData.services.map(s => `<option value="${s.name} - ${s.price} ฿">${s.name} - ${s.price} ฿</option>`).join('');
+        }
     }
 
-    // 💡 ค้นหาร้านจากป้ายโปรโมชั่น
     function focusPromo(storeName) {
         let sb = document.getElementById('searchBox');
         if(sb) sb.value = storeName;
@@ -373,14 +387,12 @@
         if (provincePromos.length > 0) {
             banner.style.display = 'block';
             promoList.innerHTML = provincePromos.map(p => {
-                // 💡 รูปภาพพร้อมเอฟเฟกต์แสงสะท้อน
                 const imgTag = p.image 
                     ? `<div style="position:relative; width:100%; height:180px;"><img src="${p.image}" style="width: 100%; height: 100%; object-fit: cover;"><div class="shine-effect"></div></div>` 
                     : `<div style="position:relative; width: 100%; height: 180px; background-color: var(--dark-light); display: flex; align-items: center; justify-content: center; color: var(--primary);"><div class="shine-effect"></div>Painaidee</div>`;
                 
                 const categoryBadge = p.category ? `<span style="background:var(--primary); color:#000; padding:2px 10px; border-radius:12px; font-size:11px; font-weight:600; display:inline-block; margin-bottom:8px;">📌 ${p.category}</span>` : '';
                 
-                // 💡 ปุ่ม LINE และพิกัดร้าน
                 let lineBtn = p.lineUrl ? `<button onclick="window.open('${p.lineUrl}', '_blank')" class="promo-btn-hover" style="flex:1; background:var(--line-green); color:white; border:none; padding:10px; border-radius:8px; font-family:'Kanit'; font-weight:600; font-size:13px; cursor:pointer; transition:0.2s;">💬 ทัก LINE เลย</button>` : '';
 
                 return `<div style="background: var(--surface); border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(197,160,89,0.15); border: 2px solid var(--primary); display: flex; flex-direction: column; position: relative;">
@@ -713,6 +725,7 @@
         alert("✅ อัปเดตข้อมูลลิงก์โซเชียล VIP เรียบร้อยแล้วครับ!");
     }
 
+    // 💡 ส่งข้อมูลซื้อโปรโมชั่น
     function submitPromoWithPIN() {
         try {
             const pin = document.getElementById('storePinInput').value.trim();
@@ -720,6 +733,10 @@
             const imageInput = document.getElementById('promoImageInput');
             const provId = document.getElementById('promoProvinceSelect') ? document.getElementById('promoProvinceSelect').value : 'ubon'; 
             const selectedCategory = document.getElementById('promoStoreCategory') ? document.getElementById('promoStoreCategory').value : 'ร้านอาหาร';
+            
+            // ดึงค่าแพ็กเกจที่ลูกค้าเลือก
+            const serviceSelect = document.getElementById('promoServiceSelect');
+            const selectedService = serviceSelect ? serviceSelect.value : '';
             
             if (!pin || !detail) return alert("⚠️ กรุณาตรวจสอบรหัส PIN และกรอกรายละเอียดให้ครบครับ");
             const store = appData.registeredStores.find(s => s.pin === pin);
@@ -734,11 +751,11 @@
                     province: provId, 
                     detail: detail, 
                     image: b64, 
-                    category: selectedCategory, 
+                    category: selectedCategory,
+                    service: selectedService, // 💡 บันทึกแพ็กเกจค่าบริการลงฐานข้อมูล
                     date: new Date().toLocaleString('th-TH') 
                 };
 
-                // แนบลิงก์ LINE ให้แอดมิน เพื่อไปสร้างปุ่มในแบนเนอร์
                 if(store.isVIP) {
                     promoObj.lineUrl = store.lineUrl || '';
                     promoObj.fbUrl = store.fbUrl || '';
@@ -761,6 +778,7 @@
         } catch (err) { alert("เกิดข้อผิดพลาดในการส่งข้อมูล: " + err.message); }
     }
 
+    // ซิงค์เวลามีการอัปเดตข้อมูลจากหน้า Admin
     window.addEventListener('storage', function(e) {
         if (e.key === 'painaidee_auth') { renderUI(); }
     });
