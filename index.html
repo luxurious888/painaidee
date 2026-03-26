@@ -257,7 +257,7 @@
 <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <script>
     // 🔗 API เชื่อม Google Sheets (Cloud)
-    const API_URL = "https://script.google.com/macros/s/AKfycbwJiwswKLe5DicJYo_5mcwM5KBSDS1O9tV6KhJ6ehsVSjkES2k-3ESKNeBak36B8Qz-/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbwWUUmlsCjBKGNECm4zNVSNMYeGW_DKHTB_41aTmb-BW2IG_dAESbYDIrwQIOjhfRyA/exec";
     
     // 💡 ข้อมูลหมวดหมู่และราคาเริ่มต้น
     const defaultCategories = [
@@ -667,7 +667,7 @@
         appData.registrationRequests.push({ id: Date.now(), storeName: n, storePhoto: photo, idCard: idCard, commercial: comm });
         await saveToCloud(); 
         alert("ส่งข้อมูลสำเร็จ! รอรับ PIN จากแอดมินครับ");
-        btn.innerText = "🚀 ส่งข้อมูลเพื่อตรวจสอบ"; btn.disabled = false;
+        btn.innerText = "🚀 ส่งเอกสารเพื่อตรวจสอบ"; btn.disabled = false;
         
         ['regStoreName','regStorePhoto','regIdCard','regCommercial'].forEach(id => document.getElementById(id).value = '');
         document.getElementById('regStoreVerifyCard').style.display = 'none';
