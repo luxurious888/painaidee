@@ -144,15 +144,20 @@
     }
 
     // ☁️ บันทึกข้อมูลไป Cloud
-    async function saveToCloud() { 
+    async function save() { 
+        showLoading(true);
         try { 
             await fetch(API_URL, { 
                 method: 'POST', 
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify(appData) 
             }); 
-        } catch(e) { console.error("Save Error", e); } 
-    }
+            render(); // เซฟเสร็จให้อัปเดตตารางโชว์ทันที
+        } catch(e) { 
+            console.error("Save Error", e); 
+            alert("⚠️ เกิดข้อผิดพลาดในการบันทึกข้อมูล");
+        } 
+        showLoading(false);
     }
 
     // 🎨 วาด UI ตารางต่างๆ
