@@ -251,6 +251,18 @@
             <label>รายละเอียดโปรโมชั่น</label>
             <textarea id="promoDetail" rows="3" placeholder="ระบุเงื่อนไขโปรโมชั่นของคุณ..."></textarea>
         </div>
+        <div class="form-group" style="padding: 15px; border: 1px dashed var(--primary); border-radius: 10px; background: rgba(197, 160, 89, 0.05); margin-top: 15px;">
+            <label style="color: #FFD700; font-size: 16px; margin-bottom: 5px;">👑 ข้อมูลติดต่อพิเศษ (VIP Links)</label>
+            <p id="vipLockMessage" style="font-size: 12px; color: var(--danger); margin-top: 0; margin-bottom: 10px;">
+                * ฟีเจอร์สำหรับสมาชิก VIP เท่านั้น (อัปเกรดเพื่อปลดล็อคปุ่มติดต่อตรง)
+            </p>
+            
+            <label style="font-size: 13px; color: var(--text-muted);">ลิงก์ LINE OA (เช่น https://line.me/R/ti/p/...)</label>
+            <input type="text" id="vipLineInput" placeholder="วางลิงก์ LINE ของคุณที่นี่..." disabled style="opacity: 0.5;">
+            
+            <label style="font-size: 13px; color: var(--text-muted); margin-top: 10px;">ลิงก์ Facebook Page</label>
+            <input type="text" id="vipFbInput" placeholder="วางลิงก์ Facebook ของคุณที่นี่..." disabled style="opacity: 0.5;">
+        </div>
         <button class="btn-primary" onclick="submitPromoWithPIN()">ส่งข้อมูลเพื่อขึ้นโปรโมท / ต่ออายุ</button>
     </div>
 
