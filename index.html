@@ -440,6 +440,27 @@
                     miniMarker = new google.maps.Marker({ map: miniMap });
                 }
                 miniMap.setCenter(place.geometry.location); miniMarker.setPosition(place.geometry.location);
+                // --- 👑 ตรวจสอบว่าเป็น VIP หรือไม่ เพื่อปลดล็อคช่อง ---
+                if (store.isVIP) {
+                    document.getElementById('vipLineInput').disabled = false;
+                    document.getElementById('vipFbInput').disabled = false;
+                    document.getElementById('vipLineInput').style.opacity = '1';
+                    document.getElementById('vipFbInput').style.opacity = '1';
+                    document.getElementById('vipLockMessage').style.display = 'none'; // ซ่อนคำเตือน
+                    
+                    // ถ้าเคยใส่ข้อมูลไว้แล้ว ให้ดึงมาแสดง
+                    document.getElementById('vipLineInput').value = store.lineUrl || '';
+                    document.getElementById('vipFbInput').value = store.fbUrl || '';
+                } else {
+                    document.getElementById('vipLineInput').disabled = true;
+                    document.getElementById('vipFbInput').disabled = true;
+                    document.getElementById('vipLineInput').style.opacity = '0.5';
+                    document.getElementById('vipFbInput').style.opacity = '0.5';
+                    document.getElementById('vipLockMessage').style.display = 'block'; // โชว์คำเตือน
+                    document.getElementById('vipLineInput').value = '';
+                    document.getElementById('vipFbInput').value = '';
+                }
+                // --------------------------------------------------
             } else { alert(`⚠️ หาพิกัดร้านไม่เจอ`); }
         });
     }
