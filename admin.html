@@ -27,6 +27,9 @@
         #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; font-weight: bold; color: var(--dark); }
         .spinner { width: 50px; height: 50px; border: 5px solid #eee; border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 15px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        /* ช่องกรอกข้อมูลแบบ Inline สำหรับแก้ข้อมูลลูกค้า */
+        .edit-input { padding: 6px; border: 1px solid #ccc; border-radius: 6px; font-family: 'Kanit'; font-size: 13px; width: 100%; box-sizing: border-box; margin-bottom: 6px; background: #fff;}
+        .edit-input:focus { border-color: var(--primary); box-shadow: 0 0 5px rgba(197,160,89,0.3); outline: none;}
     </style>
 </head>
 <body>
@@ -66,12 +69,12 @@
     </div>
 
     <div class="card" style="border-left-color: var(--info);">
-        <h2>📌 3. คำขอขึ้นแบนเนอร์โปรโมท (รอการอนุมัติ)</h2>
+        <h2>📌 3. คำขออัปเดต / ขึ้นแบนเนอร์โปรโมท (แอดมินแก้ไขก่อนอนุมัติได้)</h2>
         <table id="pTable"></table>
     </div>
 
     <div class="card" style="border-left-color: var(--success);">
-        <h2>✨ 4. สถานะแบนเนอร์โฆษณาที่กำลังแสดงผล</h2>
+        <h2>✨ 4. สถานะแบนเนอร์โฆษณาที่กำลังแสดงผล (สามารถกดแก้ไขได้)</h2>
         <table id="activePTable"></table>
     </div>
 
@@ -92,7 +95,7 @@
 </div>
 
 <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbx1ZMaFt-GWvrZ_-XTSiqhx__zhwYTo_NcpnTAzU75Xxh4pPAgdi7OO4sC1H0yxeGEr/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbwWUUmlsCjBKGNECm4zNVSNMYeGW_DKHTB_41aTmb-BW2IG_dAESbYDIrwQIOjhfRyA/exec";
     
     let appData = { registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], categories: [], closedReports: [], blacklistedPlaces: [], services: [] };
 
@@ -106,14 +109,17 @@
         showLoading(false);
     }
 
-    // ⚡ อัปเดตข้อมูลอัตโนมัติ (Real-time admin)
+    // ⚡ อัปเดตข้อมูลอัตโนมัติ
     setInterval(async () => {
         try {
             const res = await fetch(API_URL);
             const data = await res.json();
             if (data && Object.keys(data).length > 0) {
                 appData = data;
-                render(); // รีเฟรชเฉพาะตาราง
+                // ถ้าแอดมินกำลังพิมพ์ข้อมูลอยู่ เราจะไม่ render ทับ เพื่อไม่ให้แอดมินหงุดหงิด
+                if (!document.activeElement.classList.contains('edit-input')) {
+                    render(); 
+                }
             }
         } catch (e) {}
     }, 10000);
@@ -134,14 +140,48 @@
         document.getElementById('cTable').innerHTML = '<tr><th>กลุ่มหลัก</th><th>ชื่อที่แสดง</th><th>คำค้น (Maps)</th><th>จัดการ</th></tr>' + 
             (appData.categories || []).map((c,i) => `<tr><td><span class="status-badge" style="background:#8e44ad;">${c.group}</span></td><td><strong>${c.label}</strong></td><td style="color:var(--info);">${c.keyword}</td><td><button class="btn btn-del" onclick="deleteItem('categories', ${i})">🗑️ ลบ</button></td></tr>`).join('');
 
-        document.getElementById('pTable').innerHTML = '<tr><th>ร้านค้า (จังหวัด)</th><th>แพ็กเกจที่ซื้อ</th><th>รูปที่แนบ</th><th>จัดการ</th></tr>' + 
-            (appData.pendingPromotions || []).map((p,i) => `<tr><td><strong>${p.storeName}</strong><br><small style="color:#666;">${p.province}</small></td><td><span class="status-badge" style="background:#eee; color:#333;">${p.category || 'ทั่วไป'}</span><br><span class="status-badge bg-gold" style="margin-top:4px;">${p.service || '-'}</span></td><td><img src="${p.image}" class="img-preview" onclick="window.open(this.src)" title="คลิกเพื่อดูรูปใหญ่"></td><td><button class="btn btn-ok" onclick="approvePromotion(${i})">✅ อนุมัติ 30 วัน</button><button class="btn btn-del" onclick="deleteItem('pendingPromotions', ${i})">❌ ลบทิ้ง</button></td></tr>`).join('');
+        // ⚡ อัปเกรดตารางโปรโมท (Pending) ให้แอดมินพิมพ์แก้ไขได้เลย
+        document.getElementById('pTable').innerHTML = '<tr><th style="width:25%;">ร้านค้า / จังหวัด</th><th style="width:25%;">หมวดหมู่ / แพ็กเกจ</th><th>รายละเอียด (แก้ได้)</th><th>รูปที่แนบ</th><th>จัดการ</th></tr>' + 
+            (appData.pendingPromotions || []).map((p,i) => `<tr>
+                <td>
+                    <input type="text" id="editPStore_${i}" class="edit-input" value="${p.storeName}" placeholder="ชื่อร้านค้า">
+                    <input type="text" id="editPProv_${i}" class="edit-input" value="${p.province}" placeholder="รหัสจังหวัด เช่น ubon">
+                </td>
+                <td>
+                    <input type="text" id="editPCat_${i}" class="edit-input" value="${p.category || ''}" placeholder="หมวดหมู่">
+                    <input type="text" id="editPServ_${i}" class="edit-input" value="${p.service || ''}" placeholder="ชื่อแพ็กเกจ">
+                </td>
+                <td>
+                    <textarea id="editPDetail_${i}" class="edit-input" rows="2">${p.detail || ''}</textarea>
+                </td>
+                <td><img src="${p.image}" class="img-preview" onclick="window.open(this.src)" title="คลิกเพื่อดูรูปใหญ่"></td>
+                <td>
+                    <button class="btn btn-ok" onclick="approvePromotion(${i})">✅ บันทึก & อนุมัติ</button>
+                    <button class="btn btn-del" onclick="deleteItem('pendingPromotions', ${i})">❌ ลบทิ้ง</button>
+                </td>
+            </tr>`).join('');
 
+        // ⚡ อัปเกรดตารางโปรโมท (Active) ให้แอดมินแก้ไขข้อมูลสดๆ ได้เช่นกัน
         const now = Date.now();
-        document.getElementById('activePTable').innerHTML = '<tr><th>ร้านค้า (จังหวัด)</th><th>รายละเอียด</th><th>วันหมดอายุ</th><th>จัดการ</th></tr>' + 
+        document.getElementById('activePTable').innerHTML = '<tr><th style="width:25%;">ร้านค้า / จังหวัด</th><th>รายละเอียดแคปชั่น</th><th>วันหมดอายุ</th><th>จัดการ</th></tr>' + 
             (appData.activePromotions || []).map((p,i) => {
                 const isExpired = p.expireTimestamp && now > p.expireTimestamp;
-                return `<tr style="${isExpired ? 'opacity: 0.6; background: #fff5f5;' : ''}"><td><strong>${p.storeName}</strong><br><small>${p.province}</small></td><td style="max-width:200px; font-size:12px;">${p.detail}</td><td style="color:${isExpired ? 'var(--danger)' : 'var(--success)'}; font-weight:600;">${isExpired ? 'หมดอายุแล้ว' : new Date(p.expireTimestamp).toLocaleDateString('th-TH')}</td><td><button class="btn btn-del" onclick="deleteItem('activePromotions', ${i})">🗑️ นำออก</button></td></tr>`;
+                return `<tr style="${isExpired ? 'opacity: 0.6; background: #fff5f5;' : ''}">
+                    <td>
+                        <input type="text" id="editAStore_${i}" class="edit-input" value="${p.storeName}" style="font-weight:bold;">
+                        <input type="text" id="editAProv_${i}" class="edit-input" value="${p.province}">
+                    </td>
+                    <td>
+                        <textarea id="editADetail_${i}" class="edit-input" rows="2">${p.detail}</textarea>
+                    </td>
+                    <td style="color:${isExpired ? 'var(--danger)' : 'var(--success)'}; font-weight:600;">
+                        ${isExpired ? 'หมดอายุแล้ว' : new Date(p.expireTimestamp).toLocaleDateString('th-TH')}
+                    </td>
+                    <td>
+                        <button class="btn btn-info" onclick="saveActivePromo(${i})">💾 บันทึกที่แก้</button>
+                        <button class="btn btn-del" onclick="deleteItem('activePromotions', ${i})">🗑️ นำออก</button>
+                    </td>
+                </tr>`;
             }).join('');
 
         document.getElementById('rTable').innerHTML = '<tr><th>ชื่อร้าน</th><th>เอกสารแนบ</th><th>จัดการ</th></tr>' + 
@@ -168,10 +208,42 @@
         document.getElementById('cLabel').value = ''; document.getElementById('cKey').value = '';
     }
 
+    // ⚡ ฟังก์ชันอนุมัติที่ดึงค่าจากช่องที่แอดมินพิมพ์แก้
     function approvePromotion(i) {
-        let p = appData.pendingPromotions[i]; p.expireTimestamp = Date.now() + (30 * 24 * 60 * 60 * 1000); 
+        let p = appData.pendingPromotions[i]; 
+        
+        // ดึงข้อมูลที่แอดมินอาจจะแก้ไขมาใช้งาน
+        p.storeName = document.getElementById(`editPStore_${i}`).value;
+        p.province = document.getElementById(`editPProv_${i}`).value;
+        p.category = document.getElementById(`editPCat_${i}`).value;
+        p.service = document.getElementById(`editPServ_${i}`).value;
+        p.detail = document.getElementById(`editPDetail_${i}`).value;
+
+        p.expireTimestamp = Date.now() + (30 * 24 * 60 * 60 * 1000); // 30 วัน
+        
         if(!appData.activePromotions) appData.activePromotions = [];
-        appData.activePromotions.unshift(p); appData.pendingPromotions.splice(i, 1); save();
+        
+        // ถ้าร้านนี้มีโปรโมทโชว์อยู่แล้ว ให้อัปเดตทับเลย จะได้ไม่ซ้ำซ้อน
+        const existingIndex = appData.activePromotions.findIndex(act => act.storeName === p.storeName);
+        if(existingIndex !== -1) {
+            appData.activePromotions[existingIndex] = p;
+        } else {
+            appData.activePromotions.unshift(p);
+        }
+
+        appData.pendingPromotions.splice(i, 1); 
+        save();
+        alert("✅ บันทึกการแก้ไขและอนุมัติขึ้นแบนเนอร์เรียบร้อยแล้ว!");
+    }
+
+    // ⚡ ฟังก์ชันอัปเดตข้อมูลแบนเนอร์ที่ Active อยู่แล้ว
+    function saveActivePromo(i) {
+        let p = appData.activePromotions[i];
+        p.storeName = document.getElementById(`editAStore_${i}`).value;
+        p.province = document.getElementById(`editAProv_${i}`).value;
+        p.detail = document.getElementById(`editADetail_${i}`).value;
+        save();
+        alert("💾 บันทึกการแก้ไขข้อมูลเรียบร้อยแล้ว!");
     }
 
     function approveStore(i) {
