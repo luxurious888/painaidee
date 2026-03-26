@@ -230,6 +230,7 @@
 
 <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <script>
+    // 💡 ค่าเริ่มต้นหมวดหมู่เผื่อกรณีฐานข้อมูลว่าง
     const defaultCategories = [
         { id: 1, group: 'food', label: 'หมูกระทะ / แจ่วฮ้อน', keyword: 'หมูกระทะ' },
         { id: 2, group: 'food', label: 'ชาบู / สุกี้', keyword: 'ชาบู' },
@@ -247,7 +248,7 @@
         { id: 14, group: 'sport', label: 'สระว่ายน้ำ', keyword: 'สระว่ายน้ำ' }
     ];
 
-    let appData = { registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], categories: [] };
+    let appData = { registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], categories: [], closedReports: [], blacklistedPlaces: [] };
 
     function loadFromStorage() {
         try {
@@ -256,6 +257,7 @@
                 let parsed = JSON.parse(raw);
                 appData = parsed;
                 if (!appData.categories || appData.categories.length === 0) appData.categories = defaultCategories;
+                if (!appData.blacklistedPlaces) appData.blacklistedPlaces = [];
             } else {
                 appData.categories = defaultCategories;
             }
@@ -274,6 +276,7 @@
         document.getElementById('tab-' + p).classList.add('active');
     }
 
+    // --- LIFF ---
     const myLiffId = "2009598846-wiCUeV35";
     async function initializeLiff() {
         loadFromStorage();
@@ -341,6 +344,11 @@
     }
 
     let map, infoWindow, service, currentCoords = { lat: 15.2287, lng: 104.8564 }, gpsMarker = null, googlePlaces = [], markers = [];
+    
+    // 💡 ตัวแปรสำหรับ Pagination
+    let currentPagination = null;
+    let currentKeyword = "";
+
     const provinces = [
         {id:'bkk',name:'กรุงเทพมหานคร',lat:13.7563,lng:100.5018},{id:'krabi',name:'กระบี่',lat:8.0863,lng:98.9063},{id:'kanchanaburi',name:'กาญจนบุรี',lat:14.0159,lng:99.5336},
         {id:'kalasin',name:'กาฬสินธุ์',lat:16.4322,lng:103.5061},{id:'kamphaengphet',name:'กำแพงเพชร',lat:16.4828,lng:99.5227},{id:'khonkaen',name:'ขอนแก่น',lat:16.4322,lng:102.8236},
@@ -430,30 +438,52 @@
                 else if (catSelect) keywordToSearch = catSelect.value;
             }
         }
+        
+        // เริ่มค้นหาใหม่ เคลียร์ของเก่าทิ้ง
         fetchPlaces(currentCoords, keywordToSearch); 
     }
     
+    // 💡 ฟังก์ชันดึงข้อมูล และรองรับ Pagination (โหลดเพิ่มเติม)
     function fetchPlaces(coords, keyword) { 
-        googlePlaces = []; clearMarkers(); map.setCenter(coords); 
+        googlePlaces = []; 
+        clearMarkers(); 
+        currentKeyword = keyword; // เก็บค่าไว้ใช้ตอนโหลดเพิ่ม
+        map.setCenter(coords); 
+
         document.getElementById('placeList').innerHTML = `<p style="text-align:center; padding: 40px; color:var(--text-muted);">กำลังค้นหา <b>"${keyword}"</b>...</p>`; 
-        service.nearbySearch({ location: coords, radius: 5000, keyword: keyword }, (results, status) => { 
-            if (status === google.maps.places.PlacesServiceStatus.OK && results) { 
-                const activePlaces = results.filter(p => p.business_status === 'OPERATIONAL'); 
-                if(activePlaces.length > 0) { googlePlaces = activePlaces; renderCards(googlePlaces); createMarkers(googlePlaces); } 
-                else { document.getElementById('placeList').innerHTML = `<p style="text-align:center; padding: 40px; color:var(--text-muted);">ไม่มี <b>"${keyword}"</b> ที่เปิดให้บริการ</p>`; } 
-            } else { document.getElementById('placeList').innerHTML = `<p style="text-align:center; padding: 40px; color:var(--text-muted);">ไม่พบ <b>"${keyword}"</b> ในบริเวณนี้</p>`; } 
-        }); 
+        
+        service.nearbySearch({ location: coords, radius: 5000, keyword: keyword }, processPlacesResult); 
     }
 
-    // 💡 คืนชีพฟังก์ชันปุ่มรายงานการปิดร้าน (แอบอยู่ตรงมุมขวาล่างของการ์ด)
-    function reportClosed(placeId, placeName, event) { 
-        event.stopPropagation(); 
-        if(confirm(`ร้าน "${placeName}" ปิดกิจการถาวรแล้ว?`)) {
-            alert("ส่งเรื่องแจ้งแอดมินเรียบร้อยแล้ว ขอบคุณครับ!"); 
+    function processPlacesResult(results, status, pagination) {
+        if (status === google.maps.places.PlacesServiceStatus.OK && results) { 
+            const activePlaces = results.filter(p => p.business_status === 'OPERATIONAL' && !appData.blacklistedPlaces.includes(p.place_id)); 
+            
+            // เช็คและเพิ่มร้านที่ไม่ซ้ำ
+            activePlaces.forEach(newPlace => {
+                if (!googlePlaces.find(old => old.place_id === newPlace.place_id)) {
+                    googlePlaces.push(newPlace);
+                }
+            });
+
+            currentPagination = pagination; // เก็บตัวแบ่งหน้าไว้ใช้ปุ่มโหลดเพิ่ม
+            
+            renderCards(googlePlaces); 
+            createMarkers(activePlaces); 
+        } else if (googlePlaces.length === 0) { 
+            document.getElementById('placeList').innerHTML = `<p style="text-align:center; padding: 40px; color:var(--text-muted);">ไม่พบ <b>"${currentKeyword}"</b> ในบริเวณนี้</p>`; 
         }
     }
 
-    // 💡 การ์ด VIP พร้อมปุ่มโซเชียลเต็มสูบ!
+    // 💡 ฟังก์ชันโหลดข้อมูลเพิ่มเติมเมื่อกดปุ่ม
+    function loadMorePlaces() {
+        if (currentPagination && currentPagination.hasNextPage) {
+            const btn = document.getElementById('loadMoreBtn');
+            if(btn) btn.innerHTML = "กำลังค้นหาเพิ่มเติม... ⏳";
+            currentPagination.nextPage();
+        }
+    }
+
     function renderCards(places) { 
         const list = document.getElementById('placeList'); 
         const originPoint = new google.maps.LatLng(currentCoords.lat, currentCoords.lng); 
@@ -464,7 +494,7 @@
             return vipB - vipA;
         });
 
-        list.innerHTML = sortedPlaces.map(p => { 
+        let html = sortedPlaces.map(p => { 
             const lat = p.geometry.location.lat(), lng = p.geometry.location.lng();
             const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`; 
             const distanceKm = (google.maps.geometry.spherical.computeDistanceBetween(originPoint, p.geometry.location) / 1000).toFixed(1); 
@@ -510,6 +540,21 @@
                 </div>
             </div>`; 
         }).join(''); 
+
+        // 💡 เพิ่มปุ่ม "ดูเพิ่มเติม" ต่อท้ายสุด หากยังมีหน้าถัดไป (API จำกัดที่ 60 รายการ)
+        if (currentPagination && currentPagination.hasNextPage) {
+            html += `
+            <div style="grid-column: 1 / -1; text-align: center; margin-top: 10px; padding-bottom: 20px;">
+                <button id="loadMoreBtn" class="btn-outline" style="width: 250px; border-color: var(--primary); color: var(--primary); background: var(--surface);" onclick="loadMorePlaces()">⬇️ ดูเพิ่มเติม (โหลดอีก 20 ร้าน)</button>
+            </div>`;
+        } else if (googlePlaces.length > 0) {
+            html += `
+            <div style="grid-column: 1 / -1; text-align: center; margin-top: 10px; padding-bottom: 20px; color: var(--text-muted); font-size: 13px;">
+                สุดทางแล้วครับ (ค้นพบทั้งหมด ${googlePlaces.length} สถานที่)
+            </div>`;
+        }
+
+        list.innerHTML = html;
     }
 
     function createMarkers(places) { places.forEach(p => { const marker = new google.maps.Marker({ map, position: p.geometry.location, title: p.name }); marker.addListener("click", () => { infoWindow.setContent(`<div style="padding:8px 12px; font-family:Kanit; color:#333;"><strong>${p.name}</strong></div>`); infoWindow.open(map, marker); }); p.markerRef = marker; markers.push(marker); }); }
@@ -517,6 +562,15 @@
     function focusPlace(id) { const p = googlePlaces.find(x => x.place_id === id); if(p) { map.panTo(p.geometry.location); map.setZoom(17); infoWindow.setContent(`<div style="padding:8px 12px; font-family:Kanit; color:#333;"><strong>${p.name}</strong></div>`); infoWindow.open(map, p.markerRef); window.scrollTo({ top: 0, behavior: 'smooth' }); } }
     function callPlace(placeId, event) { event.stopPropagation(); service.getDetails({ placeId: placeId, fields: ['formatted_phone_number'] }, (place, status) => { if (status === google.maps.places.PlacesServiceStatus.OK && place.formatted_phone_number) window.location.href = `tel:${place.formatted_phone_number.replace(/[\s-]/g, '')}`; else alert("ขออภัยครับ ร้านนี้ไม่ได้ระบุเบอร์โทร"); }); }
     function sharePlace(name, lat, lng, event) { event.stopPropagation(); const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`; if (navigator.share) navigator.share({ title: name, url: navUrl }).catch(console.error); else { navigator.clipboard.writeText(navUrl); alert("คัดลอกลิงก์เรียบร้อยแล้ว"); } }
+    
+    function reportClosed(placeId, placeName, event) { 
+        event.stopPropagation(); 
+        if(confirm(`ร้าน "${placeName}" ปิดกิจการถาวรแล้ว?`)) {
+            if(appData.closedReports.find(r => r.placeId === placeId)) return alert("รับเรื่องแล้ว แอดมินกำลังตรวจสอบครับ");
+            appData.closedReports.push({ id: Date.now(), placeId: placeId, storeName: placeName, date: new Date().toLocaleString('th-TH') });
+            saveData(); alert("ส่งเรื่องแจ้งแอดมินเรียบร้อยแล้ว ขอบคุณครับ!");
+        }
+    }
 
     // --- ส่วนจัดการร้านค้า ---
     let regMiniMap, regMiniMarker;
