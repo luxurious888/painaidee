@@ -230,7 +230,6 @@
 
 <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <script>
-    // 💡 ค่าเริ่มต้นหมวดหมู่เผื่อกรณีฐานข้อมูลว่าง
     const defaultCategories = [
         { id: 1, group: 'food', label: 'หมูกระทะ / แจ่วฮ้อน', keyword: 'หมูกระทะ' },
         { id: 2, group: 'food', label: 'ชาบู / สุกี้', keyword: 'ชาบู' },
@@ -275,7 +274,6 @@
         document.getElementById('tab-' + p).classList.add('active');
     }
 
-    // --- LIFF ---
     const myLiffId = "2009598846-wiCUeV35";
     async function initializeLiff() {
         loadFromStorage();
@@ -293,7 +291,6 @@
     }
     function loginWithLine() { if (!liff.isLoggedIn()) liff.login({ redirectUri: window.location.href }); }
 
-    // 💡 ฟังก์ชันสร้างตัวเลือกหมวดหมู่อัตโนมัติ (Sync จากหน้าแอดมิน)
     function renderCategories() {
         const catData = appData.categories || [];
         const genOptions = (group, defLabel, defVal) => {
@@ -322,7 +319,7 @@
 
     function renderUI() {
         loadFromStorage();
-        renderCategories(); // อัปเดตกล่องเลือกเมื่อดึงข้อมูลเสร็จ
+        renderCategories();
 
         const now = Date.now();
         appData.activePromotions = appData.activePromotions.filter(p => !p.expireTimestamp || p.expireTimestamp > now);
@@ -343,7 +340,6 @@
         } else { banner.style.display = 'none'; }
     }
 
-    // --- Google Maps & Search ---
     let map, infoWindow, service, currentCoords = { lat: 15.2287, lng: 104.8564 }, gpsMarker = null, googlePlaces = [], markers = [];
     const provinces = [
         {id:'bkk',name:'กรุงเทพมหานคร',lat:13.7563,lng:100.5018},{id:'krabi',name:'กระบี่',lat:8.0863,lng:98.9063},{id:'kanchanaburi',name:'กาญจนบุรี',lat:14.0159,lng:99.5336},
@@ -449,6 +445,15 @@
         }); 
     }
 
+    // 💡 คืนชีพฟังก์ชันปุ่มรายงานการปิดร้าน (แอบอยู่ตรงมุมขวาล่างของการ์ด)
+    function reportClosed(placeId, placeName, event) { 
+        event.stopPropagation(); 
+        if(confirm(`ร้าน "${placeName}" ปิดกิจการถาวรแล้ว?`)) {
+            alert("ส่งเรื่องแจ้งแอดมินเรียบร้อยแล้ว ขอบคุณครับ!"); 
+        }
+    }
+
+    // 💡 การ์ด VIP พร้อมปุ่มโซเชียลเต็มสูบ!
     function renderCards(places) { 
         const list = document.getElementById('placeList'); 
         const originPoint = new google.maps.LatLng(currentCoords.lat, currentCoords.lng); 
@@ -490,12 +495,17 @@
                     </div>
                     <p style="font-size:13px; color:var(--text-muted); margin:0 0 10px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.vicinity}</p>
                     <div><span style="color:var(--primary); font-weight:600;">⭐ ${p.rating || 'ใหม่'}</span></div>
+                    
                     <div class="action-buttons">
                         <button class="btn-action btn-nav" onclick="window.open('${navUrl}', '_blank'); event.stopPropagation();">นำทาง</button>
                         <button class="btn-action btn-call" onclick="callPlace('${p.place_id}', event)">โทร</button>
                         ${(isVIP && p.vip.lineUrl) ? `<button class="btn-action btn-line" onclick="window.open('${p.vip.lineUrl}', '_blank'); event.stopPropagation();">LINE</button>` : ''}
                         ${(isVIP && p.vip.fbUrl) ? `<button class="btn-action btn-fb" onclick="window.open('${p.vip.fbUrl}', '_blank'); event.stopPropagation();">FB</button>` : ''}
                         <button class="btn-action btn-share" onclick="sharePlace('${p.name.replace(/'/g, "\\'")}', ${lat}, ${lng}, event)">แชร์</button>
+                    </div>
+                    
+                    <div style="margin-top: 15px; text-align: right;">
+                        <span style="font-size: 11px; color: var(--danger); cursor: pointer; border-bottom: 1px dotted var(--danger); transition: 0.2s;" onclick="reportClosed('${p.place_id}', '${p.name.replace(/'/g, "\\'")}', event)">🚩 แจ้งร้านปิดถาวร</span>
                     </div>
                 </div>
             </div>`; 
@@ -610,7 +620,6 @@
         } catch (err) { alert("เกิดข้อผิดพลาดในการส่งข้อมูล: " + err.message); }
     }
 
-    // ซิงค์เวลามีการอัปเดตหมวดหมู่จากหน้า Admin
     window.addEventListener('storage', function(e) {
         if (e.key === 'painaidee_auth') { renderUI(); }
     });
