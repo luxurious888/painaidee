@@ -48,23 +48,35 @@
             <input type="text" id="newCatLabel" placeholder="ชื่อที่แสดง (เช่น ชาบู/สุกี้)" style="width: 250px; margin-right: 5px;">
             <input type="text" id="newCatKeyword" placeholder="คำค้นหา Google (เช่น ชาบู)" style="width: 250px; margin-right: 5px;">
             <button class="btn btn-approve" onclick="addCategory()">เพิ่มลงในระบบ</button>
-            <p style="font-size:12px; color:#D9534F; margin-top:8px; margin-bottom: 0;">* <b>คำค้นหา Google Maps</b> ต้องเป็นคำสั้นๆ กระชับ เพื่อให้แผนที่ค้นหาสถานที่เจอ</p>
         </div>
         <table id="categoryTable">
             <tr><th>กลุ่มหลัก</th><th>ชื่อที่แสดง (ลูกค้าเห็น)</th><th>คำค้นหา (หลังบ้าน)</th><th>จัดการ</th></tr>
         </table>
     </div>
 
+    <div class="card" style="border-left: 4px solid #f39c12;">
+        <h2>💰 2. ตั้งค่าอัตราค่าบริการ (แพ็กเกจโฆษณา)</h2>
+        <div style="background: #fdfdfd; padding: 15px; border: 1px dashed #ccc; border-radius: 8px; margin-bottom: 15px;">
+            <strong style="color: #f39c12;">➕ เพิ่มแพ็กเกจใหม่</strong><br><br>
+            <input type="text" id="newServiceName" placeholder="ชื่อแพ็กเกจ (เช่น โปรโมท 30 วัน)" style="width: 300px; margin-right: 5px;">
+            <input type="number" id="newServicePrice" placeholder="ราคา (บาท)" style="width: 150px; margin-right: 5px;">
+            <button class="btn btn-warning" style="color: #fff;" onclick="addService()">เพิ่มแพ็กเกจ</button>
+        </div>
+        <table id="serviceTable">
+            <tr><th>ชื่อแพ็กเกจ</th><th>ราคา (บาท)</th><th>จัดการ</th></tr>
+        </table>
+    </div>
+
     <div class="card" style="border-left: 4px solid #17a2b8;">
-        <h2>📌 2. คำขอขึ้นแบนเนอร์โปรโมท (รออนุมัติ) <span class="badge" id="pendingCount">0</span></h2>
+        <h2>📌 3. คำขอขึ้นแบนเนอร์โปรโมท (รออนุมัติ) <span class="badge" id="pendingCount">0</span></h2>
         <table id="promoTable">
-            <tr><th>ร้านค้า (จังหวัด)</th><th>หมวดหมู่ / แพ็กเกจ</th><th>รายละเอียดที่ขอ</th><th>วันที่ส่งคำขอ</th><th>จัดการ</th></tr>
+            <tr><th>ร้านค้า (จังหวัด)</th><th>หมวดหมู่ / แพ็กเกจที่เลือก</th><th>รายละเอียดที่ขอ</th><th>วันที่ส่งคำขอ</th><th>จัดการ</th></tr>
         </table>
         <div id="emptyPromo" class="empty-state" style="display:none;">ไม่มีคำขอโปรโมทในขณะนี้</div>
     </div>
 
     <div class="card" style="border-left: 4px solid #06C755;">
-        <h2>✨ 3. สถานะแบนเนอร์โปรโมชั่น (กำลังแสดง) <span class="badge" style="background:#06C755;" id="activeCount">0</span></h2>
+        <h2>✨ 4. สถานะแบนเนอร์โปรโมชั่น (กำลังแสดง) <span class="badge" style="background:#06C755;" id="activeCount">0</span></h2>
         <table id="activePromoTable">
             <tr><th>ชื่อร้าน (หมวดหมู่)</th><th>รายละเอียดแบนเนอร์</th><th>เวลาหมดอายุ</th><th>สถานะ</th><th>จัดการ</th></tr>
         </table>
@@ -72,7 +84,7 @@
     </div>
 
     <div class="card" style="border-left: 4px solid #C5A059;">
-        <h2>📝 4. คำขอลงทะเบียนร้านค้าใหม่ <span class="badge" style="background:#C5A059;" id="reqCount">0</span></h2>
+        <h2>📝 5. คำขอลงทะเบียนร้านค้าใหม่ <span class="badge" style="background:#C5A059;" id="reqCount">0</span></h2>
         <table id="reqTable">
             <tr><th>ชื่อร้าน</th><th>รูปภาพแนบ</th><th>จัดการ</th></tr>
         </table>
@@ -80,7 +92,7 @@
     </div>
 
     <div class="card" style="border-left: 4px solid #121418;">
-        <h2>🏬 5. ฐานข้อมูลร้านค้าทั้งหมด (จัดการ PIN / VIP)</h2>
+        <h2>🏬 6. ฐานข้อมูลร้านค้าทั้งหมด (จัดการ PIN / VIP)</h2>
         <table id="storeTable">
             <tr><th>ชื่อร้าน</th><th>รหัส PIN</th><th>สถานะพิเศษ</th><th>จัดการ</th></tr>
         </table>
@@ -88,7 +100,7 @@
     </div>
 
     <div class="card" style="border-left: 4px solid #D9534F;">
-        <h2>🚩 6. รายงานร้านปิดกิจการถาวร <span class="badge" id="closedCount">0</span></h2>
+        <h2>🚩 7. รายงานร้านปิดกิจการถาวร <span class="badge" id="closedCount">0</span></h2>
         <table id="closedReportsTable">
             <tr><th>ชื่อร้านที่ถูกแจ้ง</th><th>วันที่ลูกค้าแจ้งมา</th><th>จัดการ (แบนออกจากระบบ)</th></tr>
         </table>
@@ -115,7 +127,6 @@
         { id: 14, group: 'sport', label: 'สระว่ายน้ำ', keyword: 'สระว่ายน้ำ' }
     ];
 
-    // 💡 คืนชีพ Default Services
     const defaultServices = [
         { id: 1, name: 'ปักหมุดโปรโมชั่นหน้าแรก (รายเดือน)', price: 500 },
         { id: 2, name: 'อัปเดตแก้ไขแบนเนอร์ (ต่อครั้ง)', price: 150 }
@@ -138,10 +149,10 @@
                 appData.closedReports = parsed.closedReports || [];
                 appData.blacklistedPlaces = parsed.blacklistedPlaces || [];
                 appData.categories = parsed.categories && parsed.categories.length > 0 ? parsed.categories : defaultCategories;
-                appData.services = parsed.services && parsed.services.length > 0 ? parsed.services : defaultServices; // 💡 เพิ่มบรรทัดนี้
+                appData.services = parsed.services && parsed.services.length > 0 ? parsed.services : defaultServices;
             } else {
                 appData.categories = defaultCategories;
-                appData.services = defaultServices; // 💡 เพิ่มบรรทัดนี้
+                appData.services = defaultServices;
             }
         } catch(e) { console.error("Error loading data", e); }
     }
@@ -176,26 +187,36 @@
                 </td>
             </tr>`).join('');
 
-        // --- 2. Render Pending Promos ---
+        // --- 💡 2. Render Services (ตารางอัตราค่าบริการ) ---
+        const serviceTable = document.getElementById('serviceTable');
+        serviceTable.innerHTML = '<tr><th>ชื่อแพ็กเกจ</th><th>ราคา (บาท)</th><th>จัดการ</th></tr>' + 
+            appData.services.map((s, index) => `
+            <tr>
+                <td><strong>${s.name}</strong></td>
+                <td style="color:#C5A059; font-weight:bold; font-size: 16px;">${s.price} ฿</td>
+                <td>
+                    <button class="btn btn-info" onclick="editService(${index})">✏️ แก้ไข</button>
+                    <button class="btn btn-delete" onclick="deleteService(${index})">🗑️ ลบ</button>
+                </td>
+            </tr>`).join('');
+
+        // --- 3. Render Pending Promos ---
         document.getElementById('pendingCount').innerText = appData.pendingPromotions.length;
         const promoTable = document.getElementById('promoTable'), emptyPromo = document.getElementById('emptyPromo');
         if(appData.pendingPromotions.length > 0) {
             promoTable.style.display = 'table'; emptyPromo.style.display = 'none';
-            promoTable.innerHTML = '<tr><th>ร้านค้า (จังหวัด)</th><th>หมวดหมู่ / แพ็กเกจ</th><th>รายละเอียดที่ขอ</th><th>วันที่ส่งคำขอ</th><th>จัดการ</th></tr>' + 
+            promoTable.innerHTML = '<tr><th>ร้านค้า (จังหวัด)</th><th>หมวดหมู่ / แพ็กเกจที่เลือก</th><th>รายละเอียดที่ขอ</th><th>วันที่ส่งคำขอ</th><th>จัดการ</th></tr>' + 
                 appData.pendingPromotions.map((p, index) => `
                 <tr>
                     <td><strong>${p.storeName || 'ไม่ระบุ'}</strong><br><span style="font-size:12px; color:#888;">${p.province || 'ไม่ระบุ'}</span></td>
-                    <td>
-                        <span style="background:#eee; padding:2px 6px; border-radius:4px; font-size:11px;">${p.category || 'ทั่วไป'}</span><br>
-                        <span style="color:#17a2b8; font-size:12px; font-weight:bold;">${p.service || '-'}</span>
-                    </td>
+                    <td><span style="background:#eee; padding:2px 6px; border-radius:4px; font-size:11px;">${p.category || 'ทั่วไป'}</span><br><span style="color:#17a2b8; font-size:12px; font-weight:bold;">${p.service || '-'}</span></td>
                     <td style="max-width: 200px;">${p.detail || ''}</td>
                     <td style="font-size: 12px;">${p.date || '-'}</td>
                     <td style="min-width: 150px;"><button class="btn btn-approve" onclick="approvePromo(${index})">✅ อนุมัติ</button> <button class="btn btn-delete" onclick="deletePendingPromo(${index})">❌ ลบ</button></td>
                 </tr>`).join('');
         } else { promoTable.style.display = 'none'; emptyPromo.style.display = 'block'; }
 
-        // --- 3. Render Active Promos ---
+        // --- 4. Render Active Promos ---
         document.getElementById('activeCount').innerText = appData.activePromotions.length;
         const activePromoTable = document.getElementById('activePromoTable'), emptyActive = document.getElementById('emptyActive');
         if(appData.activePromotions.length > 0) {
@@ -221,7 +242,7 @@
                 }).join('');
         } else { activePromoTable.style.display = 'none'; emptyActive.style.display = 'block'; }
 
-        // --- 4. Render Registrations ---
+        // --- 5. Render Registrations ---
         document.getElementById('reqCount').innerText = appData.registrationRequests.length;
         const reqTable = document.getElementById('reqTable'), emptyReq = document.getElementById('emptyReq');
         if(appData.registrationRequests.length > 0) {
@@ -230,7 +251,7 @@
                 appData.registrationRequests.map((r, index) => `<tr><td><strong>${r.storeName}</strong></td><td>${r.storePhoto ? `<button class="btn btn-secondary" onclick="window.open('${r.storePhoto}', '_blank')">🖼️ ดูรูป</button>` : '-'}</td><td><button class="btn btn-approve" onclick="approveStore(${index})">✅ สร้างรหัส PIN</button> <button class="btn btn-delete" onclick="deleteReq(${index})">❌ ลบ</button></td></tr>`).join('');
         } else { reqTable.style.display = 'none'; emptyReq.style.display = 'block'; }
 
-        // --- 5. Render Stores ---
+        // --- 6. Render Stores ---
         const storeTable = document.getElementById('storeTable'), emptyStore = document.getElementById('emptyStore');
         if(appData.registeredStores.length > 0) {
             storeTable.style.display = 'table'; emptyStore.style.display = 'none';
@@ -238,14 +259,12 @@
                 appData.registeredStores.map((s, index) => `<tr><td>${s.name}</td><td style="font-size: 18px; color: #C5A059;"><strong>${s.pin}</strong></td><td>${s.isVIP ? '<span style="background:#FFD700; padding:2px 8px; border-radius:10px; font-weight:bold; font-size:12px;">👑 VIP</span>' : '<span style="color:#999; font-size:12px;">ร้านทั่วไป</span>'}</td><td><button class="btn btn-vip" onclick="toggleVIP(${index})">👑 สลับสิทธิ์ VIP</button> <button class="btn btn-delete" onclick="deleteStore(${index})">🗑️ ลบร้าน</button></td></tr>`).join('');
         } else { storeTable.style.display = 'none'; emptyStore.style.display = 'block'; }
 
-        // --- 6. Render Closed Reports ---
+        // --- 7. Render Closed Reports ---
         document.getElementById('closedCount').innerText = appData.closedReports.length;
         const closedTable = document.getElementById('closedReportsTable');
         const emptyClosed = document.getElementById('emptyClosed');
-
         if(appData.closedReports.length > 0) {
-            closedTable.style.display = 'table';
-            emptyClosed.style.display = 'none';
+            closedTable.style.display = 'table'; emptyClosed.style.display = 'none';
             closedTable.innerHTML = '<tr><th>ชื่อร้านที่ถูกแจ้ง</th><th>วันที่ลูกค้าแจ้งมา</th><th>จัดการ (แบนออกจากระบบ)</th></tr>' + 
                 appData.closedReports.map((r, index) => `
                 <tr>
@@ -256,13 +275,40 @@
                         <button class="btn btn-secondary" onclick="rejectClosedReport(${index})">❌ ลบรายงานทิ้ง</button>
                     </td>
                 </tr>`).join('');
-        } else {
-            closedTable.style.display = 'none';
-            emptyClosed.style.display = 'block';
+        } else { closedTable.style.display = 'none'; emptyClosed.style.display = 'block'; }
+    }
+
+    // --- 💡 Functions: Service Packages ---
+    function addService() {
+        const name = document.getElementById('newServiceName').value.trim();
+        const price = document.getElementById('newServicePrice').value.trim();
+        if(!name || !price) return alert("กรุณากรอกชื่อแพ็กเกจ และราคาให้ครบถ้วนครับ");
+        appData.services.push({ id: Date.now(), name: name, price: parseInt(price) });
+        saveData();
+        document.getElementById('newServiceName').value = '';
+        document.getElementById('newServicePrice').value = '';
+    }
+
+    function editService(index) {
+        let s = appData.services[index];
+        let newName = prompt("แก้ไขชื่อแพ็กเกจโฆษณา:", s.name);
+        if(!newName) return;
+        let newPrice = prompt("แก้ไขราคา (บาท):", s.price);
+        if(!newPrice || isNaN(newPrice)) return;
+        
+        s.name = newName;
+        s.price = parseInt(newPrice);
+        saveData();
+    }
+
+    function deleteService(index) {
+        if(confirm('คุณแน่ใจหรือไม่ที่จะลบแพ็กเกจค่าบริการนี้?')) {
+            appData.services.splice(index, 1);
+            saveData();
         }
     }
 
-    // --- Category Management ---
+    // --- Functions: Category Management ---
     function addCategory() {
         const group = document.getElementById('newCatGroup').value;
         const label = document.getElementById('newCatLabel').value.trim();
@@ -287,7 +333,7 @@
         if(confirm('ลบหมวดหมู่นี้ออกจากหน้าลูกค้าใช่หรือไม่?')) { appData.categories.splice(index, 1); saveData(); }
     }
 
-    // --- Promo & Store Management ---
+    // --- Functions: Promo & Store Management ---
     function approvePromo(index) {
         const promo = appData.pendingPromotions[index];
         let daysInput = prompt(`✅ อนุมัติแบนเนอร์ของร้าน: ${promo.storeName}\n\nระบุจำนวนวันที่จะให้โปรโมชั่นนี้แสดงผลบนหน้าแอป (เช่น 30):`, "30");
