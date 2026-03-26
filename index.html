@@ -6,40 +6,69 @@
     <title>ไปไหนดี - Painaidee (Premium VIP)</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap');
-        :root { --primary: #C5A059; --primary-light: #DFBF8B; --primary-hover: #AF8B48; --dark: #121418; --dark-light: #1A1D23; --dark-muted: #2A2E36; --bg-light: #121418; --surface: #1A1D23; --border: rgba(197, 160, 89, 0.2); --text-main: #FFFFFF; --text-gold: #C5A059; --text-muted: #999999; --danger: #D9534F; --line-green: #06C755; --fb-blue: #1877F2; }
+        
+        :root {
+            --primary: #C5A059;       
+            --primary-light: #DFBF8B; 
+            --primary-hover: #AF8B48; 
+            --dark: #121418;          
+            --dark-light: #1A1D23;    
+            --dark-muted: #2A2E36;    
+            --bg-light: #121418;      
+            --surface: #1A1D23;       
+            --border: rgba(197, 160, 89, 0.2); 
+            --text-main: #FFFFFF;     
+            --text-gold: #C5A059;     
+            --text-muted: #999999;    
+            --danger: #D9534F;
+            --line-green: #06C755;
+            --fb-blue: #1877F2;
+        }
+
         body { font-family: 'Kanit', sans-serif; margin: 0; background-color: var(--bg-light); padding-bottom: 50px; color: var(--text-gold); overflow-x: hidden; }
+        
         nav { display: flex; justify-content: space-around; background: var(--surface); padding: 12px 0; position: sticky; top: 0; z-index: 2000; box-shadow: 0 4px 20px rgba(0,0,0,0.1); border-bottom: 1px solid var(--border); }
         nav div { cursor: pointer; font-weight: 500; color: var(--text-muted); padding: 12px 20px; transition: 0.3s; position: relative; letter-spacing: 0.5px; }
         nav div.active { color: var(--primary); font-weight: 600; }
         nav div.active::after { content: ''; position: absolute; bottom: 0; left: 15%; width: 70%; height: 3px; background: var(--primary); border-radius: 3px 3px 0 0; box-shadow: 0 -3px 10px rgba(197, 160, 89, 0.5); }
+
         header { background: var(--dark); color: var(--surface); padding: 30px 20px; text-align: center; border-radius: 0 0 24px 24px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(26, 28, 32, 0.3); border: 1px solid var(--border); border-top: none; }
         header h1 { margin: 0; color: var(--primary); font-weight: 600; letter-spacing: 1px; }
         header p { margin: 8px 0 0 0; font-weight: 300; opacity: 0.8; font-size: 14px; color: #FFF; }
+
         .page { display: none; padding: 15px; max-width: 900px; margin: 0 auto; animation: fadeIn 0.4s ease; }
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
         #map { width: 100%; height: 320px; border-radius: 16px; border: 1px solid var(--border); background: #eee; box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
         .search-area { background: var(--surface); padding: 25px; border-radius: 16px; margin-top: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); border: 1px solid var(--border); }
         .input-row { display: flex; gap: 12px; margin-bottom: 12px; }
-        select, input[type="text"], input[type="password"], input[type="number"], input[type="file"], textarea { padding: 14px; border-radius: 10px; border: 1px solid var(--border); font-family: 'Kanit'; font-size: 15px; outline: none; box-sizing: border-box; width: 100%; background: var(--dark); color: var(--primary-light); transition: 0.3s; }
+        
+        select, input[type="text"], input[type="password"], input[type="number"], input[type="file"], textarea { 
+            padding: 14px; border-radius: 10px; border: 1px solid var(--border); font-family: 'Kanit'; font-size: 15px; outline: none; box-sizing: border-box; width: 100%; 
+            background: var(--dark); color: var(--primary-light); transition: 0.3s; 
+        }
         select:focus, input:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(197, 160, 89, 0.15); background: var(--dark-light); }
         .input-row select { flex: 1; width: 50%; }
         option, optgroup { background-color: var(--dark-light); color: var(--primary-light); font-weight: 400; }
         optgroup { font-weight: 600; color: var(--primary); }
         ::placeholder { color: rgba(223, 191, 139, 0.4); } 
         .search-box-container { display: flex; gap: 12px; width: 100%; }
+
         .btn-primary { padding: 14px 24px; background: var(--primary); color: white; border: none; border-radius: 10px; font-family: 'Kanit'; font-weight: 500; font-size: 15px; cursor: pointer; transition: 0.3s; white-space: nowrap; width: 100%; box-shadow: 0 4px 10px rgba(197, 160, 89, 0.3); }
         .btn-primary:hover { background: var(--primary-hover); transform: translateY(-2px); }
         .btn-secondary { background: var(--dark); color: var(--primary); padding: 12px 15px; border-radius: 10px; border: 1px solid var(--primary); cursor: pointer; font-family: 'Kanit'; font-weight: 500; text-align: center; transition: 0.3s; }
         .btn-secondary:hover { background: var(--primary); color: white; transform: translateY(-2px); }
         .btn-outline { background: transparent; color: var(--primary); border: 1px solid var(--border); padding: 10px 15px; border-radius: 10px; cursor: pointer; font-family: 'Kanit'; font-weight: 500; transition: 0.3s; }
         .btn-outline:hover { border-color: var(--primary); background: rgba(197, 160, 89, 0.1); }
+
         .place-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; margin-top: 24px; }
         .place-card { background: var(--surface); border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid rgba(197,160,89,0.15); transition: 0.4s; cursor: pointer; position: relative; display: flex; flex-direction: column; }
         .place-card:hover { transform: translateY(-6px); box-shadow: 0 15px 40px rgba(197, 160, 89, 0.25); border-color: rgba(197, 160, 89, 0.5); }
         .place-card img { width: 100%; height: 180px; object-fit: cover; background-color: var(--dark-muted); }
         .place-info { padding: 20px; display: flex; flex-direction: column; flex-grow: 1; }
         .distance-badge { position: absolute; top: 15px; right: 15px; background: rgba(26, 28, 32, 0.9); color: var(--primary-light); padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; backdrop-filter: blur(5px); border: 1px solid rgba(197, 160, 89, 0.3); box-shadow: 0 3px 10px rgba(0,0,0,0.2); z-index: 10; }
+        
         .action-buttons { display: flex; gap: 8px; margin-top: auto; padding-top: 15px; flex-wrap: wrap; }
         .btn-action { flex: 1; text-align: center; color: white; text-decoration: none; padding: 10px 5px; border-radius: 10px; font-weight: 500; font-size: 12px; transition: 0.3s; border: none; cursor: pointer; font-family: 'Kanit'; min-width: 30%; }
         .btn-nav { background: var(--dark-muted); color: var(--surface); border: 1px solid var(--border); }
@@ -47,27 +76,35 @@
         .btn-call { background: var(--primary); color: white; }
         .btn-share { background: transparent; color: var(--text-gold); border: 1px solid var(--border); }
         .status-tag { display: inline-flex; align-items: center; justify-content: center; padding: 4px 8px; border-radius: 20px; font-size: 11px; font-weight: 500; white-space: nowrap; box-shadow: 0 2px 5px rgba(0,0,0,0.2); line-height: 1.2; }
+
+        /* 👑 VIP Aura */
         .card-vip { border: 2px solid #FFD700 !important; box-shadow: 0 0 20px rgba(255, 215, 0, 0.25) !important; transform: translateY(-2px); }
         .card-vip:hover { box-shadow: 0 15px 40px rgba(255, 215, 0, 0.4) !important; border-color: #FFF !important; }
         .vip-crown-badge { position: absolute; top: -10px; left: -10px; background: linear-gradient(135deg, #FFD700, #C5A059, #FFD700); color: #000; padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: 800; z-index: 15; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border: 2px solid #FFF; animation: pulseGlow 2s infinite; }
         @keyframes pulseGlow { 0% { box-shadow: 0 0 10px rgba(255,215,0,0.4); } 50% { box-shadow: 0 0 20px rgba(255,215,0,0.8); } 100% { box-shadow: 0 0 10px rgba(255,215,0,0.4); } }
         .btn-line { background: #06C755 !important; color: #FFF !important; border: none !important; font-weight: 600;}
         .btn-fb { background: #1877F2 !important; color: #FFF !important; border: none !important; font-weight: 600;}
+
+        /* 🚀 เอฟเฟกต์แสงสะท้อน */
         @keyframes shine { 100% { left: 125%; } }
         .shine-effect::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%); transform: skewX(-25deg); animation: shine 3s infinite; pointer-events: none; }
         .promo-btn-hover:hover { filter: brightness(1.1); transform: translateY(-2px); }
+
         .highlight-banner { background: linear-gradient(135deg, var(--dark), var(--dark-light)); color: white; padding: 25px; border-radius: 16px; margin-top: 24px; box-shadow: 0 15px 35px rgba(26, 28, 32, 0.4); display: none; position: relative; overflow: hidden; border: 1px solid var(--border); }
         .highlight-banner::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(197,160,89,0.15) 0%, transparent 60%); pointer-events: none; }
         .highlight-banner h3 { margin: 0 0 5px 0; font-size: 20px; color: var(--primary); font-weight: 500; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
+
         .dashboard-card { background: var(--surface); padding: 25px; border-radius: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); margin-bottom: 24px; border: 1px solid var(--border); }
         .dashboard-card h3 { margin-top: 0; color: var(--primary-light); border-bottom: 2px solid var(--border); padding-bottom: 12px; font-weight: 500; }
         .form-group { margin-bottom: 18px; }
         .form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px; color: #FFF; }
+        
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(18, 20, 24, 0.95); backdrop-filter: blur(15px); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .login-card { background: var(--surface); padding: 40px; border-radius: 24px; text-align: center; max-width: 350px; width: 90%; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid var(--border); animation: fadeIn 0.5s ease; }
         .btn-line-login { background-color: var(--line-green); color: white; border: none; padding: 15px 20px; border-radius: 12px; font-family: 'Kanit'; font-weight: 600; font-size: 16px; width: 100%; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 5px 15px rgba(6, 199, 85, 0.3); }
         .spinner { width: 50px; height: 50px; border: 5px solid var(--surface); border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
         #appContent { display: none; }
     </style>
 </head>
@@ -176,22 +213,16 @@
             <div id="lockedFeatures" style="display: none; margin-top: 20px;">
                 <div id="vipUpdateSection" style="padding: 15px; border: 1px dashed var(--primary); border-radius: 12px; margin-bottom: 25px; background: rgba(197, 160, 89, 0.05);">
                     <h4 style="margin: 0 0 5px 0; color: #FFD700; font-size: 16px;">👑 ข้อมูลติดต่อพิเศษ (VIP Links)</h4>
-                    <p id="vipLockMessage" style="font-size: 12px; color: var(--danger); margin-top: 0; margin-bottom: 10px;">* ฟีเจอร์สำหรับสมาชิก VIP เท่านั้น</p>
-                    <div class="form-group"><label style="font-size: 12px;">ลิงก์ LINE OA</label><input type="text" id="vipLineInput" disabled style="opacity: 0.5;"></div>
-                    <div class="form-group" style="margin-bottom: 10px;"><label style="font-size: 12px;">ลิงก์ Facebook Page</label><input type="text" id="vipFbInput" disabled style="opacity: 0.5;"></div>
-                    <button id="btnSaveVip" class="btn-primary" style="background: linear-gradient(135deg, #FFD700, #C5A059); color: #000; opacity: 0.5;" disabled onclick="updateVipData()">💾 บันทึกข้อมูล VIP</button>
+                    <p id="vipLockMessage" style="font-size: 12px; color: var(--danger); margin-top: 0; margin-bottom: 10px;">* ระบุลิงก์เพื่อให้ลูกค้ากดติดต่อได้ทันที</p>
+                    <div class="form-group"><label style="font-size: 12px;">ลิงก์ LINE OA</label><input type="text" id="vipLineInput" placeholder="https://line.me/R/ti/p/..."></div>
+                    <div class="form-group" style="margin-bottom: 10px;"><label style="font-size: 12px;">ลิงก์ Facebook Page</label><input type="text" id="vipFbInput" placeholder="https://facebook.com/..."></div>
+                    <button id="btnSaveVip" class="btn-primary" style="background: linear-gradient(135deg, #FFD700, #C5A059); color: #000;" onclick="updateVipData()">💾 บันทึกข้อมูล VIP</button>
                 </div>
 
                 <div style="padding: 20px; border: 2px solid var(--primary); border-radius: 16px; background: linear-gradient(180deg, rgba(197, 160, 89, 0.1) 0%, var(--surface) 100%); position: relative; overflow: hidden; margin-top: 30px;">
                     <div style="position: absolute; top: 20px; right: -35px; background: #D9534F; color: white; padding: 5px 40px; transform: rotate(45deg); font-size: 12px; font-weight: bold; box-shadow: 0 2px 10px rgba(0,0,0,0.5);">HOT 🔥</div>
                     <h4 style="margin: 0 0 5px 0; color: var(--primary); font-size: 18px; text-align: center;">🚀 ดันยอดขายพุ่ง! พื้นที่โปรโมทหน้าแรก</h4>
                     <p style="text-align: center; font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">ให้ลูกค้าในจังหวัดเห็นร้านคุณเป็นอันดับแรก ทันทีที่เปิดแอป</p>
-                    <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; margin-bottom: 20px; font-size: 13px; border: 1px solid rgba(197,160,89,0.2);">
-                        <div style="display: flex; align-items: flex-start; margin-bottom: 12px;"><span style="font-size:18px; margin-right:10px; line-height: 1;">👁️</span> <div><strong>การมองเห็นสูงสุด:</strong> โชว์เด่นที่สุด ด้านบนสุดของหน้าค้นหา</div></div>
-                        <div style="display: flex; align-items: flex-start; margin-bottom: 12px;"><span style="font-size:18px; margin-right:10px; line-height: 1;">🎯</span> <div><strong>ตรงกลุ่มเป้าหมาย:</strong> แสดงผลเฉพาะจังหวัดที่คุณต้องการเจาะตลาด</div></div>
-                        <div style="display: flex; align-items: flex-start;"><span style="font-size:18px; margin-right:10px; line-height: 1;">⏳</span> <div><strong>รับจำนวนจำกัด:</strong> โควต้าสุด Exclusive เพียง <b style="color:#D9534F;">10 ร้าน/จังหวัด</b> เท่านั้น!</div></div>
-                    </div>
-                    <div style="text-align: center; color: #f0ad4e; font-size: 13px; margin-bottom: 20px; font-weight: 500;">⚠️ พื้นที่มีจำกัด รีบจองก่อนโดนคู่แข่งแย่งตำแหน่ง!</div>
 
                     <div class="form-group"><label>📍 เลือกจังหวัดที่จะโปรโมท</label><select id="promoProvinceSelect"></select></div>
                     <div class="form-group"><label>🏷️ หมวดหมู่ร้านค้าของคุณ</label><select id="promoStoreCategory"></select></div>
@@ -199,7 +230,7 @@
                     
                     <div class="form-group">
                         <label>🖼️ รูปภาพป้ายโฆษณา (แนวนอน 3:2)</label>
-                        <p style="font-size: 11px; color: var(--text-muted); margin: -5px 0 8px 0;">* แนะนำรูปภาพที่มีความคมชัด สีสันสะดุดตา</p>
+                        <p style="font-size: 11px; color: var(--text-muted); margin: -5px 0 8px 0;">* อัปโหลดรูปใหม่เฉพาะเมื่อต้องการเปลี่ยนรูปเดิม</p>
                         <input type="file" id="promoImageInput" accept="image/*">
                     </div>
                     
@@ -209,7 +240,7 @@
                     </div>
                     
                     <button id="btnSubmitPromo" class="btn-primary promo-btn-hover" style="width: 100%; background: linear-gradient(135deg, #FFD700, #C5A059); color: #000; font-size: 16px; font-weight: 600; padding: 16px; margin-top: 10px; border: none; box-shadow: 0 6px 20px rgba(255, 215, 0, 0.3);" onclick="submitPromoWithPIN()">
-                        🚀 สั่งซื้อและส่งเรื่องขอโปรโมท
+                        🚀 สั่งซื้อและส่งเรื่องอัปเดตข้อมูล
                     </button>
                 </div>
             </div>
@@ -219,8 +250,7 @@
 
 <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <script>
-    // 🔗 API เชื่อม Google Sheets (Cloud)
-    const API_URL = "https://script.google.com/macros/s/AKfycbx1ZMaFt-GWvrZ_-XTSiqhx__zhwYTo_NcpnTAzU75Xxh4pPAgdi7OO4sC1H0yxeGEr/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbwWUUmlsCjBKGNECm4zNVSNMYeGW_DKHTB_41aTmb-BW2IG_dAESbYDIrwQIOjhfRyA/exec";
     
     const defaultCategories = [
         { id: 1, group: 'food', label: 'หมูกระทะ / แจ่วฮ้อน', keyword: 'หมูกระทะ' },
@@ -300,13 +330,12 @@
             const data = await res.json();
             if (data && Object.keys(data).length > 0) {
                 appData = { ...appData, ...data };
-                renderPromos(); // อัปเดตโปรโมทแบบเรียลไทม์
-                if (googlePlaces.length > 0) renderCards(document.getElementById('searchBox').value || 'ร้านอาหาร'); // อัปเดตป้าย VIP ในหน้าแผนที่
+                renderPromos();
+                if (googlePlaces.length > 0) renderCards(document.getElementById('searchBox').value || 'ร้านอาหาร');
             }
         } catch(e) {}
     }, 15000);
 
-    // 📱 ระบบย่อรูปภาพ (ครอป 3:2 ไม่ให้ยืด/เบี้ยว)
     const resizeImg = (file) => new Promise(resolve => {
         if(!file) return resolve('');
         const reader = new FileReader(); reader.readAsDataURL(file);
@@ -314,23 +343,16 @@
             const img = new Image(); img.src = e.target.result;
             img.onload = () => {
                 const canvas = document.createElement('canvas');
-                const targetRatio = 3/2; // สัดส่วนเป้าหมาย 3:2
+                const targetRatio = 3/2; 
                 const imgRatio = img.width / img.height;
                 let sx = 0, sy = 0, sWidth = img.width, sHeight = img.height;
+                if (imgRatio > targetRatio) { sWidth = img.height * targetRatio; sx = (img.width - sWidth) / 2; } 
+                else { sHeight = img.width / targetRatio; sy = (img.height - sHeight) / 2; }
                 
-                // คำนวณตัดขอบส่วนเกินออก (Center Crop)
-                if (imgRatio > targetRatio) {
-                    sWidth = img.height * targetRatio;
-                    sx = (img.width - sWidth) / 2;
-                } else {
-                    sHeight = img.width / targetRatio;
-                    sy = (img.height - sHeight) / 2;
-                }
-                
-                canvas.width = 800; canvas.height = 533; // ล็อกขนาดไว้ที่ 800x533 px
+                canvas.width = 800; canvas.height = 533; 
                 const ctx = canvas.getContext('2d'); 
                 ctx.drawImage(img, sx, sy, sWidth, sHeight, 0, 0, canvas.width, canvas.height);
-                resolve(canvas.toDataURL('image/jpeg', 0.7)); // บีบอัดลดขนาดไฟล์
+                resolve(canvas.toDataURL('image/jpeg', 0.7)); 
             };
         };
     });
@@ -376,7 +398,7 @@
             if(pSel) pSel.appendChild(new Option(p.name, p.id)); 
             if(prSel) prSel.appendChild(new Option(p.name, p.id)); 
         });
-        if(pSel) pSel.value = 'current'; // บังคับเริ่มที่ตำแหน่งปัจจุบันเสมอ
+        if(pSel) pSel.value = 'current';
         map = new google.maps.Map(document.getElementById("map"), { center: currentCoords, zoom: 14, mapTypeControl: false, streetViewControl: false });
         service = new google.maps.places.PlacesService(map);
         infoWindow = new google.maps.InfoWindow();
@@ -403,7 +425,7 @@
                     currentCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
                     gpsMarker = new google.maps.Marker({ position: currentCoords, map: map }); 
                     map.setCenter(currentCoords); 
-                    executeSearch('food'); // ⚡ บังคับค้นหาร้านอาหารให้ทันทีเมื่อได้พิกัด
+                    executeSearch('food'); 
                 }, () => { 
                     alert("ไม่สามารถเข้าถึงตำแหน่งได้ จะแสดงข้อมูลของอุบลราชธานีแทนครับ"); 
                     document.getElementById('provinceSelect').value = 'ubon'; 
@@ -415,7 +437,7 @@
             if(sel) { 
                 currentCoords = { lat: sel.lat, lng: sel.lng }; 
                 map.setCenter(currentCoords); 
-                executeSearch('food'); // ⚡ บังคับค้นหาร้านอาหารทันที
+                executeSearch('food'); 
             }
         }
     }
@@ -673,6 +695,7 @@
         document.getElementById('regStoreVerifyCard').style.display = 'none';
     }
 
+    // ⚡ ฟังก์ชันโหลดข้อมูลเดิมให้ร้านค้าแก้ไข
     function verifyStore() {
         const stores = appData.registeredStores || [];
         const store = stores.find(s => s.pin === document.getElementById('storePinInput').value);
@@ -681,7 +704,20 @@
             document.getElementById('vipUpdateSection').style.display = store.isVIP ? 'block' : 'none';
             document.getElementById('vipLineInput').value = store.lineUrl || '';
             document.getElementById('vipFbInput').value = store.fbUrl || '';
-            alert("ยินดีต้อนรับร้าน " + store.name); 
+
+            // ดึงโปรโมทที่เคยขอไว้ (Active หรือ Pending) มาใส่ในฟอร์มให้เลย
+            const existingPromo = (appData.activePromotions || []).find(p => p.storeName === store.name) || 
+                                  (appData.pendingPromotions || []).find(p => p.storeName === store.name);
+            
+            if (existingPromo) {
+                if(document.getElementById('promoProvinceSelect')) document.getElementById('promoProvinceSelect').value = existingPromo.province || 'ubon';
+                if(document.getElementById('promoStoreCategory')) document.getElementById('promoStoreCategory').value = existingPromo.category || '';
+                if(document.getElementById('promoServiceSelect')) document.getElementById('promoServiceSelect').value = existingPromo.service || '';
+                if(document.getElementById('promoDetail')) document.getElementById('promoDetail').value = existingPromo.detail || '';
+                window.currentPromoImage = existingPromo.image; // เก็บรูปเก่าไว้ ถ้าร้านไม่อัปรูปใหม่ก็ใช้รูปเดิม
+            }
+
+            alert("ยินดีต้อนรับร้าน " + store.name + "\n(หากมีโปรโมทเดิม ข้อมูลจะถูกดึงมาให้แก้ไขอัตโนมัติ)"); 
         } else alert("PIN ไม่ถูกต้อง");
     }
 
@@ -699,16 +735,23 @@
         const btn = document.getElementById('btnSubmitPromo'); 
         const stores = appData.registeredStores || [];
         const store = stores.find(s => s.pin === document.getElementById('storePinInput').value);
-        const pImg = document.getElementById('promoImageInput').files[0];
+        const pImgFile = document.getElementById('promoImageInput').files[0];
         const pDet = document.getElementById('promoDetail').value;
         
         if(!store) return alert("กรุณายืนยัน PIN ก่อน");
-        if(!pImg || !pDet) return alert("กรุณาแนบรูปและกรอกรายละเอียด");
+        if(!pImgFile && !window.currentPromoImage) return alert("กรุณาแนบรูปและกรอกรายละเอียด");
 
         btn.innerText = "กำลังประมวลผลรูป... ⏳"; btn.disabled = true;
-        const img = await resizeImg(pImg);
+        
+        // ถ้าร้านเลือกรูปใหม่ ก็บีบอัดใหม่ ถ้าร้านไม่เลือก ก็ใช้รูปเดิมที่ดึงมา
+        let img = window.currentPromoImage;
+        if(pImgFile) { img = await resizeImg(pImgFile); }
         
         if (!appData.pendingPromotions) appData.pendingPromotions = [];
+        
+        // ลบคำขอของร้านนี้ที่ค้างอยู่ออก (แทนที่ด้วยอันใหม่ที่เพิ่งแก้)
+        appData.pendingPromotions = appData.pendingPromotions.filter(p => p.storeName !== store.name);
+        
         appData.pendingPromotions.push({ 
             id: Date.now().toString(), storeName: store.name, province: document.getElementById('promoProvinceSelect').value, 
             detail: pDet, image: img, service: document.getElementById('promoServiceSelect').value, category: document.getElementById('promoStoreCategory').value,
@@ -716,9 +759,9 @@
         });
         
         await saveToCloud(); 
-        alert("สั่งซื้อสำเร็จ! รอแอดมินอนุมัติแบนเนอร์ครับ");
-        btn.innerText = "🚀 สั่งซื้อและส่งเรื่องขอโปรโมท"; btn.disabled = false;
-        document.getElementById('promoImageInput').value = ''; document.getElementById('promoDetail').value = '';
+        alert("ส่งข้อมูลอัปเดตสำเร็จ! รอแอดมินอนุมัติครับ");
+        btn.innerText = "🚀 สั่งซื้อและส่งเรื่องอัปเดตข้อมูล"; btn.disabled = false;
+        document.getElementById('promoImageInput').value = '';
     }
 
     window.onload = initializeLiff;
