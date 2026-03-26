@@ -3,128 +3,255 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painaidee - Admin Panel</title>
+    <title>Painaidee - Admin Dashboard</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap');
         body { font-family: 'Kanit', sans-serif; background-color: #f4f7f6; color: #333; margin: 0; padding: 20px; }
-        .container { max-width: 1000px; margin: 0 auto; }
-        h1 { color: #C5A059; text-align: center; background: #121418; padding: 20px; border-radius: 12px; margin-top: 0; }
-        .card { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .card h2 { margin-top: 0; color: #121418; border-bottom: 2px solid #eee; padding-bottom: 10px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; font-size: 14px; }
-        th { background-color: #f9f9f9; }
-        .btn { padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-family: 'Kanit'; font-weight: 500; color: #fff; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #C5A059; text-align: center; background: #121418; padding: 25px; border-radius: 12px; margin-top: 0; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        
+        .card { background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 25px; overflow-x: auto; }
+        .card h2 { margin-top: 0; color: #121418; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; font-size: 20px; display: flex; justify-content: space-between; }
+        .badge { background: #D9534F; color: white; padding: 2px 10px; border-radius: 20px; font-size: 14px; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; min-width: 800px; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; font-size: 14px; vertical-align: middle; }
+        th { background-color: #fafafa; color: #555; font-weight: 500; }
+        tr:hover { background-color: #f9f9f9; }
+        
+        .btn { padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-family: 'Kanit'; font-weight: 500; color: #fff; font-size: 13px; transition: 0.2s; margin-right: 4px; margin-bottom: 4px; display: inline-block; }
+        .btn:hover { transform: translateY(-2px); opacity: 0.9; }
         .btn-approve { background-color: #06C755; }
         .btn-delete { background-color: #D9534F; }
-        .btn-vip { background-color: #FFD700; color: #000; }
+        .btn-vip { background-color: #FFD700; color: #000; box-shadow: 0 2px 5px rgba(255,215,0,0.3); }
+        .btn-warning { background-color: #f0ad4e; }
+        .btn-info { background-color: #17a2b8; }
+        .btn-secondary { background-color: #6c757d; }
+        
+        .status-on { color: #06C755; font-weight: 600; background: #e6f9ed; padding: 4px 10px; border-radius: 12px; font-size: 12px; }
+        .status-off { color: #f0ad4e; font-weight: 600; background: #fdf5e8; padding: 4px 10px; border-radius: 12px; font-size: 12px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>👑 ระบบจัดการหลังบ้าน (Admin)</h1>
+    <h1>👑 ระบบบัญชาการ Painaidee (Admin)</h1>
 
-    <div class="card">
-        <h2>1. คำขอลงทะเบียนร้านค้าใหม่</h2>
-        <table id="reqTable">
-            <tr><th>ชื่อร้าน</th><th>รูปภาพ</th><th>จัดการ</th></tr>
-        </table>
-    </div>
-
-    <div class="card">
-        <h2>2. ร้านค้าในระบบ (จัดการ PIN / VIP)</h2>
-        <table id="storeTable">
-            <tr><th>ชื่อร้าน</th><th>PIN</th><th>สถานะ VIP</th><th>จัดการ</th></tr>
-        </table>
-    </div>
-
-    <div class="card">
-        <h2>3. คำขอขึ้นป้ายโปรโมทแบนเนอร์</h2>
+    <div class="card" style="border-left: 4px solid #17a2b8;">
+        <h2>📌 1. คำขอขึ้นแบนเนอร์โปรโมท (รออนุมัติ) <span class="badge" id="pendingCount">0</span></h2>
         <table id="promoTable">
-            <tr><th>ชื่อร้าน</th><th>รายละเอียด</th><th>หมวดหมู่</th><th>จัดการ</th></tr>
+            <tr><th>ร้านค้า (จังหวัด)</th><th>แพ็กเกจ</th><th>รายละเอียดที่ขอ</th><th>วันที่ส่งคำขอ</th><th>จัดการ</th></tr>
         </table>
     </div>
+
+    <div class="card" style="border-left: 4px solid #06C755;">
+        <h2>✨ 2. สถานะแบนเนอร์โปรโมชั่น (กำลังแสดงหน้าแอป) <span class="badge" style="background:#06C755;" id="activeCount">0</span></h2>
+        <p style="font-size: 13px; color: #666; margin-top: -10px;">* ระบบจะลบแบนเนอร์ที่หมดอายุออกจากหน้าแอปให้อัตโนมัติ</p>
+        <table id="activePromoTable">
+            <tr><th>ชื่อร้าน</th><th>รายละเอียดแบนเนอร์</th><th>เวลาเริ่มต้น</th><th>เวลาหมดอายุ</th><th>สถานะ</th><th>จัดการ</th></tr>
+        </table>
+    </div>
+
+    <div class="card" style="border-left: 4px solid #C5A059;">
+        <h2>📝 3. คำขอลงทะเบียนร้านค้าใหม่ <span class="badge" style="background:#C5A059;" id="reqCount">0</span></h2>
+        <table id="reqTable">
+            <tr><th>ชื่อร้าน</th><th>รูปภาพแนบ</th><th>จัดการ</th></tr>
+        </table>
+    </div>
+
+    <div class="card" style="border-left: 4px solid #121418;">
+        <h2>🏬 4. ฐานข้อมูลร้านค้าทั้งหมด (จัดการรหัส PIN / สิทธิ์ VIP)</h2>
+        <table id="storeTable">
+            <tr><th>ชื่อร้าน</th><th>รหัส PIN</th><th>สถานะพิเศษ</th><th>จัดการ</th></tr>
+        </table>
+    </div>
+
 </div>
 
 <script>
-    // เชื่อมต่อฐานข้อมูลเดียวกันกับหน้าเว็บหลัก
+    // ดึงฐานข้อมูลจาก LocalStorage
     let appData = JSON.parse(localStorage.getItem('painaidee_auth')) || { registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [] };
-    function saveData() { localStorage.setItem('painaidee_auth', JSON.stringify(appData)); loadAdminData(); }
+    
+    function saveData() { 
+        localStorage.setItem('painaidee_auth', JSON.stringify(appData)); 
+        loadAdminData(); 
+    }
+
+    function formatTime(timestamp) {
+        if(!timestamp) return "-";
+        return new Date(timestamp).toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' });
+    }
 
     function loadAdminData() {
-        // 1. โหลดคำขอลงทะเบียน
-        const reqTable = document.getElementById('reqTable');
-        reqTable.innerHTML = '<tr><th>ชื่อร้าน</th><th>รูปภาพ</th><th>จัดการ</th></tr>' + 
-            appData.registrationRequests.map((r, index) => `
+        // --- 1. คำขอขึ้นป้ายแบนเนอร์ (รออนุมัติ) ---
+        document.getElementById('pendingCount').innerText = appData.pendingPromotions.length;
+        const promoTable = document.getElementById('promoTable');
+        promoTable.innerHTML = '<tr><th>ร้านค้า (จังหวัด)</th><th>แพ็กเกจ</th><th>รายละเอียดที่ขอ</th><th>วันที่ส่งคำขอ</th><th>จัดการ</th></tr>' + 
+            appData.pendingPromotions.map((p, index) => `
             <tr>
-                <td>${r.storeName}</td>
-                <td><img src="${r.storePhoto}" height="50"></td>
+                <td><strong>${p.storeName}</strong><br><span style="font-size:12px; color:#888;">${p.province}</span></td>
+                <td><span style="color:#17a2b8; font-size:12px;">${p.service || '-'}</span></td>
+                <td style="max-width: 200px;">${p.detail}</td>
+                <td style="font-size: 12px;">${p.date || '-'}</td>
                 <td>
-                    <button class="btn btn-approve" onclick="approveStore(${index})">สร้างรหัส PIN</button>
-                    <button class="btn btn-delete" onclick="deleteReq(${index})">ลบ</button>
+                    <button class="btn btn-approve" onclick="approvePromo(${index})">✅ อนุมัติ/ตั้งเวลา</button>
+                    <button class="btn btn-delete" onclick="deletePendingPromo(${index})">❌ ลบ</button>
                 </td>
             </tr>`).join('');
 
-        // 2. โหลดร้านค้าในระบบ
+        // --- 2. แบนเนอร์ที่กำลังแสดง (จัดการสถานะ) ---
+        const now = Date.now();
+        document.getElementById('activeCount').innerText = appData.activePromotions.length;
+        const activePromoTable = document.getElementById('activePromoTable');
+        
+        activePromoTable.innerHTML = '<tr><th>ชื่อร้าน</th><th>รายละเอียดแบนเนอร์</th><th>เวลาเริ่มต้น</th><th>เวลาหมดอายุ</th><th>สถานะ</th><th>จัดการ</th></tr>' + 
+            appData.activePromotions.map((p, index) => {
+                // เช็คว่าถูกปิดซ่อนไว้หรือไม่ (เทคนิคใส่ _PAUSED_ นำหน้าจังหวัด)
+                const isPaused = p.province.startsWith('_PAUSED_');
+                const isExpired = p.expireTimestamp && now > p.expireTimestamp;
+                
+                let statusHtml = '';
+                if (isExpired) statusHtml = '<span class="badge">หมดอายุแล้ว</span>';
+                else if (isPaused) statusHtml = '<span class="status-off">⏸️ ปิดซ่อน</span>';
+                else statusHtml = '<span class="status-on">✅ กำลังแสดง</span>';
+
+                return `
+                <tr style="${isExpired ? 'opacity: 0.6; background: #fff5f5;' : ''}">
+                    <td><strong>${p.storeName}</strong></td>
+                    <td style="max-width: 200px; font-size: 12px;">${p.detail}</td>
+                    <td style="font-size: 12px; color: #666;">${formatTime(p.startDate)}</td>
+                    <td style="font-size: 12px; color: ${isExpired ? '#D9534F' : '#06C755'}; font-weight: bold;">${formatTime(p.expireTimestamp)}</td>
+                    <td>${statusHtml}</td>
+                    <td style="min-width: 220px;">
+                        <button class="btn ${isPaused ? 'btn-approve' : 'btn-warning'}" onclick="toggleActivePromo(${index})">${isPaused ? '▶️ เปิดโชว์' : '⏸️ ปิดซ่อน'}</button>
+                        <button class="btn btn-info" onclick="editActivePromo(${index})">✏️ แก้ไข</button>
+                        <button class="btn btn-delete" onclick="deleteActivePromo(${index})">🗑️ ลบ</button>
+                    </td>
+                </tr>`;
+            }).join('');
+
+        // --- 3. คำขอลงทะเบียนร้านค้าใหม่ ---
+        document.getElementById('reqCount').innerText = appData.registrationRequests.length;
+        const reqTable = document.getElementById('reqTable');
+        reqTable.innerHTML = '<tr><th>ชื่อร้าน</th><th>รูปภาพแนบ</th><th>จัดการ</th></tr>' + 
+            appData.registrationRequests.map((r, index) => `
+            <tr>
+                <td><strong>${r.storeName}</strong></td>
+                <td><button class="btn btn-secondary" onclick="window.open('${r.storePhoto}', '_blank')">ดูรูปถ่าย</button></td>
+                <td>
+                    <button class="btn btn-approve" onclick="approveStore(${index})">✅ สร้างรหัส PIN</button>
+                    <button class="btn btn-delete" onclick="deleteReq(${index})">❌ ลบ</button>
+                </td>
+            </tr>`).join('');
+
+        // --- 4. จัดการร้านค้าทั้งหมด (PIN & VIP) ---
         const storeTable = document.getElementById('storeTable');
-        storeTable.innerHTML = '<tr><th>ชื่อร้าน</th><th>PIN</th><th>สถานะ VIP</th><th>จัดการ</th></tr>' + 
+        storeTable.innerHTML = '<tr><th>ชื่อร้าน</th><th>รหัส PIN</th><th>สถานะพิเศษ</th><th>จัดการ</th></tr>' + 
             appData.registeredStores.map((s, index) => `
             <tr>
                 <td>${s.name}</td>
-                <td><strong>${s.pin}</strong></td>
-                <td>${s.isVIP ? '👑 VIP' : 'ทั่วไป'}</td>
+                <td style="font-size: 18px; color: #C5A059;"><strong>${s.pin}</strong></td>
+                <td>${s.isVIP ? '<span style="background:#FFD700; padding:2px 8px; border-radius:10px; font-weight:bold; font-size:12px;">👑 VIP</span>' : 'ทั่วไป'}</td>
                 <td>
-                    <button class="btn btn-vip" onclick="toggleVIP(${index})">สลับ VIP</button>
-                    <button class="btn btn-delete" onclick="deleteStore(${index})">ลบ</button>
-                </td>
-            </tr>`).join('');
-
-        // 3. โหลดคำขอโปรโมท
-        const promoTable = document.getElementById('promoTable');
-        promoTable.innerHTML = '<tr><th>ชื่อร้าน</th><th>รายละเอียด</th><th>แพ็กเกจ</th><th>จัดการ</th></tr>' + 
-            appData.pendingPromotions.map((p, index) => `
-            <tr>
-                <td>${p.storeName}</td>
-                <td>${p.detail}</td>
-                <td>${p.service || '-'}</td>
-                <td>
-                    <button class="btn btn-approve" onclick="approvePromo(${index})">อนุมัติขึ้นป้าย</button>
-                    <button class="btn btn-delete" onclick="deletePromo(${index})">ลบ</button>
+                    <button class="btn btn-vip" onclick="toggleVIP(${index})">สลับสิทธิ์ VIP</button>
+                    <button class="btn btn-delete" onclick="deleteStore(${index})">ลบร้าน</button>
                 </td>
             </tr>`).join('');
     }
 
-    // ฟังก์ชันจัดการต่างๆ
-    function approveStore(index) {
-        const req = appData.registrationRequests[index];
-        const newPin = Math.floor(1000 + Math.random() * 9000).toString(); // สุ่ม PIN 4 หลัก
-        appData.registeredStores.push({ name: req.storeName, pin: newPin, isVIP: false });
-        appData.registrationRequests.splice(index, 1);
-        saveData(); alert(`อนุมัติร้าน ${req.storeName} สำเร็จ!\nรหัส PIN คือ: ${newPin}`);
-    }
-    function deleteReq(index) { if(confirm('แน่ใจที่จะลบคำขอนี้?')) { appData.registrationRequests.splice(index, 1); saveData(); } }
-    
-    function toggleVIP(index) { appData.registeredStores[index].isVIP = !appData.registeredStores[index].isVIP; saveData(); }
-    function deleteStore(index) { if(confirm('ลบร้านค้านี้ออกจากระบบ?')) { appData.registeredStores.splice(index, 1); saveData(); } }
-
+    // ==================================================
+    // ฟังก์ชันสำหรับ 1. คำขอแบนเนอร์
+    // ==================================================
     function approvePromo(index) {
         const promo = appData.pendingPromotions[index];
-        // ตรวจสอบว่าแบนเนอร์ของร้านนี้มีอยู่แล้วหรือไม่ ถ้ามีให้ต่อเวลา
+        let daysInput = prompt(`✅ อนุมัติแบนเนอร์ของร้าน: ${promo.storeName}\n\nกรุณาระบุจำนวนวันที่จะให้โปรโมชั่นนี้แสดงผลบนหน้าแอป (ค่าเริ่มต้น 30 วัน):`, "30");
+        
+        if (daysInput === null) return; // กด Cancel
+        
+        let days = parseInt(daysInput) || 30;
+        const durationMs = days * 24 * 60 * 60 * 1000;
+        const now = Date.now();
+
+        // เช็คว่ามีแบนเนอร์เดิมไหม ถ้ามีให้ต่อเวลา
         const existingPromo = appData.activePromotions.find(p => p.storeName === promo.storeName);
-        const duration = 30 * 24 * 60 * 60 * 1000; // 30 วัน
         
         if (existingPromo) {
-            existingPromo.expireTimestamp = Math.max(existingPromo.expireTimestamp, Date.now()) + duration;
-            existingPromo.image = promo.image; existingPromo.detail = promo.detail;
+            existingPromo.expireTimestamp = Math.max(existingPromo.expireTimestamp || now, now) + durationMs;
+            if(promo.image) existingPromo.image = promo.image; 
+            existingPromo.detail = promo.detail;
+            existingPromo.category = promo.category;
+            existingPromo.service = promo.service;
+            
+            // เผื่อร้านนี้ถูกปิดซ่อนอยู่ ให้เปิดกลับมาอัตโนมัติ
+            if(existingPromo.province.startsWith('_PAUSED_')) {
+                existingPromo.province = existingPromo.province.replace('_PAUSED_', '');
+            }
         } else {
-            promo.expireTimestamp = Date.now() + duration;
-            appData.activePromotions.push(promo);
+            promo.startDate = now;
+            promo.expireTimestamp = now + durationMs;
+            appData.activePromotions.unshift(promo); // ดันขึ้นบนสุด
         }
+        
         appData.pendingPromotions.splice(index, 1);
-        saveData(); alert("อนุมัติโปรโมชั่นขึ้นป้ายสำเร็จ!");
+        saveData(); 
+        alert(`✅ อนุมัติสำเร็จ! แบนเนอร์จะแสดงผลเป็นเวลา ${days} วัน`);
     }
-    function deletePromo(index) { if(confirm('ลบคำขอโปรโมชั่นนี้?')) { appData.pendingPromotions.splice(index, 1); saveData(); } }
+    
+    function deletePendingPromo(index) { 
+        if(confirm('ไม่อนุมัติ และลบคำขอโปรโมชั่นนี้ใช่หรือไม่?')) { appData.pendingPromotions.splice(index, 1); saveData(); } 
+    }
+
+    // ==================================================
+    // ฟังก์ชันสำหรับ 2. แบนเนอร์ที่กำลังแสดง (Active)
+    // ==================================================
+    function toggleActivePromo(index) {
+        let p = appData.activePromotions[index];
+        // ใช้เทคนิคเติม _PAUSED_ หน้าจังหวัด เพื่อไม่ให้แผนที่หน้าแรกค้นหาเจอ (โดยไม่ต้องลบข้อมูลทิ้ง)
+        if (p.province.startsWith('_PAUSED_')) {
+            p.province = p.province.replace('_PAUSED_', '');
+        } else {
+            p.province = '_PAUSED_' + p.province;
+        }
+        saveData();
+    }
+
+    function editActivePromo(index) {
+        let p = appData.activePromotions[index];
+        let newDetail = prompt("✏️ แก้ไขรายละเอียดโปรโมชั่น:", p.detail);
+        if (newDetail !== null) {
+            p.detail = newDetail;
+            let addDays = prompt("⏳ ต้องการเพิ่ม/ลด วันหมดอายุหรือไม่?\n(ใส่จำนวนวัน เช่น 15 เพื่อต่อเวลา, หรือใส่ 0 เพื่อไม่เปลี่ยนแปลงเวลา):", "0");
+            if (addDays !== null && !isNaN(addDays)) {
+                let extraMs = parseInt(addDays) * 24 * 60 * 60 * 1000;
+                if (extraMs !== 0) {
+                    p.expireTimestamp = (p.expireTimestamp || Date.now()) + extraMs;
+                }
+            }
+            saveData();
+        }
+    }
+
+    function deleteActivePromo(index) {
+        if(confirm('🚨 แน่ใจหรือไม่ที่จะลบแบนเนอร์นี้ทิ้งถาวร? (ข้อมูลจะหายไปจากหน้าแอปทันที)')) {
+            appData.activePromotions.splice(index, 1);
+            saveData();
+        }
+    }
+
+    // ==================================================
+    // ฟังก์ชันสำหรับ 3-4. จัดการร้านค้าและ PIN
+    // ==================================================
+    function approveStore(index) {
+        const req = appData.registrationRequests[index];
+        const newPin = Math.floor(1000 + Math.random() * 9000).toString(); 
+        appData.registeredStores.unshift({ name: req.storeName, pin: newPin, isVIP: false });
+        appData.registrationRequests.splice(index, 1);
+        saveData(); alert(`✅ สร้างร้านค้า ${req.storeName} สำเร็จ!\nรหัส PIN ที่ต้องส่งให้ร้านคือ: ${newPin}`);
+    }
+    
+    function deleteReq(index) { if(confirm('ลบคำขอนี้ใช่หรือไม่?')) { appData.registrationRequests.splice(index, 1); saveData(); } }
+    function toggleVIP(index) { appData.registeredStores[index].isVIP = !appData.registeredStores[index].isVIP; saveData(); }
+    function deleteStore(index) { if(confirm('🚨 ลบร้านค้านี้ออกจากระบบ? (พินจะใช้ไม่ได้อีกต่อไป)')) { appData.registeredStores.splice(index, 1); saveData(); } }
 
     window.onload = loadAdminData;
 </script>
