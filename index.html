@@ -259,7 +259,7 @@
     // 🔗 API เชื่อม Google Sheets (Cloud)
     const API_URL = "https://script.google.com/macros/s/AKfycbwJiwswKLe5DicJYo_5mcwM5KBSDS1O9tV6KhJ6ehsVSjkES2k-3ESKNeBak36B8Qz-/exec";
     
-    // 💡 ข้อมูลหมวดหมู่และราคาเริ่มต้น (กันการโหลดหน้าขาวถ้าฐานข้อมูลพึ่งสร้างใหม่)
+    // 💡 ข้อมูลหมวดหมู่และราคาเริ่มต้น
     const defaultCategories = [
         { id: 1, group: 'food', label: 'หมูกระทะ / แจ่วฮ้อน', keyword: 'หมูกระทะ' },
         { id: 2, group: 'food', label: 'ชาบู / สุกี้', keyword: 'ชาบู' },
@@ -315,6 +315,23 @@
     ];
 
     // ☁️ ระบบ Cloud Sync
+    async function loadFromCloud() {
+        try {
+            const res = await fetch(API_URL);
+            const data = await res.json();
+            if(data && Object.keys(data).length > 0) {
+                appData = data;
+            }
+            if (!appData.categories || appData.categories.length === 0) appData.categories = defaultCategories;
+            if (!appData.services || appData.services.length === 0) appData.services = defaultServices;
+        } catch(e) {
+            console.error("Cloud Error", e);
+            appData.categories = defaultCategories;
+            appData.services = defaultServices;
+        }
+        renderUI();
+    }
+
     async function saveToCloud() { 
         try { 
             await fetch(API_URL, { 
@@ -323,22 +340,6 @@
                 body: JSON.stringify(appData) 
             }); 
         } catch(e) { console.error("Save Error", e); } 
-    }
-            
-            // 💡 ถ้าแอดมินยังไม่เคยตั้งค่า ให้ดึงข้อมูลพื้นฐานมาใส่เลย (ป้องกันหน้าขาว)
-            if (!appData.categories || appData.categories.length === 0) appData.categories = defaultCategories;
-            if (!appData.services || appData.services.length === 0) appData.services = defaultServices;
-            
-        } catch(e) { 
-            console.error("Cloud Error", e); 
-            appData.categories = defaultCategories;
-            appData.services = defaultServices;
-        }
-        renderUI();
-    }
-    
-    async function saveToCloud() { 
-        try { await fetch(API_URL, { method: 'POST', body: JSON.stringify(appData) }); } catch(e) { console.error(e); } 
     }
 
     // 📱 ระบบย่อรูปภาพ 
