@@ -65,7 +65,6 @@
 
     <div class="card" style="border-left: 4px solid #06C755;">
         <h2>✨ 3. สถานะแบนเนอร์โปรโมชั่น (กำลังแสดง) <span class="badge" style="background:#06C755;" id="activeCount">0</span></h2>
-        <p style="font-size: 13px; color: #666; margin-top: -10px;">* ระบบจะซ่อนแบนเนอร์ที่หมดอายุอัตโนมัติ แอดมินสามารถกดปิดซ่อน หรือแก้ไขเพิ่มวันได้</p>
         <table id="activePromoTable">
             <tr><th>ชื่อร้าน (หมวดหมู่)</th><th>รายละเอียดแบนเนอร์</th><th>เวลาหมดอายุ</th><th>สถานะ</th><th>จัดการ</th></tr>
         </table>
@@ -90,7 +89,6 @@
 
     <div class="card" style="border-left: 4px solid #D9534F;">
         <h2>🚩 6. รายงานร้านปิดกิจการถาวร <span class="badge" id="closedCount">0</span></h2>
-        <p style="font-size: 13px; color: #666; margin-top: -10px;">* หากกด "ยืนยันว่าปิด" ระบบจะซ่อนร้านนี้ไม่ให้แสดงในแผนที่แอปอีกต่อไป</p>
         <table id="closedReportsTable">
             <tr><th>ชื่อร้านที่ถูกแจ้ง</th><th>วันที่ลูกค้าแจ้งมา</th><th>จัดการ (แบนออกจากระบบ)</th></tr>
         </table>
@@ -100,16 +98,6 @@
 </div>
 
 <script>
-    let appData = { 
-        registrationRequests: [], 
-        registeredStores: [], 
-        pendingPromotions: [], 
-        activePromotions: [], 
-        categories: [],
-        closedReports: [],      // 💡 ระบบรายงานร้านปิด
-        blacklistedPlaces: []   // 💡 รายชื่อร้านที่ถูกแบน
-    };
-
     const defaultCategories = [
         { id: 1, group: 'food', label: 'หมูกระทะ / แจ่วฮ้อน', keyword: 'หมูกระทะ' },
         { id: 2, group: 'food', label: 'ชาบู / สุกี้', keyword: 'ชาบู' },
@@ -127,6 +115,17 @@
         { id: 14, group: 'sport', label: 'สระว่ายน้ำ', keyword: 'สระว่ายน้ำ' }
     ];
 
+    // 💡 คืนชีพ Default Services
+    const defaultServices = [
+        { id: 1, name: 'ปักหมุดโปรโมชั่นหน้าแรก (รายเดือน)', price: 500 },
+        { id: 2, name: 'อัปเดตแก้ไขแบนเนอร์ (ต่อครั้ง)', price: 150 }
+    ];
+
+    let appData = { 
+        registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], 
+        categories: [], closedReports: [], blacklistedPlaces: [], services: [] 
+    };
+
     function loadFromStorage() {
         try {
             let raw = localStorage.getItem('painaidee_auth');
@@ -139,8 +138,10 @@
                 appData.closedReports = parsed.closedReports || [];
                 appData.blacklistedPlaces = parsed.blacklistedPlaces || [];
                 appData.categories = parsed.categories && parsed.categories.length > 0 ? parsed.categories : defaultCategories;
+                appData.services = parsed.services && parsed.services.length > 0 ? parsed.services : defaultServices; // 💡 เพิ่มบรรทัดนี้
             } else {
                 appData.categories = defaultCategories;
+                appData.services = defaultServices; // 💡 เพิ่มบรรทัดนี้
             }
         } catch(e) { console.error("Error loading data", e); }
     }
@@ -184,7 +185,10 @@
                 appData.pendingPromotions.map((p, index) => `
                 <tr>
                     <td><strong>${p.storeName || 'ไม่ระบุ'}</strong><br><span style="font-size:12px; color:#888;">${p.province || 'ไม่ระบุ'}</span></td>
-                    <td><span style="background:#eee; padding:2px 6px; border-radius:4px; font-size:11px;">${p.category || 'ทั่วไป'}</span><br><span style="color:#17a2b8; font-size:12px;">${p.service || '-'}</span></td>
+                    <td>
+                        <span style="background:#eee; padding:2px 6px; border-radius:4px; font-size:11px;">${p.category || 'ทั่วไป'}</span><br>
+                        <span style="color:#17a2b8; font-size:12px; font-weight:bold;">${p.service || '-'}</span>
+                    </td>
                     <td style="max-width: 200px;">${p.detail || ''}</td>
                     <td style="font-size: 12px;">${p.date || '-'}</td>
                     <td style="min-width: 150px;"><button class="btn btn-approve" onclick="approvePromo(${index})">✅ อนุมัติ</button> <button class="btn btn-delete" onclick="deletePendingPromo(${index})">❌ ลบ</button></td>
@@ -234,7 +238,7 @@
                 appData.registeredStores.map((s, index) => `<tr><td>${s.name}</td><td style="font-size: 18px; color: #C5A059;"><strong>${s.pin}</strong></td><td>${s.isVIP ? '<span style="background:#FFD700; padding:2px 8px; border-radius:10px; font-weight:bold; font-size:12px;">👑 VIP</span>' : '<span style="color:#999; font-size:12px;">ร้านทั่วไป</span>'}</td><td><button class="btn btn-vip" onclick="toggleVIP(${index})">👑 สลับสิทธิ์ VIP</button> <button class="btn btn-delete" onclick="deleteStore(${index})">🗑️ ลบร้าน</button></td></tr>`).join('');
         } else { storeTable.style.display = 'none'; emptyStore.style.display = 'block'; }
 
-        // --- 💡 6. Render Closed Reports (รายงานปิดร้าน) ---
+        // --- 6. Render Closed Reports ---
         document.getElementById('closedCount').innerText = appData.closedReports.length;
         const closedTable = document.getElementById('closedReportsTable');
         const emptyClosed = document.getElementById('emptyClosed');
@@ -297,6 +301,7 @@
             if(promo.image) existingPromo.image = promo.image; 
             existingPromo.detail = promo.detail; 
             existingPromo.category = promo.category;
+            existingPromo.service = promo.service;
             if(existingPromo.province && existingPromo.province.startsWith('_PAUSED_')) existingPromo.province = existingPromo.province.replace('_PAUSED_', '');
         } else {
             promo.startDate = Date.now(); 
@@ -347,20 +352,11 @@
     function toggleVIP(index) { appData.registeredStores[index].isVIP = !appData.registeredStores[index].isVIP; saveData(); }
     function deleteStore(index) { if(confirm('🚨 ลบร้านค้านี้ออกจากระบบ?')) { appData.registeredStores.splice(index, 1); saveData(); } }
 
-    // 💡 --- จัดการรายงานปิดร้านถาวร ---
     function approveClosedReport(index) {
         if(confirm('ยืนยันว่าร้านนี้ปิดกิจการถาวร?\n(ระบบจะแบนร้านนี้ ไม่ให้แสดงผลในหน้าค้นหาของลูกค้าอีกต่อไป)')) {
             const report = appData.closedReports[index];
-            
-            // 1. เพิ่มเข้ารายชื่อ Blacklist
-            if(!appData.blacklistedPlaces.includes(report.placeId)) {
-                appData.blacklistedPlaces.push(report.placeId);
-            }
-            
-            // 2. เคลียร์แบนเนอร์ของร้านนี้ (ถ้ามี)
+            if(!appData.blacklistedPlaces.includes(report.placeId)) appData.blacklistedPlaces.push(report.placeId);
             appData.activePromotions = appData.activePromotions.filter(p => p.storeName !== report.storeName);
-            
-            // 3. ลบคำขอออกจากคิวรายงาน
             appData.closedReports.splice(index, 1);
             saveData();
             alert('นำร้านนี้ออกจากระบบเรียบร้อยแล้ว');
@@ -368,13 +364,9 @@
     }
 
     function rejectClosedReport(index) {
-        if(confirm('ลบรายงานนี้ทิ้ง (ร้านนี้ยังเปิดให้บริการอยู่ใช่หรือไม่)?')) {
-            appData.closedReports.splice(index, 1);
-            saveData();
-        }
+        if(confirm('ลบรายงานนี้ทิ้ง (ร้านนี้ยังเปิดให้บริการอยู่ใช่หรือไม่)?')) { appData.closedReports.splice(index, 1); saveData(); }
     }
 
-    // ซิงค์อัตโนมัติเมื่อมีการเปลี่ยนแปลงจากหน้าลูกค้า
     window.addEventListener('storage', function(e) { if (e.key === 'painaidee_auth') { renderAdminUI(); } });
     
     window.onload = renderAdminUI;
