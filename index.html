@@ -92,7 +92,7 @@
 <div id="loginOverlay">
     <div id="loadingSpinner" style="display: flex; flex-direction: column; align-items: center;">
         <div class="spinner"></div>
-        <h3 style="color: var(--primary); margin: 0;">กำลังเชื่อมต่อระบบ LINE...</h3>
+        <h3 style="color: var(--primary); margin: 0;">กำลังเชื่อมต่อระบบ...</h3>
         <p style="color: var(--text-muted); font-size: 14px;">กรุณารอสักครู่เพื่อเข้าสู่แอปไปไหนดี</p>
     </div>
 
@@ -191,7 +191,7 @@
 
                 <div style="padding: 20px; border: 2px solid var(--primary); border-radius: 16px; background: linear-gradient(180deg, rgba(197, 160, 89, 0.15) 0%, var(--surface) 100%); position: relative; overflow: hidden; margin-top: 30px;">
                     <div style="position: absolute; top: 20px; right: -35px; background: #D9534F; color: white; padding: 5px 40px; transform: rotate(45deg); font-size: 12px; font-weight: bold; box-shadow: 0 2px 10px rgba(0,0,0,0.5);">HOT 🔥</div>
-                    <h4 style="margin: 0 0 5px 0; color: var(--primary); font-size: 18px; text-align: center;">🚀 ดันยอดขายพุ่ง! พื้นที่โปรโมทหน้าแรก</h4>
+                    <h4 style="margin: 0 0 5px 0; color: var(--primary); font-size: 18px; text-align: center;">🚀 ดันยอดขาย! แบนเนอร์โปรโมทหน้าแรก</h4>
                     <p style="text-align: center; font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">ให้ลูกค้าในจังหวัดเห็นร้านคุณเป็นอันดับแรก ทันทีที่เปิดแอป</p>
                     
                     <div class="form-group"><label>📍 เลือกจังหวัดที่จะโปรโมท</label><select id="promoProvinceSelect"></select></div>
@@ -218,6 +218,29 @@
 <script>
     // 🔗 API เชื่อม Google Sheets (Cloud)
     const API_URL = "https://script.google.com/macros/s/AKfycbyyxw7bjOCIxM7PaBWX59bYbdJtW5nLsjqAbkNP6b7NiDmehQqErLGKw0FGQXx4jrW2/exec";
+
+    // 💡 ข้อมูลหมวดหมู่และราคาเริ่มต้น (กันการโหลดหน้าขาวถ้าฐานข้อมูลพึ่งสร้างใหม่)
+    const defaultCategories = [
+        { id: 1, group: 'food', label: 'หมูกระทะ / แจ่วฮ้อน', keyword: 'หมูกระทะ' },
+        { id: 2, group: 'food', label: 'ชาบู / สุกี้', keyword: 'ชาบู' },
+        { id: 3, group: 'food', label: 'ปิ้งย่าง', keyword: 'ปิ้งย่าง' },
+        { id: 4, group: 'food', label: 'อาหารตามสั่ง', keyword: 'อาหารตามสั่ง' },
+        { id: 5, group: 'food', label: 'คาเฟ่ / ขนม', keyword: 'คาเฟ่' },
+        { id: 6, group: 'beauty', label: 'ร้านนวด / สปา', keyword: 'ร้านนวด' },
+        { id: 7, group: 'beauty', label: 'คลินิกเสริมความงาม', keyword: 'คลินิกความงาม' },
+        { id: 8, group: 'beauty', label: 'ร้านเสริมสวย / ทำผม', keyword: 'ร้านทำผม' },
+        { id: 9, group: 'beauty', label: 'ร้านทำเล็บ', keyword: 'ร้านทำเล็บ' },
+        { id: 10, group: 'activity', label: 'แคมป์ปิ้ง / กางเต็นท์', keyword: 'แคมป์ปิ้ง' },
+        { id: 11, group: 'activity', label: 'สวนสนุก / สวนน้ำ', keyword: 'สวนน้ำ' },
+        { id: 12, group: 'sport', label: 'ฟิตเนส / ยิม', keyword: 'ฟิตเนส' },
+        { id: 13, group: 'sport', label: 'สนามฟุตบอล / หญ้าเทียม', keyword: 'สนามฟุตบอล' },
+        { id: 14, group: 'sport', label: 'สระว่ายน้ำ', keyword: 'สระว่ายน้ำ' }
+    ];
+
+    const defaultServices = [
+        { id: 1, name: 'ปักหมุดโปรโมชั่นหน้าแรก (รายเดือน)', price: 500 },
+        { id: 2, name: 'อัปเดตแก้ไขแบนเนอร์ (ต่อครั้ง)', price: 150 }
+    ];
 
     let appData = { registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], categories: [], closedReports: [], blacklistedPlaces: [], services: [] };
 
@@ -256,8 +279,19 @@
         try { 
             const res = await fetch(API_URL); 
             const data = await res.json(); 
-            if(data && data.registeredStores) appData = data; 
-        } catch(e) { console.error("Cloud Error", e); }
+            if(data && Object.keys(data).length > 0) {
+                appData = data; 
+            }
+            
+            // 💡 ถ้าแอดมินยังไม่เคยตั้งค่า ให้ดึงข้อมูลพื้นฐานมาใส่เลย (ป้องกันหมวดหมู่หาย)
+            if (!appData.categories || appData.categories.length === 0) appData.categories = defaultCategories;
+            if (!appData.services || appData.services.length === 0) appData.services = defaultServices;
+            
+        } catch(e) { 
+            console.error("Cloud Error", e); 
+            appData.categories = defaultCategories;
+            appData.services = defaultServices;
+        }
         renderUI();
     }
     
@@ -289,14 +323,13 @@
                 const profile = await liff.getProfile();
                 document.getElementById('header-profile').innerHTML = `<img src="${profile.pictureUrl}" style="width:100%; height:100%; object-fit:cover;">`;
                 await loadFromCloud(); // โหลดข้อมูลให้เสร็จก่อน
-                hideLoginOverlay();    // แล้วค่อยปิดหน้าโหลด
+                hideLoginOverlay();    // ปิดหน้าหมุนโหลด
             } else {
                 // Auto-Login: สั่งล็อกอินอัตโนมัติ 
                 liff.login({ redirectUri: window.location.href }); 
             }
         } catch (err) { 
             console.error("LIFF Init Error:", err); 
-            // Fallback: ถ้า Error (เช่นเปิดในคอม) ให้โหลดข้อมูลและแสดงปุ่มให้กดเอง
             await loadFromCloud();
             document.getElementById('loadingSpinner').style.display = 'none';
             document.getElementById('loginCard').style.display = 'block';
@@ -333,12 +366,11 @@
         service = new google.maps.places.PlacesService(map);
         infoWindow = new google.maps.InfoWindow();
         
-        // รอให้ข้อมูล Cloud พร้อม ค่อยค้นหาสถานที่
         checkDataAndSearch();
     }
 
     function checkDataAndSearch() {
-        if(appData && appData.categories) {
+        if(appData && appData.categories && appData.categories.length > 0) {
             executeSearch();
         } else {
             setTimeout(checkDataAndSearch, 500); 
