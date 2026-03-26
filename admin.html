@@ -144,19 +144,15 @@
     }
 
     // ☁️ บันทึกข้อมูลไป Cloud
-    async function save() {
-        showLoading(true);
-        try {
+    async function saveToCloud() { 
+        try { 
             await fetch(API_URL, { 
                 method: 'POST', 
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify(appData) 
-            });
-            render();
-        } catch (e) { 
-            console.error("Save Error", e);
-            alert("Error: ไม่สามารถบันทึกข้อมูลได้"); 
-        }
-        showLoading(false);
+            }); 
+        } catch(e) { console.error("Save Error", e); } 
+    }
     }
 
     // 🎨 วาด UI ตารางต่างๆ
