@@ -403,7 +403,7 @@
             if(pSel) pSel.appendChild(new Option(p.name, p.id)); 
             if(prSel) prSel.appendChild(new Option(p.name, p.id)); 
         });
-        if(pSel) pSel.value = 'current'; // บังคับเริ่มที่ตำแหน่งปัจจุบันเสมอ
+        if(pSel) pSel.value = 'current'; // บังคับเริ่มที่ตำแหน่งปัจจุบัน
         map = new google.maps.Map(document.getElementById("map"), { center: currentCoords, zoom: 14, mapTypeControl: false, streetViewControl: false });
         service = new google.maps.places.PlacesService(map);
         infoWindow = new google.maps.InfoWindow();
@@ -435,7 +435,7 @@
                     alert("ไม่สามารถเข้าถึงตำแหน่งได้ จะแสดงข้อมูลของอุบลราชธานีแทนครับ"); 
                     document.getElementById('provinceSelect').value = 'ubon'; 
                     changeLocation(); 
-                }, { timeout: 10000, enableHighAccuracy: true }); // เพิ่มเวลาให้ PC ค้นหาพิกัด
+                }, { timeout: 10000, enableHighAccuracy: true });
             }
         } else {
             const sel = provinces.find(p => p.id === val);
@@ -453,7 +453,6 @@
         const searchVal = searchBox ? searchBox.value.trim() : ""; 
         let keywordToSearch = "ร้านอาหาร"; 
         
-        // แก้ไขดึง ID อาหารให้ถูกต้อง (foodSelect)
         const foodSelect = document.getElementById('foodSelect'), beautySelect = document.getElementById('beautySelect'), actSelect = document.getElementById('activitySelect'), sportSelect = document.getElementById('sportSelect');
 
         if (searchVal !== "" && type === 'text') {
@@ -492,7 +491,6 @@
         const originPoint = new google.maps.LatLng(currentCoords.lat, currentCoords.lng); 
         const stores = appData.registeredStores || []; 
 
-        // ระบบจัดเรียง: 1. ดัน VIP ขึ้นก่อนสุด 2. เรียงตามระยะทาง ใกล้ -> ไกล
         const sorted = googlePlaces.sort((a, b) => {
             const isVipA = stores.find(s => s.name === a.name)?.isVIP ? 1 : 0;
             const isVipB = stores.find(s => s.name === b.name)?.isVIP ? 1 : 0;
@@ -500,7 +498,6 @@
             if (isVipA !== isVipB) {
                 return isVipB - isVipA; 
             }
-
             const distA = google.maps.geometry.spherical.computeDistanceBetween(originPoint, a.geometry.location);
             const distB = google.maps.geometry.spherical.computeDistanceBetween(originPoint, b.geometry.location);
             return distA - distB;
@@ -577,12 +574,24 @@
     }
 
     function renderPromos() {
-        const curProv = document.getElementById('provinceSelect').value;
+        let curProv = document.getElementById('provinceSelect').value;
         const activePromos = appData.activePromotions || []; 
         
-        // ถ้าระบุตำแหน่งปัจจุบัน ให้แสดงโปรโมทที่กำลัง Active ทั้งหมด เพื่อไม่ให้หน้า PC โล่ง
-        const promos = curProv === 'current' ? activePromos : activePromos.filter(p => p.province === curProv);
+        // 📍 ถ้าเป็น "ตำแหน่งปัจจุบัน" ให้หาระยะทางหาจังหวัดที่ใกล้ที่สุด
+        if (curProv === 'current' && currentCoords) {
+            let minDist = Infinity;
+            const originPoint = new google.maps.LatLng(currentCoords.lat, currentCoords.lng);
+            provinces.forEach(p => {
+                const destPoint = new google.maps.LatLng(p.lat, p.lng);
+                const dist = google.maps.geometry.spherical.computeDistanceBetween(originPoint, destPoint);
+                if (dist < minDist) {
+                    minDist = dist;
+                    curProv = p.id; // จะได้ id จังหวัดที่ใกล้ที่สุด เช่น 'ubon', 'bkk'
+                }
+            });
+        }
         
+        const promos = activePromos.filter(p => p.province === curProv);
         const banner = document.getElementById('promoBanner');
         
         if(promos.length > 0) {
