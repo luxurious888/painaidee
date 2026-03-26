@@ -215,22 +215,58 @@
                     <button id="btnSaveVip" class="btn-primary" style="background: linear-gradient(135deg, #FFD700, #C5A059); color: #000; opacity: 0.5;" disabled onclick="updateVipData()">💾 บันทึกข้อมูล VIP</button>
                 </div>
 
-                <div style="padding: 15px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface);">
-                    <h4 style="margin: 0 0 10px 0; color: var(--primary); font-size: 16px;">📌 โปรโมทหน้าแรก (แบนเนอร์)</h4>
-                    <div class="form-group"><label>📍 จังหวัด</label><select id="promoProvinceSelect"></select></div>
-                    <div class="form-group"><label>🏷️ หมวดหมู่ร้านค้า</label><select id="promoStoreCategory"></select></div>
-                    <div class="form-group"><label>รายละเอียดโปรโมชั่น</label><textarea id="promoDetail" rows="2"></textarea></div>
-                    <div class="form-group"><label>รูปภาพแนวนอน (3:2)</label><input type="file" id="promoImageInput" accept="image/*"></div>
-                    <button class="btn-outline" style="width: 100%; border-color: var(--primary); color: var(--primary);" onclick="submitPromoWithPIN()">🚀 ส่งเรื่องขอโปรโมท</button>
+                <div style="padding: 20px; border: 2px solid var(--primary); border-radius: 16px; background: linear-gradient(180deg, rgba(197, 160, 89, 0.1) 0%, var(--surface) 100%); position: relative; overflow: hidden; margin-top: 30px;">
+                    <div style="position: absolute; top: 20px; right: -35px; background: #D9534F; color: white; padding: 5px 40px; transform: rotate(45deg); font-size: 12px; font-weight: bold; box-shadow: 0 2px 10px rgba(0,0,0,0.5);">HOT 🔥</div>
+
+                    <h4 style="margin: 0 0 5px 0; color: var(--primary); font-size: 18px; text-align: center;">🚀 ดันยอดขายพุ่ง! พื้นที่โปรโมทหน้าแรก</h4>
+                    <p style="text-align: center; font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">ให้ลูกค้าในจังหวัดเห็นร้านคุณเป็นอันดับแรก ทันทีที่เปิดแอป</p>
+
+                    <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; margin-bottom: 20px; font-size: 13px; border: 1px solid rgba(197,160,89,0.2);">
+                        <div style="display: flex; align-items: flex-start; margin-bottom: 12px;">
+                            <span style="font-size:18px; margin-right:10px; line-height: 1;">👁️</span> 
+                            <div><strong>การมองเห็นสูงสุด:</strong> โชว์เด่นที่สุด ด้านบนสุดของหน้าค้นหา</div>
+                        </div>
+                        <div style="display: flex; align-items: flex-start; margin-bottom: 12px;">
+                            <span style="font-size:18px; margin-right:10px; line-height: 1;">🎯</span> 
+                            <div><strong>ตรงกลุ่มเป้าหมาย:</strong> แสดงผลเฉพาะจังหวัดที่คุณต้องการเจาะตลาด</div>
+                        </div>
+                        <div style="display: flex; align-items: flex-start;">
+                            <span style="font-size:18px; margin-right:10px; line-height: 1;">⏳</span> 
+                            <div><strong>รับจำนวนจำกัด:</strong> โควต้าสุด Exclusive เพียง <b style="color:#D9534F;">10 ร้าน/จังหวัด</b> เท่านั้น!</div>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; color: #f0ad4e; font-size: 13px; margin-bottom: 20px; font-weight: 500;">
+                        ⚠️ พื้นที่มีจำกัด รีบจองก่อนโดนคู่แข่งแย่งตำแหน่ง!
+                    </div>
+
+                    <div class="form-group"><label>📍 เลือกจังหวัดที่จะโปรโมท</label><select id="promoProvinceSelect"></select></div>
+                    <div class="form-group"><label>🏷️ หมวดหมู่ร้านค้าของคุณ</label><select id="promoStoreCategory"></select></div>
+                    <div class="form-group"><label>💎 เลือกแพ็กเกจค่าบริการ</label><select id="promoServiceSelect"></select></div>
+                    
+                    <div class="form-group">
+                        <label>🖼️ รูปภาพป้ายโฆษณา (แนวนอน 3:2)</label>
+                        <p style="font-size: 11px; color: var(--text-muted); margin: -5px 0 8px 0;">* แนะนำรูปภาพที่มีความคมชัด สีสันสะดุดตา และมีข้อความโปรโมชั่นชัดเจน</p>
+                        <input type="file" id="promoImageInput" accept="image/*">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>📝 รายละเอียดโปรโมชั่น (แคปชั่นดึงดูดลูกค้า)</label>
+                        <textarea id="promoDetail" rows="3" placeholder="เช่น ลด 50% ทันทีเมื่อโชว์แอปนี้! หรือ มา 4 จ่าย 3 ด่วน หมดเขตสิ้นเดือน..."></textarea>
+                    </div>
+                    
+                    <button class="btn-primary" style="width: 100%; background: linear-gradient(135deg, #FFD700, #C5A059); color: #000; font-size: 16px; font-weight: 600; padding: 16px; margin-top: 10px; border: none; box-shadow: 0 6px 20px rgba(255, 215, 0, 0.3);" onclick="submitPromoWithPIN()">
+                        🚀 สั่งซื้อและส่งเรื่องขอโปรโมท
+                    </button>
                 </div>
-            </div>
+                </div>
         </div>
     </div>
 </div>
 
 <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <script>
-    // ข้อมูลเริ่มต้นสำหรับหมวดหมู่
+    // ข้อมูลเริ่มต้นสำหรับหมวดหมู่ (ถ้าแอดมินยังไม่ได้ตั้งค่า)
     const defaultCategories = [
         { id: 1, group: 'food', label: 'หมูกระทะ / แจ่วฮ้อน', keyword: 'หมูกระทะ' },
         { id: 2, group: 'food', label: 'ชาบู / สุกี้', keyword: 'ชาบู' },
@@ -258,7 +294,6 @@
         blacklistedPlaces: [] 
     };
 
-    // 💡 ฟังก์ชันดึงข้อมูลที่ป้องกัน Error ได้ 100% (รองรับการอัปเดตตัวแปรใหม่)
     function loadFromStorage() {
         try {
             let raw = localStorage.getItem('painaidee_auth');
@@ -289,7 +324,7 @@
         document.getElementById('tab-' + p).classList.add('active');
     }
 
-    // --- LIFF ---
+    // --- LIFF Login ---
     const myLiffId = "2009598846-wiCUeV35";
     async function initializeLiff() {
         loadFromStorage();
@@ -307,6 +342,7 @@
     }
     function loginWithLine() { if (!liff.isLoggedIn()) liff.login({ redirectUri: window.location.href }); }
 
+    // --- หมวดหมู่ Dynamic ---
     function renderCategories() {
         const catData = appData.categories || [];
         const genOptions = (group, defLabel, defVal) => {
@@ -356,6 +392,7 @@
         } else { banner.style.display = 'none'; }
     }
 
+    // --- Google Maps, Pagination ---
     let map, infoWindow, service, currentCoords = { lat: 15.2287, lng: 104.8564 }, gpsMarker = null, googlePlaces = [], markers = [];
     let currentPagination = null;
     let currentKeyword = "";
@@ -449,6 +486,7 @@
                 else if (catSelect) keywordToSearch = catSelect.value;
             }
         }
+        
         fetchPlaces(currentCoords, keywordToSearch); 
     }
     
@@ -558,7 +596,6 @@
     function callPlace(placeId, event) { event.stopPropagation(); service.getDetails({ placeId: placeId, fields: ['formatted_phone_number'] }, (place, status) => { if (status === google.maps.places.PlacesServiceStatus.OK && place.formatted_phone_number) window.location.href = `tel:${place.formatted_phone_number.replace(/[\s-]/g, '')}`; else alert("ขออภัยครับ ร้านนี้ไม่ได้ระบุเบอร์โทร"); }); }
     function sharePlace(name, lat, lng, event) { event.stopPropagation(); const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`; if (navigator.share) navigator.share({ title: name, url: navUrl }).catch(console.error); else { navigator.clipboard.writeText(navUrl); alert("คัดลอกลิงก์เรียบร้อยแล้ว"); } }
 
-    // 💡 ฟังก์ชันแจ้งร้านปิดถาวร (ส่งเข้า admin.html อย่างปลอดภัย)
     function reportClosed(placeId, placeName, event) { 
         event.stopPropagation(); 
         if(confirm(`ยืนยันการแจ้งร้าน "${placeName}" ปิดกิจการถาวร?`)) {
@@ -571,7 +608,7 @@
         }
     }
 
-    // --- ส่วนจัดการร้านค้า ---
+    // --- ส่วนจัดการร้านค้า (Partner) ---
     let regMiniMap, regMiniMarker;
     function searchRegStore() {
         const query = document.getElementById('regStoreName').value.trim();
@@ -673,6 +710,7 @@
         } catch (err) { alert("เกิดข้อผิดพลาดในการส่งข้อมูล: " + err.message); }
     }
 
+    // ซิงค์เวลามีการอัปเดตข้อมูลจากหน้า Admin
     window.addEventListener('storage', function(e) {
         if (e.key === 'painaidee_auth') { renderUI(); }
     });
