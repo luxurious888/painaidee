@@ -50,7 +50,8 @@
         }
         select:focus, input:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(197, 160, 89, 0.15); background: var(--dark-light); }
         .input-row select { flex: 1; width: 50%; }
-        option { background-color: var(--dark-light); color: var(--primary-light); font-weight: 400; }
+        option, optgroup { background-color: var(--dark-light); color: var(--primary-light); font-weight: 400; }
+        optgroup { font-weight: 600; color: var(--primary); }
         ::placeholder { color: rgba(223, 191, 139, 0.4); } 
         .search-box-container { display: flex; gap: 12px; width: 100%; }
 
@@ -66,6 +67,7 @@
         .place-card:hover { transform: translateY(-6px); box-shadow: 0 15px 40px rgba(197, 160, 89, 0.25); border-color: rgba(197, 160, 89, 0.5); }
         .place-card img { width: 100%; height: 180px; object-fit: cover; background-color: var(--dark-muted); }
         .place-info { padding: 20px; display: flex; flex-direction: column; flex-grow: 1; }
+        
         .distance-badge { position: absolute; top: 15px; right: 15px; background: rgba(26, 28, 32, 0.9); color: var(--primary-light); padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; backdrop-filter: blur(5px); border: 1px solid rgba(197, 160, 89, 0.3); box-shadow: 0 3px 10px rgba(0,0,0,0.2); z-index: 10; }
         
         .action-buttons { display: flex; gap: 8px; margin-top: auto; padding-top: 15px; flex-wrap: wrap; }
@@ -139,12 +141,15 @@
         <div id="map"></div>
         
         <div class="search-area">
-            <div class="input-row">
-                <select id="provinceSelect" onchange="changeLocation()">
+            <div style="margin-bottom: 12px;">
+                <select id="provinceSelect" onchange="changeLocation()" style="width: 100%;">
                     <option value="current" selected>📍 ตำแหน่งปัจจุบัน</option>
                 </select>
-                <select id="categorySelect" onchange="executeSearch()">
-                    <option value="ร้านอาหาร">ทั้งหมด</option>
+            </div>
+            
+            <div class="input-row">
+                <select id="categorySelect" onchange="executeSearch('food')">
+                    <option value="ร้านอาหาร">🍽️ หมวดอาหาร (ทั้งหมด)</option>
                     <option value="หมูกระทะ แจ่วฮ้อน">หมูกระทะ / แจ่วฮ้อน</option>
                     <option value="ชาบู สุกี้">ชาบู / สุกี้</option>
                     <option value="ปิ้งย่าง">ปิ้งย่าง</option>
@@ -156,16 +161,25 @@
                     <option value="สถานบันเทิง ผับ">สถานบันเทิง / ผับ</option>
                     <option value="แคมป์ปิ้ง ลานกางเต็นท์">แคมป์ปิ้ง</option>
                 </select>
+                
+                <select id="beautySelect" onchange="executeSearch('beauty')">
+                    <option value="ร้านนวด คลินิก">💆‍♀️ หมวดพักผ่อน (ทั้งหมด)</option>
+                    <option value="ร้านนวด สปา">ร้านนวด / สปา</option>
+                    <option value="คลินิกเสริมความงาม">คลินิกเสริมความงาม</option>
+                    <option value="ร้านเสริมสวย ทำผม">ร้านเสริมสวย / ทำผม</option>
+                    <option value="ร้านทำเล็บ">ร้านทำเล็บ</option>
+                </select>
             </div>
+
             <div class="search-box-container">
-                <input type="text" id="searchBox" placeholder="พิมพ์ชื่อร้านที่ต้องการค้นหา..." onkeydown="if(event.key === 'Enter') executeSearch()">
-                <button class="btn-primary" style="width: auto;" onclick="executeSearch()">ค้นหา</button>
+                <input type="text" id="searchBox" placeholder="พิมพ์ชื่อร้านที่ต้องการค้นหา..." onkeydown="if(event.key === 'Enter') executeSearch('text')">
+                <button class="btn-primary" style="width: auto;" onclick="executeSearch('text')">ค้นหา</button>
             </div>
         </div>
 
         <div id="promoBanner" class="highlight-banner">
             <h3>✨ Exclusive Promotions</h3>
-            <p style="font-size: 13px; margin:0 0 15px 0; color:rgba(255,255,255,0.6);">ร้านแนะนำเฉพาะจังหวัดนี้ โควต้าพิเศษ 10 ร้านเท่านั้น</p>
+            <p style="font-size: 13px; margin:0 0 15px 0; color:rgba(255,255,255,0.6);">ร้านแนะนำเฉพาะจังหวัดนี้</p>
             <div id="approvedPromoList" class="place-grid" style="margin-top: 0;"></div>
         </div>
 
@@ -237,19 +251,35 @@
                         <label>📍 จังหวัดที่จะโปรโมท (โควต้า 10 ร้าน/จังหวัด)</label>
                         <select id="promoProvinceSelect"></select>
                     </div>
+                    
                     <div class="form-group">
                         <label>🏷️ หมวดหมู่ร้านค้า</label>
                         <select id="promoStoreCategory">
-                            <option value="ร้านอาหาร">ร้านอาหาร (ทั่วไป)</option>
-                            <option value="หมูกระทะ แจ่วฮ้อน">หมูกระทะ / แจ่วฮ้อน</option>
-                            <option value="คาเฟ่ ร้านกาแฟ">คาเฟ่ / ขนม</option>
-                            <option value="บาร์">บาร์</option>
+                            <optgroup label="🍽️ หมวดร้านอาหาร">
+                                <option value="ร้านอาหาร">ร้านอาหาร (ทั่วไป)</option>
+                                <option value="หมูกระทะ แจ่วฮ้อน">หมูกระทะ / แจ่วฮ้อน</option>
+                                <option value="ชาบู สุกี้">ชาบู / สุกี้</option>
+                                <option value="ปิ้งย่าง">ปิ้งย่าง</option>
+                                <option value="อาหารตามสั่ง">อาหารตามสั่ง</option>
+                                <option value="ก๋วยเตี๋ยว">ก๋วยเตี๋ยว / เส้น</option>
+                                <option value="ส้มตำ ยำ">ส้มตำ / ยำ</option>
+                                <option value="คาเฟ่ ร้านกาแฟ">คาเฟ่ / ขนม</option>
+                                <option value="บาร์">บาร์</option>
+                                <option value="สถานบันเทิง ผับ">สถานบันเทิง / ผับ</option>
+                                <option value="แคมป์ปิ้ง ลานกางเต็นท์">แคมป์ปิ้ง</option>
+                            </optgroup>
+                            <optgroup label="💆‍♀️ หมวดความงามและพักผ่อน">
+                                <option value="ร้านนวด สปา">ร้านนวด / สปา</option>
+                                <option value="คลินิกเสริมความงาม">คลินิกเสริมความงาม</option>
+                                <option value="ร้านเสริมสวย ทำผม">ร้านเสริมสวย / ทำผม</option>
+                                <option value="ร้านทำเล็บ">ร้านทำเล็บ</option>
+                            </optgroup>
                         </select>
                     </div>
+                    
                     <div class="form-group"><label>เลือกแพ็กเกจค่าบริการ</label><select id="promoServiceSelect"></select></div>
                     <div class="form-group"><label>รูปภาพโปรโมชั่นแบนเนอร์ (แนวนอน 3:2)</label><input type="file" id="promoImageInput" accept="image/*"></div>
                     <div class="form-group"><label>รายละเอียดโปรโมชั่น (แสดงบนแบนเนอร์)</label><textarea id="promoDetail" rows="3" placeholder="ระบุเงื่อนไขโปรโมชั่นของคุณ..."></textarea></div>
-                    
                     <button class="btn-outline" style="width: 100%; border-color: var(--primary); color: var(--primary);" onclick="submitPromoBanner()">🚀 ส่งเรื่องขอขึ้นแบนเนอร์โปรโมท</button>
                 </div>
 
@@ -265,13 +295,12 @@
 
 <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <script>
-    // 💡 5. ระบบซิงค์แอดมินสมบูรณ์ (ใช้ Key painaidee_auth)
+    // 💡 5. ระบบซิงค์แอดมิน (painaidee_auth)
     let appData = JSON.parse(localStorage.getItem('painaidee_auth')) || { 
         registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], closedReports: [], blacklistedPlaces: [], 
         services: [{ id: 1, name: 'ปักหมุดโปรโมชั่นหน้าแรก (30 วัน)', price: 500 }, { id: 2, name: 'อัปเดตแบนเนอร์ (ต่อครั้ง)', price: 150 }] 
     };
 
-    // สร้างร้าน VIP จำลองสำหรับให้ทดสอบ (ถ้ายังไม่มี)
     if (!appData.registeredStores.find(s => s.pin === "1234")) {
         appData.registeredStores.push({ name: "Lan'suk ลานสุข อุบล", pin: "1234", isVIP: true });
         localStorage.setItem('painaidee_auth', JSON.stringify(appData));
@@ -286,7 +315,6 @@
         document.getElementById('tab-' + p).classList.add('active');
     }
 
-    // 💡 1. แก้ LINE ไม่เด้งกลับ
     const myLiffId = "2009598846-wiCUeV35";
     async function initializeLiff() {
         try {
@@ -305,9 +333,7 @@
     }
     
     function loginWithLine() { 
-        if (!liff.isLoggedIn()) {
-            liff.login({ redirectUri: window.location.href }); 
-        } 
+        if (!liff.isLoggedIn()) { liff.login({ redirectUri: window.location.href }); } 
     }
 
     function reportClosed(placeId, placeName, event) {
@@ -397,7 +423,6 @@
                 document.getElementById('serviceRatesCard').style.display = 'block';
                 document.getElementById('registerNewStoreCard').style.display = 'none';
                 
-                // 💡 4. กล่อง VIP อัปเซลล์
                 const vipSection = document.getElementById('vipUpdateSection');
                 if (store.isVIP) {
                     vipSection.style.border = '2px solid #FFD700';
@@ -431,7 +456,6 @@
         });
     }
 
-    // 💡 คืนชีพฟังก์ชันปุ่มส่งข้อมูล VIP
     function updateVipData() {
         const pin = document.getElementById('storePinInput').value.trim();
         const store = appData.registeredStores.find(s => s.pin === pin);
@@ -439,12 +463,10 @@
 
         store.lineUrl = document.getElementById('vipLineInput').value.trim();
         store.fbUrl = document.getElementById('vipFbInput').value.trim();
-
         saveData();
         alert("✅ อัปเดตข้อมูลลิงก์โซเชียล VIP เรียบร้อยแล้วครับ!");
     }
 
-    // 💡 คืนชีพฟังก์ชันปุ่มส่งข้อมูลแบนเนอร์ไปให้ Admin
     function submitPromoBanner() {
         const pin = document.getElementById('storePinInput').value.trim();
         const store = appData.registeredStores.find(s => s.pin === pin);
@@ -463,10 +485,8 @@
         if (activeInProv.length >= 10) return alert("❌ ขออภัย โควต้าโปรโมทหน้าแรกของจังหวัดนี้เต็มแล้ว (10/10)");
 
         const finishSave = (b64) => {
-            // ดึงของเก่าออกก่อน (ถ้ามีค้างใน pending)
             appData.pendingPromotions = appData.pendingPromotions.filter(p => p.storeName !== store.name);
             
-            // นำข้อมูลแบนเนอร์ใหม่ ส่งไปให้แอดมินรออนุมัติ
             let promoObj = { 
                 id: Date.now().toString(), 
                 storeName: store.name, 
@@ -481,23 +501,15 @@
             appData.pendingPromotions.push(promoObj);
             saveData();
             
-            // เคลียร์ฟอร์ม
             document.getElementById('promoDetail').value = ''; 
             document.getElementById('promoImageInput').value = '';
             
             alert(`✅ ส่งข้อมูลขอขึ้นแบนเนอร์สำเร็จ! กรุณารอแอดมินอนุมัติ 1-2 วันครับ`);
         };
 
-        if(imgFile) { 
-            const r = new FileReader(); 
-            r.onload = e => finishSave(e.target.result); 
-            r.readAsDataURL(imgFile); 
-        } else { 
-            finishSave(''); 
-        }
+        if(imgFile) { const r = new FileReader(); r.onload = e => finishSave(e.target.result); r.readAsDataURL(imgFile); } else { finishSave(''); }
     }
 
-    // 💡 จัดเต็ม 77 จังหวัด
     let map, infoWindow, service, currentCoords = { lat: 15.2287, lng: 104.8564 }, gpsMarker = null, googlePlaces = [], markers = [];
     const provinces = [
         {id:'bkk',name:'กรุงเทพมหานคร',lat:13.7563,lng:100.5018},{id:'krabi',name:'กระบี่',lat:8.0863,lng:98.9063},{id:'kanchanaburi',name:'กาญจนบุรี',lat:14.0159,lng:99.5336},
@@ -575,11 +587,36 @@
         } 
     }
     
-    function executeSearch() { 
+    // 💡 2. ปรับฟังก์ชันค้นหาให้รองรับ 2 Dropdown (อาหาร / ความงาม)
+    function executeSearch(type) { 
         if (!currentCoords) return; 
-        const categoryVal = document.getElementById('categorySelect').value; 
-        const searchVal = document.getElementById('searchBox').value.trim(); 
-        fetchPlaces(currentCoords, searchVal !== "" ? searchVal : categoryVal); 
+        
+        const searchBox = document.getElementById('searchBox');
+        const searchVal = searchBox ? searchBox.value.trim() : ""; 
+        
+        let keywordToSearch = "ร้านอาหาร"; // ค่าเริ่มต้น
+
+        if (searchVal !== "") {
+            keywordToSearch = searchVal;
+        } else {
+            if (type === 'beauty') {
+                keywordToSearch = document.getElementById('beautySelect').value;
+                document.getElementById('categorySelect').selectedIndex = 0;
+                if(searchBox) searchBox.value = "";
+            } else if (type === 'food') {
+                keywordToSearch = document.getElementById('categorySelect').value;
+                document.getElementById('beautySelect').selectedIndex = 0;
+                if(searchBox) searchBox.value = "";
+            } else {
+                if (document.getElementById('beautySelect').selectedIndex > 0) {
+                    keywordToSearch = document.getElementById('beautySelect').value;
+                } else {
+                    keywordToSearch = document.getElementById('categorySelect').value;
+                }
+            }
+        }
+        
+        fetchPlaces(currentCoords, keywordToSearch); 
     }
     
     function fetchPlaces(coords, keyword) { 
@@ -594,7 +631,6 @@
         }); 
     }
     
-    // 💡 3. การ์ด VIP พรีเมียม ออร่าทองคำ
     function renderCards(places) { 
         const list = document.getElementById('placeList'); 
         const originPoint = new google.maps.LatLng(currentCoords.lat, currentCoords.lng); 
