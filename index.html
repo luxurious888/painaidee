@@ -152,7 +152,7 @@
             </div>
             
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
-                <select id="categorySelect" onchange="executeSearch('food')"><option value="ร้านอาหาร">🍽️ หมวดอาหาร</option></select>
+                <select id="foodSelect" onchange="executeSearch('food')"><option value="ร้านอาหาร">🍽️ หมวดอาหาร</option></select>
                 <select id="beautySelect" onchange="executeSearch('beauty')"><option value="สปา">💆‍♀️ พักผ่อน/ความงาม</option></select>
                 <select id="activitySelect" onchange="executeSearch('activity')"><option value="สถานที่ท่องเที่ยว">🎯 กิจกรรม/เที่ยว</option></select>
                 <select id="sportSelect" onchange="executeSearch('sport')"><option value="ฟิตเนส">🏋️ กีฬา/ออกกำลังกาย</option></select>
@@ -259,7 +259,6 @@
     // 🔗 API เชื่อม Google Sheets (Cloud)
     const API_URL = "https://script.google.com/macros/s/AKfycbwWUUmlsCjBKGNECm4zNVSNMYeGW_DKHTB_41aTmb-BW2IG_dAESbYDIrwQIOjhfRyA/exec";
     
-    // 💡 ข้อมูลหมวดหมู่และราคาเริ่มต้น
     const defaultCategories = [
         { id: 1, group: 'food', label: 'หมูกระทะ / แจ่วฮ้อน', keyword: 'หมูกระทะ' },
         { id: 2, group: 'food', label: 'ชาบู / สุกี้', keyword: 'ชาบู' },
@@ -284,7 +283,6 @@
 
     let appData = { registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], categories: [], closedReports: [], blacklistedPlaces: [], services: [] };
 
-    // 🗺️ รายชื่อ 77 จังหวัด
     const provinces = [
         {id:'bkk',name:'กรุงเทพมหานคร',lat:13.7563,lng:100.5018},{id:'krabi',name:'กระบี่',lat:8.0863,lng:98.9063},{id:'kanchanaburi',name:'กาญจนบุรี',lat:14.0159,lng:99.5336},
         {id:'kalasin',name:'กาฬสินธุ์',lat:16.4322,lng:103.5061},{id:'kamphaengphet',name:'กำแพงเพชร',lat:16.4828,lng:99.5227},{id:'khonkaen',name:'ขอนแก่น',lat:16.4322,lng:102.8236},
@@ -314,18 +312,15 @@
         {id:'uthaithani',name:'อุทัยธานี',lat:15.3730,lng:100.0243},{id:'ubon',name:'อุบลราชธานี',lat:15.2287,lng:104.8564}
     ];
 
-    // ☁️ ระบบ Cloud Sync (ปลอดภัยจากฐานข้อมูลว่างเปล่า)
     async function loadFromCloud() {
         try {
             const res = await fetch(API_URL);
             const data = await res.json();
             
-            // ผสานข้อมูลจาก Cloud เข้ากับข้อมูลพื้นฐาน
             if (data && Object.keys(data).length > 0) {
                 appData = { ...appData, ...data };
             }
             
-            // เติมข้อมูลให้ถ้ามันหายไป (ป้องกันการค้าง)
             if (!appData.categories || appData.categories.length === 0) appData.categories = defaultCategories;
             if (!appData.services || appData.services.length === 0) appData.services = defaultServices;
             if (!appData.registeredStores) appData.registeredStores = [];
@@ -336,7 +331,7 @@
             appData.categories = defaultCategories;
             appData.services = defaultServices;
         }
-        renderUI(); // ทำงานต่อได้เลย ไม่ค้างแล้ว!
+        renderUI(); 
     }
 
     async function saveToCloud() { 
@@ -349,7 +344,6 @@
         } catch(e) { console.error("Save Error", e); } 
     }
 
-    // 📱 ระบบย่อรูปภาพ 
     const resizeImg = (file) => new Promise(resolve => {
         if(!file) return resolve('');
         const reader = new FileReader(); reader.readAsDataURL(file);
@@ -365,7 +359,6 @@
         };
     });
 
-    // 🚀 ระบบ Auto-Login LIFF
     async function initializeLiff() {
         try {
             await liff.init({ liffId: "2009598846-wiCUeV35" });
@@ -399,7 +392,6 @@
         document.getElementById('tab-'+p).classList.add('active'); 
     }
 
-    // 🗺️ ระบบ Google Maps 
     let map, service, infoWindow, currentCoords = { lat: 15.2287, lng: 104.8564 }, googlePlaces = [], currentPagination = null;
     let gpsMarker = null;
 
@@ -411,7 +403,7 @@
             if(pSel) pSel.appendChild(new Option(p.name, p.id)); 
             if(prSel) prSel.appendChild(new Option(p.name, p.id)); 
         });
-        if(pSel) pSel.value = 'ubon';
+        if(pSel) pSel.value = 'current'; // บังคับเริ่มที่ตำแหน่งปัจจุบันเสมอ
         map = new google.maps.Map(document.getElementById("map"), { center: currentCoords, zoom: 14, mapTypeControl: false, streetViewControl: false });
         service = new google.maps.places.PlacesService(map);
         infoWindow = new google.maps.InfoWindow();
@@ -440,10 +432,10 @@
                     map.setCenter(currentCoords); 
                     executeSearch();
                 }, () => { 
-                    alert("กรุณาเปิดการแชร์ตำแหน่ง (GPS) ครับ"); 
+                    alert("ไม่สามารถเข้าถึงตำแหน่งได้ จะแสดงข้อมูลของอุบลราชธานีแทนครับ"); 
                     document.getElementById('provinceSelect').value = 'ubon'; 
                     changeLocation(); 
-                }, { timeout: 5000, enableHighAccuracy: false });
+                }, { timeout: 10000, enableHighAccuracy: true }); // เพิ่มเวลาให้ PC ค้นหาพิกัด
             }
         } else {
             const sel = provinces.find(p => p.id === val);
@@ -461,21 +453,22 @@
         const searchVal = searchBox ? searchBox.value.trim() : ""; 
         let keywordToSearch = "ร้านอาหาร"; 
         
-        const catSelect = document.getElementById('categorySelect'), beautySelect = document.getElementById('beautySelect'), actSelect = document.getElementById('activitySelect'), sportSelect = document.getElementById('sportSelect');
+        // แก้ไขดึง ID อาหารให้ถูกต้อง (foodSelect)
+        const foodSelect = document.getElementById('foodSelect'), beautySelect = document.getElementById('beautySelect'), actSelect = document.getElementById('activitySelect'), sportSelect = document.getElementById('sportSelect');
 
         if (searchVal !== "" && type === 'text') {
             keywordToSearch = searchVal;
-            if(catSelect) catSelect.selectedIndex = 0; if(beautySelect) beautySelect.selectedIndex = 0; if(actSelect) actSelect.selectedIndex = 0; if(sportSelect) sportSelect.selectedIndex = 0;
+            if(foodSelect) foodSelect.selectedIndex = 0; if(beautySelect) beautySelect.selectedIndex = 0; if(actSelect) actSelect.selectedIndex = 0; if(sportSelect) sportSelect.selectedIndex = 0;
         } else {
-            if (type === 'beauty') { keywordToSearch = beautySelect ? beautySelect.value : keywordToSearch; if(catSelect) catSelect.selectedIndex = 0; if(actSelect) actSelect.selectedIndex = 0; if(sportSelect) sportSelect.selectedIndex = 0; if(searchBox) searchBox.value = "";
-            } else if (type === 'food') { keywordToSearch = catSelect ? catSelect.value : keywordToSearch; if(beautySelect) beautySelect.selectedIndex = 0; if(actSelect) actSelect.selectedIndex = 0; if(sportSelect) sportSelect.selectedIndex = 0; if(searchBox) searchBox.value = "";
-            } else if (type === 'activity') { keywordToSearch = actSelect ? actSelect.value : keywordToSearch; if(catSelect) catSelect.selectedIndex = 0; if(beautySelect) beautySelect.selectedIndex = 0; if(sportSelect) sportSelect.selectedIndex = 0; if(searchBox) searchBox.value = "";
-            } else if (type === 'sport') { keywordToSearch = sportSelect ? sportSelect.value : keywordToSearch; if(catSelect) catSelect.selectedIndex = 0; if(beautySelect) beautySelect.selectedIndex = 0; if(actSelect) actSelect.selectedIndex = 0; if(searchBox) searchBox.value = "";
+            if (type === 'beauty') { keywordToSearch = beautySelect ? beautySelect.value : keywordToSearch; if(foodSelect) foodSelect.selectedIndex = 0; if(actSelect) actSelect.selectedIndex = 0; if(sportSelect) sportSelect.selectedIndex = 0; if(searchBox) searchBox.value = "";
+            } else if (type === 'food') { keywordToSearch = foodSelect ? foodSelect.value : keywordToSearch; if(beautySelect) beautySelect.selectedIndex = 0; if(actSelect) actSelect.selectedIndex = 0; if(sportSelect) sportSelect.selectedIndex = 0; if(searchBox) searchBox.value = "";
+            } else if (type === 'activity') { keywordToSearch = actSelect ? actSelect.value : keywordToSearch; if(foodSelect) foodSelect.selectedIndex = 0; if(beautySelect) beautySelect.selectedIndex = 0; if(sportSelect) sportSelect.selectedIndex = 0; if(searchBox) searchBox.value = "";
+            } else if (type === 'sport') { keywordToSearch = sportSelect ? sportSelect.value : keywordToSearch; if(foodSelect) foodSelect.selectedIndex = 0; if(beautySelect) beautySelect.selectedIndex = 0; if(actSelect) actSelect.selectedIndex = 0; if(searchBox) searchBox.value = "";
             } else {
                 if (beautySelect && beautySelect.selectedIndex > 0) keywordToSearch = beautySelect.value;
                 else if (actSelect && actSelect.selectedIndex > 0) keywordToSearch = actSelect.value;
                 else if (sportSelect && sportSelect.selectedIndex > 0) keywordToSearch = sportSelect.value;
-                else if (catSelect) keywordToSearch = catSelect.value;
+                else if (foodSelect) keywordToSearch = foodSelect.value;
             }
         }
         
@@ -497,9 +490,21 @@
     function renderCards(keywordSearched) {
         const list = document.getElementById('placeList');
         const originPoint = new google.maps.LatLng(currentCoords.lat, currentCoords.lng); 
-        const stores = appData.registeredStores || []; // ดึงข้อมูลอย่างปลอดภัย
+        const stores = appData.registeredStores || []; 
 
-        const sorted = googlePlaces.sort((a,b) => (stores.find(s=>s.name===b.name)?.isVIP ? 1 : 0) - (stores.find(s=>s.name===a.name)?.isVIP ? 1 : 0));
+        // ระบบจัดเรียง: 1. ดัน VIP ขึ้นก่อนสุด 2. เรียงตามระยะทาง ใกล้ -> ไกล
+        const sorted = googlePlaces.sort((a, b) => {
+            const isVipA = stores.find(s => s.name === a.name)?.isVIP ? 1 : 0;
+            const isVipB = stores.find(s => s.name === b.name)?.isVIP ? 1 : 0;
+
+            if (isVipA !== isVipB) {
+                return isVipB - isVipA; 
+            }
+
+            const distA = google.maps.geometry.spherical.computeDistanceBetween(originPoint, a.geometry.location);
+            const distB = google.maps.geometry.spherical.computeDistanceBetween(originPoint, b.geometry.location);
+            return distA - distB;
+        });
         
         let html = sorted.slice(0, 80).map(p => {
             const store = stores.find(s => s.name === p.name);
@@ -573,8 +578,11 @@
 
     function renderPromos() {
         const curProv = document.getElementById('provinceSelect').value;
-        const activePromos = appData.activePromotions || []; // ดึงข้อมูลอย่างปลอดภัย
-        const promos = activePromos.filter(p => p.province === curProv);
+        const activePromos = appData.activePromotions || []; 
+        
+        // ถ้าระบุตำแหน่งปัจจุบัน ให้แสดงโปรโมทที่กำลัง Active ทั้งหมด เพื่อไม่ให้หน้า PC โล่ง
+        const promos = curProv === 'current' ? activePromos : activePromos.filter(p => p.province === curProv);
+        
         const banner = document.getElementById('promoBanner');
         
         if(promos.length > 0) {
