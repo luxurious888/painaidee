@@ -157,9 +157,10 @@
                 </select>
             </div>
             
-            <div class="input-row">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+                
                 <select id="categorySelect" onchange="executeSearch('food')">
-                    <option value="ร้านอาหาร">🍽️ หมวดอาหาร</option>
+                    <option value="ร้านอาหาร">🍽️ อาหาร/เครื่องดื่ม</option>
                     <option value="หมูกระทะ แจ่วฮ้อน">หมูกระทะ / แจ่วฮ้อน</option>
                     <option value="ชาบู สุกี้">ชาบู / สุกี้</option>
                     <option value="ปิ้งย่าง">ปิ้งย่าง</option>
@@ -168,17 +169,35 @@
                     <option value="ส้มตำ ยำ">ส้มตำ / ยำ</option>
                     <option value="คาเฟ่ ร้านกาแฟ">คาเฟ่ / ขนม</option>
                     <option value="บาร์">บาร์</option>
-                    <option value="สถานบันเทิง ผับ">สถานบันเทิง / ผับ</option>
-                    <option value="แคมป์ปิ้ง ลานกางเต็นท์">แคมป์ปิ้ง</option>
                 </select>
                 
                 <select id="beautySelect" onchange="executeSearch('beauty')">
-                    <option value="ร้านนวด คลินิก">💆‍♀️ พักผ่อน/ความงาม</option>
+                    <option value="ร้านนวด คลินิก">💆‍♀️ ความงาม/พักผ่อน</option>
                     <option value="ร้านนวด สปา">ร้านนวด / สปา</option>
                     <option value="คลินิกเสริมความงาม">คลินิกเสริมความงาม</option>
                     <option value="ร้านเสริมสวย ทำผม">ร้านเสริมสวย / ทำผม</option>
                     <option value="ร้านทำเล็บ">ร้านทำเล็บ</option>
                 </select>
+
+                <select id="activitySelect" onchange="executeSearch('activity')">
+                    <option value="สถานที่ท่องเที่ยว">🎯 กิจกรรม/ท่องเที่ยว</option>
+                    <option value="แคมป์ปิ้ง ลานกางเต็นท์">แคมป์ปิ้ง / กางเต็นท์</option>
+                    <option value="สวนสนุก สวนน้ำ">สวนสนุก / สวนน้ำ</option>
+                    <option value="สวนสัตว์">สวนสัตว์</option>
+                    <option value="พิพิธภัณฑ์">พิพิธภัณฑ์</option>
+                    <option value="โรงภาพยนตร์">โรงภาพยนตร์</option>
+                </select>
+
+                <select id="sportSelect" onchange="executeSearch('sport')">
+                    <option value="สถานที่ออกกำลังกาย">🏋️ กีฬา/ออกกำลังกาย</option>
+                    <option value="ฟิตเนส ยิม">ฟิตเนส / ยิม</option>
+                    <option value="สนามฟุตบอล">สนามฟุตบอล / หญ้าเทียม</option>
+                    <option value="สนามแบดมินตัน">สนามแบดมินตัน</option>
+                    <option value="สระว่ายน้ำ">สระว่ายน้ำ</option>
+                    <option value="สวนสาธารณะ">สวนสาธารณะ / วิ่ง</option>
+                    <option value="โต๊ะสนุกเกอร์">สนุกเกอร์ / บิลเลียด</option>
+                </select>
+
             </div>
 
             <div class="search-box-container">
