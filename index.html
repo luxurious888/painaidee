@@ -257,7 +257,7 @@
 <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <script>
     // 🔗 API เชื่อม Google Sheets (Cloud)
-    const API_URL = "https://script.google.com/macros/s/AKfycbwWUUmlsCjBKGNECm4zNVSNMYeGW_DKHTB_41aTmb-BW2IG_dAESbYDIrwQIOjhfRyA/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbwJiwswKLe5DicJYo_5mcwM5KBSDS1O9tV6KhJ6ehsVSjkES2k-3ESKNeBak36B8Qz-/exec";
     
     // 💡 ข้อมูลหมวดหมู่และราคาเริ่มต้น
     const defaultCategories = [
@@ -314,21 +314,16 @@
         {id:'uthaithani',name:'อุทัยธานี',lat:15.3730,lng:100.0243},{id:'ubon',name:'อุบลราชธานี',lat:15.2287,lng:104.8564}
     ];
 
-    // ☁️ ระบบ Cloud Sync (ป้องกันฐานข้อมูลว่างเปล่า 100%)
+    // ☁️ ระบบ Cloud Sync
     async function loadFromCloud() {
         try {
             const res = await fetch(API_URL);
             const data = await res.json();
-            
-            // ถ้ามีข้อมูลในฐานข้อมูล ให้ดึงมาผสานกับ appData เดิม
             if(data && Object.keys(data).length > 0) {
-                appData = { ...appData, ...data };
+                appData = data;
             }
-            
-            // ถ้าหมวดหมู่หรือบริการหาย ให้เติมข้อมูลตั้งต้นให้ทันที
             if (!appData.categories || appData.categories.length === 0) appData.categories = defaultCategories;
             if (!appData.services || appData.services.length === 0) appData.services = defaultServices;
-            
         } catch(e) {
             console.error("Cloud Error", e);
             appData.categories = defaultCategories;
@@ -373,6 +368,7 @@
                 await loadFromCloud(); // โหลดข้อมูลให้เสร็จก่อน
                 hideLoginOverlay();    // ปิดหน้าหมุนโหลด
             } else {
+                // Auto-Login: สั่งล็อกอินอัตโนมัติ 
                 liff.login({ redirectUri: window.location.href }); 
             }
         } catch (err) { 
@@ -482,8 +478,7 @@
         
         service.nearbySearch({ location: currentCoords, radius: 5000, keyword: keywordToSearch }, (res, status, pag) => {
             if(status === "OK") {
-                const blacklisted = appData.blacklistedPlaces || [];
-                googlePlaces = res.filter(p => !blacklisted.includes(p.place_id));
+                googlePlaces = res.filter(p => !(appData.blacklistedPlaces || []).includes(p.place_id));
                 currentPagination = pag; 
                 renderCards(keywordToSearch);
             } else {
@@ -495,12 +490,11 @@
     function renderCards(keywordSearched) {
         const list = document.getElementById('placeList');
         const originPoint = new google.maps.LatLng(currentCoords.lat, currentCoords.lng); 
-        const stores = appData.registeredStores || []; // ป้องกันร้านค้าเป็นค่าว่าง
 
-        const sorted = googlePlaces.sort((a,b) => (stores.find(s=>s.name===b.name)?.isVIP ? 1 : 0) - (stores.find(s=>s.name===a.name)?.isVIP ? 1 : 0));
+        const sorted = googlePlaces.sort((a,b) => (appData.registeredStores.find(s=>s.name===b.name)?.isVIP ? 1 : 0) - (appData.registeredStores.find(s=>s.name===a.name)?.isVIP ? 1 : 0));
         
         let html = sorted.slice(0, 80).map(p => {
-            const store = stores.find(s => s.name === p.name);
+            const store = (appData.registeredStores || []).find(s => s.name === p.name);
             const isVIP = store?.isVIP;
             const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${p.geometry.location.lat()},${p.geometry.location.lng()}`;
             const distanceKm = (google.maps.geometry.spherical.computeDistanceBetween(originPoint, p.geometry.location) / 1000).toFixed(1); 
@@ -571,8 +565,7 @@
 
     function renderPromos() {
         const curProv = document.getElementById('provinceSelect').value;
-        const activePromos = appData.activePromotions || []; // ป้องกันค่าว่าง
-        const promos = activePromos.filter(p => p.province === curProv);
+        const promos = (appData.activePromotions || []).filter(p => p.province === curProv);
         const banner = document.getElementById('promoBanner');
         if(promos.length > 0) {
             banner.style.display = 'block';
@@ -674,15 +667,14 @@
         appData.registrationRequests.push({ id: Date.now(), storeName: n, storePhoto: photo, idCard: idCard, commercial: comm });
         await saveToCloud(); 
         alert("ส่งข้อมูลสำเร็จ! รอรับ PIN จากแอดมินครับ");
-        btn.innerText = "🚀 ส่งเอกสารเพื่อตรวจสอบ"; btn.disabled = false;
+        btn.innerText = "🚀 ส่งข้อมูลเพื่อตรวจสอบ"; btn.disabled = false;
         
         ['regStoreName','regStorePhoto','regIdCard','regCommercial'].forEach(id => document.getElementById(id).value = '');
         document.getElementById('regStoreVerifyCard').style.display = 'none';
     }
 
     function verifyStore() {
-        const stores = appData.registeredStores || [];
-        const store = stores.find(s => s.pin === document.getElementById('storePinInput').value);
+        const store = (appData.registeredStores || []).find(s => s.pin === document.getElementById('storePinInput').value);
         if(store) { 
             document.getElementById('lockedFeatures').style.display = 'block'; 
             document.getElementById('vipUpdateSection').style.display = store.isVIP ? 'block' : 'none';
@@ -693,8 +685,7 @@
     }
 
     async function updateVipData() {
-        const stores = appData.registeredStores || [];
-        const store = stores.find(s => s.pin === document.getElementById('storePinInput').value);
+        const store = appData.registeredStores.find(s => s.pin === document.getElementById('storePinInput').value);
         if(store) { 
             store.lineUrl = document.getElementById('vipLineInput').value; 
             store.fbUrl = document.getElementById('vipFbInput').value; 
@@ -704,8 +695,7 @@
 
     async function submitPromoWithPIN() {
         const btn = document.getElementById('btnSubmitPromo'); 
-        const stores = appData.registeredStores || [];
-        const store = stores.find(s => s.pin === document.getElementById('storePinInput').value);
+        const store = appData.registeredStores.find(s => s.pin === document.getElementById('storePinInput').value);
         const pImg = document.getElementById('promoImageInput').files[0];
         const pDet = document.getElementById('promoDetail').value;
         
