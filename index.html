@@ -257,7 +257,7 @@
 <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <script>
     // 🔗 API เชื่อม Google Sheets (Cloud)
-    const API_URL = "https://script.google.com/macros/s/AKfycbwJiwswKLe5DicJYo_5mcwM5KBSDS1O9tV6KhJ6ehsVSjkES2k-3ESKNeBak36B8Qz-/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbwWUUmlsCjBKGNECm4zNVSNMYeGW_DKHTB_41aTmb-BW2IG_dAESbYDIrwQIOjhfRyA/exec";
     
     // 💡 ข้อมูลหมวดหมู่และราคาเริ่มต้น
     const defaultCategories = [
@@ -673,6 +673,56 @@
         document.getElementById('regStoreVerifyCard').style.display = 'none';
     }
 
+    function verifyStore() {
+        const store = (appData.registeredStores || []).find(s => s.pin === document.getElementById('storePinInput').value);
+        if(store) { 
+            document.getElementById('lockedFeatures').style.display = 'block'; 
+            document.getElementById('vipUpdateSection').style.display = store.isVIP ? 'block' : 'none';
+            document.getElementById('vipLineInput').value = store.lineUrl || '';
+            document.getElementById('vipFbInput').value = store.fbUrl || '';
+            alert("ยินดีต้อนรับร้าน " + store.name); 
+        } else alert("PIN ไม่ถูกต้อง");
+    }
+
+    async function updateVipData() {
+        const store = appData.registeredStores.find(s => s.pin === document.getElementById('storePinInput').value);
+        if(store) { 
+            store.lineUrl = document.getElementById('vipLineInput').value; 
+            store.fbUrl = document.getElementById('vipFbInput').value; 
+            await saveToCloud(); alert("บันทึกข้อมูลติดต่อแล้ว"); 
+        }
+    }
+
+    async function submitPromoWithPIN() {
+        const btn = document.getElementById('btnSubmitPromo'); 
+        const store = appData.registeredStores.find(s => s.pin === document.getElementById('storePinInput').value);
+        const pImg = document.getElementById('promoImageInput').files[0];
+        const pDet = document.getElementById('promoDetail').value;
+        
+        if(!store) return alert("กรุณายืนยัน PIN ก่อน");
+        if(!pImg || !pDet) return alert("กรุณาแนบรูปและกรอกรายละเอียด");
+
+        btn.innerText = "กำลังประมวลผลรูป... ⏳"; btn.disabled = true;
+        const img = await resizeImg(pImg);
+        
+        if (!appData.pendingPromotions) appData.pendingPromotions = [];
+        appData.pendingPromotions.push({ 
+            id: Date.now().toString(), storeName: store.name, province: document.getElementById('promoProvinceSelect').value, 
+            detail: pDet, image: img, service: document.getElementById('promoServiceSelect').value, category: document.getElementById('promoStoreCategory').value,
+            lineUrl: store.lineUrl || '', fbUrl: store.fbUrl || ''
+        });
+        
+        await saveToCloud(); 
+        alert("สั่งซื้อสำเร็จ! รอแอดมินอนุมัติแบนเนอร์ครับ");
+        btn.innerText = "🚀 สั่งซื้อและส่งเรื่องขอโปรโมท"; btn.disabled = false;
+        document.getElementById('promoImageInput').value = ''; document.getElementById('promoDetail').value = '';
+    }
+
+    window.onload = initializeLiff;
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD7Qqf1Z9KQBuvipDzgIc5laJLz9SiOBH8&libraries=places,geometry&callback=initMap" async defer></script>
+</body>
+</html>
     function verifyStore() {
         const store = (appData.registeredStores || []).find(s => s.pin === document.getElementById('storePinInput').value);
         if(store) { 
