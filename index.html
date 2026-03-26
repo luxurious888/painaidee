@@ -20,10 +20,11 @@
             --text-main: #FFFFFF;     
             --text-gold: #C5A059;     
             --text-muted: #999999;    
-            --danger: #D9534F;        
+            --danger: #D9534F;
+            --line-green: #06C755; 
         }
 
-        body { font-family: 'Kanit', sans-serif; margin: 0; background-color: var(--bg-light); padding-bottom: 50px; color: var(--text-gold); }
+        body { font-family: 'Kanit', sans-serif; margin: 0; background-color: var(--bg-light); padding-bottom: 50px; color: var(--text-gold); overflow-x: hidden; }
         
         nav { display: flex; justify-content: space-around; background: var(--surface); padding: 12px 0; position: sticky; top: 0; z-index: 2000; box-shadow: 0 4px 20px rgba(0,0,0,0.1); border-bottom: 1px solid var(--border); }
         nav div { cursor: pointer; font-weight: 500; color: var(--text-muted); padding: 12px 20px; transition: 0.3s; position: relative; letter-spacing: 0.5px; }
@@ -82,6 +83,8 @@
         .btn-call:hover { background: var(--primary-hover); }
         .btn-share { background: transparent; color: var(--text-gold); border: 1px solid var(--border); }
         .btn-share:hover { background: rgba(197, 160, 89, 0.1); }
+        
+        .status-tag { display: inline-flex; align-items: center; justify-content: center; padding: 4px 8px; border-radius: 20px; font-size: 11px; font-weight: 500; white-space: nowrap; box-shadow: 0 2px 5px rgba(0,0,0,0.2); line-height: 1.2; }
 
         .highlight-banner { background: linear-gradient(135deg, var(--dark), var(--dark-light)); color: white; padding: 25px; border-radius: 16px; margin-top: 24px; box-shadow: 0 15px 35px rgba(26, 28, 32, 0.4); display: none; position: relative; overflow: hidden; border: 1px solid var(--border); }
         .highlight-banner::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(197,160,89,0.15) 0%, transparent 60%); pointer-events: none; }
@@ -97,20 +100,6 @@
         .price-list { list-style: none; padding: 0; margin: 0; }
         .price-list li { display: flex; justify-content: space-between; padding: 15px 10px; border-bottom: 1px solid var(--border); align-items: center; transition: 0.2s; }
         .price-list li:hover { background: rgba(197, 160, 89, 0.05); border-radius: 8px; }
-        
-        /* 💡 แก้ไข CSS ของ status-tag ให้ยืดหยุ่นและไม่ตกบรรทัด */
-        .status-tag { 
-            display: inline-flex; 
-            align-items: center;
-            justify-content: center;
-            padding: 4px 8px; 
-            border-radius: 20px; 
-            font-size: 11px; /* ปรับขนาดให้เล็กลงนิดหน่อย */
-            font-weight: 500; 
-            white-space: nowrap; /* ป้องกันการตกบรรทัด */
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2); 
-            line-height: 1.2;
-        }
 
         .img-modal { display: none; position: fixed; z-index: 9999; padding-top: 50px; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(18, 20, 24, 0.95); backdrop-filter: blur(8px); }
         .img-modal-content { margin: auto; display: block; max-width: 90%; max-height: 80vh; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); object-fit: contain; border: 2px solid var(--primary-light); }
@@ -251,18 +240,19 @@
             <label>รายละเอียดโปรโมชั่น</label>
             <textarea id="promoDetail" rows="3" placeholder="ระบุเงื่อนไขโปรโมชั่นของคุณ..."></textarea>
         </div>
+
         <div class="form-group" style="padding: 15px; border: 1px dashed var(--primary); border-radius: 10px; background: rgba(197, 160, 89, 0.05); margin-top: 15px;">
             <label style="color: #FFD700; font-size: 16px; margin-bottom: 5px;">👑 ข้อมูลติดต่อพิเศษ (VIP Links)</label>
             <p id="vipLockMessage" style="font-size: 12px; color: var(--danger); margin-top: 0; margin-bottom: 10px;">
                 * ฟีเจอร์สำหรับสมาชิก VIP เท่านั้น (อัปเกรดเพื่อปลดล็อคปุ่มติดต่อตรง)
             </p>
-            
             <label style="font-size: 13px; color: var(--text-muted);">ลิงก์ LINE OA (เช่น https://line.me/R/ti/p/...)</label>
             <input type="text" id="vipLineInput" placeholder="วางลิงก์ LINE ของคุณที่นี่..." disabled style="opacity: 0.5;">
             
             <label style="font-size: 13px; color: var(--text-muted); margin-top: 10px;">ลิงก์ Facebook Page</label>
             <input type="text" id="vipFbInput" placeholder="วางลิงก์ Facebook ของคุณที่นี่..." disabled style="opacity: 0.5;">
         </div>
+
         <button class="btn-primary" onclick="submitPromoWithPIN()">ส่งข้อมูลเพื่อขึ้นโปรโมท / ต่ออายุ</button>
     </div>
 
@@ -283,7 +273,13 @@
     let appData = rawData ? JSON.parse(rawData) : {};
 
     appData.registrationRequests = appData.registrationRequests || [];
-    appData.registeredStores = appData.registeredStores || [];
+    // เพิ่มร้าน Lan'suk เป็น VIP ไว้ใช้ทดสอบรหัส 1234
+    if(appData.registeredStores === undefined || appData.registeredStores.length === 0) {
+        appData.registeredStores = [{ name: "Lan'suk ลานสุข อุบล", pin: "1234", isVIP: true }];
+    } else {
+        appData.registeredStores = appData.registeredStores;
+    }
+    
     appData.pendingPromotions = appData.pendingPromotions || [];
     appData.activePromotions = appData.activePromotions || [];
     appData.closedReports = appData.closedReports || [];
@@ -440,6 +436,7 @@
                     miniMarker = new google.maps.Marker({ map: miniMap });
                 }
                 miniMap.setCenter(place.geometry.location); miniMarker.setPosition(place.geometry.location);
+
                 // --- 👑 ตรวจสอบว่าเป็น VIP หรือไม่ เพื่อปลดล็อคช่อง ---
                 if (store.isVIP) {
                     document.getElementById('vipLineInput').disabled = false;
@@ -461,6 +458,7 @@
                     document.getElementById('vipFbInput').value = '';
                 }
                 // --------------------------------------------------
+
             } else { alert(`⚠️ หาพิกัดร้านไม่เจอ`); }
         });
     }
@@ -488,7 +486,9 @@
 
         const savePromoData = (base64Image) => {
             appData.pendingPromotions = appData.pendingPromotions.filter(p => p.storeName !== store.name);
-            appData.pendingPromotions.push({ 
+            
+            // สร้างก้อนข้อมูลโปรโมชั่น
+            let promoObj = { 
                 id: Date.now().toString(), 
                 storeName: store.name, 
                 detail: detail, 
@@ -496,12 +496,29 @@
                 service: selectedService, 
                 category: selectedCategory, 
                 date: new Date().toLocaleString('th-TH') 
-            });
+            };
+
+            // 👑 ถ้าเป็น VIP ให้ดึงลิงก์มาบันทึกด้วย
+            if (store.isVIP) {
+                promoObj.lineUrl = document.getElementById('vipLineInput').value.trim();
+                promoObj.fbUrl = document.getElementById('vipFbInput').value.trim();
+                // บันทึกกลับไปที่ข้อมูลร้านค้าหลักด้วย
+                store.lineUrl = promoObj.lineUrl;
+                store.fbUrl = promoObj.fbUrl;
+            }
+
+            appData.pendingPromotions.push(promoObj);
+            
             saveData();
             
             document.getElementById('storePinInput').value = ''; 
             document.getElementById('promoDetail').value = '';
             document.getElementById('promoImageInput').value = '';
+            
+            // รีเซ็ตช่อง VIP
+            document.getElementById('vipLineInput').value = '';
+            document.getElementById('vipFbInput').value = '';
+            
             document.getElementById('storeVerifyCard').style.display = 'none';
             alert(`ส่งโปรโมชั่นสำเร็จ กรุณารอการตรวจสอบ`);
         };
@@ -640,7 +657,6 @@
         }
     }
 
-    // 💡 ฟังก์ชันเรนเดอร์การ์ดร้านค้าที่มีการอัปเดต CSS ยืดหยุ่น
     function renderCards(places) {
         const list = document.getElementById('placeList');
         const originPoint = new google.maps.LatLng(currentCoords.lat, currentCoords.lng);
