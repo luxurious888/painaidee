@@ -259,6 +259,7 @@
     // 🔗 API เชื่อม Google Sheets (Cloud)
     const API_URL = "https://script.google.com/macros/s/AKfycbwWUUmlsCjBKGNECm4zNVSNMYeGW_DKHTB_41aTmb-BW2IG_dAESbYDIrwQIOjhfRyA/exec";
     
+    // 💡 ข้อมูลหมวดหมู่และราคาเริ่มต้น
     const defaultCategories = [
         { id: 1, group: 'food', label: 'หมูกระทะ / แจ่วฮ้อน', keyword: 'หมูกระทะ' },
         { id: 2, group: 'food', label: 'ชาบู / สุกี้', keyword: 'ชาบู' },
@@ -283,6 +284,7 @@
 
     let appData = { registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], categories: [], closedReports: [], blacklistedPlaces: [], services: [] };
 
+    // 🗺️ รายชื่อ 77 จังหวัด
     const provinces = [
         {id:'bkk',name:'กรุงเทพมหานคร',lat:13.7563,lng:100.5018},{id:'krabi',name:'กระบี่',lat:8.0863,lng:98.9063},{id:'kanchanaburi',name:'กาญจนบุรี',lat:14.0159,lng:99.5336},
         {id:'kalasin',name:'กาฬสินธุ์',lat:16.4322,lng:103.5061},{id:'kamphaengphet',name:'กำแพงเพชร',lat:16.4828,lng:99.5227},{id:'khonkaen',name:'ขอนแก่น',lat:16.4322,lng:102.8236},
@@ -312,6 +314,7 @@
         {id:'uthaithani',name:'อุทัยธานี',lat:15.3730,lng:100.0243},{id:'ubon',name:'อุบลราชธานี',lat:15.2287,lng:104.8564}
     ];
 
+    // ☁️ ระบบ Cloud Sync (ปลอดภัยจากฐานข้อมูลว่างเปล่า)
     async function loadFromCloud() {
         try {
             const res = await fetch(API_URL);
@@ -321,6 +324,7 @@
                 appData = { ...appData, ...data };
             }
             
+            // เติมข้อมูลให้ถ้ามันหายไป (ป้องกันการค้าง)
             if (!appData.categories || appData.categories.length === 0) appData.categories = defaultCategories;
             if (!appData.services || appData.services.length === 0) appData.services = defaultServices;
             if (!appData.registeredStores) appData.registeredStores = [];
@@ -344,6 +348,7 @@
         } catch(e) { console.error("Save Error", e); } 
     }
 
+    // 📱 ระบบย่อรูปภาพ 
     const resizeImg = (file) => new Promise(resolve => {
         if(!file) return resolve('');
         const reader = new FileReader(); reader.readAsDataURL(file);
@@ -359,6 +364,7 @@
         };
     });
 
+    // 🚀 ระบบ Auto-Login LIFF
     async function initializeLiff() {
         try {
             await liff.init({ liffId: "2009598846-wiCUeV35" });
@@ -392,6 +398,7 @@
         document.getElementById('tab-'+p).classList.add('active'); 
     }
 
+    // 🗺️ ระบบ Google Maps 
     let map, service, infoWindow, currentCoords = { lat: 15.2287, lng: 104.8564 }, googlePlaces = [], currentPagination = null;
     let gpsMarker = null;
 
@@ -491,6 +498,7 @@
         const originPoint = new google.maps.LatLng(currentCoords.lat, currentCoords.lng); 
         const stores = appData.registeredStores || []; 
 
+        // ระบบจัดเรียง: 1. ดัน VIP ขึ้นก่อนสุด 2. เรียงตามระยะทาง ใกล้ -> ไกล (แบบปลอดภัย)
         const sorted = googlePlaces.sort((a, b) => {
             const isVipA = stores.find(s => s.name === a.name)?.isVIP ? 1 : 0;
             const isVipB = stores.find(s => s.name === b.name)?.isVIP ? 1 : 0;
@@ -498,16 +506,23 @@
             if (isVipA !== isVipB) {
                 return isVipB - isVipA; 
             }
-            const distA = google.maps.geometry.spherical.computeDistanceBetween(originPoint, a.geometry.location);
-            const distB = google.maps.geometry.spherical.computeDistanceBetween(originPoint, b.geometry.location);
-            return distA - distB;
+            if (window.google && window.google.maps && window.google.maps.geometry) {
+                const distA = google.maps.geometry.spherical.computeDistanceBetween(originPoint, a.geometry.location);
+                const distB = google.maps.geometry.spherical.computeDistanceBetween(originPoint, b.geometry.location);
+                return distA - distB;
+            }
+            return 0;
         });
         
         let html = sorted.slice(0, 80).map(p => {
             const store = stores.find(s => s.name === p.name);
             const isVIP = store?.isVIP;
             const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${p.geometry.location.lat()},${p.geometry.location.lng()}`;
-            const distanceKm = (google.maps.geometry.spherical.computeDistanceBetween(originPoint, p.geometry.location) / 1000).toFixed(1); 
+            
+            let distanceKm = "0.0";
+            if (window.google && window.google.maps && window.google.maps.geometry) {
+                distanceKm = (google.maps.geometry.spherical.computeDistanceBetween(originPoint, p.geometry.location) / 1000).toFixed(1); 
+            }
 
             let openStatusHtml = '<span class="status-tag" style="background:var(--bg-light); color:var(--text-muted); border:1px solid var(--border);">⚪ ไม่ระบุเวลา</span>'; 
             if (p.business_status === 'CLOSED_TEMPORARILY') { openStatusHtml = '<span class="status-tag" style="background:#FFF3F3; color:var(--danger); border:1px solid rgba(217,83,79,0.2);">🔴 ปิดชั่วคราว</span>'; } 
@@ -577,8 +592,8 @@
         let curProv = document.getElementById('provinceSelect').value;
         const activePromos = appData.activePromotions || []; 
         
-        // 📍 ถ้าเป็น "ตำแหน่งปัจจุบัน" ให้หาระยะทางหาจังหวัดที่ใกล้ที่สุด
-        if (curProv === 'current' && currentCoords) {
+        // 📍 คำนวณจังหวัดที่ใกล้ที่สุด (แบบปลอดภัย)
+        if (curProv === 'current' && currentCoords && window.google && window.google.maps && window.google.maps.geometry) {
             let minDist = Infinity;
             const originPoint = new google.maps.LatLng(currentCoords.lat, currentCoords.lng);
             provinces.forEach(p => {
@@ -586,9 +601,11 @@
                 const dist = google.maps.geometry.spherical.computeDistanceBetween(originPoint, destPoint);
                 if (dist < minDist) {
                     minDist = dist;
-                    curProv = p.id; // จะได้ id จังหวัดที่ใกล้ที่สุด เช่น 'ubon', 'bkk'
+                    curProv = p.id; 
                 }
             });
+        } else if (curProv === 'current') {
+            curProv = 'ubon'; // ถ้าคำนวณไม่ได้ ให้ตั้งเป็นอุบลไว้ก่อนกันพัง
         }
         
         const promos = activePromos.filter(p => p.province === curProv);
