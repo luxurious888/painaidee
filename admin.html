@@ -6,44 +6,24 @@
     <title>Painaidee Admin - ระบบจัดการหลังบ้าน (Cloud)</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap');
-        
-        :root {
-            --primary: #C5A059;
-            --dark: #121418;
-            --surface: #ffffff;
-            --bg: #f0f2f5;
-            --danger: #D9534F;
-            --success: #06C755;
-            --info: #17a2b8;
-        }
-
+        :root { --primary: #C5A059; --dark: #121418; --surface: #ffffff; --bg: #f0f2f5; --danger: #D9534F; --success: #06C755; --info: #17a2b8; }
         body { font-family: 'Kanit', sans-serif; background-color: var(--bg); color: #333; margin: 0; padding: 20px; }
         .container { max-width: 1100px; margin: 0 auto; }
-        
         h1 { background: var(--dark); color: var(--primary); padding: 25px; border-radius: 15px; text-align: center; margin-top: 0; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-        
         .card { background: var(--surface); padding: 25px; border-radius: 15px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-left: 5px solid var(--primary); overflow-x: auto; }
         .card h2 { margin-top: 0; color: var(--dark); font-size: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; display: flex; align-items: center; gap: 10px; }
-
         table { width: 100%; border-collapse: collapse; margin-top: 15px; min-width: 600px; }
         th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; font-size: 14px; vertical-align: middle; }
         th { background: #fafafa; color: #666; font-weight: 500; }
         tr:hover { background: #f9f9f9; }
-
         .btn { padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; font-family: 'Kanit'; font-size: 13px; font-weight: 500; transition: 0.2s; color: #fff; text-decoration: none; display: inline-block; margin-right: 5px; margin-bottom: 5px; }
         .btn:hover { opacity: 0.8; transform: translateY(-1px); }
-        .btn-ok { background: var(--success); }
-        .btn-del { background: var(--danger); }
-        .btn-info { background: var(--info); }
-        .btn-warn { background: #f39c12; }
-
+        .btn-ok { background: var(--success); } .btn-del { background: var(--danger); } .btn-info { background: var(--info); } .btn-warn { background: #f39c12; }
         input, select { padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-family: 'Kanit'; outline: none; margin-right: 5px; margin-bottom: 10px; }
         .img-preview { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; cursor: pointer; border: 1px solid #ddd; transition: transform 0.2s; }
         .img-preview:hover { transform: scale(1.1); }
-        
         .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; color: #fff; display: inline-block; }
         .bg-gold { background: linear-gradient(135deg, #FFD700, #C5A059); color: #000; box-shadow: 0 2px 5px rgba(197, 160, 89, 0.3); }
-        
         #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; font-weight: bold; color: var(--dark); }
         .spinner { width: 50px; height: 50px; border: 5px solid #eee; border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 15px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -112,213 +92,106 @@
 </div>
 
 <script>
-    // 🔗 URL เว็บแอป Google Sheets ของคุณ
-    const API_URL = "https://script.google.com/macros/s/AKfycbx1ZMaFt-GWvrZ_-XTSiqhx__zhwYTo_NcpnTAzU75Xxh4pPAgdi7OO4sC1H0yxeGEr/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbwWUUmlsCjBKGNECm4zNVSNMYeGW_DKHTB_41aTmb-BW2IG_dAESbYDIrwQIOjhfRyA/exec";
     
-    let appData = { 
-        registrationRequests: [], 
-        registeredStores: [], 
-        pendingPromotions: [], 
-        activePromotions: [], 
-        categories: [], 
-        closedReports: [], 
-        blacklistedPlaces: [], 
-        services: [] 
-    };
+    let appData = { registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], categories: [], closedReports: [], blacklistedPlaces: [], services: [] };
 
-    // ☁️ โหลดข้อมูลจาก Cloud
     async function load() {
         showLoading(true);
         try {
             const res = await fetch(API_URL);
             const data = await res.json();
-            if (data && Object.keys(data).length > 0) {
-                appData = data;
-                render();
-            }
-        } catch (e) { 
-            console.error("Cloud Error", e);
-            alert("Error: ไม่สามารถโหลดข้อมูลจาก Cloud ได้"); 
-        }
+            if (data && Object.keys(data).length > 0) { appData = data; render(); }
+        } catch (e) {}
         showLoading(false);
     }
 
-    // ☁️ บันทึกข้อมูลไป Cloud
+    // ⚡ อัปเดตข้อมูลอัตโนมัติ (Real-time admin)
+    setInterval(async () => {
+        try {
+            const res = await fetch(API_URL);
+            const data = await res.json();
+            if (data && Object.keys(data).length > 0) {
+                appData = data;
+                render(); // รีเฟรชเฉพาะตาราง
+            }
+        } catch (e) {}
+    }, 10000);
+
     async function save() { 
         showLoading(true);
         try { 
-            await fetch(API_URL, { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify(appData) 
-            }); 
-            render(); // เซฟเสร็จให้อัปเดตตารางโชว์ทันที
-        } catch(e) { 
-            console.error("Save Error", e); 
-            alert("⚠️ เกิดข้อผิดพลาดในการบันทึกข้อมูล");
-        } 
+            await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(appData) }); 
+            render(); 
+        } catch(e) { alert("⚠️ เกิดข้อผิดพลาดในการบันทึกข้อมูล"); } 
         showLoading(false);
     }
 
-    // 🎨 วาด UI ตารางต่างๆ
     function render() {
-        // 1. ตารางค่าบริการ
         document.getElementById('sTable').innerHTML = '<tr><th>ชื่อแพ็กเกจ</th><th>ราคา</th><th>จัดการ</th></tr>' + 
-            (appData.services || []).map((s,i) => `<tr>
-                <td><strong>${s.name}</strong></td>
-                <td style="color:#C5A059; font-weight:bold;">${s.price} ฿</td>
-                <td><button class="btn btn-del" onclick="deleteItem('services', ${i})">🗑️ ลบ</button></td>
-            </tr>`).join('');
+            (appData.services || []).map((s,i) => `<tr><td><strong>${s.name}</strong></td><td style="color:#C5A059; font-weight:bold;">${s.price} ฿</td><td><button class="btn btn-del" onclick="deleteItem('services', ${i})">🗑️ ลบ</button></td></tr>`).join('');
 
-        // 2. ตารางหมวดหมู่
         document.getElementById('cTable').innerHTML = '<tr><th>กลุ่มหลัก</th><th>ชื่อที่แสดง</th><th>คำค้น (Maps)</th><th>จัดการ</th></tr>' + 
-            (appData.categories || []).map((c,i) => `<tr>
-                <td><span class="status-badge" style="background:#8e44ad;">${c.group}</span></td>
-                <td><strong>${c.label}</strong></td>
-                <td style="color:var(--info);">${c.keyword}</td>
-                <td><button class="btn btn-del" onclick="deleteItem('categories', ${i})">🗑️ ลบ</button></td>
-            </tr>`).join('');
+            (appData.categories || []).map((c,i) => `<tr><td><span class="status-badge" style="background:#8e44ad;">${c.group}</span></td><td><strong>${c.label}</strong></td><td style="color:var(--info);">${c.keyword}</td><td><button class="btn btn-del" onclick="deleteItem('categories', ${i})">🗑️ ลบ</button></td></tr>`).join('');
 
-        // 3. คำขอโปรโมชั่น
         document.getElementById('pTable').innerHTML = '<tr><th>ร้านค้า (จังหวัด)</th><th>แพ็กเกจที่ซื้อ</th><th>รูปที่แนบ</th><th>จัดการ</th></tr>' + 
-            (appData.pendingPromotions || []).map((p,i) => `<tr>
-                <td><strong>${p.storeName}</strong><br><small style="color:#666;">${p.province}</small></td>
-                <td>
-                    <span class="status-badge" style="background:#eee; color:#333;">${p.category || 'ทั่วไป'}</span><br>
-                    <span class="status-badge bg-gold" style="margin-top:4px;">${p.service || '-'}</span>
-                </td>
-                <td><img src="${p.image}" class="img-preview" onclick="window.open(this.src)" title="คลิกเพื่อดูรูปใหญ่"></td>
-                <td>
-                    <button class="btn btn-ok" onclick="approvePromotion(${i})">✅ อนุมัติ 30 วัน</button>
-                    <button class="btn btn-del" onclick="deleteItem('pendingPromotions', ${i})">❌ ลบทิ้ง</button>
-                </td>
-            </tr>`).join('');
+            (appData.pendingPromotions || []).map((p,i) => `<tr><td><strong>${p.storeName}</strong><br><small style="color:#666;">${p.province}</small></td><td><span class="status-badge" style="background:#eee; color:#333;">${p.category || 'ทั่วไป'}</span><br><span class="status-badge bg-gold" style="margin-top:4px;">${p.service || '-'}</span></td><td><img src="${p.image}" class="img-preview" onclick="window.open(this.src)" title="คลิกเพื่อดูรูปใหญ่"></td><td><button class="btn btn-ok" onclick="approvePromotion(${i})">✅ อนุมัติ 30 วัน</button><button class="btn btn-del" onclick="deleteItem('pendingPromotions', ${i})">❌ ลบทิ้ง</button></td></tr>`).join('');
 
-        // 4. แบนเนอร์ Active
         const now = Date.now();
         document.getElementById('activePTable').innerHTML = '<tr><th>ร้านค้า (จังหวัด)</th><th>รายละเอียด</th><th>วันหมดอายุ</th><th>จัดการ</th></tr>' + 
             (appData.activePromotions || []).map((p,i) => {
                 const isExpired = p.expireTimestamp && now > p.expireTimestamp;
-                return `<tr style="${isExpired ? 'opacity: 0.6; background: #fff5f5;' : ''}">
-                    <td><strong>${p.storeName}</strong><br><small>${p.province}</small></td>
-                    <td style="max-width:200px; font-size:12px;">${p.detail}</td>
-                    <td style="color:${isExpired ? 'var(--danger)' : 'var(--success)'}; font-weight:600;">
-                        ${isExpired ? 'หมดอายุแล้ว' : new Date(p.expireTimestamp).toLocaleDateString('th-TH')}
-                    </td>
-                    <td><button class="btn btn-del" onclick="deleteItem('activePromotions', ${i})">🗑️ นำออก</button></td>
-                </tr>`;
+                return `<tr style="${isExpired ? 'opacity: 0.6; background: #fff5f5;' : ''}"><td><strong>${p.storeName}</strong><br><small>${p.province}</small></td><td style="max-width:200px; font-size:12px;">${p.detail}</td><td style="color:${isExpired ? 'var(--danger)' : 'var(--success)'}; font-weight:600;">${isExpired ? 'หมดอายุแล้ว' : new Date(p.expireTimestamp).toLocaleDateString('th-TH')}</td><td><button class="btn btn-del" onclick="deleteItem('activePromotions', ${i})">🗑️ นำออก</button></td></tr>`;
             }).join('');
 
-        // 5. คำขอลงทะเบียนร้านค้า
         document.getElementById('rTable').innerHTML = '<tr><th>ชื่อร้าน</th><th>เอกสารแนบ</th><th>จัดการ</th></tr>' + 
-            (appData.registrationRequests || []).map((r,i) => `<tr>
-                <td><strong>${r.storeName}</strong></td>
-                <td>
-                    ${r.storePhoto ? `<button class="btn btn-info" onclick="window.open('${r.storePhoto}')">🖼️ หน้าร้าน</button>` : ''}
-                    ${r.idCard ? `<button class="btn btn-info" onclick="window.open('${r.idCard}')">🆔 บัตร ปชช.</button>` : ''}
-                    ${r.commercial ? `<button class="btn btn-info" onclick="window.open('${r.commercial}')">📄 ทะเบียนพาณิชย์</button>` : ''}
-                </td>
-                <td>
-                    <button class="btn btn-ok" onclick="approveStore(${i})">🎫 สร้าง PIN อนุมัติ</button>
-                    <button class="btn btn-del" onclick="deleteItem('registrationRequests', ${i})">❌ ลบ</button>
-                </td>
-            </tr>`).join('');
+            (appData.registrationRequests || []).map((r,i) => `<tr><td><strong>${r.storeName}</strong></td><td>${r.storePhoto ? `<button class="btn btn-info" onclick="window.open('${r.storePhoto}')">🖼️ หน้าร้าน</button>` : ''}${r.idCard ? `<button class="btn btn-info" onclick="window.open('${r.idCard}')">🆔 บัตร ปชช.</button>` : ''}${r.commercial ? `<button class="btn btn-info" onclick="window.open('${r.commercial}')">📄 ทะเบียนพาณิชย์</button>` : ''}</td><td><button class="btn btn-ok" onclick="approveStore(${i})">🎫 สร้าง PIN อนุมัติ</button><button class="btn btn-del" onclick="deleteItem('registrationRequests', ${i})">❌ ลบ</button></td></tr>`).join('');
 
-        // 6. ร้านค้าทั้งหมด
         document.getElementById('storeTable').innerHTML = '<tr><th>ชื่อร้าน</th><th>รหัส PIN</th><th>สถานะ</th><th>จัดการ</th></tr>' + 
-            (appData.registeredStores || []).map((s,i) => `<tr>
-                <td><strong>${s.name}</strong></td>
-                <td style="font-weight:bold; color:var(--primary); font-size:16px;">${s.pin}</td>
-                <td>${s.isVIP ? '<span class="status-badge bg-gold">👑 VIP</span>' : '<span class="status-badge" style="background:#aaa;">ทั่วไป</span>'}</td>
-                <td>
-                    <button class="btn btn-warn" onclick="toggleVIP(${i})">👑 สลับสิทธิ์ VIP</button>
-                    <button class="btn btn-del" onclick="deleteItem('registeredStores', ${i})">🗑️ ลบร้าน</button>
-                </td>
-            </tr>`).join('');
+            (appData.registeredStores || []).map((s,i) => `<tr><td><strong>${s.name}</strong></td><td style="font-weight:bold; color:var(--primary); font-size:16px;">${s.pin}</td><td>${s.isVIP ? '<span class="status-badge bg-gold">👑 VIP</span>' : '<span class="status-badge" style="background:#aaa;">ทั่วไป</span>'}</td><td><button class="btn btn-warn" onclick="toggleVIP(${i})">👑 สลับสิทธิ์ VIP</button><button class="btn btn-del" onclick="deleteItem('registeredStores', ${i})">🗑️ ลบร้าน</button></td></tr>`).join('');
 
-        // 7. รายงานร้านปิด
         document.getElementById('closedTable').innerHTML = '<tr><th>ร้านที่ถูกแจ้ง (ID)</th><th>วันที่ลูกค้าแจ้ง</th><th>จัดการ</th></tr>' + 
-            (appData.closedReports || []).map((c,i) => `<tr>
-                <td><strong>${c.storeName}</strong><br><small style="color:#888;">${c.placeId}</small></td>
-                <td>${c.date}</td>
-                <td>
-                    <button class="btn btn-del" onclick="blacklistPlace('${c.placeId}', ${i})">🚩 ยืนยัน แบนร้านถาวร</button>
-                    <button class="btn btn-info" onclick="deleteItem('closedReports', ${i})">❌ ลบรายงานทิ้ง</button>
-                </td>
-            </tr>`).join('');
+            (appData.closedReports || []).map((c,i) => `<tr><td><strong>${c.storeName}</strong><br><small style="color:#888;">${c.placeId}</small></td><td>${c.date}</td><td><button class="btn btn-del" onclick="blacklistPlace('${c.placeId}', ${i})">🚩 ยืนยัน แบนร้านถาวร</button><button class="btn btn-info" onclick="deleteItem('closedReports', ${i})">❌ ลบรายงานทิ้ง</button></td></tr>`).join('');
     }
 
-    // --- ฟังก์ชันการเพิ่ม/แก้ไข/ลบ ---
     function addService() {
-        const name = document.getElementById('sName').value.trim();
-        const price = document.getElementById('sPrice').value.trim();
+        const name = document.getElementById('sName').value.trim(); const price = document.getElementById('sPrice').value.trim();
         if(!name || !price) return alert("กรุณากรอกข้อมูลให้ครบถ้วนครับ");
-        if(!appData.services) appData.services = [];
-        appData.services.push({ name, price: parseInt(price) });
-        save();
-        document.getElementById('sName').value = '';
-        document.getElementById('sPrice').value = '';
+        if(!appData.services) appData.services = []; appData.services.push({ name, price: parseInt(price) }); save();
+        document.getElementById('sName').value = ''; document.getElementById('sPrice').value = '';
     }
 
     function addCategory() {
-        const group = document.getElementById('cGroup').value;
-        const label = document.getElementById('cLabel').value.trim();
-        const keyword = document.getElementById('cKey').value.trim();
+        const group = document.getElementById('cGroup').value; const label = document.getElementById('cLabel').value.trim(); const keyword = document.getElementById('cKey').value.trim();
         if(!label || !keyword) return alert("กรุณากรอกข้อมูลให้ครบถ้วนครับ");
-        if(!appData.categories) appData.categories = [];
-        appData.categories.push({ group, label, keyword });
-        save();
-        document.getElementById('cLabel').value = '';
-        document.getElementById('cKey').value = '';
+        if(!appData.categories) appData.categories = []; appData.categories.push({ group, label, keyword }); save();
+        document.getElementById('cLabel').value = ''; document.getElementById('cKey').value = '';
     }
 
     function approvePromotion(i) {
-        let p = appData.pendingPromotions[i];
-        p.expireTimestamp = Date.now() + (30 * 24 * 60 * 60 * 1000); // ระยะเวลาแสดงผล 30 วัน
+        let p = appData.pendingPromotions[i]; p.expireTimestamp = Date.now() + (30 * 24 * 60 * 60 * 1000); 
         if(!appData.activePromotions) appData.activePromotions = [];
-        appData.activePromotions.unshift(p);
-        appData.pendingPromotions.splice(i, 1);
-        save();
-        alert("✅ อนุมัติแบนเนอร์เรียบร้อยแล้ว แบนเนอร์จะไปแสดงที่หน้าแอปทันที!");
+        appData.activePromotions.unshift(p); appData.pendingPromotions.splice(i, 1); save();
     }
 
     function approveStore(i) {
-        let r = appData.registrationRequests[i];
-        let pin = Math.floor(1000 + Math.random() * 9000).toString();
+        let r = appData.registrationRequests[i]; let pin = Math.floor(1000 + Math.random() * 9000).toString();
         if(!appData.registeredStores) appData.registeredStores = [];
-        appData.registeredStores.unshift({ name: r.storeName, pin: pin, isVIP: false });
-        appData.registrationRequests.splice(i, 1);
-        save();
-        alert("✅ สร้างร้านค้าสำเร็จ! รหัส PIN สำหรับให้ร้านค้าเข้าสู่ระบบคือ: " + pin);
+        appData.registeredStores.unshift({ name: r.storeName, pin: pin, isVIP: false }); appData.registrationRequests.splice(i, 1); save();
     }
 
-    function toggleVIP(i) {
-        appData.registeredStores[i].isVIP = !appData.registeredStores[i].isVIP;
-        save();
-    }
+    function toggleVIP(i) { appData.registeredStores[i].isVIP = !appData.registeredStores[i].isVIP; save(); }
 
     function blacklistPlace(placeId, reportIndex) {
         if(confirm('⚠️ คุณแน่ใจนะว่าจะแบนร้านนี้ถาวร? ร้านนี้จะไม่แสดงผลในหน้าแผนที่และการค้นหาอีกเลย')) {
             if(!appData.blacklistedPlaces) appData.blacklistedPlaces = [];
-            if(!appData.blacklistedPlaces.includes(placeId)) {
-                appData.blacklistedPlaces.push(placeId);
-            }
-            appData.closedReports.splice(reportIndex, 1);
-            save();
+            if(!appData.blacklistedPlaces.includes(placeId)) appData.blacklistedPlaces.push(placeId);
+            appData.closedReports.splice(reportIndex, 1); save();
         }
     }
 
-    function deleteItem(targetArray, index) {
-        if(confirm('🗑️ ยืนยันการลบข้อมูลนี้ใช่หรือไม่?')) {
-            appData[targetArray].splice(index, 1);
-            save();
-        }
-    }
-
-    // เปิดปิด UI โหลดข้อมูล
-    function showLoading(show) { 
-        document.getElementById('loading').style.display = show ? 'flex' : 'none'; 
-    }
+    function deleteItem(targetArray, index) { if(confirm('🗑️ ยืนยันการลบข้อมูลนี้ใช่หรือไม่?')) { appData[targetArray].splice(index, 1); save(); } }
+    function showLoading(show) { document.getElementById('loading').style.display = show ? 'flex' : 'none'; }
 
     window.onload = load;
 </script>
