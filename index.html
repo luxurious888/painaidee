@@ -384,15 +384,24 @@
         try {
             await liff.init({ liffId: "2009598846-wiCUeV35" });
             
+            // ⚡ 1. ถ้าลูกค้าใช้มือถือเปิด (Safari/Chrome) ให้บังคับสลับไปเปิดในแอป LINE ทันที! (แก้ปัญหา Safari บล็อก)
+            if (!liff.isInClient() && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+                window.location.replace("https://liff.line.me/2009598846-wiCUeV35");
+                return; // หยุดทำงานตรงนี้ เพื่อรอระบบสลับแอป
+            }
+
+            // ⚡ 2. ถ้าลูกค้าใช้คอมพิวเตอร์เปิด (PC/Mac) แล้วยังไม่ได้ล็อกอิน ให้โชว์ปุ่มสีเขียว
             if (!liff.isLoggedIn()) {
                 document.getElementById('loadingSpinner').style.display = 'none';
                 document.getElementById('loginCard').style.display = 'block';
                 return;
             }
 
+            // 3. ถ้าล็อกอินแล้ว ดึงรูปโปรไฟล์มาแสดง
             const profile = await liff.getProfile();
             document.getElementById('header-profile').innerHTML = `<img src="${profile.pictureUrl}" style="width:100%; height:100%; object-fit:cover;">`;
             
+            // 4. เข้าสู่แอป
             await loadFromCloud();
             hideLoginOverlay();
 
@@ -748,7 +757,6 @@
         document.getElementById('regStoreVerifyCard').style.display = 'none';
     }
 
-    // ⚡ ฟังก์ชันสำหรับตรจสอบรหัสร้านค้า (ซ่อนโชว์ VIP ตามสถานะจริง)
     function verifyStore() {
         const stores = appData.registeredStores || [];
         const store = stores.find(s => s.pin === document.getElementById('storePinInput').value);
@@ -762,27 +770,23 @@
                 isVIP = true;
             }
 
-            // ดึงราคาและเลขบัญชีจากระบบแอดมินมาแสดง (ถ้าแอดมินยังไม่ตั้ง จะใช้ค่าเริ่มต้น 500)
             const vipPrice = (appData.vipSettings && appData.vipSettings.price) ? appData.vipSettings.price : 500;
             const bankAcc = (appData.vipSettings && appData.vipSettings.bankAccount) ? appData.vipSettings.bankAccount : 'รอแอดมินตั้งค่าบัญชี (ไปไหนดี)';
             document.getElementById('displayVipPrice').innerText = vipPrice;
             document.getElementById('displayBankAcc').innerText = bankAcc;
 
             if(isVIP) {
-                // ถ้าเป็น VIP แล้ว: ให้โชว์ช่องกรอกลิงก์โซเชียล และปุ่มต่ออายุ
                 document.getElementById('vipUpdateSection').style.display = 'block';
                 document.getElementById('vipSubscribeSection').style.display = 'block';
                 document.getElementById('vipSubscribeTitle').innerHTML = '👑 ต่ออายุ VIP <span style="font-size:12px; color:#06C755;">(สถานะ: ใช้งานได้)</span>';
                 document.getElementById('vipLineInput').value = store.lineUrl || '';
                 document.getElementById('vipFbInput').value = store.fbUrl || '';
             } else {
-                // ถ้ายังไม่เป็น VIP: ซ่อนช่องลิงก์โซเชียล บังคับให้สมัคร+แนบสลิปก่อน
                 document.getElementById('vipUpdateSection').style.display = 'none';
                 document.getElementById('vipSubscribeSection').style.display = 'block';
                 document.getElementById('vipSubscribeTitle').innerHTML = '👑 สมัครสมาชิก VIP';
             }
 
-            // ดึงข้อมูลโปรโมชั่นเดิมที่เคยลงไว้
             const existingPromo = (appData.activePromotions || []).find(p => p.storeName === store.name) || 
                                   (appData.pendingPromotions || []).find(p => p.storeName === store.name);
             
@@ -798,7 +802,6 @@
         } else alert("รหัส PIN ไม่ถูกต้อง");
     }
 
-    // ⚡ ฟังก์ชันใหม่: ส่งข้อมูลขอสมัคร/ต่ออายุ VIP (อัปสลิป)
     async function submitVipRequest() {
         const store = appData.registeredStores.find(s => s.pin === document.getElementById('storePinInput').value);
         const slipFile = document.getElementById('vipSlipInput').files[0];
@@ -813,7 +816,6 @@
 
         if(!appData.pendingVipRequests) appData.pendingVipRequests = [];
         
-        // ลบคำขอเก่าของร้านนี้ที่ยังค้างอยู่ออกก่อน (เพื่อป้องกันข้อมูลซ้ำ)
         appData.pendingVipRequests = appData.pendingVipRequests.filter(r => r.storeName !== store.name);
         
         appData.pendingVipRequests.push({
