@@ -193,6 +193,11 @@
             <div class="form-group"><label>2. รูปถ่ายหน้าร้านคู่เจ้าของร้าน <span style="color:var(--danger);">*</span></label><input type="file" id="regStorePhoto" accept="image/*"></div>
             <div class="form-group"><label>3. สำเนาบัตรประชาชน/พาสปอร์ต <span style="color:var(--danger);">*</span></label><input type="file" id="regIdCard" accept="image/*"></div>
             <div class="form-group"><label>4. ใบทะเบียนพาณิชย์ (ถ้ามี)</label><input type="file" id="regCommercial" accept="image/*"></div>
+            <div class="form-group">
+                <label>5. เบอร์โทรศัพท์ติดต่อ <span style="color:var(--danger);">*</span></label>
+                <input type="text" id="regPhone" placeholder="08X-XXX-XXXX">
+            </div>
+
             <button class="btn-secondary" id="btnSubmitReg" style="width: 100%; margin-top: 10px;" onclick="submitStoreRegistration()">ส่งข้อมูลเพื่อตรวจสอบ</button>
         </div>
 
@@ -204,10 +209,6 @@
                     <input type="password" id="storePinInput" placeholder="รหัส PIN">
                     <button class="btn-outline" style="width: auto; white-space: nowrap;" onclick="verifyStore()">ตรวจสอบ</button>
                 </div>
-            </div>
-            <div id="storeVerifyCard" style="display:none; background:var(--bg-light); padding:15px; border-radius:10px; margin-bottom:15px; border:1px solid var(--border);">
-                <h4 id="verifyStoreName" style="margin:0 0 10px 0; color:var(--primary);"></h4>
-                <div id="miniMap" style="width:100%; height:150px; border-radius:10px;"></div>
             </div>
 
             <div id="lockedFeatures" style="display: none; margin-top: 20px;">
@@ -250,67 +251,8 @@
 
 <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <script>
-    // 🔗 API เชื่อม Google Sheets (Cloud) ตัวล่าสุด
     const API_URL = "https://script.google.com/macros/s/AKfycbx1ZMaFt-GWvrZ_-XTSiqhx__zhwYTo_NcpnTAzU75Xxh4pPAgdi7OO4sC1H0yxeGEr/exec";
     
-    const defaultCategories = [
-        // --- 🍽️ หมวดอาหาร/เครื่องดื่ม ---
-        { id: 1, group: 'food', label: 'หมูกระทะ / แจ่วฮ้อน', keyword: 'หมูกระทะ' },
-        { id: 2, group: 'food', label: 'ชาบู / สุกี้', keyword: 'ชาบู' },
-        { id: 3, group: 'food', label: 'ปิ้งย่าง / ยากินิคุ', keyword: 'ปิ้งย่าง' },
-        { id: 4, group: 'food', label: 'อาหารตามสั่ง / ข้าวแกง', keyword: 'อาหารตามสั่ง' },
-        { id: 5, group: 'food', label: 'คาเฟ่ / กาแฟ / เบเกอรี่', keyword: 'คาเฟ่' },
-        { id: 6, group: 'food', label: 'อาหารอีสาน / ส้มตำ', keyword: 'ร้านส้มตำ' },
-        { id: 7, group: 'food', label: 'ก๋วยเตี๋ยว / ก๋วยจั๊บ', keyword: 'ก๋วยเตี๋ยว' },
-        { id: 8, group: 'food', label: 'อาหารเวียดนาม', keyword: 'อาหารเวียดนาม' },
-        { id: 9, group: 'food', label: 'อาหารทะเล / ซีฟู้ด', keyword: 'ร้านอาหารทะเล' },
-        { id: 10, group: 'food', label: 'อาหารญี่ปุ่น / ซูชิ', keyword: 'อาหารญี่ปุ่น' },
-        { id: 11, group: 'food', label: 'อาหารฝรั่ง / สเต็ก / พิซซ่า', keyword: 'ร้านสเต็ก' },
-        { id: 12, group: 'food', label: 'อาหารเหนือ', keyword: 'อาหารเหนือ' },
-        { id: 13, group: 'food', label: 'อาหารใต้', keyword: 'อาหารใต้' },
-        { id: 14, group: 'food', label: 'ข้าวต้มรอบดึก', keyword: 'ร้านข้าวต้ม' },
-        { id: 15, group: 'food', label: 'ร้านเหล้า / บาร์นั่งชิล', keyword: 'บาร์' },
-        { id: 16, group: 'food', label: 'ฟาสต์ฟู้ด / เบอร์เกอร์', keyword: 'ฟาสต์ฟู้ด' },
-        { id: 17, group: 'food', label: 'บุฟเฟ่ต์นานาชาติ', keyword: 'บุฟเฟ่ต์' },
-
-        // --- 💆‍♀️ หมวดความงาม/พักผ่อน ---
-        { id: 18, group: 'beauty', label: 'ร้านนวด / สปา', keyword: 'ร้านนวด' },
-        { id: 19, group: 'beauty', label: 'คลินิกเสริมความงาม', keyword: 'คลินิกความงาม' },
-        { id: 20, group: 'beauty', label: 'ร้านเสริมสวย / ทำผม', keyword: 'ร้านทำผม' },
-        { id: 21, group: 'beauty', label: 'ร้านทำเล็บ / ต่อขนตา', keyword: 'ร้านทำเล็บ' },
-        { id: 22, group: 'beauty', label: 'สักคิ้ว / สักปาก / สักลาย', keyword: 'ร้านสัก' },
-        { id: 23, group: 'beauty', label: 'คลินิกทำฟัน / จัดฟัน', keyword: 'คลินิกทันตกรรม' },
-        { id: 24, group: 'beauty', label: 'อาบน้ำตัดขน / สปาสัตว์เลี้ยง', keyword: 'อาบน้ำสัตว์เลี้ยง' },
-
-        // --- 🎯 หมวดกิจกรรม/ท่องเที่ยว ---
-        { id: 25, group: 'activity', label: 'สถานที่ท่องเที่ยว / จุดชมวิว', keyword: 'สถานที่ท่องเที่ยว' },
-        { id: 26, group: 'activity', label: 'แคมป์ปิ้ง / กางเต็นท์', keyword: 'ลานกางเต็นท์' },
-        { id: 27, group: 'activity', label: 'สวนสนุก / สวนน้ำ', keyword: 'สวนน้ำ' },
-        { id: 28, group: 'activity', label: 'วัด / สถานที่ทำบุญ', keyword: 'วัด' },
-        { id: 29, group: 'activity', label: 'ตลาดนัดกลางคืน / ถนนคนเดิน', keyword: 'ตลาดกลางคืน' },
-        { id: 30, group: 'activity', label: 'ห้างสรรพสินค้า / คอมมูนิตี้มอลล์', keyword: 'ห้างสรรพสินค้า' },
-        { id: 31, group: 'activity', label: 'พิพิธภัณฑ์ / หอศิลป์', keyword: 'พิพิธภัณฑ์' },
-        { id: 32, group: 'activity', label: 'สวนสัตว์ / อควาเรียม', keyword: 'สวนสัตว์' },
-        { id: 33, group: 'activity', label: 'โรงภาพยนตร์', keyword: 'โรงภาพยนตร์' },
-
-        // --- 🏋️ หมวดกีฬา/ออกกำลังกาย ---
-        { id: 34, group: 'sport', label: 'ฟิตเนส / ยิม', keyword: 'ฟิตเนส' },
-        { id: 35, group: 'sport', label: 'สนามฟุตบอล / หญ้าเทียม', keyword: 'สนามฟุตบอล' },
-        { id: 36, group: 'sport', label: 'สระว่ายน้ำ', keyword: 'สระว่ายน้ำ' },
-        { id: 37, group: 'sport', label: 'สนามแบดมินตัน', keyword: 'สนามแบดมินตัน' },
-        { id: 38, group: 'sport', label: 'คอร์ทเทนนิส', keyword: 'สนามเทนนิส' },
-        { id: 39, group: 'sport', label: 'สนามกอล์ฟ / ไดร์ฟกอล์ฟ', keyword: 'สนามกอล์ฟ' },
-        { id: 40, group: 'sport', label: 'มวยไทย / ค่ายมวย', keyword: 'ค่ายมวย' },
-        { id: 41, group: 'sport', label: 'สตูดิโอโยคะ / พิลาทิส', keyword: 'สตูดิโอโยคะ' },
-        { id: 42, group: 'sport', label: 'ลานสเก็ต / เอ็กซ์ตรีม', keyword: 'ลานสเก็ต' },
-        { id: 43, group: 'sport', label: 'สวนสาธารณะ (วิ่ง/จักรยาน)', keyword: 'สวนสาธารณะ' }
-    ];
-
-    const defaultServices = [
-        { id: 1, name: 'ปักหมุดโปรโมชั่นหน้าแรก (รายเดือน)', price: 500 },
-        { id: 2, name: 'อัปเดตแก้ไขแบนเนอร์ (ต่อครั้ง)', price: 150 }
-    ];
-
     let appData = { registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], categories: [], closedReports: [], blacklistedPlaces: [], services: [] };
 
     const provinces = [
@@ -342,15 +284,11 @@
         {id:'uthaithani',name:'อุทัยธานี',lat:15.3730,lng:100.0243},{id:'ubon',name:'อุบลราชธานี',lat:15.2287,lng:104.8564}
     ];
 
-    // ⚡ ดึงข้อมูลแบบฝ่าแคชเบราว์เซอร์
     async function loadFromCloud() {
         try {
             const res = await fetch(API_URL + "?t=" + new Date().getTime());
             const data = await res.json();
             if (data && Object.keys(data).length > 0) { appData = { ...appData, ...data }; }
-            
-            if (!appData.categories || appData.categories.length === 0) appData.categories = defaultCategories;
-            if (!appData.services || appData.services.length === 0) appData.services = defaultServices;
             if (!appData.registeredStores) appData.registeredStores = [];
             if (!appData.activePromotions) appData.activePromotions = [];
         } catch(e) {}
@@ -361,7 +299,6 @@
         try { await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(appData) }); } catch(e) {} 
     }
 
-    // ⚡ ระบบ Real-time แบบฝ่าแคชเบราว์เซอร์
     setInterval(async () => {
         try {
             const res = await fetch(API_URL + "?t=" + new Date().getTime());
@@ -436,7 +373,7 @@
             if(pSel) pSel.appendChild(new Option(p.name, p.id)); 
             if(prSel) prSel.appendChild(new Option(p.name, p.id)); 
         });
-        if(pSel) pSel.value = 'current';
+        if(pSel) pSel.value = 'current'; 
         map = new google.maps.Map(document.getElementById("map"), { center: currentCoords, zoom: 14, mapTypeControl: false, streetViewControl: false });
         service = new google.maps.places.PlacesService(map);
         infoWindow = new google.maps.InfoWindow();
@@ -463,6 +400,7 @@
                     currentCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
                     gpsMarker = new google.maps.Marker({ position: currentCoords, map: map }); 
                     map.setCenter(currentCoords); 
+                    // ⚡ ได้พิกัดปุ๊บ ค้นหาร้านอาหารรอบตัวทันที
                     executeSearch('food'); 
                 }, () => { 
                     alert("ไม่สามารถเข้าถึงตำแหน่งได้ จะแสดงข้อมูลของอุบลราชธานีแทนครับ"); 
@@ -480,11 +418,26 @@
         }
     }
 
+    // ⚡ ฟังก์ชันสำหรับ "ดูพิกัดร้าน"
+    function searchAndFocusStore(storeName) {
+        document.getElementById('searchBox').value = storeName;
+        executeSearch('text');
+        window.scrollTo({top: document.getElementById('map').offsetTop - 20, behavior:'smooth'});
+        
+        // สั่งให้ Google Maps พุ่งกล้องไปหาร้านนั้นเลย
+        service.textSearch({ query: storeName, location: currentCoords, radius: 50000 }, (res, status) => {
+            if (status === "OK" && res.length > 0) {
+                map.panTo(res[0].geometry.location);
+                map.setZoom(17);
+            }
+        });
+    }
+
     function executeSearch(type) {
         if (!currentCoords) return; 
         const searchBox = document.getElementById('searchBox');
         const searchVal = searchBox ? searchBox.value.trim() : ""; 
-        let keywordToSearch = "ร้านอาหาร"; 
+        let keywordToSearch = "ร้านอาหาร"; // ⚡ ค่าเริ่มต้นป้องกันการว่างเปล่า
         
         const foodSelect = document.getElementById('foodSelect'), beautySelect = document.getElementById('beautySelect'), actSelect = document.getElementById('activitySelect'), sportSelect = document.getElementById('sportSelect');
 
@@ -523,11 +476,11 @@
         const list = document.getElementById('placeList');
         const originPoint = new google.maps.LatLng(currentCoords.lat, currentCoords.lng); 
         const stores = appData.registeredStores || []; 
+        const now = Date.now();
 
         const sorted = googlePlaces.sort((a, b) => {
             const isVipA = stores.find(s => s.name === a.name)?.isVIP ? 1 : 0;
             const isVipB = stores.find(s => s.name === b.name)?.isVIP ? 1 : 0;
-
             if (isVipA !== isVipB) return isVipB - isVipA; 
             
             if (window.google && window.google.maps && window.google.maps.geometry) {
@@ -540,9 +493,13 @@
         
         let html = sorted.slice(0, 80).map(p => {
             const store = stores.find(s => s.name === p.name);
-            const isVIP = store?.isVIP;
-            const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${p.geometry.location.lat()},${p.geometry.location.lng()}`;
+            let isVIP = false;
             
+            if (store && store.isVIP) {
+                if (!store.vipExpireTimestamp || store.vipExpireTimestamp > now || store.vipAutoRenew) { isVIP = true; }
+            }
+
+            const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${p.geometry.location.lat()},${p.geometry.location.lng()}`;
             let distanceKm = "0.0";
             if (window.google && window.google.maps && window.google.maps.geometry) {
                 distanceKm = (google.maps.geometry.spherical.computeDistanceBetween(originPoint, p.geometry.location) / 1000).toFixed(1); 
@@ -559,7 +516,7 @@
                 else if (p.business_status === 'OPERATIONAL') { openStatusHtml = '<span class="status-tag" style="background:#F4FBF4; color:#2E7D32; border:1px solid rgba(46,125,50,0.2);">🟢 เปิดให้บริการ</span>'; } 
             } 
             
-            // ⚡ เงื่อนไข: ปุ่ม Line และ FB จะโชว์ก็ต่อเมื่อร้านค้านั้นเป็น VIP (isVIP == true)
+            // ⚡ ดึงลิงก์ LINE/FB จากตัวแปร store โดยตรงเพื่อความชัวร์ 100%
             return `<div class="place-card ${isVIP ? 'card-vip':''}" onclick="focusPlace('${p.place_id}')">
                 ${isVIP?'<div class="vip-crown-badge">👑 VIP RECOMMEND</div>':''}
                 <div class="distance-badge">${distanceKm} กม.</div>
@@ -575,8 +532,8 @@
                     <div class="action-buttons">
                         <button class="btn-action btn-nav" onclick="window.open('${navUrl}', '_blank'); event.stopPropagation();">นำทาง</button>
                         <button class="btn-action btn-call" onclick="callPlace('${p.place_id}', event)">โทร</button>
-                        ${(isVIP && store.lineUrl) ? `<button class="btn-action btn-line" onclick="window.open('${store.lineUrl.startsWith('http') ? store.lineUrl : 'https://'+store.lineUrl}', '_blank'); event.stopPropagation();">LINE</button>` : ''}
-                        ${(isVIP && store.fbUrl) ? `<button class="btn-action btn-fb" onclick="window.open('${store.fbUrl.startsWith('http') ? store.fbUrl : 'https://'+store.fbUrl}', '_blank'); event.stopPropagation();">FB</button>` : ''}
+                        ${(isVIP && store && store.lineUrl) ? `<button class="btn-action btn-line" onclick="window.open('${store.lineUrl.startsWith('http') ? store.lineUrl : 'https://'+store.lineUrl}', '_blank'); event.stopPropagation();">LINE</button>` : ''}
+                        ${(isVIP && store && store.fbUrl) ? `<button class="btn-action btn-fb" onclick="window.open('${store.fbUrl.startsWith('http') ? store.fbUrl : 'https://'+store.fbUrl}', '_blank'); event.stopPropagation();">FB</button>` : ''}
                         <button class="btn-action btn-share" onclick="sharePlace('${p.name.replace(/'/g, "\\'")}', ${p.geometry.location.lat()}, ${p.geometry.location.lng()}, event)">แชร์</button>
                     </div>
                     <div style="margin-top:15px; text-align:right;"><span style="color:var(--danger); font-size:11px; cursor:pointer; opacity:0.6; border-bottom: 1px dotted var(--danger);" onclick="reportClosed('${p.place_id}','${p.name.replace(/'/g,"")}'); event.stopPropagation();">🚩 แจ้งร้านปิดถาวร</span></div>
@@ -611,7 +568,12 @@
 
     function renderPromos() {
         let curProv = document.getElementById('provinceSelect').value;
-        const activePromos = appData.activePromotions || []; 
+        const now = Date.now();
+        
+        const activePromos = (appData.activePromotions || []).filter(p => {
+            if (p.expireTimestamp && now > p.expireTimestamp && !p.autoRenew) return false;
+            return true;
+        }); 
         
         if (curProv === 'current' && currentCoords && window.google && window.google.maps && window.google.maps.geometry) {
             let minDist = Infinity;
@@ -631,10 +593,15 @@
         if(promos.length > 0) {
             banner.style.display = 'block';
             document.getElementById('approvedPromoList').innerHTML = promos.map(p => {
-                // ⚡ เช็คว่าร้านที่โปรโมทเป็น VIP หรือไม่
-                const store = appData.registeredStores.find(s => s.name === p.storeName);
-                const isVIP = store?.isVIP;
+                const store = (appData.registeredStores || []).find(s => s.name === p.storeName);
+                let isVIP = false;
+                if (store && store.isVIP) {
+                    if (!store.vipExpireTimestamp || store.vipExpireTimestamp > now || store.vipAutoRenew) {
+                        isVIP = true;
+                    }
+                }
                 
+                // ⚡ ใช้ปุ่มดูพิกัดแบบเจาะจง searchAndFocusStore
                 return `
                 <div class="place-card" style="border:2px solid var(--primary); box-shadow: 0 0 20px rgba(197,160,89,0.2);">
                     <div style="position:absolute; top:12px; right:-28px; background:#D9534F; color:#FFF; padding:4px 30px; transform:rotate(45deg); font-size:11px; font-weight:800; z-index:10; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">HOT 🔥</div>
@@ -648,9 +615,9 @@
                             <p style="font-size:14px; color:var(--text-main); margin:0;">${p.detail}</p>
                         </div>
                         <div style="display:flex; gap:8px; margin-top:auto;">
-                            ${(isVIP && p.lineUrl) ? `<button onclick="window.open('${p.lineUrl.startsWith('http') ? p.lineUrl : 'https://'+p.lineUrl}', '_blank')" class="promo-btn-hover" style="flex:1; background:var(--line-green); color:white; border:none; padding:10px; border-radius:8px; font-family:'Kanit'; font-weight:600; font-size:13px; cursor:pointer;">💬 LINE</button>` : ''}
-                            ${(isVIP && p.fbUrl) ? `<button onclick="window.open('${p.fbUrl.startsWith('http') ? p.fbUrl : 'https://'+p.fbUrl}', '_blank')" class="promo-btn-hover" style="flex:1; background:var(--fb-blue); color:white; border:none; padding:10px; border-radius:8px; font-family:'Kanit'; font-weight:600; font-size:13px; cursor:pointer;">👍 FB</button>` : ''}
-                            <button onclick="document.getElementById('searchBox').value='${p.storeName}'; executeSearch('text'); window.scrollTo({top: document.getElementById('map').offsetTop - 20, behavior:'smooth'});" class="promo-btn-hover" style="flex:1; background:linear-gradient(135deg, #FFD700, #C5A059); color:#000; border:none; padding:10px; border-radius:8px; font-family:'Kanit'; font-weight:600; font-size:13px; cursor:pointer; box-shadow: 0 4px 10px rgba(197,160,89,0.2);">📍 ดูพิกัดร้าน</button>
+                            ${(isVIP && store && store.lineUrl) ? `<button onclick="window.open('${store.lineUrl.startsWith('http') ? store.lineUrl : 'https://'+store.lineUrl}', '_blank')" class="promo-btn-hover" style="flex:1; background:var(--line-green); color:white; border:none; padding:10px; border-radius:8px; font-family:'Kanit'; font-weight:600; font-size:13px; cursor:pointer;">💬 LINE</button>` : ''}
+                            ${(isVIP && store && store.fbUrl) ? `<button onclick="window.open('${store.fbUrl.startsWith('http') ? store.fbUrl : 'https://'+store.fbUrl}', '_blank')" class="promo-btn-hover" style="flex:1; background:var(--fb-blue); color:white; border:none; padding:10px; border-radius:8px; font-family:'Kanit'; font-weight:600; font-size:13px; cursor:pointer;">👍 FB</button>` : ''}
+                            <button onclick="searchAndFocusStore('${p.storeName}')" class="promo-btn-hover" style="flex:1; background:linear-gradient(135deg, #FFD700, #C5A059); color:#000; border:none; padding:10px; border-radius:8px; font-family:'Kanit'; font-weight:600; font-size:13px; cursor:pointer; box-shadow: 0 4px 10px rgba(197,160,89,0.2);">📍 ดูพิกัดร้าน</button>
                         </div>
                     </div>
                 </div>`;
@@ -685,8 +652,6 @@
 
         const sSel = document.getElementById('promoServiceSelect');
         if(sSel) sSel.innerHTML = (appData.services||[]).map(s => `<option value="${s.name} - ${s.price}฿">${s.name} - ${s.price}฿</option>`).join('');
-        
-        renderPromos();
     }
 
     function reportClosed(id, n) { 
@@ -720,7 +685,9 @@
         const n = document.getElementById('regStoreName').value;
         const p1 = document.getElementById('regStorePhoto').files[0];
         const p2 = document.getElementById('regIdCard').files[0];
-        if(!n || !p1 || !p2) return alert("กรุณากรอกข้อมูลและแนบรูปให้ครบครับ");
+        const p3 = document.getElementById('regPhone').value; 
+        
+        if(!n || !p1 || !p2 || !p3) return alert("กรุณากรอกข้อมูลและแนบรูปให้ครบครับ");
         
         btn.innerText = "กำลังอัปโหลดข้อมูล... ⏳"; btn.disabled = true;
         const photo = await resizeImg(p1);
@@ -731,12 +698,12 @@
         }
         
         if (!appData.registrationRequests) appData.registrationRequests = [];
-        appData.registrationRequests.push({ id: Date.now(), storeName: n, storePhoto: photo, idCard: idCard, commercial: comm });
+        appData.registrationRequests.push({ id: Date.now(), storeName: n, phone: p3, storePhoto: photo, idCard: idCard, commercial: comm });
         await saveToCloud(); 
         alert("ส่งข้อมูลสำเร็จ! รอรับ PIN จากแอดมินครับ");
         btn.innerText = "🚀 ส่งเอกสารเพื่อตรวจสอบ"; btn.disabled = false;
         
-        ['regStoreName','regStorePhoto','regIdCard','regCommercial'].forEach(id => document.getElementById(id).value = '');
+        ['regStoreName','regPhone','regStorePhoto','regIdCard','regCommercial'].forEach(id => document.getElementById(id).value = '');
         document.getElementById('regStoreVerifyCard').style.display = 'none';
     }
 
@@ -746,8 +713,13 @@
         if(store) { 
             document.getElementById('lockedFeatures').style.display = 'block'; 
             
-            // ⚡ เงื่อนไข: เฉพาะ VIP เท่านั้นถึงจะใส่กรอบโซเชียลได้
-            if(store.isVIP) {
+            const now = Date.now();
+            let isVIP = false;
+            if (store.isVIP && (!store.vipExpireTimestamp || store.vipExpireTimestamp > now || store.vipAutoRenew)) {
+                isVIP = true;
+            }
+
+            if(isVIP) {
                 document.getElementById('vipUpdateSection').style.display = 'block';
                 document.getElementById('vipLineInput').value = store.lineUrl || '';
                 document.getElementById('vipFbInput').value = store.fbUrl || '';
@@ -766,7 +738,7 @@
                 window.currentPromoImage = existingPromo.image; 
             }
 
-            alert("ยินดีต้อนรับร้าน " + store.name + "\n(หากมีโปรโมทเดิม ข้อมูลจะถูกดึงมาให้แก้ไขอัตโนมัติ)"); 
+            alert("ยินดีต้อนรับร้าน " + store.name); 
         } else alert("PIN ไม่ถูกต้อง");
     }
 
