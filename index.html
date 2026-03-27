@@ -210,6 +210,10 @@
                     <button class="btn-outline" style="width: auto; white-space: nowrap;" onclick="verifyStore()">ตรวจสอบ</button>
                 </div>
             </div>
+            <div id="storeVerifyCard" style="display:none; background:var(--bg-light); padding:15px; border-radius:10px; margin-bottom:15px; border:1px solid var(--border);">
+                <h4 id="verifyStoreName" style="margin:0 0 10px 0; color:var(--primary);"></h4>
+                <div id="miniMap" style="width:100%; height:150px; border-radius:10px;"></div>
+            </div>
 
             <div id="lockedFeatures" style="display: none; margin-top: 20px;">
                 <div id="vipUpdateSection" style="padding: 15px; border: 1px dashed var(--primary); border-radius: 12px; margin-bottom: 25px; background: rgba(197, 160, 89, 0.05); display: none;">
@@ -400,7 +404,6 @@
                     currentCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
                     gpsMarker = new google.maps.Marker({ position: currentCoords, map: map }); 
                     map.setCenter(currentCoords); 
-                    // ⚡ ได้พิกัดปุ๊บ ค้นหาร้านอาหารรอบตัวทันที
                     executeSearch('food'); 
                 }, () => { 
                     alert("ไม่สามารถเข้าถึงตำแหน่งได้ จะแสดงข้อมูลของอุบลราชธานีแทนครับ"); 
@@ -418,13 +421,11 @@
         }
     }
 
-    // ⚡ ฟังก์ชันสำหรับ "ดูพิกัดร้าน"
     function searchAndFocusStore(storeName) {
         document.getElementById('searchBox').value = storeName;
         executeSearch('text');
         window.scrollTo({top: document.getElementById('map').offsetTop - 20, behavior:'smooth'});
         
-        // สั่งให้ Google Maps พุ่งกล้องไปหาร้านนั้นเลย
         service.textSearch({ query: storeName, location: currentCoords, radius: 50000 }, (res, status) => {
             if (status === "OK" && res.length > 0) {
                 map.panTo(res[0].geometry.location);
@@ -437,7 +438,7 @@
         if (!currentCoords) return; 
         const searchBox = document.getElementById('searchBox');
         const searchVal = searchBox ? searchBox.value.trim() : ""; 
-        let keywordToSearch = "ร้านอาหาร"; // ⚡ ค่าเริ่มต้นป้องกันการว่างเปล่า
+        let keywordToSearch = "ร้านอาหาร"; 
         
         const foodSelect = document.getElementById('foodSelect'), beautySelect = document.getElementById('beautySelect'), actSelect = document.getElementById('activitySelect'), sportSelect = document.getElementById('sportSelect');
 
@@ -481,6 +482,7 @@
         const sorted = googlePlaces.sort((a, b) => {
             const isVipA = stores.find(s => s.name === a.name)?.isVIP ? 1 : 0;
             const isVipB = stores.find(s => s.name === b.name)?.isVIP ? 1 : 0;
+
             if (isVipA !== isVipB) return isVipB - isVipA; 
             
             if (window.google && window.google.maps && window.google.maps.geometry) {
@@ -496,10 +498,13 @@
             let isVIP = false;
             
             if (store && store.isVIP) {
-                if (!store.vipExpireTimestamp || store.vipExpireTimestamp > now || store.vipAutoRenew) { isVIP = true; }
+                if (!store.vipExpireTimestamp || store.vipExpireTimestamp > now || store.vipAutoRenew) {
+                    isVIP = true;
+                }
             }
 
             const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${p.geometry.location.lat()},${p.geometry.location.lng()}`;
+            
             let distanceKm = "0.0";
             if (window.google && window.google.maps && window.google.maps.geometry) {
                 distanceKm = (google.maps.geometry.spherical.computeDistanceBetween(originPoint, p.geometry.location) / 1000).toFixed(1); 
@@ -516,7 +521,6 @@
                 else if (p.business_status === 'OPERATIONAL') { openStatusHtml = '<span class="status-tag" style="background:#F4FBF4; color:#2E7D32; border:1px solid rgba(46,125,50,0.2);">🟢 เปิดให้บริการ</span>'; } 
             } 
             
-            // ⚡ ดึงลิงก์ LINE/FB จากตัวแปร store โดยตรงเพื่อความชัวร์ 100%
             return `<div class="place-card ${isVIP ? 'card-vip':''}" onclick="focusPlace('${p.place_id}')">
                 ${isVIP?'<div class="vip-crown-badge">👑 VIP RECOMMEND</div>':''}
                 <div class="distance-badge">${distanceKm} กม.</div>
@@ -532,8 +536,8 @@
                     <div class="action-buttons">
                         <button class="btn-action btn-nav" onclick="window.open('${navUrl}', '_blank'); event.stopPropagation();">นำทาง</button>
                         <button class="btn-action btn-call" onclick="callPlace('${p.place_id}', event)">โทร</button>
-                        ${(isVIP && store && store.lineUrl) ? `<button class="btn-action btn-line" onclick="window.open('${store.lineUrl.startsWith('http') ? store.lineUrl : 'https://'+store.lineUrl}', '_blank'); event.stopPropagation();">LINE</button>` : ''}
-                        ${(isVIP && store && store.fbUrl) ? `<button class="btn-action btn-fb" onclick="window.open('${store.fbUrl.startsWith('http') ? store.fbUrl : 'https://'+store.fbUrl}', '_blank'); event.stopPropagation();">FB</button>` : ''}
+                        ${(isVIP && store && store.lineUrl && store.lineUrl.trim() !== '') ? `<button class="btn-action btn-line" onclick="window.open('${store.lineUrl.startsWith('http') ? store.lineUrl : 'https://'+store.lineUrl}', '_blank'); event.stopPropagation();">LINE</button>` : ''}
+                        ${(isVIP && store && store.fbUrl && store.fbUrl.trim() !== '') ? `<button class="btn-action btn-fb" onclick="window.open('${store.fbUrl.startsWith('http') ? store.fbUrl : 'https://'+store.fbUrl}', '_blank'); event.stopPropagation();">FB</button>` : ''}
                         <button class="btn-action btn-share" onclick="sharePlace('${p.name.replace(/'/g, "\\'")}', ${p.geometry.location.lat()}, ${p.geometry.location.lng()}, event)">แชร์</button>
                     </div>
                     <div style="margin-top:15px; text-align:right;"><span style="color:var(--danger); font-size:11px; cursor:pointer; opacity:0.6; border-bottom: 1px dotted var(--danger);" onclick="reportClosed('${p.place_id}','${p.name.replace(/'/g,"")}'); event.stopPropagation();">🚩 แจ้งร้านปิดถาวร</span></div>
@@ -601,7 +605,6 @@
                     }
                 }
                 
-                // ⚡ ใช้ปุ่มดูพิกัดแบบเจาะจง searchAndFocusStore
                 return `
                 <div class="place-card" style="border:2px solid var(--primary); box-shadow: 0 0 20px rgba(197,160,89,0.2);">
                     <div style="position:absolute; top:12px; right:-28px; background:#D9534F; color:#FFF; padding:4px 30px; transform:rotate(45deg); font-size:11px; font-weight:800; z-index:10; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">HOT 🔥</div>
@@ -615,8 +618,8 @@
                             <p style="font-size:14px; color:var(--text-main); margin:0;">${p.detail}</p>
                         </div>
                         <div style="display:flex; gap:8px; margin-top:auto;">
-                            ${(isVIP && store && store.lineUrl) ? `<button onclick="window.open('${store.lineUrl.startsWith('http') ? store.lineUrl : 'https://'+store.lineUrl}', '_blank')" class="promo-btn-hover" style="flex:1; background:var(--line-green); color:white; border:none; padding:10px; border-radius:8px; font-family:'Kanit'; font-weight:600; font-size:13px; cursor:pointer;">💬 LINE</button>` : ''}
-                            ${(isVIP && store && store.fbUrl) ? `<button onclick="window.open('${store.fbUrl.startsWith('http') ? store.fbUrl : 'https://'+store.fbUrl}', '_blank')" class="promo-btn-hover" style="flex:1; background:var(--fb-blue); color:white; border:none; padding:10px; border-radius:8px; font-family:'Kanit'; font-weight:600; font-size:13px; cursor:pointer;">👍 FB</button>` : ''}
+                            ${(isVIP && store && store.lineUrl && store.lineUrl.trim() !== '') ? `<button onclick="window.open('${store.lineUrl.startsWith('http') ? store.lineUrl : 'https://'+store.lineUrl}', '_blank')" class="promo-btn-hover" style="flex:1; background:var(--line-green); color:white; border:none; padding:10px; border-radius:8px; font-family:'Kanit'; font-weight:600; font-size:13px; cursor:pointer;">💬 LINE</button>` : ''}
+                            ${(isVIP && store && store.fbUrl && store.fbUrl.trim() !== '') ? `<button onclick="window.open('${store.fbUrl.startsWith('http') ? store.fbUrl : 'https://'+store.fbUrl}', '_blank')" class="promo-btn-hover" style="flex:1; background:var(--fb-blue); color:white; border:none; padding:10px; border-radius:8px; font-family:'Kanit'; font-weight:600; font-size:13px; cursor:pointer;">👍 FB</button>` : ''}
                             <button onclick="searchAndFocusStore('${p.storeName}')" class="promo-btn-hover" style="flex:1; background:linear-gradient(135deg, #FFD700, #C5A059); color:#000; border:none; padding:10px; border-radius:8px; font-family:'Kanit'; font-weight:600; font-size:13px; cursor:pointer; box-shadow: 0 4px 10px rgba(197,160,89,0.2);">📍 ดูพิกัดร้าน</button>
                         </div>
                     </div>
