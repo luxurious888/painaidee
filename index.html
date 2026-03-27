@@ -361,21 +361,25 @@
     async function initializeLiff() {
         try {
             await liff.init({ liffId: "2009598846-wiCUeV35" });
+            
+            // ⚡ ทริคพระเอก: ถ้าลูกค้าเปิดเว็บจากมือถือ แต่ไม่ได้เปิดในแอป LINE ให้เด้งไปเปิดแอป LINE ทันที!
+            if (!liff.isInClient() && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+                window.location.replace("https://liff.line.me/2009598846-wiCUeV35");
+                return; // หยุดการทำงานของหน้าเว็บ เพื่อรอให้มือถือสลับไปเปิดแอป LINE
+            }
+
             if (liff.isLoggedIn()) {
                 const profile = await liff.getProfile();
                 document.getElementById('header-profile').innerHTML = `<img src="${profile.pictureUrl}" style="width:100%; height:100%; object-fit:cover;">`;
                 
-                // ⚡ ระบบเช็คการเป็นเพื่อน (บังคับแอด LINE OA)
                 try {
                     const friendStatus = await liff.getFriendship();
                     if (!friendStatus.friendFlag) {
-                        // 🚨 ถ้ายังไม่เป็นเพื่อน ให้เด้งไปหน้าแอดเพื่อนทันที
-                        // ปล. อย่าลืมเปลี่ยน @YOUR_LINE_OA เป็นไอดีไลน์ร้านคุณจริงๆ นะครับ (เช่น @painaidee)
                         window.location.href = "https://lin.ee/5SBoptj";
-                        return; // หยุดการทำงาน ไม่ให้เข้าแอปจนกว่าจะแอด
+                        return; 
                     }
                 } catch(friendErr) {
-                    console.log("ไม่สามารถเช็คสถานะเพื่อนได้ ให้ผ่านไปก่อน");
+                    console.log("ข้ามการเช็คเพื่อน");
                 }
 
                 await loadFromCloud();
