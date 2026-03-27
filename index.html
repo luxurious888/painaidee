@@ -71,8 +71,11 @@
         
         .action-buttons { display: flex; gap: 8px; margin-top: auto; padding-top: 15px; flex-wrap: wrap; }
         .btn-action { flex: 1; text-align: center; color: white; text-decoration: none; padding: 10px 5px; border-radius: 10px; font-weight: 500; font-size: 12px; transition: 0.3s; border: none; cursor: pointer; font-family: 'Kanit'; min-width: 30%; }
-        .btn-nav { background: var(--dark-muted); color: var(--surface); border: 1px solid var(--border); }
-        .btn-nav:hover { background: var(--primary); color: white; border-color: var(--primary); }
+        
+        /* ⚡ เปลี่ยนสีปุ่ม นำทาง เป็นสีฟ้าสว่างๆ */
+        .btn-nav { background: #4285F4 !important; color: #FFF !important; border: none !important; font-weight: 600; box-shadow: 0 4px 10px rgba(66, 133, 244, 0.3); }
+        .btn-nav:hover { background: #357AE8 !important; transform: translateY(-2px); }
+        
         .btn-call { background: var(--primary); color: white; }
         .btn-share { background: transparent; color: var(--text-gold); border: 1px solid var(--border); }
         .status-tag { display: inline-flex; align-items: center; justify-content: center; padding: 4px 8px; border-radius: 20px; font-size: 11px; font-weight: 500; white-space: nowrap; box-shadow: 0 2px 5px rgba(0,0,0,0.2); line-height: 1.2; }
@@ -257,6 +260,7 @@
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbxQyC0TH3kUurtvoIS8RMwii2McaYAeKzpwbqFeJiomKzEdDcJePN0RJcwIIHNyTq-t/exec";
     
+    // ข้อมูลเริ่มต้นเผื่อกรณีฐานข้อมูล Cloud ยังว่าง
     const defaultCategories = [
         { id: 1, group: 'food', label: 'หมูกระทะ / แจ่วฮ้อน', keyword: 'หมูกระทะ' },
         { id: 2, group: 'food', label: 'ชาบู / สุกี้', keyword: 'ชาบู' },
@@ -358,19 +362,18 @@
         };
     });
 
-    // ⚡ ฟังก์ชันเจ้าปัญหาที่ถูกแก้ไขโครงสร้างให้สะอาดแล้ว
     async function initializeLiff() {
         try {
             await liff.init({ liffId: "2009598846-wiCUeV35" });
             
-            // 1. ถ้าไม่ได้ล็อกอิน (เช่นเปิดใน Chrome) ให้หยุดโหลด แล้วโชว์ปุ่มให้ผู้ใช้กด Login เอง
+            // 1. ถ้าไม่ได้ล็อกอิน ให้หยุดโหลด แล้วโชว์ปุ่มให้ผู้ใช้กด Login
             if (!liff.isLoggedIn()) {
                 document.getElementById('loadingSpinner').style.display = 'none';
                 document.getElementById('loginCard').style.display = 'block';
-                return; // หยุดทำงาน ป้องกันจอค้างและกระพริบ
+                return;
             }
 
-            // 2. ถ้าล็อกอินแล้ว ดึงข้อมูลโปรไฟล์
+            // 2. ดึงข้อมูลโปรไฟล์
             const profile = await liff.getProfile();
             document.getElementById('header-profile').innerHTML = `<img src="${profile.pictureUrl}" style="width:100%; height:100%; object-fit:cover;">`;
             
@@ -380,7 +383,6 @@
 
         } catch (err) { 
             console.error("LIFF Init Error:", err);
-            // ถ้าพังก็ให้โชว์ปุ่มล็อกอิน
             await loadFromCloud();
             document.getElementById('loadingSpinner').style.display = 'none';
             document.getElementById('loginCard').style.display = 'block';
@@ -422,7 +424,7 @@
         checkDataAndSearch();
     }
 
-    // ⚡ แก้บั๊กโหลดค้าง: สั่งให้โหลดพิกัดแผนที่ทันทีโดยไม่ต้องรอข้อมูลหมวดหมู่
+    // ⚡ ให้โหลดพิกัดแผนที่ทันที ไม่ต้องรอฐานข้อมูลเพื่อป้องกันจอดำ
     function checkDataAndSearch() {
         changeLocation();
     }
@@ -649,8 +651,11 @@
         } else { banner.style.display = 'none'; }
     }
 
+    // ⚡ ดึงข้อมูล Default ไปโชว์ทันที
     function renderUI() {
-        const cData = appData.categories || [];
+        const cData = (appData.categories && appData.categories.length > 0) ? appData.categories : defaultCategories;
+        const sData = (appData.services && appData.services.length > 0) ? appData.services : defaultServices;
+
         const groups = ['food', 'beauty', 'activity', 'sport'];
         const labels = ['🍽️ หมวดอาหาร', '💆‍♀️ ความงาม/พักผ่อน', '🎯 กิจกรรม/เที่ยว', '🏋️ กีฬา/ออกกำลังกาย'];
         const defaultKws = ['ร้านอาหาร', 'สปา', 'สถานที่ท่องเที่ยว', 'ฟิตเนส'];
@@ -676,7 +681,7 @@
         }
 
         const sSel = document.getElementById('promoServiceSelect');
-        if(sSel) sSel.innerHTML = (appData.services||[]).map(s => `<option value="${s.name} - ${s.price}฿">${s.name} - ${s.price}฿</option>`).join('');
+        if(sSel) sSel.innerHTML = sData.map(s => `<option value="${s.name} - ${s.price}฿">${s.name} - ${s.price}฿</option>`).join('');
     }
 
     function reportClosed(id, n) { 
