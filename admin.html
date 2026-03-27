@@ -3,743 +3,343 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ไปไหนดี - Painaidee (Premium VIP)</title>
+    <title>Painaidee Admin - ระบบจัดการหลังบ้าน (Cloud)</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap');
-        :root { --primary: #C5A059; --primary-light: #DFBF8B; --primary-hover: #AF8B48; --dark: #121418; --dark-light: #1A1D23; --dark-muted: #2A2E36; --bg-light: #121418; --surface: #1A1D23; --border: rgba(197, 160, 89, 0.2); --text-main: #FFFFFF; --text-gold: #C5A059; --text-muted: #999999; --danger: #D9534F; --line-green: #06C755; --fb-blue: #1877F2; }
-        body { font-family: 'Kanit', sans-serif; margin: 0; background-color: var(--bg-light); padding-bottom: 50px; color: var(--text-gold); overflow-x: hidden; }
-        nav { display: flex; justify-content: space-around; background: var(--surface); padding: 12px 0; position: sticky; top: 0; z-index: 2000; box-shadow: 0 4px 20px rgba(0,0,0,0.1); border-bottom: 1px solid var(--border); }
-        nav div { cursor: pointer; font-weight: 500; color: var(--text-muted); padding: 12px 20px; transition: 0.3s; position: relative; letter-spacing: 0.5px; }
-        nav div.active { color: var(--primary); font-weight: 600; }
-        nav div.active::after { content: ''; position: absolute; bottom: 0; left: 15%; width: 70%; height: 3px; background: var(--primary); border-radius: 3px 3px 0 0; box-shadow: 0 -3px 10px rgba(197, 160, 89, 0.5); }
-        header { background: var(--dark); color: var(--surface); padding: 30px 20px; text-align: center; border-radius: 0 0 24px 24px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(26, 28, 32, 0.3); border: 1px solid var(--border); border-top: none; }
-        header h1 { margin: 0; color: var(--primary); font-weight: 600; letter-spacing: 1px; }
-        header p { margin: 8px 0 0 0; font-weight: 300; opacity: 0.8; font-size: 14px; color: #FFF; }
-        .page { display: none; padding: 15px; max-width: 900px; margin: 0 auto; animation: fadeIn 0.4s ease; }
-        .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        #map { width: 100%; height: 320px; border-radius: 16px; border: 1px solid var(--border); background: #eee; box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
-        .search-area { background: var(--surface); padding: 25px; border-radius: 16px; margin-top: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); border: 1px solid var(--border); }
-        .input-row { display: flex; gap: 12px; margin-bottom: 12px; }
-        select, input[type="text"], input[type="password"], input[type="number"], input[type="file"], textarea { padding: 14px; border-radius: 10px; border: 1px solid var(--border); font-family: 'Kanit'; font-size: 15px; outline: none; box-sizing: border-box; width: 100%; background: var(--dark); color: var(--primary-light); transition: 0.3s; }
-        select:focus, input:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(197, 160, 89, 0.15); background: var(--dark-light); }
-        .input-row select { flex: 1; width: 50%; }
-        option, optgroup { background-color: var(--dark-light); color: var(--primary-light); font-weight: 400; }
-        optgroup { font-weight: 600; color: var(--primary); }
-        ::placeholder { color: rgba(223, 191, 139, 0.4); } 
-        .search-box-container { display: flex; gap: 12px; width: 100%; }
-        .btn-primary { padding: 14px 24px; background: var(--primary); color: white; border: none; border-radius: 10px; font-family: 'Kanit'; font-weight: 500; font-size: 15px; cursor: pointer; transition: 0.3s; white-space: nowrap; width: 100%; box-shadow: 0 4px 10px rgba(197, 160, 89, 0.3); }
-        .btn-primary:hover { background: var(--primary-hover); transform: translateY(-2px); }
-        .btn-secondary { background: var(--dark); color: var(--primary); padding: 12px 15px; border-radius: 10px; border: 1px solid var(--primary); cursor: pointer; font-family: 'Kanit'; font-weight: 500; text-align: center; transition: 0.3s; }
-        .btn-secondary:hover { background: var(--primary); color: white; transform: translateY(-2px); }
-        .btn-outline { background: transparent; color: var(--primary); border: 1px solid var(--border); padding: 10px 15px; border-radius: 10px; cursor: pointer; font-family: 'Kanit'; font-weight: 500; transition: 0.3s; }
-        .btn-outline:hover { border-color: var(--primary); background: rgba(197, 160, 89, 0.1); }
-        .place-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; margin-top: 24px; }
-        .place-card { background: var(--surface); border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid rgba(197,160,89,0.15); transition: 0.4s; cursor: pointer; position: relative; display: flex; flex-direction: column; }
-        .place-card:hover { transform: translateY(-6px); box-shadow: 0 15px 40px rgba(197, 160, 89, 0.25); border-color: rgba(197, 160, 89, 0.5); }
-        .place-card img { width: 100%; height: 180px; object-fit: cover; background-color: var(--dark-muted); }
-        .place-info { padding: 20px; display: flex; flex-direction: column; flex-grow: 1; }
-        .distance-badge { position: absolute; top: 15px; right: 15px; background: rgba(26, 28, 32, 0.9); color: var(--primary-light); padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; backdrop-filter: blur(5px); border: 1px solid rgba(197, 160, 89, 0.3); box-shadow: 0 3px 10px rgba(0,0,0,0.2); z-index: 10; }
-        .action-buttons { display: flex; gap: 8px; margin-top: auto; padding-top: 15px; flex-wrap: wrap; }
-        .btn-action { flex: 1; text-align: center; color: white; text-decoration: none; padding: 10px 5px; border-radius: 10px; font-weight: 500; font-size: 12px; transition: 0.3s; border: none; cursor: pointer; font-family: 'Kanit'; min-width: 30%; }
-        .btn-nav { background: var(--dark-muted); color: var(--surface); border: 1px solid var(--border); }
-        .btn-nav:hover { background: var(--primary); color: white; border-color: var(--primary); }
-        .btn-call { background: var(--primary); color: white; }
-        .btn-share { background: transparent; color: var(--text-gold); border: 1px solid var(--border); }
-        .status-tag { display: inline-flex; align-items: center; justify-content: center; padding: 4px 8px; border-radius: 20px; font-size: 11px; font-weight: 500; white-space: nowrap; box-shadow: 0 2px 5px rgba(0,0,0,0.2); line-height: 1.2; }
-        .card-vip { border: 2px solid #FFD700 !important; box-shadow: 0 0 20px rgba(255, 215, 0, 0.25) !important; transform: translateY(-2px); }
-        .card-vip:hover { box-shadow: 0 15px 40px rgba(255, 215, 0, 0.4) !important; border-color: #FFF !important; }
-        .vip-crown-badge { position: absolute; top: -10px; left: -10px; background: linear-gradient(135deg, #FFD700, #C5A059, #FFD700); color: #000; padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: 800; z-index: 15; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border: 2px solid #FFF; animation: pulseGlow 2s infinite; }
-        @keyframes pulseGlow { 0% { box-shadow: 0 0 10px rgba(255,215,0,0.4); } 50% { box-shadow: 0 0 20px rgba(255,215,0,0.8); } 100% { box-shadow: 0 0 10px rgba(255,215,0,0.4); } }
-        .btn-line { background: #06C755 !important; color: #FFF !important; border: none !important; font-weight: 600;}
-        .btn-fb { background: #1877F2 !important; color: #FFF !important; border: none !important; font-weight: 600;}
-        @keyframes shine { 100% { left: 125%; } }
-        .shine-effect::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%); transform: skewX(-25deg); animation: shine 3s infinite; pointer-events: none; }
-        .promo-btn-hover:hover { filter: brightness(1.1); transform: translateY(-2px); }
-        .highlight-banner { background: linear-gradient(135deg, var(--dark), var(--dark-light)); color: white; padding: 25px; border-radius: 16px; margin-top: 24px; box-shadow: 0 15px 35px rgba(26, 28, 32, 0.4); display: none; position: relative; overflow: hidden; border: 1px solid var(--border); }
-        .highlight-banner::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(197,160,89,0.15) 0%, transparent 60%); pointer-events: none; }
-        .highlight-banner h3 { margin: 0 0 5px 0; font-size: 20px; color: var(--primary); font-weight: 500; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
-        .dashboard-card { background: var(--surface); padding: 25px; border-radius: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); margin-bottom: 24px; border: 1px solid var(--border); }
-        .dashboard-card h3 { margin-top: 0; color: var(--primary-light); border-bottom: 2px solid var(--border); padding-bottom: 12px; font-weight: 500; }
-        .form-group { margin-bottom: 18px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px; color: #FFF; }
-        #loginOverlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(18, 20, 24, 0.95); backdrop-filter: blur(15px); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .login-card { background: var(--surface); padding: 40px; border-radius: 24px; text-align: center; max-width: 350px; width: 90%; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid var(--border); animation: fadeIn 0.5s ease; }
-        .btn-line-login { background-color: var(--line-green); color: white; border: none; padding: 15px 20px; border-radius: 12px; font-family: 'Kanit'; font-weight: 600; font-size: 16px; width: 100%; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 5px 15px rgba(6, 199, 85, 0.3); }
-        .spinner { width: 50px; height: 50px; border: 5px solid var(--surface); border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        :root { --primary: #C5A059; --dark: #121418; --surface: #ffffff; --bg: #f0f2f5; --danger: #D9534F; --success: #06C755; --info: #17a2b8; }
+        body { font-family: 'Kanit', sans-serif; background-color: var(--bg); color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 1100px; margin: 0 auto; }
+        h1 { background: var(--dark); color: var(--primary); padding: 25px; border-radius: 15px; text-align: center; margin-top: 0; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .card { background: var(--surface); padding: 25px; border-radius: 15px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-left: 5px solid var(--primary); overflow-x: auto; }
+        .card h2 { margin-top: 0; color: var(--dark); font-size: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; min-width: 600px; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; font-size: 14px; vertical-align: middle; }
+        th { background: #fafafa; color: #666; font-weight: 500; }
+        tr:hover { background: #f9f9f9; }
+        .btn { padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; font-family: 'Kanit'; font-size: 13px; font-weight: 500; transition: 0.2s; color: #fff; text-decoration: none; display: inline-block; margin-right: 5px; margin-bottom: 5px; }
+        .btn:hover { opacity: 0.8; transform: translateY(-1px); }
+        .btn-ok { background: var(--success); } .btn-del { background: var(--danger); } .btn-info { background: var(--info); } .btn-warn { background: #f39c12; }
+        input, select { padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-family: 'Kanit'; outline: none; margin-right: 5px; margin-bottom: 10px; }
+        .img-preview { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; cursor: pointer; border: 1px solid #ddd; transition: transform 0.2s; }
+        .img-preview:hover { transform: scale(1.1); }
+        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; color: #fff; display: inline-block; }
+        .bg-gold { background: linear-gradient(135deg, #FFD700, #C5A059); color: #000; box-shadow: 0 2px 5px rgba(197, 160, 89, 0.3); }
+        #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; font-weight: bold; color: var(--dark); }
+        .spinner { width: 50px; height: 50px; border: 5px solid #eee; border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 15px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        #appContent { display: none; }
+        .edit-input { padding: 6px; border: 1px solid #ccc; border-radius: 6px; font-family: 'Kanit'; font-size: 13px; width: 100%; box-sizing: border-box; margin-bottom: 6px; background: #fff;}
+        .edit-input:focus { border-color: var(--primary); box-shadow: 0 0 5px rgba(197,160,89,0.3); outline: none;}
     </style>
 </head>
 <body>
 
-<div id="loginOverlay">
-    <div id="loadingSpinner" style="display: flex; flex-direction: column; align-items: center;">
-        <div class="spinner"></div>
-        <h3 style="color: var(--primary); margin: 0;">กำลังเชื่อมต่อระบบ LINE...</h3>
-        <p style="color: var(--text-muted); font-size: 14px;">กรุณารอสักครู่เพื่อเข้าสู่แอปไปไหนดี</p>
+<div id="loading">
+    <div class="spinner"></div>
+    <div>กำลังประมวลผลข้อมูล... ⏳</div>
+</div>
+
+<div class="container">
+    <h1>👑 Painaidee - ระบบจัดการหลังบ้าน</h1>
+
+    <div class="card" style="border-left-color: #f39c12;">
+        <h2>💰 1. ตั้งค่าอัตราค่าบริการ (แพ็กเกจโฆษณา)</h2>
+        <div style="background: #fff9f0; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+            <input type="text" id="sName" placeholder="ชื่อแพ็กเกจ (เช่น โปรโมท 30 วัน)">
+            <input type="number" id="sPrice" placeholder="ราคา (บาท)">
+            <button class="btn btn-ok" onclick="addService()">➕ เพิ่มแพ็กเกจ</button>
+        </div>
+        <table id="sTable"></table>
     </div>
 
-    <div class="login-card" id="loginCard" style="display: none;">
-        <div style="width:100px; height:100px; border-radius:50%; background:var(--dark); border: 2px solid var(--primary); display: flex; flex-direction: column; align-items:center; justify-content:center; margin: 0 auto 20px;">
-            <p style="margin: 0; color:var(--text-gold); font-family: 'Kanit'; font-weight: 600; font-size: 18px;">ไป<br>ไหนดี</p>
+    <div class="card" style="border-left-color: #8e44ad;">
+        <h2>🏷️ 2. จัดการหมวดหมู่ค้นหา (แสดงหน้าลูกค้า)</h2>
+        <div style="background: #f7f0ff; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+            <select id="cGroup">
+                <option value="food">🍽️ อาหาร/เครื่องดื่ม</option>
+                <option value="beauty">💆‍♀️ ความงาม/พักผ่อน</option>
+                <option value="activity">🎯 กิจกรรม/ท่องเที่ยว</option>
+                <option value="sport">🏋️ กีฬา/ออกกำลังกาย</option>
+            </select>
+            <input type="text" id="cLabel" placeholder="ชื่อที่ลูกค้าเห็น (เช่น ชาบู)">
+            <input type="text" id="cKey" placeholder="คำค้นหา Google Maps">
+            <button class="btn btn-ok" onclick="addCategory()">➕ เพิ่มหมวดหมู่</button>
         </div>
-        <h2 style="color: #FFF; margin: 0 0 10px 0;">ยินดีต้อนรับ</h2>
-        <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 30px;">กรุณาเข้าสู่ระบบผ่าน LINE เพื่อค้นหาและรับโปรโมชั่นพิเศษ</p>
-        <button class="btn-line-login" onclick="loginWithLine()">เข้าสู่ระบบด้วย LINE</button>
+        <table id="cTable"></table>
+    </div>
+
+    <div class="card" style="border-left-color: var(--info);">
+        <h2>📌 3. คำขออัปเดต / ขึ้นแบนเนอร์โปรโมท (แอดมินแก้ไขก่อนอนุมัติได้)</h2>
+        <table id="pTable"></table>
+    </div>
+
+    <div class="card" style="border-left-color: var(--success);">
+        <h2>✨ 4. สถานะแบนเนอร์โฆษณาที่กำลังแสดงผล</h2>
+        <table id="activePTable"></table>
+    </div>
+
+    <div class="card" style="border-left-color: #C5A059;">
+        <h2>📝 5. คำขอลงทะเบียนร้านค้าใหม่</h2>
+        <table id="rTable"></table>
+    </div>
+
+    <div class="card" style="border-left-color: var(--dark);">
+        <h2>🏬 6. ฐานข้อมูลร้านค้าทั้งหมด (จัดการ PIN / VIP / ต่ออายุ)</h2>
+        <table id="storeTable"></table>
+    </div>
+
+    <div class="card" style="border-left-color: var(--danger);">
+        <h2>🚩 7. รายงานร้านปิดถาวร (จากลูกค้า)</h2>
+        <table id="closedTable"></table>
     </div>
 </div>
 
-<div id="appContent">
-    <nav>
-        <div id="tab-home" class="active" onclick="switchPage('home')">หน้าแรก</div>
-        <div id="tab-partner" onclick="switchPage('partner')">สำหรับร้านค้า</div>
-    </nav>
-
-    <div id="page-home" class="page active">
-        <header>
-            <div style="margin: 0 auto 15px; display: flex; justify-content: center;">
-                <div id="header-profile" style="width:100px; height:100px; border-radius:50%; background:var(--surface); border: 2px solid var(--primary); display: flex; flex-direction: column; align-items:center; justify-content:center; overflow: hidden;"></div>
-            </div>
-            <h1 id="header-name">ไปไหนดี</h1>
-            <p>ค้นหาร้านอาหารและสถานที่น่าสนใจทั่วไทย</p>
-        </header>
-        
-        <div id="map"></div>
-        
-        <div class="search-area">
-            <div style="margin-bottom: 12px;">
-                <select id="provinceSelect" onchange="changeLocation()" style="width: 100%;">
-                    <option value="current" selected>📍 ตำแหน่งปัจจุบัน</option>
-                </select>
-            </div>
-            
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
-                <select id="foodSelect" onchange="executeSearch('food')"><option value="ร้านอาหาร">🍽️ หมวดอาหาร</option></select>
-                <select id="beautySelect" onchange="executeSearch('beauty')"><option value="สปา">💆‍♀️ พักผ่อน/ความงาม</option></select>
-                <select id="activitySelect" onchange="executeSearch('activity')"><option value="สถานที่ท่องเที่ยว">🎯 กิจกรรม/เที่ยว</option></select>
-                <select id="sportSelect" onchange="executeSearch('sport')"><option value="ฟิตเนส">🏋️ กีฬา/ออกกำลังกาย</option></select>
-            </div>
-
-            <div class="search-box-container">
-                <input type="text" id="searchBox" placeholder="พิมพ์ชื่อร้านที่ต้องการค้นหา..." onkeydown="if(event.key === 'Enter') executeSearch('text')">
-                <button class="btn-primary" style="width: auto;" onclick="executeSearch('text')">ค้นหา</button>
-            </div>
-        </div>
-
-        <div id="promoBanner" class="highlight-banner">
-            <h3>✨ Exclusive Promotions</h3>
-            <p style="font-size: 13px; margin:0 0 15px 0; color:rgba(255,255,255,0.6);">แบรนด์ยอดฮิตประจำจังหวัด ห้ามพลาด!</p>
-            <div id="approvedPromoList" class="place-grid" style="margin-top: 0;"></div>
-        </div>
-
-        <div id="placeList" class="place-grid">
-            <p id="status-text" style="text-align:center; grid-column: 1/-1; padding: 40px; color: var(--text-muted);">กำลังเตรียมข้อมูลแผนที่...</p>
-        </div>
-    </div>
-
-    <div id="page-partner" class="page">
-        <div class="dashboard-card" id="registerNewStoreCard" style="border-top: 3px solid var(--primary); border-bottom: 3px solid var(--primary);">
-            <h3 style="border:none;">ลงทะเบียนร้านค้าใหม่</h3>
-            <p style="font-size: 14px; color: var(--text-muted); margin-top: -10px;">ส่งเอกสารให้แอดมินตรวจสอบ เพื่อรับ "รหัสลับ (Store PIN)"</p>
-            <div class="form-group">
-                <label>1. ค้นหาพิกัดร้านจากแผนที่</label>
-                <div style="display: flex; gap: 10px;">
-                    <input type="text" id="regStoreName" placeholder="พิมพ์ชื่อร้านเพื่อค้นหา...">
-                    <button class="btn-outline" style="width: auto; white-space: nowrap;" onclick="searchRegStore()">ค้นหา</button>
-                </div>
-                <div id="regStoreVerifyCard" style="display:none; background:var(--bg-light); padding:15px; border-radius:10px; margin-top:10px; border:1px solid var(--border);">
-                    <h4 id="regVerifyStoreName" style="margin:0 0 10px 0; color:var(--primary);"></h4>
-                    <div id="regMiniMap" style="width:100%; height:150px; border-radius:10px;"></div>
-                </div>
-            </div>
-            <div class="form-group"><label>2. รูปถ่ายหน้าร้านคู่เจ้าของร้าน <span style="color:var(--danger);">*</span></label><input type="file" id="regStorePhoto" accept="image/*"></div>
-            <div class="form-group"><label>3. สำเนาบัตรประชาชน/พาสปอร์ต <span style="color:var(--danger);">*</span></label><input type="file" id="regIdCard" accept="image/*"></div>
-            <div class="form-group"><label>4. ใบทะเบียนพาณิชย์ (ถ้ามี)</label><input type="file" id="regCommercial" accept="image/*"></div>
-            
-            <div class="form-group">
-                <label>5. เบอร์โทรศัพท์ติดต่อ <span style="color:var(--danger);">*</span></label>
-                <p style="font-size: 11px; color: var(--text-muted); margin: -5px 0 8px 0;">* แอดมินจะใช้เบอร์นี้เพื่อติดต่อกลับ</p>
-                <input type="text" id="regPhone" placeholder="08X-XXX-XXXX">
-            </div>
-
-            <button class="btn-secondary" id="btnSubmitReg" style="width: 100%; margin-top: 10px;" onclick="submitStoreRegistration()">ส่งข้อมูลเพื่อตรวจสอบ</button>
-        </div>
-
-        <div class="dashboard-card">
-            <h3>จัดการร้านค้า / อัปเดตโปรโมชั่น</h3>
-            <div class="form-group">
-                <label>รหัสลับร้านค้า (Store PIN)</label>
-                <div style="display: flex; gap: 10px;">
-                    <input type="password" id="storePinInput" placeholder="รหัส PIN">
-                    <button class="btn-outline" style="width: auto; white-space: nowrap;" onclick="verifyStore()">ตรวจสอบ</button>
-                </div>
-            </div>
-
-            <div id="lockedFeatures" style="display: none; margin-top: 20px;">
-                <div id="vipUpdateSection" style="padding: 15px; border: 1px dashed var(--primary); border-radius: 12px; margin-bottom: 25px; background: rgba(197, 160, 89, 0.05); display: none;">
-                    <h4 style="margin: 0 0 5px 0; color: #FFD700; font-size: 16px;">👑 ข้อมูลติดต่อพิเศษ (VIP Links)</h4>
-                    <p id="vipLockMessage" style="font-size: 12px; color: var(--danger); margin-top: 0; margin-bottom: 10px;">* ระบุลิงก์เพื่อให้ลูกค้ากดติดต่อได้ทันที</p>
-                    <div class="form-group"><label style="font-size: 12px;">ลิงก์ LINE OA</label><input type="text" id="vipLineInput" placeholder="https://line.me/R/ti/p/..."></div>
-                    <div class="form-group" style="margin-bottom: 10px;"><label style="font-size: 12px;">ลิงก์ Facebook Page</label><input type="text" id="vipFbInput" placeholder="https://facebook.com/..."></div>
-                    <button id="btnSaveVip" class="btn-primary" style="background: linear-gradient(135deg, #FFD700, #C5A059); color: #000;" onclick="updateVipData()">💾 บันทึกข้อมูลลิงก์โซเชียล</button>
-                </div>
-
-                <div style="padding: 20px; border: 2px solid var(--primary); border-radius: 16px; background: linear-gradient(180deg, rgba(197, 160, 89, 0.1) 0%, var(--surface) 100%); position: relative; overflow: hidden; margin-top: 30px;">
-                    <div style="position: absolute; top: 20px; right: -35px; background: #D9534F; color: white; padding: 5px 40px; transform: rotate(45deg); font-size: 12px; font-weight: bold; box-shadow: 0 2px 10px rgba(0,0,0,0.5);">HOT 🔥</div>
-                    <h4 style="margin: 0 0 5px 0; color: var(--primary); font-size: 18px; text-align: center;">🚀 ดันยอดขายพุ่ง! พื้นที่โปรโมทหน้าแรก</h4>
-                    <p style="text-align: center; font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">ให้ลูกค้าในจังหวัดเห็นร้านคุณเป็นอันดับแรก ทันทีที่เปิดแอป</p>
-
-                    <div class="form-group"><label>📍 เลือกจังหวัดที่จะโปรโมท</label><select id="promoProvinceSelect"></select></div>
-                    <div class="form-group"><label>🏷️ หมวดหมู่ร้านค้าของคุณ</label><select id="promoStoreCategory"></select></div>
-                    <div class="form-group"><label>💎 เลือกแพ็กเกจค่าบริการ</label><select id="promoServiceSelect"></select></div>
-                    
-                    <div class="form-group">
-                        <label>🖼️ รูปภาพป้ายโฆษณา (แนวนอน 3:2)</label>
-                        <p style="font-size: 11px; color: var(--text-muted); margin: -5px 0 8px 0;">* อัปโหลดรูปใหม่เฉพาะเมื่อต้องการเปลี่ยนรูปเดิม</p>
-                        <input type="file" id="promoImageInput" accept="image/*">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>📝 รายละเอียดโปรโมชั่น (แคปชั่นดึงดูดลูกค้า)</label>
-                        <textarea id="promoDetail" rows="3" placeholder="เช่น ลด 50% ทันทีเมื่อโชว์แอปนี้! หรือ มา 4 จ่าย 3 ด่วน หมดเขตสิ้นเดือน..."></textarea>
-                    </div>
-                    
-                    <button id="btnSubmitPromo" class="btn-primary promo-btn-hover" style="width: 100%; background: linear-gradient(135deg, #FFD700, #C5A059); color: #000; font-size: 16px; font-weight: 600; padding: 16px; margin-top: 10px; border: none; box-shadow: 0 6px 20px rgba(255, 215, 0, 0.3);" onclick="submitPromoWithPIN()">
-                        🚀 สั่งซื้อและส่งเรื่องอัปเดตข้อมูล
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbx1ZMaFt-GWvrZ_-XTSiqhx__zhwYTo_NcpnTAzU75Xxh4pPAgdi7OO4sC1H0yxeGEr/exec";
     
     let appData = { registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], categories: [], closedReports: [], blacklistedPlaces: [], services: [] };
 
-    const provinces = [
-        {id:'bkk',name:'กรุงเทพมหานคร',lat:13.7563,lng:100.5018},{id:'krabi',name:'กระบี่',lat:8.0863,lng:98.9063},{id:'kanchanaburi',name:'กาญจนบุรี',lat:14.0159,lng:99.5336},
-        {id:'kalasin',name:'กาฬสินธุ์',lat:16.4322,lng:103.5061},{id:'kamphaengphet',name:'กำแพงเพชร',lat:16.4828,lng:99.5227},{id:'khonkaen',name:'ขอนแก่น',lat:16.4322,lng:102.8236},
-        {id:'chanthaburi',name:'จันทบุรี',lat:12.6114,lng:102.1039},{id:'chachoengsao',name:'ฉะเชิงเทรา',lat:13.6904,lng:101.0718},{id:'chonburi',name:'ชลบุรี',lat:13.3611,lng:100.9847},
-        {id:'chainat',name:'ชัยนาท',lat:15.1852,lng:100.1251},{id:'chaiyaphum',name:'ชัยภูมิ',lat:15.8066,lng:102.0315},{id:'chumphon',name:'ชุมพร',lat:10.4930,lng:99.1800},
-        {id:'chiangrai',name:'เชียงราย',lat:19.9105,lng:99.8406},{id:'chiangmai',name:'เชียงใหม่',lat:18.7883,lng:98.9853},{id:'trang',name:'ตรัง',lat:7.5563,lng:99.6114},
-        {id:'trat',name:'ตราด',lat:12.2428,lng:102.5175},{id:'tak',name:'ตาก',lat:16.8840,lng:99.1258},{id:'nakhonnayok',name:'นครนายก',lat:14.2069,lng:101.2131},
-        {id:'nakhonpathom',name:'นครปฐม',lat:13.8199,lng:100.0601},{id:'nakhonphanom',name:'นครพนม',lat:17.4048,lng:104.7816},{id:'nakhonratchasima',name:'นครราชสีมา',lat:14.9799,lng:102.0978},
-        {id:'nakhonsithammarat',name:'นครศรีธรรมราช',lat:8.4304,lng:99.9631},{id:'nakhonsawan',name:'นครสวรรค์',lat:15.6987,lng:100.1221},{id:'nonthaburi',name:'นนทบุรี',lat:13.8591,lng:100.5217},
-        {id:'narathiwat',name:'นราธิวาส',lat:6.4255,lng:101.8253},{id:'nan',name:'น่าน',lat:18.7828,lng:100.7787},{id:'buengkan',name:'บึงกาฬ',lat:18.3609,lng:103.6508},
-        {id:'buriram',name:'บุรีรัมย์',lat:14.9930,lng:103.1029},{id:'pathumthani',name:'ปทุมธานี',lat:14.0208,lng:100.5250},{id:'prachuapkhirikhan',name:'ประจวบคีรีขันธ์',lat:11.8105,lng:99.7971},
-        {id:'prachinburi',name:'ปราจีนบุรี',lat:14.0510,lng:101.3736},{id:'pattani',name:'ปัตตานี',lat:6.8673,lng:101.2501},{id:'phranakhonsiayutthaya',name:'พระนครศรีอยุธยา',lat:14.3532,lng:100.5684},
-        {id:'phayao',name:'พะเยา',lat:19.1666,lng:99.9022},{id:'phangnga',name:'พังงา',lat:8.4501,lng:98.5283},{id:'phatthalung',name:'พัทลุง',lat:7.6166,lng:100.0740},
-        {id:'phichit',name:'พิจิตร',lat:16.4411,lng:100.3488},{id:'phitsanulok',name:'พิษณุโลก',lat:16.8211,lng:100.2659},{id:'phetchaburi',name:'เพชรบุรี',lat:13.1112,lng:99.9405},
-        {id:'phetchabun',name:'เพชรบูรณ์',lat:16.4184,lng:101.1554},{id:'phrae',name:'แพร่',lat:18.1446,lng:100.1403},{id:'phuket',name:'ภูเก็ต',lat:7.9519,lng:98.3381},
-        {id:'mahasarakham',name:'มหาสารคาม',lat:16.1852,lng:103.3007},{id:'mukdahan',name:'มุกดาหาร',lat:16.5453,lng:104.7195},{id:'maehongson',name:'แม่ฮ่องสอน',lat:19.3020,lng:97.9654},
-        {id:'yala',name:'ยะลา',lat:6.5411,lng:101.2804},{id:'yasothon',name:'ยโสธร',lat:15.7926,lng:104.1453},{id:'roiet',name:'ร้อยเอ็ด',lat:16.0538,lng:103.6520},
-        {id:'ranong',name:'ระนอง',lat:9.9658,lng:98.6348},{id:'rayong',name:'ระยอง',lat:12.6814,lng:101.2816},{id:'ratchaburi',name:'ราชบุรี',lat:13.5283,lng:99.8134},
-        {id:'lopburi',name:'ลพบุรี',lat:14.7995,lng:100.6534},{id:'lampang',name:'ลำปาง',lat:18.2888,lng:99.4930},{id:'lamphun',name:'ลำพูน',lat:18.5745,lng:99.0087},
-        {id:'loei',name:'เลย',lat:17.4860,lng:101.7223},{id:'sisaket',name:'ศรีสะเกษ',lat:15.1151,lng:104.3220},{id:'sakonnakon',name:'สกลนคร',lat:17.1664,lng:104.1486},
-        {id:'songkhla',name:'สงขลา',lat:7.1897,lng:100.5954},{id:'satun',name:'สตูล',lat:6.6238,lng:100.0674},{id:'samutprakan',name:'สมุทรปราการ',lat:13.5993,lng:100.5968},
-        {id:'samutsongkhram',name:'สมุทรสงคราม',lat:13.4098,lng:100.0023},{id:'samutsakhon',name:'สมุทรสาคร',lat:13.5475,lng:100.2736},{id:'sakaeo',name:'สระแก้ว',lat:13.8240,lng:102.0646},
-        {id:'saraburi',name:'สระบุรี',lat:14.5289,lng:100.9101},{id:'singburi',name:'สิงห์บุรี',lat:14.8936,lng:100.3967},{id:'sukhothai',name:'สุโขทัย',lat:17.0116,lng:99.8253},
-        {id:'suphanburi',name:'สุพรรณบุรี',lat:14.4742,lng:100.1123},{id:'suratthani',name:'สุราษฎร์ธานี',lat:9.1342,lng:99.3215},{id:'surin',name:'สุรินทร์',lat:14.8818,lng:103.4936},
-        {id:'nongkhai',name:'หนองคาย',lat:17.8783,lng:102.7420},{id:'nongbualamphu',name:'หนองบัวลำภู',lat:17.2045,lng:102.4339},{id:'angthong',name:'อ่างทอง',lat:14.5896,lng:100.4551},
-        {id:'amnatdharoen',name:'อำนาจเจริญ',lat:15.8657,lng:104.6258},{id:'udonthani',name:'อุดรธานี',lat:17.4138,lng:102.7872},{id:'uttaradit',name:'อุตรดิตถ์',lat:17.6201,lng:100.0993},
-        {id:'uthaithani',name:'อุทัยธานี',lat:15.3730,lng:100.0243},{id:'ubon',name:'อุบลราชธานี',lat:15.2287,lng:104.8564}
-    ];
+    // ⚡ ระบบเช็ควันหมดอายุอัตโนมัติ (จะทำงานตอนโหลดข้อมูล)
+    function checkAutoRenew() {
+        let needSave = false;
+        const now = Date.now();
+        
+        if (appData.registeredStores) {
+            appData.registeredStores.forEach(s => {
+                if (s.isVIP && s.vipExpireTimestamp && now > s.vipExpireTimestamp) {
+                    if (s.vipAutoRenew) {
+                        s.vipExpireTimestamp += (30 * 24 * 60 * 60 * 1000); // ต่ออายุอัตโนมัติ 30 วัน
+                        needSave = true;
+                    } else {
+                        s.isVIP = false; // ตัดสิทธิ์ VIP ทิ้ง
+                        needSave = true;
+                    }
+                }
+            });
+        }
+        
+        if (appData.activePromotions) {
+            appData.activePromotions.forEach(p => {
+                if (p.expireTimestamp && now > p.expireTimestamp) {
+                    if (p.autoRenew) {
+                        p.expireTimestamp += (30 * 24 * 60 * 60 * 1000); // ต่ออายุอัตโนมัติ 30 วัน
+                        needSave = true;
+                    }
+                }
+            });
+        }
+        
+        if (needSave) { save(); } else { render(); }
+    }
 
-    async function loadFromCloud() {
+    async function load() {
+        showLoading(true);
         try {
             const res = await fetch(API_URL + "?t=" + new Date().getTime());
             const data = await res.json();
-            if (data && Object.keys(data).length > 0) { appData = { ...appData, ...data }; }
-            
-            if (!appData.registeredStores) appData.registeredStores = [];
-            if (!appData.activePromotions) appData.activePromotions = [];
-        } catch(e) {}
-        renderUI(); 
+            if (data && Object.keys(data).length > 0) { appData = data; }
+            checkAutoRenew(); 
+        } catch (e) { render(); }
+        showLoading(false);
     }
 
-    async function saveToCloud() { 
-        try { await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(appData) }); } catch(e) {} 
-    }
-
+    // ⚡ อัปเดตข้อมูลอัตโนมัติแบบฝ่าแคช
     setInterval(async () => {
         try {
             const res = await fetch(API_URL + "?t=" + new Date().getTime());
             const data = await res.json();
             if (data && Object.keys(data).length > 0) {
-                appData = { ...appData, ...data };
-                renderPromos();
-                if (googlePlaces.length > 0) renderCards(document.getElementById('searchBox').value || 'ร้านอาหาร');
+                appData = data;
+                if (!document.activeElement.classList.contains('edit-input')) {
+                    checkAutoRenew(); 
+                }
             }
-        } catch(e) {}
+        } catch (e) {}
     }, 15000);
 
-    const resizeImg = (file) => new Promise(resolve => {
-        if(!file) return resolve('');
-        const reader = new FileReader(); reader.readAsDataURL(file);
-        reader.onload = e => {
-            const img = new Image(); img.src = e.target.result;
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                const targetRatio = 3/2; 
-                const imgRatio = img.width / img.height;
-                let sx = 0, sy = 0, sWidth = img.width, sHeight = img.height;
-                if (imgRatio > targetRatio) { sWidth = img.height * targetRatio; sx = (img.width - sWidth) / 2; } 
-                else { sHeight = img.width / targetRatio; sy = (img.height - sHeight) / 2; }
-                
-                canvas.width = 800; canvas.height = 533; 
-                const ctx = canvas.getContext('2d'); 
-                ctx.drawImage(img, sx, sy, sWidth, sHeight, 0, 0, canvas.width, canvas.height);
-                resolve(canvas.toDataURL('image/jpeg', 0.7)); 
-            };
-        };
-    });
-
-    async function initializeLiff() {
-        try {
-            await liff.init({ liffId: "2009598846-wiCUeV35" });
-            if (liff.isLoggedIn()) {
-                const profile = await liff.getProfile();
-                document.getElementById('header-profile').innerHTML = `<img src="${profile.pictureUrl}" style="width:100%; height:100%; object-fit:cover;">`;
-                await loadFromCloud();
-                hideLoginOverlay();
-            } else { liff.login({ redirectUri: window.location.href }); }
-        } catch (err) { 
-            await loadFromCloud();
-            document.getElementById('loadingSpinner').style.display = 'none';
-            document.getElementById('loginCard').style.display = 'block';
-        }
+    async function save() { 
+        try { 
+            await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(appData) }); 
+            render(); 
+        } catch(e) { alert("⚠️ เกิดข้อผิดพลาดในการบันทึกข้อมูล"); } 
     }
 
-    function hideLoginOverlay() {
-        document.getElementById('loginOverlay').style.display = 'none';
-        document.getElementById('appContent').style.display = 'block';
-    }
-    
-    function loginWithLine() { liff.login({ redirectUri: window.location.href }); }
+    function render() {
+        document.getElementById('sTable').innerHTML = '<tr><th>ชื่อแพ็กเกจ</th><th>ราคา</th><th>จัดการ</th></tr>' + 
+            (appData.services || []).map((s,i) => `<tr><td><strong>${s.name}</strong></td><td style="color:#C5A059; font-weight:bold;">${s.price} ฿</td><td><button class="btn btn-del" onclick="deleteItem('services', ${i})">🗑️ ลบ</button></td></tr>`).join('');
 
-    function switchPage(p) { 
-        document.querySelectorAll('.page').forEach(el => el.classList.remove('active')); 
-        document.querySelectorAll('nav div').forEach(el => el.classList.remove('active')); 
-        document.getElementById('page-'+p).classList.add('active'); 
-        document.getElementById('tab-'+p).classList.add('active'); 
-    }
+        document.getElementById('cTable').innerHTML = '<tr><th>กลุ่มหลัก</th><th>ชื่อที่แสดง</th><th>คำค้น (Maps)</th><th>จัดการ</th></tr>' + 
+            (appData.categories || []).map((c,i) => `<tr><td><span class="status-badge" style="background:#8e44ad;">${c.group}</span></td><td><strong>${c.label}</strong></td><td style="color:var(--info);">${c.keyword}</td><td><button class="btn btn-del" onclick="deleteItem('categories', ${i})">🗑️ ลบ</button></td></tr>`).join('');
 
-    let map, service, infoWindow, currentCoords = { lat: 15.2287, lng: 104.8564 }, googlePlaces = [], currentPagination = null;
-    let gpsMarker = null;
+        document.getElementById('pTable').innerHTML = '<tr><th style="width:25%;">ร้านค้า / จังหวัด</th><th style="width:25%;">หมวดหมู่ / แพ็กเกจ</th><th>รายละเอียด (แก้ได้)</th><th>รูปที่แนบ</th><th>จัดการ</th></tr>' + 
+            (appData.pendingPromotions || []).map((p,i) => `<tr>
+                <td>
+                    <input type="text" id="editPStore_${i}" class="edit-input" value="${p.storeName}" placeholder="ชื่อร้านค้า">
+                    <input type="text" id="editPProv_${i}" class="edit-input" value="${p.province}" placeholder="รหัสจังหวัด เช่น ubon">
+                </td>
+                <td>
+                    <input type="text" id="editPCat_${i}" class="edit-input" value="${p.category || ''}" placeholder="หมวดหมู่">
+                    <input type="text" id="editPServ_${i}" class="edit-input" value="${p.service || ''}" placeholder="ชื่อแพ็กเกจ">
+                </td>
+                <td><textarea id="editPDetail_${i}" class="edit-input" rows="2">${p.detail || ''}</textarea></td>
+                <td><img src="${p.image}" class="img-preview" onclick="viewPromoImage(${i})" title="คลิกเพื่อดูรูปใหญ่"></td>
+                <td>
+                    <button class="btn btn-ok" onclick="approvePromotion(${i})">✅ บันทึก & อนุมัติ (30วัน)</button>
+                    <button class="btn btn-del" onclick="deleteItem('pendingPromotions', ${i})">❌ ลบทิ้ง</button>
+                </td>
+            </tr>`).join('');
 
-    function initMap() {
-        const pSel = document.getElementById('provinceSelect'), prSel = document.getElementById('promoProvinceSelect');
-        if(pSel) pSel.innerHTML = '<option value="current">📍 ตำแหน่งปัจจุบัน</option>';
-        if(prSel) prSel.innerHTML = '';
-        provinces.sort((a,b) => a.name.localeCompare(b.name, 'th')).forEach(p => { 
-            if(pSel) pSel.appendChild(new Option(p.name, p.id)); 
-            if(prSel) prSel.appendChild(new Option(p.name, p.id)); 
-        });
-        if(pSel) pSel.value = 'current'; 
-        map = new google.maps.Map(document.getElementById("map"), { center: currentCoords, zoom: 14, mapTypeControl: false, streetViewControl: false });
-        service = new google.maps.places.PlacesService(map);
-        infoWindow = new google.maps.InfoWindow();
-        
-        checkDataAndSearch();
-    }
-
-    function checkDataAndSearch() {
-        if(appData && appData.categories && appData.categories.length > 0) {
-            changeLocation();
-        } else {
-            setTimeout(checkDataAndSearch, 500); 
-        }
-    }
-
-    function changeLocation() {
-        const val = document.getElementById('provinceSelect').value;
-        if (gpsMarker) gpsMarker.setMap(null); 
-
-        if(val === 'current') {
-            document.getElementById('placeList').innerHTML = '<p style="text-align:center; grid-column:1/-1; padding:50px; color:var(--text-muted);">📍 กำลังขอพิกัด GPS...</p>';
-            if(navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(pos => {
-                    currentCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-                    gpsMarker = new google.maps.Marker({ position: currentCoords, map: map }); 
-                    map.setCenter(currentCoords); 
-                    executeSearch('food'); 
-                }, () => { 
-                    alert("ไม่สามารถเข้าถึงตำแหน่งได้ จะแสดงข้อมูลของอุบลราชธานีแทนครับ"); 
-                    document.getElementById('provinceSelect').value = 'ubon'; 
-                    changeLocation(); 
-                }, { timeout: 10000, enableHighAccuracy: true });
-            }
-        } else {
-            const sel = provinces.find(p => p.id === val);
-            if(sel) { 
-                currentCoords = { lat: sel.lat, lng: sel.lng }; 
-                map.setCenter(currentCoords); 
-                executeSearch('food'); 
-            }
-        }
-    }
-
-    function executeSearch(type) {
-        if (!currentCoords) return; 
-        const searchBox = document.getElementById('searchBox');
-        const searchVal = searchBox ? searchBox.value.trim() : ""; 
-        let keywordToSearch = "ร้านอาหาร"; 
-        
-        const foodSelect = document.getElementById('foodSelect'), beautySelect = document.getElementById('beautySelect'), actSelect = document.getElementById('activitySelect'), sportSelect = document.getElementById('sportSelect');
-
-        if (searchVal !== "" && type === 'text') {
-            keywordToSearch = searchVal;
-            if(foodSelect) foodSelect.selectedIndex = 0; if(beautySelect) beautySelect.selectedIndex = 0; if(actSelect) actSelect.selectedIndex = 0; if(sportSelect) sportSelect.selectedIndex = 0;
-        } else {
-            if (type === 'beauty') { keywordToSearch = beautySelect ? beautySelect.value : keywordToSearch; if(foodSelect) foodSelect.selectedIndex = 0; if(actSelect) actSelect.selectedIndex = 0; if(sportSelect) sportSelect.selectedIndex = 0; if(searchBox) searchBox.value = "";
-            } else if (type === 'food') { keywordToSearch = foodSelect ? foodSelect.value : keywordToSearch; if(beautySelect) beautySelect.selectedIndex = 0; if(actSelect) actSelect.selectedIndex = 0; if(sportSelect) sportSelect.selectedIndex = 0; if(searchBox) searchBox.value = "";
-            } else if (type === 'activity') { keywordToSearch = actSelect ? actSelect.value : keywordToSearch; if(foodSelect) foodSelect.selectedIndex = 0; if(beautySelect) beautySelect.selectedIndex = 0; if(sportSelect) sportSelect.selectedIndex = 0; if(searchBox) searchBox.value = "";
-            } else if (type === 'sport') { keywordToSearch = sportSelect ? sportSelect.value : keywordToSearch; if(foodSelect) foodSelect.selectedIndex = 0; if(beautySelect) beautySelect.selectedIndex = 0; if(actSelect) actSelect.selectedIndex = 0; if(searchBox) searchBox.value = "";
-            } else {
-                if (beautySelect && beautySelect.selectedIndex > 0) keywordToSearch = beautySelect.value;
-                else if (actSelect && actSelect.selectedIndex > 0) keywordToSearch = actSelect.value;
-                else if (sportSelect && sportSelect.selectedIndex > 0) keywordToSearch = sportSelect.value;
-                else if (foodSelect && foodSelect.selectedIndex > 0) keywordToSearch = foodSelect.value;
-            }
-        }
-        
-        googlePlaces = [];
-        document.getElementById('placeList').innerHTML = `<p style="text-align:center; grid-column:1/-1; padding:50px; color:var(--text-muted);">กำลังค้นหา <b>"${keywordToSearch}"</b>...</p>`;
-        
-        service.nearbySearch({ location: currentCoords, radius: 5000, keyword: keywordToSearch }, (res, status, pag) => {
-            if(status === "OK") {
-                const blacklisted = appData.blacklistedPlaces || [];
-                googlePlaces = res.filter(p => !blacklisted.includes(p.place_id));
-                currentPagination = pag; 
-                renderCards(keywordToSearch);
-            } else {
-                document.getElementById('placeList').innerHTML = `<p style="text-align:center; grid-column:1/-1; padding:50px; color:var(--text-muted);">ไม่พบ <b>"${keywordToSearch}"</b> ในบริเวณนี้</p>`;
-            }
-        });
-    }
-
-    function renderCards(keywordSearched) {
-        const list = document.getElementById('placeList');
-        const originPoint = new google.maps.LatLng(currentCoords.lat, currentCoords.lng); 
-        const stores = appData.registeredStores || []; 
         const now = Date.now();
-
-        const sorted = googlePlaces.sort((a, b) => {
-            const isVipA = stores.find(s => s.name === a.name)?.isVIP ? 1 : 0;
-            const isVipB = stores.find(s => s.name === b.name)?.isVIP ? 1 : 0;
-
-            if (isVipA !== isVipB) return isVipB - isVipA; 
-            
-            if (window.google && window.google.maps && window.google.maps.geometry) {
-                const distA = google.maps.geometry.spherical.computeDistanceBetween(originPoint, a.geometry.location);
-                const distB = google.maps.geometry.spherical.computeDistanceBetween(originPoint, b.geometry.location);
-                return distA - distB;
-            }
-            return 0;
-        });
-        
-        let html = sorted.slice(0, 80).map(p => {
-            const store = stores.find(s => s.name === p.name);
-            let isVIP = false;
-            
-            // ⚡ เช็คว่ารัน VIP และยังไม่หมดอายุ หรือถ้าหมดอายุแต่เปิดต่ออายุอัตโนมัติไว้ ให้ถือว่าเป็น VIP อยู่
-            if (store && store.isVIP) {
-                if (!store.vipExpireTimestamp || store.vipExpireTimestamp > now || store.vipAutoRenew) {
-                    isVIP = true;
-                }
-            }
-
-            const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${p.geometry.location.lat()},${p.geometry.location.lng()}`;
-            
-            let distanceKm = "0.0";
-            if (window.google && window.google.maps && window.google.maps.geometry) {
-                distanceKm = (google.maps.geometry.spherical.computeDistanceBetween(originPoint, p.geometry.location) / 1000).toFixed(1); 
-            }
-
-            let openStatusHtml = '<span class="status-tag" style="background:var(--bg-light); color:var(--text-muted); border:1px solid var(--border);">⚪ ไม่ระบุเวลา</span>'; 
-            if (p.business_status === 'CLOSED_TEMPORARILY') { openStatusHtml = '<span class="status-tag" style="background:#FFF3F3; color:var(--danger); border:1px solid rgba(217,83,79,0.2);">🔴 ปิดชั่วคราว</span>'; } 
-            else if (p.business_status === 'CLOSED_PERMANENTLY') { openStatusHtml = '<span class="status-tag" style="background:#FFF3F3; color:var(--danger); border:1px solid rgba(217,83,79,0.2);">🔴 ปิดถาวร</span>'; } 
-            else { 
-                let isOpen = undefined; 
-                if (p.opening_hours) { if (typeof p.opening_hours.isOpen === 'function') isOpen = p.opening_hours.isOpen(); else if ('open_now' in p.opening_hours) isOpen = p.opening_hours.open_now; } 
-                if (isOpen === true) { openStatusHtml = '<span class="status-tag" style="background:#F4FBF4; color:#2E7D32; border:1px solid rgba(46,125,50,0.2);">🟢 เปิดอยู่ตอนนี้</span>'; } 
-                else if (isOpen === false) { openStatusHtml = '<span class="status-tag" style="background:#FFF3F3; color:var(--danger); border:1px solid rgba(217,83,79,0.2);">🔴 ปิดแล้ว</span>'; } 
-                else if (p.business_status === 'OPERATIONAL') { openStatusHtml = '<span class="status-tag" style="background:#F4FBF4; color:#2E7D32; border:1px solid rgba(46,125,50,0.2);">🟢 เปิดให้บริการ</span>'; } 
-            } 
-            
-            return `<div class="place-card ${isVIP ? 'card-vip':''}" onclick="focusPlace('${p.place_id}')">
-                ${isVIP?'<div class="vip-crown-badge">👑 VIP RECOMMEND</div>':''}
-                <div class="distance-badge">${distanceKm} กม.</div>
-                <img src="${p.photos?p.photos[0].getUrl({maxWidth:400}):'https://via.placeholder.com/400x200?text=Painaidee'}">
-                <div class="place-info">
-                    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; gap: 8px;">
-                        <h3 style="margin:0; font-size: 16px; flex: 1; color:${isVIP?'#FFD700':'var(--text-gold)'}; font-weight:600; line-height:1.2;">${p.name}</h3>
-                        <div style="text-align:right; flex-shrink: 0;">${openStatusHtml}</div>
-                    </div>
-                    <p style="font-size:13px; color:var(--text-muted); margin:0 0 10px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.vicinity}</p>
-                    <div><span style="color:var(--primary); font-weight:600;">⭐ ${p.rating || 'ใหม่'}</span></div>
-
-                    <div class="action-buttons">
-                        <button class="btn-action btn-nav" onclick="window.open('${navUrl}', '_blank'); event.stopPropagation();">นำทาง</button>
-                        <button class="btn-action btn-call" onclick="callPlace('${p.place_id}', event)">โทร</button>
-                        ${(isVIP && store.lineUrl) ? `<button class="btn-action btn-line" onclick="window.open('${store.lineUrl.startsWith('http') ? store.lineUrl : 'https://'+store.lineUrl}', '_blank'); event.stopPropagation();">LINE</button>` : ''}
-                        ${(isVIP && store.fbUrl) ? `<button class="btn-action btn-fb" onclick="window.open('${store.fbUrl.startsWith('http') ? store.fbUrl : 'https://'+store.fbUrl}', '_blank'); event.stopPropagation();">FB</button>` : ''}
-                        <button class="btn-action btn-share" onclick="sharePlace('${p.name.replace(/'/g, "\\'")}', ${p.geometry.location.lat()}, ${p.geometry.location.lng()}, event)">แชร์</button>
-                    </div>
-                    <div style="margin-top:15px; text-align:right;"><span style="color:var(--danger); font-size:11px; cursor:pointer; opacity:0.6; border-bottom: 1px dotted var(--danger);" onclick="reportClosed('${p.place_id}','${p.name.replace(/'/g,"")}'); event.stopPropagation();">🚩 แจ้งร้านปิดถาวร</span></div>
-                </div>
-            </div>`;
-        }).join('');
-        
-        if(currentPagination && currentPagination.hasNextPage && googlePlaces.length < 80) html += `<div style="grid-column:1/-1; text-align:center;"><button class="btn-outline" style="width:200px; border-color:var(--primary);" onclick="this.innerHTML='โหลดเพิ่ม...'; currentPagination.nextPage()">⬇️ ดูเพิ่มเติม</button></div>`;
-        list.innerHTML = html; 
-        renderPromos();
-    }
-
-    function focusPlace(id) { 
-        const p = googlePlaces.find(x => x.place_id === id); 
-        if(p) { map.panTo(p.geometry.location); map.setZoom(17); window.scrollTo({ top: 0, behavior: 'smooth' }); } 
-    }
-    
-    function callPlace(placeId, event) { 
-        event.stopPropagation(); 
-        service.getDetails({ placeId: placeId, fields: ['formatted_phone_number'] }, (place, status) => { 
-            if (status === google.maps.places.PlacesServiceStatus.OK && place.formatted_phone_number) window.location.href = `tel:${place.formatted_phone_number.replace(/[\s-]/g, '')}`; 
-            else alert("ขออภัยครับ ร้านนี้ไม่ได้ระบุเบอร์โทร"); 
-        }); 
-    }
-    
-    function sharePlace(name, lat, lng, event) { 
-        event.stopPropagation(); 
-        const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`; 
-        if (navigator.share) navigator.share({ title: name, url: navUrl }).catch(console.error); 
-        else { navigator.clipboard.writeText(navUrl); alert("คัดลอกลิงก์เรียบร้อยแล้ว"); } 
-    }
-
-    function renderPromos() {
-        let curProv = document.getElementById('provinceSelect').value;
-        const now = Date.now();
-        
-        // ⚡ กรองโปรโมชั่นที่หมดอายุแล้วออก (ยกเว้นเปิดต่ออายุอัตโนมัติไว้)
-        const activePromos = (appData.activePromotions || []).filter(p => {
-            if (p.expireTimestamp && now > p.expireTimestamp && !p.autoRenew) return false;
-            return true;
-        }); 
-        
-        if (curProv === 'current' && currentCoords && window.google && window.google.maps && window.google.maps.geometry) {
-            let minDist = Infinity;
-            const originPoint = new google.maps.LatLng(currentCoords.lat, currentCoords.lng);
-            provinces.forEach(p => {
-                const destPoint = new google.maps.LatLng(p.lat, p.lng);
-                const dist = google.maps.geometry.spherical.computeDistanceBetween(originPoint, destPoint);
-                if (dist < minDist) { minDist = dist; curProv = p.id; }
-            });
-        } else if (curProv === 'current') {
-            curProv = 'ubon'; 
-        }
-        
-        const promos = activePromos.filter(p => p.province === curProv);
-        const banner = document.getElementById('promoBanner');
-        
-        if(promos.length > 0) {
-            banner.style.display = 'block';
-            document.getElementById('approvedPromoList').innerHTML = promos.map(p => {
-                // ⚡ เช็ค VIP และการหมดอายุ
-                const store = appData.registeredStores.find(s => s.name === p.storeName);
-                let isVIP = false;
-                if (store && store.isVIP) {
-                    if (!store.vipExpireTimestamp || store.vipExpireTimestamp > now || store.vipAutoRenew) {
-                        isVIP = true;
-                    }
-                }
+        document.getElementById('activePTable').innerHTML = '<tr><th style="width:20%;">ร้านค้า / จังหวัด</th><th>รายละเอียดแคปชั่น</th><th>หมดอายุ</th><th>ต่ออายุอัตโนมัติ</th><th>จัดการ</th></tr>' + 
+            (appData.activePromotions || []).map((p,i) => {
+                const isExpired = p.expireTimestamp && now > p.expireTimestamp;
+                const store = (appData.registeredStores || []).find(s => s.name === p.storeName);
+                const phone = store ? (store.phone || '-') : '-';
                 
-                return `
-                <div class="place-card" style="border:2px solid var(--primary); box-shadow: 0 0 20px rgba(197,160,89,0.2);">
-                    <div style="position:absolute; top:12px; right:-28px; background:#D9534F; color:#FFF; padding:4px 30px; transform:rotate(45deg); font-size:11px; font-weight:800; z-index:10; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">HOT 🔥</div>
-                    <div style="position:relative; width:100%; height:180px; overflow:hidden;" class="shine-effect">
-                        <img src="${p.image}" style="width:100%; height:100%; object-fit:cover;">
-                    </div>
-                    <div style="padding:18px; display:flex; flex-direction:column; flex-grow:1;">
-                        ${p.category ? `<span style="background:var(--primary); color:#000; padding:2px 10px; border-radius:12px; font-size:11px; font-weight:600; display:inline-block; margin-bottom:8px; align-self:flex-start;">📌 ${p.category}</span>` : ''}
-                        <h3 style="margin:0 0 8px 0; font-size:18px; color:#FFD700; font-weight:600; text-shadow:0 0 5px rgba(255,215,0,0.3);">✨ ${p.storeName}</h3>
-                        <div style="background: rgba(197, 160, 89, 0.1); padding: 12px; border-radius: 8px; border: 1px dashed var(--primary); margin-bottom: 15px;">
-                            <p style="font-size:14px; color:var(--text-main); margin:0;">${p.detail}</p>
-                        </div>
-                        <div style="display:flex; gap:8px; margin-top:auto;">
-                            ${(isVIP && p.lineUrl) ? `<button onclick="window.open('${p.lineUrl.startsWith('http') ? p.lineUrl : 'https://'+p.lineUrl}', '_blank')" class="promo-btn-hover" style="flex:1; background:var(--line-green); color:white; border:none; padding:10px; border-radius:8px; font-family:'Kanit'; font-weight:600; font-size:13px; cursor:pointer;">💬 LINE</button>` : ''}
-                            ${(isVIP && p.fbUrl) ? `<button onclick="window.open('${p.fbUrl.startsWith('http') ? p.fbUrl : 'https://'+p.fbUrl}', '_blank')" class="promo-btn-hover" style="flex:1; background:var(--fb-blue); color:white; border:none; padding:10px; border-radius:8px; font-family:'Kanit'; font-weight:600; font-size:13px; cursor:pointer;">👍 FB</button>` : ''}
-                            <button onclick="document.getElementById('searchBox').value='${p.storeName}'; executeSearch('text'); window.scrollTo({top: document.getElementById('map').offsetTop - 20, behavior:'smooth'});" class="promo-btn-hover" style="flex:1; background:linear-gradient(135deg, #FFD700, #C5A059); color:#000; border:none; padding:10px; border-radius:8px; font-family:'Kanit'; font-weight:600; font-size:13px; cursor:pointer; box-shadow: 0 4px 10px rgba(197,160,89,0.2);">📍 ดูพิกัดร้าน</button>
-                        </div>
-                    </div>
-                </div>`;
+                return `<tr style="${isExpired ? 'opacity: 0.6; background: #fff5f5;' : ''}">
+                    <td>
+                        <input type="text" id="editAStore_${i}" class="edit-input" value="${p.storeName}" style="font-weight:bold;">
+                        <input type="text" id="editAProv_${i}" class="edit-input" value="${p.province}">
+                        <div style="font-size:12px; color:var(--info);">📞 ${phone}</div>
+                    </td>
+                    <td><textarea id="editADetail_${i}" class="edit-input" rows="2">${p.detail}</textarea></td>
+                    <td style="color:${isExpired ? 'var(--danger)' : 'var(--success)'}; font-weight:600; font-size:12px;">
+                        ${p.expireTimestamp ? new Date(p.expireTimestamp).toLocaleString('th-TH') : '-'}
+                    </td>
+                    <td>
+                        <button class="btn ${p.autoRenew ? 'btn-ok' : 'btn-nav'}" style="background: ${p.autoRenew ? 'var(--success)' : '#888'};" onclick="togglePromoAutoRenew(${i})">
+                            🔄 ${p.autoRenew ? 'ON' : 'OFF'}
+                        </button>
+                    </td>
+                    <td>
+                        <button class="btn btn-info" onclick="saveActivePromo(${i})">💾 เซฟแก้</button>
+                        <button class="btn btn-del" onclick="deleteItem('activePromotions', ${i})">🗑️ ลบ</button>
+                    </td>
+                </tr>`;
             }).join('');
-        } else { banner.style.display = 'none'; }
+
+        document.getElementById('rTable').innerHTML = '<tr><th>ชื่อร้าน</th><th>เบอร์โทร</th><th>เอกสารแนบ</th><th>จัดการ</th></tr>' + 
+            (appData.registrationRequests || []).map((r,i) => `<tr>
+                <td><strong>${r.storeName}</strong></td>
+                <td>${r.phone || 'ไม่ระบุ'}</td>
+                <td>
+                    ${r.storePhoto ? `<button class="btn btn-info" onclick="viewRegImage(${i}, 'storePhoto')">🖼️ หน้าร้าน</button>` : ''}
+                    ${r.idCard ? `<button class="btn btn-info" onclick="viewRegImage(${i}, 'idCard')">🆔 บัตร ปชช.</button>` : ''}
+                    ${r.commercial ? `<button class="btn btn-info" onclick="viewRegImage(${i}, 'commercial')">📄 พาณิชย์</button>` : ''}
+                </td>
+                <td>
+                    <button class="btn btn-ok" onclick="approveStore(${i})">🎫 สร้าง PIN</button>
+                    <button class="btn btn-del" onclick="deleteItem('registrationRequests', ${i})">❌ ลบ</button>
+                </td>
+            </tr>`).join('');
+
+        document.getElementById('storeTable').innerHTML = '<tr><th>ชื่อร้าน</th><th>รหัส PIN</th><th>เบอร์ติดต่อ</th><th>VIP หมดอายุ</th><th>จัดการสิทธิ์</th></tr>' + 
+            (appData.registeredStores || []).map((s,i) => `<tr>
+                <td><strong>${s.name}</strong></td>
+                <td style="font-weight:bold; color:var(--primary); font-size:16px;">${s.pin}</td>
+                <td>${s.phone || 'ไม่ระบุ'}</td>
+                <td style="font-size:12px;">${(s.isVIP && s.vipExpireTimestamp) ? new Date(s.vipExpireTimestamp).toLocaleString('th-TH') : '-'}</td>
+                <td>
+                    <button class="btn ${s.isVIP ? 'btn-del' : 'btn-warn'}" onclick="toggleVIP(${i})">${s.isVIP ? '❌ ยกเลิก VIP' : '👑 อนุมัติ VIP 30 วัน'}</button>
+                    ${s.isVIP ? `<button class="btn" style="background: ${s.vipAutoRenew ? 'var(--success)' : '#888'}; color:white;" onclick="toggleVipAutoRenew(${i})">🔄 ต่ออายุอัตโนมัติ: ${s.vipAutoRenew ? 'ON' : 'OFF'}</button>` : ''}
+                    <button class="btn btn-del" onclick="deleteItem('registeredStores', ${i})">🗑️ ลบร้าน</button>
+                </td>
+            </tr>`).join('');
+
+        document.getElementById('closedTable').innerHTML = '<tr><th>ร้านที่ถูกแจ้ง (ID)</th><th>วันที่ลูกค้าแจ้ง</th><th>จัดการ</th></tr>' + 
+            (appData.closedReports || []).map((c,i) => `<tr><td><strong>${c.storeName}</strong><br><small style="color:#888;">${c.placeId}</small></td><td>${c.date}</td><td><button class="btn btn-del" onclick="blacklistPlace('${c.placeId}', ${i})">🚩 ยืนยัน แบนร้านถาวร</button><button class="btn btn-info" onclick="deleteItem('closedReports', ${i})">❌ ลบรายงานทิ้ง</button></td></tr>`).join('');
     }
 
-    function renderUI() {
-        const cData = appData.categories || [];
-        const groups = ['food', 'beauty', 'activity', 'sport'];
-        const labels = ['🍽️ หมวดอาหาร', '💆‍♀️ ความงาม/พักผ่อน', '🎯 กิจกรรม/เที่ยว', '🏋️ กีฬา/ออกกำลังกาย'];
-        
-        groups.forEach((g, i) => {
-            const sel = document.getElementById(g+'Select');
-            if(sel) {
-                let h = `<option value="">${labels[i]}</option>`;
-                cData.filter(c => c.group === g).forEach(c => h += `<option value="${c.keyword}">${c.label}</option>`);
-                sel.innerHTML = h;
-            }
-        });
+    function toggleVipAutoRenew(i) {
+        appData.registeredStores[i].vipAutoRenew = !appData.registeredStores[i].vipAutoRenew;
+        save();
+    }
 
-        const pCat = document.getElementById('promoStoreCategory');
-        if(pCat) {
-            let ph = '';
-            groups.forEach((g, i) => {
-                ph += `<optgroup label="${labels[i]}">`;
-                cData.filter(c => c.group === g).forEach(c => { ph += `<option value="${c.label}">${c.label}</option>`; });
-                ph += `</optgroup>`;
-            });
-            pCat.innerHTML = ph;
+    function togglePromoAutoRenew(i) {
+        appData.activePromotions[i].autoRenew = !appData.activePromotions[i].autoRenew;
+        save();
+    }
+
+    function viewRegImage(index, key) { openImageTab(appData.registrationRequests[index][key]); }
+    function viewPromoImage(index) { openImageTab(appData.pendingPromotions[index].image); }
+
+    function openImageTab(base64Str) {
+        const newWindow = window.open();
+        if (newWindow) {
+            newWindow.document.write(`<html><head><title>ดูรูปภาพ - Painaidee</title></head><body style="margin:0; background:#121418; display:flex; align-items:center; justify-content:center; height:100vh;"><img src="${base64Str}" style="max-width:95%; max-height:95vh; border-radius:12px; box-shadow:0 0 30px rgba(0,0,0,0.8);"></body></html>`);
+        } else { alert("กรุณาอนุญาต Pop-up บนเบราว์เซอร์ของคุณเพื่อดูรูปภาพครับ"); }
+    }
+
+    function addService() {
+        const name = document.getElementById('sName').value.trim(); const price = document.getElementById('sPrice').value.trim();
+        if(!name || !price) return alert("กรุณากรอกข้อมูลให้ครบถ้วนครับ");
+        if(!appData.services) appData.services = []; appData.services.push({ name, price: parseInt(price) }); save();
+        document.getElementById('sName').value = ''; document.getElementById('sPrice').value = '';
+    }
+
+    function addCategory() {
+        const group = document.getElementById('cGroup').value; const label = document.getElementById('cLabel').value.trim(); const keyword = document.getElementById('cKey').value.trim();
+        if(!label || !keyword) return alert("กรุณากรอกข้อมูลให้ครบถ้วนครับ");
+        if(!appData.categories) appData.categories = []; appData.categories.push({ group, label, keyword }); save();
+        document.getElementById('cLabel').value = ''; document.getElementById('cKey').value = '';
+    }
+
+    function approvePromotion(i) {
+        let p = appData.pendingPromotions[i]; 
+        p.storeName = document.getElementById(`editPStore_${i}`).value;
+        p.province = document.getElementById(`editPProv_${i}`).value;
+        p.category = document.getElementById(`editPCat_${i}`).value;
+        p.service = document.getElementById(`editPServ_${i}`).value;
+        p.detail = document.getElementById(`editPDetail_${i}`).value;
+        p.expireTimestamp = Date.now() + (30 * 24 * 60 * 60 * 1000); // 30 วัน
+        p.autoRenew = false; // ปิดต่ออายุอัตโนมัติไว้เป็นค่าเริ่มต้น
+        
+        if(!appData.activePromotions) appData.activePromotions = [];
+        const existingIndex = appData.activePromotions.findIndex(act => act.storeName === p.storeName);
+        if(existingIndex !== -1) { appData.activePromotions[existingIndex] = p; } 
+        else { appData.activePromotions.unshift(p); }
+
+        appData.pendingPromotions.splice(i, 1); 
+        save();
+    }
+
+    function saveActivePromo(i) {
+        let p = appData.activePromotions[i];
+        p.storeName = document.getElementById(`editAStore_${i}`).value;
+        p.province = document.getElementById(`editAProv_${i}`).value;
+        p.detail = document.getElementById(`editADetail_${i}`).value;
+        save();
+    }
+
+    function approveStore(i) {
+        let r = appData.registrationRequests[i]; let pin = Math.floor(1000 + Math.random() * 9000).toString();
+        if(!appData.registeredStores) appData.registeredStores = [];
+        appData.registeredStores.unshift({ name: r.storeName, pin: pin, isVIP: false, phone: r.phone || 'ไม่ระบุ' }); appData.registrationRequests.splice(i, 1); save();
+    }
+
+    function toggleVIP(i) { 
+        let s = appData.registeredStores[i];
+        if (s.isVIP) {
+            s.isVIP = false; // ปิด VIP
+        } else {
+            s.isVIP = true; // เปิด VIP
+            s.vipExpireTimestamp = Date.now() + (30 * 24 * 60 * 60 * 1000); // ตั้งหมดอายุ 30 วัน
+            s.vipAutoRenew = false; // ค่าเริ่มต้นปิด Auto-renew
         }
-
-        const sSel = document.getElementById('promoServiceSelect');
-        if(sSel) sSel.innerHTML = (appData.services||[]).map(s => `<option value="${s.name} - ${s.price}฿">${s.name} - ${s.price}฿</option>`).join('');
+        save(); 
     }
 
-    function reportClosed(id, n) { 
-        if(confirm('ยืนยันแจ้งปิดร้าน '+n+' ถาวร?')) { 
-            if(!appData.closedReports) appData.closedReports = [];
-            appData.closedReports.push({placeId:id, storeName:n, date:new Date().toLocaleString()}); 
-            saveToCloud(); alert('ขอบคุณครับ แอดมินจะตรวจสอบครับ'); 
-        } 
-    }
-
-    let regMiniMap, regMiniMarker;
-    function searchRegStore() {
-        const q = document.getElementById('regStoreName').value;
-        if(!q) return alert("ระบุชื่อร้านก่อนครับ");
-        service.textSearch({ query: q, location: currentCoords, radius: 50000 }, (res, status) => {
-            if(status === "OK") {
-                const p = res[0];
-                document.getElementById('regStoreVerifyCard').style.display = 'block';
-                document.getElementById('regVerifyStoreName').innerText = "✅ " + p.name;
-                document.getElementById('regStoreName').value = p.name;
-                if(!regMiniMap) regMiniMap = new google.maps.Map(document.getElementById("regMiniMap"), { zoom: 16, mapTypeControl: false });
-                regMiniMap.setCenter(p.geometry.location);
-                if(regMiniMarker) regMiniMarker.setMap(null);
-                regMiniMarker = new google.maps.Marker({ position: p.geometry.location, map: regMiniMap });
-            } else alert("ไม่พบพิกัดร้านครับ");
-        });
-    }
-
-    async function submitStoreRegistration() {
-        const btn = document.getElementById('btnSubmitReg'); 
-        const n = document.getElementById('regStoreName').value;
-        const p1 = document.getElementById('regStorePhoto').files[0];
-        const p2 = document.getElementById('regIdCard').files[0];
-        const p3 = document.getElementById('regPhone').value; // ⚡ ดึงเบอร์โทร
-        
-        if(!n || !p1 || !p2 || !p3) return alert("กรุณากรอกข้อมูลให้ครบถ้วนครับ");
-        
-        btn.innerText = "กำลังอัปโหลดข้อมูล... ⏳"; btn.disabled = true;
-        const photo = await resizeImg(p1);
-        const idCard = await resizeImg(p2);
-        let comm = "";
-        if (document.getElementById('regCommercial').files[0]) {
-            comm = await resizeImg(document.getElementById('regCommercial').files[0]);
-        }
-        
-        if (!appData.registrationRequests) appData.registrationRequests = [];
-        appData.registrationRequests.push({ id: Date.now(), storeName: n, phone: p3, storePhoto: photo, idCard: idCard, commercial: comm });
-        await saveToCloud(); 
-        alert("ส่งข้อมูลสำเร็จ! รอรับ PIN จากแอดมินครับ");
-        btn.innerText = "🚀 ส่งเอกสารเพื่อตรวจสอบ"; btn.disabled = false;
-        
-        ['regStoreName','regPhone','regStorePhoto','regIdCard','regCommercial'].forEach(id => document.getElementById(id).value = '');
-        document.getElementById('regStoreVerifyCard').style.display = 'none';
-    }
-
-    function verifyStore() {
-        const stores = appData.registeredStores || [];
-        const store = stores.find(s => s.pin === document.getElementById('storePinInput').value);
-        if(store) { 
-            document.getElementById('lockedFeatures').style.display = 'block'; 
-            
-            // ⚡ เช็คว่าร้านค้าเป็น VIP หรือไม่ ถ้าเป็นถึงจะเปิดให้กรอก LINE/FB
-            const now = Date.now();
-            let isVIP = false;
-            if (store.isVIP && (!store.vipExpireTimestamp || store.vipExpireTimestamp > now || store.vipAutoRenew)) {
-                isVIP = true;
-            }
-
-            if(isVIP) {
-                document.getElementById('vipUpdateSection').style.display = 'block';
-                document.getElementById('vipLineInput').value = store.lineUrl || '';
-                document.getElementById('vipFbInput').value = store.fbUrl || '';
-            } else {
-                document.getElementById('vipUpdateSection').style.display = 'none';
-            }
-
-            const existingPromo = (appData.activePromotions || []).find(p => p.storeName === store.name) || 
-                                  (appData.pendingPromotions || []).find(p => p.storeName === store.name);
-            
-            if (existingPromo) {
-                if(document.getElementById('promoProvinceSelect')) document.getElementById('promoProvinceSelect').value = existingPromo.province || 'ubon';
-                if(document.getElementById('promoStoreCategory')) document.getElementById('promoStoreCategory').value = existingPromo.category || '';
-                if(document.getElementById('promoServiceSelect')) document.getElementById('promoServiceSelect').value = existingPromo.service || '';
-                if(document.getElementById('promoDetail')) document.getElementById('promoDetail').value = existingPromo.detail || '';
-                window.currentPromoImage = existingPromo.image; 
-            }
-
-            alert("ยินดีต้อนรับร้าน " + store.name); 
-        } else alert("PIN ไม่ถูกต้อง");
-    }
-
-    async function updateVipData() {
-        const stores = appData.registeredStores || [];
-        const store = stores.find(s => s.pin === document.getElementById('storePinInput').value);
-        if(store) { 
-            store.lineUrl = document.getElementById('vipLineInput').value; 
-            store.fbUrl = document.getElementById('vipFbInput').value; 
-            await saveToCloud(); alert("บันทึกข้อมูลติดต่อแล้ว"); 
+    function blacklistPlace(placeId, reportIndex) {
+        if(confirm('⚠️ คุณแน่ใจนะว่าจะแบนร้านนี้ถาวร? ร้านนี้จะไม่แสดงผลในหน้าแผนที่และการค้นหาอีกเลย')) {
+            if(!appData.blacklistedPlaces) appData.blacklistedPlaces = [];
+            if(!appData.blacklistedPlaces.includes(placeId)) appData.blacklistedPlaces.push(placeId);
+            appData.closedReports.splice(reportIndex, 1); save();
         }
     }
 
-    async function submitPromoWithPIN() {
-        const btn = document.getElementById('btnSubmitPromo'); 
-        const stores = appData.registeredStores || [];
-        const store = stores.find(s => s.pin === document.getElementById('storePinInput').value);
-        const pImgFile = document.getElementById('promoImageInput').files[0];
-        const pDet = document.getElementById('promoDetail').value;
-        
-        if(!store) return alert("กรุณายืนยัน PIN ก่อน");
-        if(!pImgFile && !window.currentPromoImage) return alert("กรุณาแนบรูปและกรอกรายละเอียด");
+    function deleteItem(targetArray, index) { if(confirm('🗑️ ยืนยันการลบข้อมูลนี้ใช่หรือไม่?')) { appData[targetArray].splice(index, 1); save(); } }
+    function showLoading(show) { document.getElementById('loading').style.display = show ? 'flex' : 'none'; }
 
-        btn.innerText = "กำลังประมวลผลรูป... ⏳"; btn.disabled = true;
-        
-        let img = window.currentPromoImage;
-        if(pImgFile) { img = await resizeImg(pImgFile); }
-        
-        if (!appData.pendingPromotions) appData.pendingPromotions = [];
-        appData.pendingPromotions = appData.pendingPromotions.filter(p => p.storeName !== store.name);
-        
-        appData.pendingPromotions.push({ 
-            id: Date.now().toString(), storeName: store.name, province: document.getElementById('promoProvinceSelect').value, 
-            detail: pDet, image: img, service: document.getElementById('promoServiceSelect').value, category: document.getElementById('promoStoreCategory').value,
-            lineUrl: store.lineUrl || '', fbUrl: store.fbUrl || ''
-        });
-        
-        await saveToCloud(); 
-        alert("ส่งข้อมูลอัปเดตสำเร็จ! รอแอดมินอนุมัติครับ");
-        btn.innerText = "🚀 สั่งซื้อและส่งเรื่องอัปเดตข้อมูล"; btn.disabled = false;
-        document.getElementById('promoImageInput').value = '';
-    }
-
-    window.onload = initializeLiff;
+    window.onload = load;
 </script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD7Qqf1Z9KQBuvipDzgIc5laJLz9SiOBH8&libraries=places,geometry&callback=initMap" async defer></script>
 </body>
 </html>
