@@ -71,11 +71,8 @@
         
         .action-buttons { display: flex; gap: 8px; margin-top: auto; padding-top: 15px; flex-wrap: wrap; }
         .btn-action { flex: 1; text-align: center; color: white; text-decoration: none; padding: 10px 5px; border-radius: 10px; font-weight: 500; font-size: 12px; transition: 0.3s; border: none; cursor: pointer; font-family: 'Kanit'; min-width: 30%; }
-        
-        /* ⚡ เปลี่ยนสีปุ่ม นำทาง เป็นสีฟ้าสว่างๆ */
         .btn-nav { background: #4285F4 !important; color: #FFF !important; border: none !important; font-weight: 600; box-shadow: 0 4px 10px rgba(66, 133, 244, 0.3); }
         .btn-nav:hover { background: #357AE8 !important; transform: translateY(-2px); }
-        
         .btn-call { background: var(--primary); color: white; }
         .btn-share { background: transparent; color: var(--text-gold); border: 1px solid var(--border); }
         .status-tag { display: inline-flex; align-items: center; justify-content: center; padding: 4px 8px; border-radius: 20px; font-size: 11px; font-weight: 500; white-space: nowrap; box-shadow: 0 2px 5px rgba(0,0,0,0.2); line-height: 1.2; }
@@ -219,12 +216,35 @@
             </div>
 
             <div id="lockedFeatures" style="display: none; margin-top: 20px;">
+                
+                <div id="vipSubscribeSection" style="padding: 20px; border: 2px solid #FFD700; border-radius: 16px; background: linear-gradient(180deg, rgba(255, 215, 0, 0.1) 0%, var(--surface) 100%); margin-bottom: 25px; text-align: center;">
+                    <h4 id="vipSubscribeTitle" style="margin: 0 0 10px 0; color: #FFD700; font-size: 18px;">👑 สมัครสมาชิก VIP</h4>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">ปลดล็อกการใส่ลิงก์ LINE, Facebook และป้ายกำกับร้านแนะนำ</p>
+                    
+                    <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid rgba(197, 160, 89, 0.3);">
+                        <p style="margin: 0; color: #FFF; font-size: 16px;">ค่าบริการ: <strong style="color: var(--line-green); font-size: 20px;" id="displayVipPrice">500</strong> <strong>บาท/เดือน</strong></p>
+                        <p style="margin: 5px 0 0 0; font-size: 13px; color: var(--primary-light);">บัญชีโอนเงิน: <span id="displayBankAcc">รอแอดมินตั้งค่าบัญชี</span></p>
+                    </div>
+                    
+                    <div class="form-group" style="text-align: left;">
+                        <label>🧾 แนบสลิปการโอนเงิน <span style="color:var(--danger);">*</span></label>
+                        <input type="file" id="vipSlipInput" accept="image/*">
+                    </div>
+                    
+                    <button id="btnSubmitVip" class="btn-primary" style="background: linear-gradient(135deg, #FFD700, #C5A059); color: #000; font-weight: 600; padding: 12px; font-size: 16px;" onclick="submitVipRequest()">
+                        ส่งสลิปเพื่ออัปเกรด VIP
+                    </button>
+                </div>
+
                 <div id="vipUpdateSection" style="padding: 15px; border: 1px dashed var(--primary); border-radius: 12px; margin-bottom: 25px; background: rgba(197, 160, 89, 0.05); display: none;">
-                    <h4 style="margin: 0 0 5px 0; color: #FFD700; font-size: 16px;">👑 ข้อมูลติดต่อพิเศษ (VIP Links)</h4>
-                    <p id="vipLockMessage" style="font-size: 12px; color: var(--danger); margin-top: 0; margin-bottom: 10px;">* ระบุลิงก์เพื่อให้ลูกค้ากดติดต่อได้ทันที</p>
+                    <div style="text-align: center; margin-bottom: 15px;">
+                        <span style="background: var(--line-green); color: white; padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: bold;">✅ สถานะ VIP ใช้งานได้</span>
+                    </div>
+                    <h4 style="margin: 0 0 5px 0; color: #FFD700; font-size: 16px;">🔗 ข้อมูลติดต่อพิเศษ (VIP Links)</h4>
+                    <p style="font-size: 12px; color: var(--text-muted); margin-top: 0; margin-bottom: 10px;">ลูกค้าร้าน VIP สามารถกดลิงก์ติดต่อได้ทันที</p>
                     <div class="form-group"><label style="font-size: 12px;">ลิงก์ LINE OA</label><input type="text" id="vipLineInput" placeholder="https://line.me/R/ti/p/..."></div>
                     <div class="form-group" style="margin-bottom: 10px;"><label style="font-size: 12px;">ลิงก์ Facebook Page</label><input type="text" id="vipFbInput" placeholder="https://facebook.com/..."></div>
-                    <button id="btnSaveVip" class="btn-primary" style="background: linear-gradient(135deg, #FFD700, #C5A059); color: #000;" onclick="updateVipData()">💾 บันทึกข้อมูลลิงก์โซเชียล</button>
+                    <button class="btn-outline" style="width: 100%; border-color: var(--primary);" onclick="updateVipData()">💾 บันทึกข้อมูลลิงก์โซเชียล</button>
                 </div>
 
                 <div style="padding: 20px; border: 2px solid var(--primary); border-radius: 16px; background: linear-gradient(180deg, rgba(197, 160, 89, 0.1) 0%, var(--surface) 100%); position: relative; overflow: hidden; margin-top: 30px;">
@@ -260,7 +280,6 @@
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbxQyC0TH3kUurtvoIS8RMwii2McaYAeKzpwbqFeJiomKzEdDcJePN0RJcwIIHNyTq-t/exec";
     
-    // ข้อมูลเริ่มต้นเผื่อกรณีฐานข้อมูล Cloud ยังว่าง
     const defaultCategories = [
         { id: 1, group: 'food', label: 'หมูกระทะ / แจ่วฮ้อน', keyword: 'หมูกระทะ' },
         { id: 2, group: 'food', label: 'ชาบู / สุกี้', keyword: 'ชาบู' },
@@ -279,11 +298,10 @@
     ];
 
     const defaultServices = [
-        { id: 1, name: 'ปักหมุดโปรโมชั่นหน้าแรก (รายเดือน)', price: 500 },
-        { id: 2, name: 'อัปเดตแก้ไขแบนเนอร์ (ต่อครั้ง)', price: 150 }
+        { id: 1, name: 'อัปเดตแก้ไขแบนเนอร์ (ต่อครั้ง)', price: 150 }
     ];
 
-    let appData = { registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], categories: [], closedReports: [], blacklistedPlaces: [], services: [] };
+    let appData = { registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], categories: [], closedReports: [], blacklistedPlaces: [], services: [], pendingVipRequests: [], vipSettings: { price: 500, bankAccount: 'กสิกรไทย 123-4-56789-0 (ไปไหนดี)' } };
 
     const provinces = [
         {id:'bkk',name:'กรุงเทพมหานคร',lat:13.7563,lng:100.5018},{id:'krabi',name:'กระบี่',lat:8.0863,lng:98.9063},{id:'kanchanaburi',name:'กาญจนบุรี',lat:14.0159,lng:99.5336},
@@ -366,18 +384,15 @@
         try {
             await liff.init({ liffId: "2009598846-wiCUeV35" });
             
-            // 1. ถ้าไม่ได้ล็อกอิน ให้หยุดโหลด แล้วโชว์ปุ่มให้ผู้ใช้กด Login
             if (!liff.isLoggedIn()) {
                 document.getElementById('loadingSpinner').style.display = 'none';
                 document.getElementById('loginCard').style.display = 'block';
                 return;
             }
 
-            // 2. ดึงข้อมูลโปรไฟล์
             const profile = await liff.getProfile();
             document.getElementById('header-profile').innerHTML = `<img src="${profile.pictureUrl}" style="width:100%; height:100%; object-fit:cover;">`;
             
-            // 3. ปิดหน้าจอ Loading และเข้าแอป
             await loadFromCloud();
             hideLoginOverlay();
 
@@ -394,9 +409,7 @@
         document.getElementById('appContent').style.display = 'block';
     }
     
-    function loginWithLine() { 
-        liff.login({ redirectUri: window.location.href }); 
-    }
+    function loginWithLine() { liff.login({ redirectUri: window.location.href }); }
 
     function switchPage(p) { 
         document.querySelectorAll('.page').forEach(el => el.classList.remove('active')); 
@@ -424,7 +437,6 @@
         checkDataAndSearch();
     }
 
-    // ⚡ ให้โหลดพิกัดแผนที่ทันที ไม่ต้องรอฐานข้อมูลเพื่อป้องกันจอดำ
     function checkDataAndSearch() {
         changeLocation();
     }
@@ -651,7 +663,6 @@
         } else { banner.style.display = 'none'; }
     }
 
-    // ⚡ ดึงข้อมูล Default ไปโชว์ทันที
     function renderUI() {
         const cData = (appData.categories && appData.categories.length > 0) ? appData.categories : defaultCategories;
         const sData = (appData.services && appData.services.length > 0) ? appData.services : defaultServices;
@@ -737,11 +748,13 @@
         document.getElementById('regStoreVerifyCard').style.display = 'none';
     }
 
+    // ⚡ ฟังก์ชันสำหรับตรจสอบรหัสร้านค้า (ซ่อนโชว์ VIP ตามสถานะจริง)
     function verifyStore() {
         const stores = appData.registeredStores || [];
         const store = stores.find(s => s.pin === document.getElementById('storePinInput').value);
         if(store) { 
             document.getElementById('lockedFeatures').style.display = 'block'; 
+            document.getElementById('storeVerifyCard').style.display = 'none'; 
             
             const now = Date.now();
             let isVIP = false;
@@ -749,14 +762,27 @@
                 isVIP = true;
             }
 
+            // ดึงราคาและเลขบัญชีจากระบบแอดมินมาแสดง (ถ้าแอดมินยังไม่ตั้ง จะใช้ค่าเริ่มต้น 500)
+            const vipPrice = (appData.vipSettings && appData.vipSettings.price) ? appData.vipSettings.price : 500;
+            const bankAcc = (appData.vipSettings && appData.vipSettings.bankAccount) ? appData.vipSettings.bankAccount : 'รอแอดมินตั้งค่าบัญชี (ไปไหนดี)';
+            document.getElementById('displayVipPrice').innerText = vipPrice;
+            document.getElementById('displayBankAcc').innerText = bankAcc;
+
             if(isVIP) {
+                // ถ้าเป็น VIP แล้ว: ให้โชว์ช่องกรอกลิงก์โซเชียล และปุ่มต่ออายุ
                 document.getElementById('vipUpdateSection').style.display = 'block';
+                document.getElementById('vipSubscribeSection').style.display = 'block';
+                document.getElementById('vipSubscribeTitle').innerHTML = '👑 ต่ออายุ VIP <span style="font-size:12px; color:#06C755;">(สถานะ: ใช้งานได้)</span>';
                 document.getElementById('vipLineInput').value = store.lineUrl || '';
                 document.getElementById('vipFbInput').value = store.fbUrl || '';
             } else {
+                // ถ้ายังไม่เป็น VIP: ซ่อนช่องลิงก์โซเชียล บังคับให้สมัคร+แนบสลิปก่อน
                 document.getElementById('vipUpdateSection').style.display = 'none';
+                document.getElementById('vipSubscribeSection').style.display = 'block';
+                document.getElementById('vipSubscribeTitle').innerHTML = '👑 สมัครสมาชิก VIP';
             }
 
+            // ดึงข้อมูลโปรโมชั่นเดิมที่เคยลงไว้
             const existingPromo = (appData.activePromotions || []).find(p => p.storeName === store.name) || 
                                   (appData.pendingPromotions || []).find(p => p.storeName === store.name);
             
@@ -768,8 +794,40 @@
                 window.currentPromoImage = existingPromo.image; 
             }
 
-            alert("ยินดีต้อนรับร้าน " + store.name); 
-        } else alert("PIN ไม่ถูกต้อง");
+            alert("ยืนยันตัวตนสำเร็จ! ยินดีต้อนรับร้าน " + store.name); 
+        } else alert("รหัส PIN ไม่ถูกต้อง");
+    }
+
+    // ⚡ ฟังก์ชันใหม่: ส่งข้อมูลขอสมัคร/ต่ออายุ VIP (อัปสลิป)
+    async function submitVipRequest() {
+        const store = appData.registeredStores.find(s => s.pin === document.getElementById('storePinInput').value);
+        const slipFile = document.getElementById('vipSlipInput').files[0];
+        
+        if(!store) return alert("กรุณาเข้าสู่ระบบด้วยรหัส PIN ก่อนครับ");
+        if(!slipFile) return alert("กรุณาแนบสลิปการโอนเงินครับ");
+
+        const btn = document.getElementById('btnSubmitVip');
+        btn.innerText = "กำลังส่งสลิป... ⏳"; btn.disabled = true;
+
+        const slipImg = await resizeImg(slipFile);
+
+        if(!appData.pendingVipRequests) appData.pendingVipRequests = [];
+        
+        // ลบคำขอเก่าของร้านนี้ที่ยังค้างอยู่ออกก่อน (เพื่อป้องกันข้อมูลซ้ำ)
+        appData.pendingVipRequests = appData.pendingVipRequests.filter(r => r.storeName !== store.name);
+        
+        appData.pendingVipRequests.push({
+            id: Date.now().toString(),
+            storeName: store.name,
+            slipImage: slipImg,
+            requestDate: new Date().toLocaleString()
+        });
+
+        await saveToCloud();
+        alert("ส่งสลิปสำเร็จ! กรุณารอแอดมินอนุมัติสถานะ VIP ครับ (หลังจากอนุมัติ ช่องกรอก LINE/FB จะเปิดให้ใช้งาน)");
+
+        btn.innerText = "ส่งสลิปเพื่ออัปเกรด VIP"; btn.disabled = false;
+        document.getElementById('vipSlipInput').value = '';
     }
 
     async function updateVipData() {
@@ -778,7 +836,7 @@
         if(store) { 
             store.lineUrl = document.getElementById('vipLineInput').value; 
             store.fbUrl = document.getElementById('vipFbInput').value; 
-            await saveToCloud(); alert("บันทึกข้อมูลติดต่อแล้ว"); 
+            await saveToCloud(); alert("บันทึกข้อมูลติดต่อแล้ว ลูกค้าสามารถกดเข้า LINE/FB ได้ทันที"); 
         }
     }
 
@@ -807,7 +865,7 @@
         });
         
         await saveToCloud(); 
-        alert("ส่งข้อมูลอัปเดตสำเร็จ! รอแอดมินอนุมัติครับ");
+        alert("ส่งข้อมูลอัปเดตแบนเนอร์สำเร็จ! รอแอดมินอนุมัติครับ");
         btn.innerText = "🚀 สั่งซื้อและส่งเรื่องอัปเดตข้อมูล"; btn.disabled = false;
         document.getElementById('promoImageInput').value = '';
     }
