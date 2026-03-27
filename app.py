@@ -7,6 +7,7 @@ import pandas as pd
 from streamlit_gsheets import GSheetsConnection
 import requests
 from datetime import datetime
+import time
 
 # --- 1. การตั้งค่าหน้าเว็บ (Config) ---
 st.set_page_config(
@@ -34,8 +35,48 @@ except Exception as e:
     st.stop()
 
 # --- 2. ระบบ LINE LOGIN ---
+# --- 2. ระบบ LINE LOGIN ---
 def get_line_login_url():
     return f"https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id={LINE_CLIENT_ID}&redirect_uri={REDIRECT_URI}&state=12345abcde&scope=profile%20openid"
+
+# ตรวจสอบการ Login จาก URL Query Parameters
+query_params = st.query_params
+if "code" in query_params and not st.session_state.get("is_logged_in"):
+    code = query_params["code"]
+    
+    # สั่งลบ code ออกจาก URL ทันที
+    st.query_params.clear()
+    
+    token_url = "https://api.line.me/oauth2/v2.1/token"
+    data = {
+        'grant_type': 'authorization_code',
+        'code': code,
+        'redirect_uri': REDIRECT_URI,
+        'client_id': LINE_CLIENT_ID,
+        'client_secret': LINE_CLIENT_SECRET
+    }
+    
+    try:
+        res = requests.post(token_url, data=data).json()
+        
+        if "access_token" in res:
+            p_headers = {'Authorization': f"Bearer {res['access_token']}"}
+            profile = requests.get("https://api.line.me/v2/profile", headers=p_headers).json()
+            
+            st.session_state.is_logged_in = True
+            st.session_state.user_name = profile.get('displayName')
+            st.session_state.user_pic = profile.get('pictureUrl')
+            
+            # หน่วงเวลาให้ Mobile Chrome ทำงานทัน
+            time.sleep(0.5)
+            st.rerun()
+        else:
+            st.error("⚠️ รหัสเข้าสู่ระบบหมดอายุ หรือเกิดข้อผิดพลาด กรุณากดเข้าสู่ระบบใหม่อีกครั้ง")
+            st.stop()
+            
+    except Exception as e:
+        st.error(f"⚠️ ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ LINE ได้: {e}")
+        st.stop()
 
 # ตรวจสอบการ Login จาก URL Query Parameters
 query_params = st.query_params
