@@ -358,23 +358,24 @@
         };
     });
 
+    // ⚡ ฟังก์ชันเจ้าปัญหาที่ถูกแก้ไขโครงสร้างให้สะอาดแล้ว
     async function initializeLiff() {
         try {
             await liff.init({ liffId: "2009598846-wiCUeV35" });
             
-            // ⚡ 1. ถ้าลูกค้าเปิดเว็บจากมือถือ (เบราว์เซอร์) ให้เด้งไปเปิดแอป LINE ทันที!
+            // 1. ถ้าเปิดเว็บจากมือถือ (เบราว์เซอร์) ให้เด้งไปเปิดแอป LINE ทันที
             if (!liff.isInClient() && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
                 window.location.replace("https://liff.line.me/2009598846-wiCUeV35");
-                return; // หยุดการทำงานเพื่อรอสลับแอป
+                return;
             }
 
-            // ⚡ 2. แก้ปัญหา Chrome ค้าง: ถ้ายังไม่ได้ Login ให้บังคับไปหน้า Login ทันที
+            // 2. ถ้ายังไม่ได้ Login (เช่นเปิดใน Chrome คอมพิวเตอร์) ให้บังคับไปหน้า Login ทันที
             if (!liff.isLoggedIn()) {
                 liff.login({ redirectUri: window.location.href });
-                return; // หยุดรันโค้ดตรงนี้ เพื่อรอระบบพาไปหน้า Login
+                return;
             }
 
-            // 3. ถ้า Login เรียบร้อยแล้ว ดึงข้อมูลโปรไฟล์มาแสดง
+            // 3. ดึงข้อมูลโปรไฟล์มาแสดง
             const profile = await liff.getProfile();
             document.getElementById('header-profile').innerHTML = `<img src="${profile.pictureUrl}" style="width:100%; height:100%; object-fit:cover;">`;
                 
@@ -396,21 +397,6 @@
         } catch (err) { 
             console.error("LIFF Init Error:", err);
             // 6. ถ้ามีปัญหา ให้โชว์ปุ่ม Login สำรอง
-            await loadFromCloud();
-            document.getElementById('loadingSpinner').style.display = 'none';
-            document.getElementById('loginCard').style.display = 'block';
-        }
-    }
-                } catch(friendErr) {
-                    console.log("ข้ามการเช็คเพื่อน");
-                }
-
-                await loadFromCloud();
-                hideLoginOverlay();
-            } else { 
-                liff.login({ redirectUri: window.location.href }); 
-            }
-        } catch (err) { 
             await loadFromCloud();
             document.getElementById('loadingSpinner').style.display = 'none';
             document.getElementById('loginCard').style.display = 'block';
@@ -504,7 +490,6 @@
         const searchBox = document.getElementById('searchBox');
         const searchVal = searchBox ? searchBox.value.trim() : ""; 
         
-        // ⚡ ล็อกให้ค้นหาร้านอาหารเสมอถ้าไม่ได้พิมพ์อะไรมา
         let keywordToSearch = "ร้านอาหาร"; 
         
         const foodSelect = document.getElementById('foodSelect'), beautySelect = document.getElementById('beautySelect'), actSelect = document.getElementById('activitySelect'), sportSelect = document.getElementById('sportSelect');
@@ -570,6 +555,7 @@
                 }
             }
 
+            // ⚡ แก้บั๊กลิงก์นำทาง Google Maps ให้ชัวร์ 100%
             const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${p.geometry.location.lat()},${p.geometry.location.lng()}`;
             
             let distanceKm = "0.0";
@@ -588,7 +574,6 @@
                 else if (p.business_status === 'OPERATIONAL') { openStatusHtml = '<span class="status-tag" style="background:#F4FBF4; color:#2E7D32; border:1px solid rgba(46,125,50,0.2);">🟢 เปิดให้บริการ</span>'; } 
             } 
             
-            // ⚡ เช็คว่าถ้าเป็น VIP และต้องมีข้อมูลลิงก์ที่กรอกไว้จริงๆ (ไม่เว้นวรรคหลอก) ถึงจะโชว์ปุ่ม
             const hasLine = isVIP && store && store.lineUrl && store.lineUrl.trim() !== '';
             const hasFb = isVIP && store && store.fbUrl && store.fbUrl.trim() !== '';
 
@@ -656,7 +641,6 @@
                     }
                 }
 
-                // ⚡ เช็คว่าถ้าเป็น VIP และต้องมีข้อมูลลิงก์ที่กรอกไว้จริงๆ ถึงจะโชว์ปุ่มในแบนเนอร์ด้วย
                 const hasLine = isVIP && store && store.lineUrl && store.lineUrl.trim() !== '';
                 const hasFb = isVIP && store && store.fbUrl && store.fbUrl.trim() !== '';
                 
@@ -683,7 +667,6 @@
         } else { banner.style.display = 'none'; }
     }
 
-    // ⚡ ตั้งค่า Default ให้กับตัวเลือกแรกสุดเป็น "ร้านอาหาร", "สปา", ฯลฯ
     function renderUI() {
         const cData = appData.categories || [];
         const groups = ['food', 'beauty', 'activity', 'sport'];
