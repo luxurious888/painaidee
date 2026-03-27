@@ -257,6 +257,28 @@
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbx1ZMaFt-GWvrZ_-XTSiqhx__zhwYTo_NcpnTAzU75Xxh4pPAgdi7OO4sC1H0yxeGEr/exec";
     
+    const defaultCategories = [
+        { id: 1, group: 'food', label: 'หมูกระทะ / แจ่วฮ้อน', keyword: 'หมูกระทะ' },
+        { id: 2, group: 'food', label: 'ชาบู / สุกี้', keyword: 'ชาบู' },
+        { id: 3, group: 'food', label: 'ปิ้งย่าง', keyword: 'ปิ้งย่าง' },
+        { id: 4, group: 'food', label: 'อาหารตามสั่ง', keyword: 'อาหารตามสั่ง' },
+        { id: 5, group: 'food', label: 'คาเฟ่ / ขนม', keyword: 'คาเฟ่' },
+        { id: 6, group: 'beauty', label: 'ร้านนวด / สปา', keyword: 'ร้านนวด' },
+        { id: 7, group: 'beauty', label: 'คลินิกเสริมความงาม', keyword: 'คลินิกความงาม' },
+        { id: 8, group: 'beauty', label: 'ร้านเสริมสวย / ทำผม', keyword: 'ร้านทำผม' },
+        { id: 9, group: 'beauty', label: 'ร้านทำเล็บ', keyword: 'ร้านทำเล็บ' },
+        { id: 10, group: 'activity', label: 'แคมป์ปิ้ง / กางเต็นท์', keyword: 'แคมป์ปิ้ง' },
+        { id: 11, group: 'activity', label: 'สวนสนุก / สวนน้ำ', keyword: 'สวนน้ำ' },
+        { id: 12, group: 'sport', label: 'ฟิตเนส / ยิม', keyword: 'ฟิตเนส' },
+        { id: 13, group: 'sport', label: 'สนามฟุตบอล / หญ้าเทียม', keyword: 'สนามฟุตบอล' },
+        { id: 14, group: 'sport', label: 'สระว่ายน้ำ', keyword: 'สระว่ายน้ำ' }
+    ];
+
+    const defaultServices = [
+        { id: 1, name: 'ปักหมุดโปรโมชั่นหน้าแรก (รายเดือน)', price: 500 },
+        { id: 2, name: 'อัปเดตแก้ไขแบนเนอร์ (ต่อครั้ง)', price: 150 }
+    ];
+
     let appData = { registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], categories: [], closedReports: [], blacklistedPlaces: [], services: [] };
 
     const provinces = [
@@ -438,6 +460,8 @@
         if (!currentCoords) return; 
         const searchBox = document.getElementById('searchBox');
         const searchVal = searchBox ? searchBox.value.trim() : ""; 
+        
+        // ⚡ ล็อกให้ค้นหาร้านอาหารเสมอถ้าไม่ได้พิมพ์อะไรมา
         let keywordToSearch = "ร้านอาหาร"; 
         
         const foodSelect = document.getElementById('foodSelect'), beautySelect = document.getElementById('beautySelect'), actSelect = document.getElementById('activitySelect'), sportSelect = document.getElementById('sportSelect');
@@ -446,10 +470,10 @@
             keywordToSearch = searchVal;
             if(foodSelect) foodSelect.selectedIndex = 0; if(beautySelect) beautySelect.selectedIndex = 0; if(actSelect) actSelect.selectedIndex = 0; if(sportSelect) sportSelect.selectedIndex = 0;
         } else {
-            if (type === 'beauty') { keywordToSearch = beautySelect ? beautySelect.value : keywordToSearch; if(foodSelect) foodSelect.selectedIndex = 0; if(actSelect) actSelect.selectedIndex = 0; if(sportSelect) sportSelect.selectedIndex = 0; if(searchBox) searchBox.value = "";
-            } else if (type === 'food') { keywordToSearch = foodSelect ? foodSelect.value : keywordToSearch; if(beautySelect) beautySelect.selectedIndex = 0; if(actSelect) actSelect.selectedIndex = 0; if(sportSelect) sportSelect.selectedIndex = 0; if(searchBox) searchBox.value = "";
-            } else if (type === 'activity') { keywordToSearch = actSelect ? actSelect.value : keywordToSearch; if(foodSelect) foodSelect.selectedIndex = 0; if(beautySelect) beautySelect.selectedIndex = 0; if(sportSelect) sportSelect.selectedIndex = 0; if(searchBox) searchBox.value = "";
-            } else if (type === 'sport') { keywordToSearch = sportSelect ? sportSelect.value : keywordToSearch; if(foodSelect) foodSelect.selectedIndex = 0; if(beautySelect) beautySelect.selectedIndex = 0; if(actSelect) actSelect.selectedIndex = 0; if(searchBox) searchBox.value = "";
+            if (type === 'beauty') { keywordToSearch = (beautySelect && beautySelect.value) ? beautySelect.value : "สปา"; if(foodSelect) foodSelect.selectedIndex = 0; if(actSelect) actSelect.selectedIndex = 0; if(sportSelect) sportSelect.selectedIndex = 0; if(searchBox) searchBox.value = "";
+            } else if (type === 'food') { keywordToSearch = (foodSelect && foodSelect.value) ? foodSelect.value : "ร้านอาหาร"; if(beautySelect) beautySelect.selectedIndex = 0; if(actSelect) actSelect.selectedIndex = 0; if(sportSelect) sportSelect.selectedIndex = 0; if(searchBox) searchBox.value = "";
+            } else if (type === 'activity') { keywordToSearch = (actSelect && actSelect.value) ? actSelect.value : "สถานที่ท่องเที่ยว"; if(foodSelect) foodSelect.selectedIndex = 0; if(beautySelect) beautySelect.selectedIndex = 0; if(sportSelect) sportSelect.selectedIndex = 0; if(searchBox) searchBox.value = "";
+            } else if (type === 'sport') { keywordToSearch = (sportSelect && sportSelect.value) ? sportSelect.value : "ฟิตเนส"; if(foodSelect) foodSelect.selectedIndex = 0; if(beautySelect) beautySelect.selectedIndex = 0; if(actSelect) actSelect.selectedIndex = 0; if(searchBox) searchBox.value = "";
             } else {
                 if (beautySelect && beautySelect.selectedIndex > 0) keywordToSearch = beautySelect.value;
                 else if (actSelect && actSelect.selectedIndex > 0) keywordToSearch = actSelect.value;
@@ -521,6 +545,10 @@
                 else if (p.business_status === 'OPERATIONAL') { openStatusHtml = '<span class="status-tag" style="background:#F4FBF4; color:#2E7D32; border:1px solid rgba(46,125,50,0.2);">🟢 เปิดให้บริการ</span>'; } 
             } 
             
+            // ⚡ เช็คว่าถ้าเป็น VIP และต้องมีข้อมูลลิงก์ที่กรอกไว้จริงๆ (ไม่เว้นวรรคหลอก) ถึงจะโชว์ปุ่ม
+            const hasLine = isVIP && store && store.lineUrl && store.lineUrl.trim() !== '';
+            const hasFb = isVIP && store && store.fbUrl && store.fbUrl.trim() !== '';
+
             return `<div class="place-card ${isVIP ? 'card-vip':''}" onclick="focusPlace('${p.place_id}')">
                 ${isVIP?'<div class="vip-crown-badge">👑 VIP RECOMMEND</div>':''}
                 <div class="distance-badge">${distanceKm} กม.</div>
@@ -536,8 +564,8 @@
                     <div class="action-buttons">
                         <button class="btn-action btn-nav" onclick="window.open('${navUrl}', '_blank'); event.stopPropagation();">นำทาง</button>
                         <button class="btn-action btn-call" onclick="callPlace('${p.place_id}', event)">โทร</button>
-                        ${(isVIP && store && store.lineUrl && store.lineUrl.trim() !== '') ? `<button class="btn-action btn-line" onclick="window.open('${store.lineUrl.startsWith('http') ? store.lineUrl : 'https://'+store.lineUrl}', '_blank'); event.stopPropagation();">LINE</button>` : ''}
-                        ${(isVIP && store && store.fbUrl && store.fbUrl.trim() !== '') ? `<button class="btn-action btn-fb" onclick="window.open('${store.fbUrl.startsWith('http') ? store.fbUrl : 'https://'+store.fbUrl}', '_blank'); event.stopPropagation();">FB</button>` : ''}
+                        ${hasLine ? `<button class="btn-action btn-line" onclick="window.open('${store.lineUrl.startsWith('http') ? store.lineUrl : 'https://'+store.lineUrl}', '_blank'); event.stopPropagation();">LINE</button>` : ''}
+                        ${hasFb ? `<button class="btn-action btn-fb" onclick="window.open('${store.fbUrl.startsWith('http') ? store.fbUrl : 'https://'+store.fbUrl}', '_blank'); event.stopPropagation();">FB</button>` : ''}
                         <button class="btn-action btn-share" onclick="sharePlace('${p.name.replace(/'/g, "\\'")}', ${p.geometry.location.lat()}, ${p.geometry.location.lng()}, event)">แชร์</button>
                     </div>
                     <div style="margin-top:15px; text-align:right;"><span style="color:var(--danger); font-size:11px; cursor:pointer; opacity:0.6; border-bottom: 1px dotted var(--danger);" onclick="reportClosed('${p.place_id}','${p.name.replace(/'/g,"")}'); event.stopPropagation();">🚩 แจ้งร้านปิดถาวร</span></div>
@@ -548,26 +576,6 @@
         if(currentPagination && currentPagination.hasNextPage && googlePlaces.length < 80) html += `<div style="grid-column:1/-1; text-align:center;"><button class="btn-outline" style="width:200px; border-color:var(--primary);" onclick="this.innerHTML='โหลดเพิ่ม...'; currentPagination.nextPage()">⬇️ ดูเพิ่มเติม</button></div>`;
         list.innerHTML = html; 
         renderPromos();
-    }
-
-    function focusPlace(id) { 
-        const p = googlePlaces.find(x => x.place_id === id); 
-        if(p) { map.panTo(p.geometry.location); map.setZoom(17); window.scrollTo({ top: 0, behavior: 'smooth' }); } 
-    }
-    
-    function callPlace(placeId, event) { 
-        event.stopPropagation(); 
-        service.getDetails({ placeId: placeId, fields: ['formatted_phone_number'] }, (place, status) => { 
-            if (status === google.maps.places.PlacesServiceStatus.OK && place.formatted_phone_number) window.location.href = `tel:${place.formatted_phone_number.replace(/[\s-]/g, '')}`; 
-            else alert("ขออภัยครับ ร้านนี้ไม่ได้ระบุเบอร์โทร"); 
-        }); 
-    }
-    
-    function sharePlace(name, lat, lng, event) { 
-        event.stopPropagation(); 
-        const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`; 
-        if (navigator.share) navigator.share({ title: name, url: navUrl }).catch(console.error); 
-        else { navigator.clipboard.writeText(navUrl); alert("คัดลอกลิงก์เรียบร้อยแล้ว"); } 
     }
 
     function renderPromos() {
@@ -604,6 +612,10 @@
                         isVIP = true;
                     }
                 }
+
+                // ⚡ เช็คว่าถ้าเป็น VIP และต้องมีข้อมูลลิงก์ที่กรอกไว้จริงๆ ถึงจะโชว์ปุ่มในแบนเนอร์ด้วย
+                const hasLine = isVIP && store && store.lineUrl && store.lineUrl.trim() !== '';
+                const hasFb = isVIP && store && store.fbUrl && store.fbUrl.trim() !== '';
                 
                 return `
                 <div class="place-card" style="border:2px solid var(--primary); box-shadow: 0 0 20px rgba(197,160,89,0.2);">
@@ -618,8 +630,8 @@
                             <p style="font-size:14px; color:var(--text-main); margin:0;">${p.detail}</p>
                         </div>
                         <div style="display:flex; gap:8px; margin-top:auto;">
-                            ${(isVIP && store && store.lineUrl && store.lineUrl.trim() !== '') ? `<button onclick="window.open('${store.lineUrl.startsWith('http') ? store.lineUrl : 'https://'+store.lineUrl}', '_blank')" class="promo-btn-hover" style="flex:1; background:var(--line-green); color:white; border:none; padding:10px; border-radius:8px; font-family:'Kanit'; font-weight:600; font-size:13px; cursor:pointer;">💬 LINE</button>` : ''}
-                            ${(isVIP && store && store.fbUrl && store.fbUrl.trim() !== '') ? `<button onclick="window.open('${store.fbUrl.startsWith('http') ? store.fbUrl : 'https://'+store.fbUrl}', '_blank')" class="promo-btn-hover" style="flex:1; background:var(--fb-blue); color:white; border:none; padding:10px; border-radius:8px; font-family:'Kanit'; font-weight:600; font-size:13px; cursor:pointer;">👍 FB</button>` : ''}
+                            ${hasLine ? `<button onclick="window.open('${store.lineUrl.startsWith('http') ? store.lineUrl : 'https://'+store.lineUrl}', '_blank')" class="promo-btn-hover" style="flex:1; background:var(--line-green); color:white; border:none; padding:10px; border-radius:8px; font-family:'Kanit'; font-weight:600; font-size:13px; cursor:pointer;">💬 LINE</button>` : ''}
+                            ${hasFb ? `<button onclick="window.open('${store.fbUrl.startsWith('http') ? store.fbUrl : 'https://'+store.fbUrl}', '_blank')" class="promo-btn-hover" style="flex:1; background:var(--fb-blue); color:white; border:none; padding:10px; border-radius:8px; font-family:'Kanit'; font-weight:600; font-size:13px; cursor:pointer;">👍 FB</button>` : ''}
                             <button onclick="searchAndFocusStore('${p.storeName}')" class="promo-btn-hover" style="flex:1; background:linear-gradient(135deg, #FFD700, #C5A059); color:#000; border:none; padding:10px; border-radius:8px; font-family:'Kanit'; font-weight:600; font-size:13px; cursor:pointer; box-shadow: 0 4px 10px rgba(197,160,89,0.2);">📍 ดูพิกัดร้าน</button>
                         </div>
                     </div>
@@ -628,15 +640,17 @@
         } else { banner.style.display = 'none'; }
     }
 
+    // ⚡ ตั้งค่า Default ให้กับตัวเลือกแรกสุดเป็น "ร้านอาหาร", "สปา", ฯลฯ
     function renderUI() {
         const cData = appData.categories || [];
         const groups = ['food', 'beauty', 'activity', 'sport'];
         const labels = ['🍽️ หมวดอาหาร', '💆‍♀️ ความงาม/พักผ่อน', '🎯 กิจกรรม/เที่ยว', '🏋️ กีฬา/ออกกำลังกาย'];
+        const defaultKws = ['ร้านอาหาร', 'สปา', 'สถานที่ท่องเที่ยว', 'ฟิตเนส'];
         
         groups.forEach((g, i) => {
             const sel = document.getElementById(g+'Select');
             if(sel) {
-                let h = `<option value="">${labels[i]}</option>`;
+                let h = `<option value="${defaultKws[i]}">${labels[i]}</option>`;
                 cData.filter(c => c.group === g).forEach(c => h += `<option value="${c.keyword}">${c.label}</option>`);
                 sel.innerHTML = h;
             }
