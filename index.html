@@ -254,20 +254,56 @@
     const API_URL = "https://script.google.com/macros/s/AKfycbx1ZMaFt-GWvrZ_-XTSiqhx__zhwYTo_NcpnTAzU75Xxh4pPAgdi7OO4sC1H0yxeGEr/exec";
     
     const defaultCategories = [
+        // --- 🍽️ หมวดอาหาร/เครื่องดื่ม ---
         { id: 1, group: 'food', label: 'หมูกระทะ / แจ่วฮ้อน', keyword: 'หมูกระทะ' },
         { id: 2, group: 'food', label: 'ชาบู / สุกี้', keyword: 'ชาบู' },
-        { id: 3, group: 'food', label: 'ปิ้งย่าง', keyword: 'ปิ้งย่าง' },
-        { id: 4, group: 'food', label: 'อาหารตามสั่ง', keyword: 'อาหารตามสั่ง' },
-        { id: 5, group: 'food', label: 'คาเฟ่ / ขนม', keyword: 'คาเฟ่' },
-        { id: 6, group: 'beauty', label: 'ร้านนวด / สปา', keyword: 'ร้านนวด' },
-        { id: 7, group: 'beauty', label: 'คลินิกเสริมความงาม', keyword: 'คลินิกความงาม' },
-        { id: 8, group: 'beauty', label: 'ร้านเสริมสวย / ทำผม', keyword: 'ร้านทำผม' },
-        { id: 9, group: 'beauty', label: 'ร้านทำเล็บ', keyword: 'ร้านทำเล็บ' },
-        { id: 10, group: 'activity', label: 'แคมป์ปิ้ง / กางเต็นท์', keyword: 'แคมป์ปิ้ง' },
-        { id: 11, group: 'activity', label: 'สวนสนุก / สวนน้ำ', keyword: 'สวนน้ำ' },
-        { id: 12, group: 'sport', label: 'ฟิตเนส / ยิม', keyword: 'ฟิตเนส' },
-        { id: 13, group: 'sport', label: 'สนามฟุตบอล / หญ้าเทียม', keyword: 'สนามฟุตบอล' },
-        { id: 14, group: 'sport', label: 'สระว่ายน้ำ', keyword: 'สระว่ายน้ำ' }
+        { id: 3, group: 'food', label: 'ปิ้งย่าง / ยากินิคุ', keyword: 'ปิ้งย่าง' },
+        { id: 4, group: 'food', label: 'อาหารตามสั่ง / ข้าวแกง', keyword: 'อาหารตามสั่ง' },
+        { id: 5, group: 'food', label: 'คาเฟ่ / กาแฟ / เบเกอรี่', keyword: 'คาเฟ่' },
+        { id: 6, group: 'food', label: 'อาหารอีสาน / ส้มตำ', keyword: 'ร้านส้มตำ' },
+        { id: 7, group: 'food', label: 'ก๋วยเตี๋ยว / ก๋วยจั๊บ', keyword: 'ก๋วยเตี๋ยว' },
+        { id: 8, group: 'food', label: 'อาหารเวียดนาม', keyword: 'อาหารเวียดนาม' },
+        { id: 9, group: 'food', label: 'อาหารทะเล / ซีฟู้ด', keyword: 'ร้านอาหารทะเล' },
+        { id: 10, group: 'food', label: 'อาหารญี่ปุ่น / ซูชิ', keyword: 'อาหารญี่ปุ่น' },
+        { id: 11, group: 'food', label: 'อาหารฝรั่ง / สเต็ก / พิซซ่า', keyword: 'ร้านสเต็ก' },
+        { id: 12, group: 'food', label: 'อาหารเหนือ', keyword: 'อาหารเหนือ' },
+        { id: 13, group: 'food', label: 'อาหารใต้', keyword: 'อาหารใต้' },
+        { id: 14, group: 'food', label: 'ข้าวต้มรอบดึก', keyword: 'ร้านข้าวต้ม' },
+        { id: 15, group: 'food', label: 'ร้านเหล้า / บาร์นั่งชิล', keyword: 'บาร์' },
+        { id: 16, group: 'food', label: 'ฟาสต์ฟู้ด / เบอร์เกอร์', keyword: 'ฟาสต์ฟู้ด' },
+        { id: 17, group: 'food', label: 'บุฟเฟ่ต์นานาชาติ', keyword: 'บุฟเฟ่ต์' },
+
+        // --- 💆‍♀️ หมวดความงาม/พักผ่อน ---
+        { id: 18, group: 'beauty', label: 'ร้านนวด / สปา', keyword: 'ร้านนวด' },
+        { id: 19, group: 'beauty', label: 'คลินิกเสริมความงาม', keyword: 'คลินิกความงาม' },
+        { id: 20, group: 'beauty', label: 'ร้านเสริมสวย / ทำผม', keyword: 'ร้านทำผม' },
+        { id: 21, group: 'beauty', label: 'ร้านทำเล็บ / ต่อขนตา', keyword: 'ร้านทำเล็บ' },
+        { id: 22, group: 'beauty', label: 'สักคิ้ว / สักปาก / สักลาย', keyword: 'ร้านสัก' },
+        { id: 23, group: 'beauty', label: 'คลินิกทำฟัน / จัดฟัน', keyword: 'คลินิกทันตกรรม' },
+        { id: 24, group: 'beauty', label: 'อาบน้ำตัดขน / สปาสัตว์เลี้ยง', keyword: 'อาบน้ำสัตว์เลี้ยง' },
+
+        // --- 🎯 หมวดกิจกรรม/ท่องเที่ยว ---
+        { id: 25, group: 'activity', label: 'สถานที่ท่องเที่ยว / จุดชมวิว', keyword: 'สถานที่ท่องเที่ยว' },
+        { id: 26, group: 'activity', label: 'แคมป์ปิ้ง / กางเต็นท์', keyword: 'ลานกางเต็นท์' },
+        { id: 27, group: 'activity', label: 'สวนสนุก / สวนน้ำ', keyword: 'สวนน้ำ' },
+        { id: 28, group: 'activity', label: 'วัด / สถานที่ทำบุญ', keyword: 'วัด' },
+        { id: 29, group: 'activity', label: 'ตลาดนัดกลางคืน / ถนนคนเดิน', keyword: 'ตลาดกลางคืน' },
+        { id: 30, group: 'activity', label: 'ห้างสรรพสินค้า / คอมมูนิตี้มอลล์', keyword: 'ห้างสรรพสินค้า' },
+        { id: 31, group: 'activity', label: 'พิพิธภัณฑ์ / หอศิลป์', keyword: 'พิพิธภัณฑ์' },
+        { id: 32, group: 'activity', label: 'สวนสัตว์ / อควาเรียม', keyword: 'สวนสัตว์' },
+        { id: 33, group: 'activity', label: 'โรงภาพยนตร์', keyword: 'โรงภาพยนตร์' },
+
+        // --- 🏋️ หมวดกีฬา/ออกกำลังกาย ---
+        { id: 34, group: 'sport', label: 'ฟิตเนส / ยิม', keyword: 'ฟิตเนส' },
+        { id: 35, group: 'sport', label: 'สนามฟุตบอล / หญ้าเทียม', keyword: 'สนามฟุตบอล' },
+        { id: 36, group: 'sport', label: 'สระว่ายน้ำ', keyword: 'สระว่ายน้ำ' },
+        { id: 37, group: 'sport', label: 'สนามแบดมินตัน', keyword: 'สนามแบดมินตัน' },
+        { id: 38, group: 'sport', label: 'คอร์ทเทนนิส', keyword: 'สนามเทนนิส' },
+        { id: 39, group: 'sport', label: 'สนามกอล์ฟ / ไดร์ฟกอล์ฟ', keyword: 'สนามกอล์ฟ' },
+        { id: 40, group: 'sport', label: 'มวยไทย / ค่ายมวย', keyword: 'ค่ายมวย' },
+        { id: 41, group: 'sport', label: 'สตูดิโอโยคะ / พิลาทิส', keyword: 'สตูดิโอโยคะ' },
+        { id: 42, group: 'sport', label: 'ลานสเก็ต / เอ็กซ์ตรีม', keyword: 'ลานสเก็ต' },
+        { id: 43, group: 'sport', label: 'สวนสาธารณะ (วิ่ง/จักรยาน)', keyword: 'สวนสาธารณะ' }
     ];
 
     const defaultServices = [
