@@ -363,40 +363,24 @@
         try {
             await liff.init({ liffId: "2009598846-wiCUeV35" });
             
-            // 1. ถ้าเปิดเว็บจากมือถือ (เบราว์เซอร์) ให้เด้งไปเปิดแอป LINE ทันที
-            if (!liff.isInClient() && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-                window.location.replace("https://liff.line.me/2009598846-wiCUeV35");
-                return;
-            }
-
-            // 2. ถ้ายังไม่ได้ Login (เช่นเปิดใน Chrome คอมพิวเตอร์) ให้บังคับไปหน้า Login ทันที
+            // 1. ถ้าไม่ได้ล็อกอิน (เช่นเปิดใน Chrome) ให้หยุดโหลด แล้วโชว์ปุ่มให้ผู้ใช้กด Login เอง
             if (!liff.isLoggedIn()) {
-                liff.login({ redirectUri: window.location.href });
-                return;
+                document.getElementById('loadingSpinner').style.display = 'none';
+                document.getElementById('loginCard').style.display = 'block';
+                return; // หยุดทำงาน ป้องกันจอค้างและกระพริบ
             }
 
-            // 3. ดึงข้อมูลโปรไฟล์มาแสดง
+            // 2. ถ้าล็อกอินแล้ว ดึงข้อมูลโปรไฟล์
             const profile = await liff.getProfile();
             document.getElementById('header-profile').innerHTML = `<img src="${profile.pictureUrl}" style="width:100%; height:100%; object-fit:cover;">`;
-                
-            // 4. เช็คว่าแอดเพื่อน LINE OA หรือยัง
-            try {
-                const friendStatus = await liff.getFriendship();
-                if (!friendStatus.friendFlag) {
-                    window.location.href = "https://lin.ee/5SBoptj";
-                    return; 
-                }
-            } catch(friendErr) {
-                console.log("ข้ามการเช็คเพื่อน");
-            }
-
-            // 5. ทุกอย่างผ่านฉลุย โหลดข้อมูลร้านค้าและปิดหน้าต่าง Loading
+            
+            // 3. ปิดหน้าจอ Loading และเข้าแอป
             await loadFromCloud();
             hideLoginOverlay();
 
         } catch (err) { 
             console.error("LIFF Init Error:", err);
-            // 6. ถ้ามีปัญหา ให้โชว์ปุ่ม Login สำรอง
+            // ถ้าพังก็ให้โชว์ปุ่มล็อกอิน
             await loadFromCloud();
             document.getElementById('loadingSpinner').style.display = 'none';
             document.getElementById('loginCard').style.display = 'block';
@@ -408,7 +392,9 @@
         document.getElementById('appContent').style.display = 'block';
     }
     
-    function loginWithLine() { liff.login({ redirectUri: window.location.href }); }
+    function loginWithLine() { 
+        liff.login({ redirectUri: window.location.href }); 
+    }
 
     function switchPage(p) { 
         document.querySelectorAll('.page').forEach(el => el.classList.remove('active')); 
@@ -555,7 +541,6 @@
                 }
             }
 
-            // ⚡ แก้บั๊กลิงก์นำทาง Google Maps ให้ชัวร์ 100%
             const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${p.geometry.location.lat()},${p.geometry.location.lng()}`;
             
             let distanceKm = "0.0";
