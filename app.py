@@ -117,7 +117,13 @@ with st.sidebar:
     if st.session_state.user_pic:
         st.image(st.session_state.user_pic, width=100)
     st.title(f"สวัสดีคุณ {st.session_state.user_name}")
-    menu = st.radio("เมนูหลัก", ["🔍 ค้นหาร้านอาหาร", "🏪 ลงทะเบียนเจ้าของร้าน"])
+    
+    # 🔴 ลบบรรทัดเก่าทิ้ง: 
+    # menu = st.radio("เมนูหลัก", ["🔍 ค้นหาร้านอาหาร", "🏪 ลงทะเบียนเจ้าของร้าน"])
+    
+    # 🟢 เอาบรรทัดใหม่มาวางแทนตรงนี้เลยครับ:
+    menu = st.radio("เมนูหลัก", ["🔍 ค้นหาร้านอาหาร", "🏪 ลงทะเบียนเจ้าของร้าน", "📢 จัดการโปรโมท"])
+    
     if st.button("ออกจากระบบ"):
         st.session_state.clear()
         st.rerun()
