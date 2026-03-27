@@ -7,7 +7,6 @@ import pandas as pd
 from streamlit_gsheets import GSheetsConnection
 import requests
 from datetime import datetime
-import time
 
 # --- 1. การตั้งค่าหน้าเว็บ (Config) ---
 st.set_page_config(
@@ -16,16 +15,19 @@ st.set_page_config(
     page_icon="📍"
 )
 
-# ดึงข้อมูลจาก Secrets
+# ดึงข้อมูลจาก Secrets (ใช้ชื่อตัวแปรที่ตั้งไว้ในไฟล์ Secrets เท่านั้น)
 try:
+    # แก้ไข: ดึงจากชื่อ Key ที่เราตั้งไว้ใน Secrets
     GOOGLE_API_KEY = st.secrets["G_MAPS_API_KEY"] 
     gmaps = googlemaps.Client(key=GOOGLE_API_KEY)
     
+    # แก้ไข: ใช้ชื่อ "gsheets" ตามที่ตั้งไว้ใน [connections.gsheets]
     conn = st.connection("gsheets", type=GSheetsConnection)
     
     LINE_CLIENT_ID = st.secrets["line_login"]["client_id"]
     LINE_CLIENT_SECRET = st.secrets["line_login"]["client_secret"]
     
+    # URL ของแอปคุณบน Streamlit Cloud
     REDIRECT_URI = "https://ominous-broccoli-....app.github.dev/"
 except Exception as e:
     st.error(f"⚠️ ตรวจสอบการตั้งค่า Secrets ให้ครบถ้วน: {e}")
@@ -35,14 +37,10 @@ except Exception as e:
 def get_line_login_url():
     return f"https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id={LINE_CLIENT_ID}&redirect_uri={REDIRECT_URI}&state=12345abcde&scope=profile%20openid"
 
-# ตรวจสอบการ Login จาก URL Query Parameters (ใช้เวอร์ชันที่แก้จอกระพริบ)
+# ตรวจสอบการ Login จาก URL Query Parameters
 query_params = st.query_params
 if "code" in query_params and not st.session_state.get("is_logged_in"):
     code = query_params["code"]
-    
-    # สั่งลบ code ออกจาก URL ทันที
-    st.query_params.clear()
-    
     token_url = "https://api.line.me/oauth2/v2.1/token"
     data = {
         'grant_type': 'authorization_code',
@@ -51,28 +49,17 @@ if "code" in query_params and not st.session_state.get("is_logged_in"):
         'client_id': LINE_CLIENT_ID,
         'client_secret': LINE_CLIENT_SECRET
     }
+    res = requests.post(token_url, data=data).json()
     
-    try:
-        res = requests.post(token_url, data=data).json()
-        
-        if "access_token" in res:
-            p_headers = {'Authorization': f"Bearer {res['access_token']}"}
-            profile = requests.get("https://api.line.me/v2/profile", headers=p_headers).json()
-            
-            st.session_state.is_logged_in = True
-            st.session_state.user_name = profile.get('displayName')
-            st.session_state.user_pic = profile.get('pictureUrl')
-            
-            # หน่วงเวลาให้ Mobile Chrome ทำงานทัน
-            time.sleep(0.5)
-            st.rerun()
-        else:
-            st.error("⚠️ รหัสเข้าสู่ระบบหมดอายุ หรือเกิดข้อผิดพลาด กรุณากดเข้าสู่ระบบใหม่อีกครั้ง")
-            st.stop()
-            
-    except Exception as e:
-        st.error(f"⚠️ ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ LINE ได้: {e}")
-        st.stop()
+    if "access_token" in res:
+        p_headers = {'Authorization': f"Bearer {res['access_token']}"}
+        profile = requests.get("https://api.line.me/v2/profile", headers=p_headers).json()
+        st.session_state.is_logged_in = True
+        st.session_state.user_name = profile.get('displayName')
+        st.session_state.user_pic = profile.get('pictureUrl')
+        # ล้าง query params เพื่อให้ URL สะอาด
+        st.query_params.clear()
+        st.rerun()
 
 # หน้าจอ Login (ถ้ายังไม่ได้เข้าสู่ระบบ)
 if not st.session_state.get("is_logged_in"):
@@ -99,6 +86,7 @@ def get_google_shops(lat, lng, radius_km, keyword):
 
 def get_premium_shops(province, category):
     try:
+        # อ่านข้อมูลจาก Sheet1
         df = conn.read(worksheet="Sheet1")
         premium = df[
             (df['IsPremium'].astype(str).str.upper() == 'TRUE') & 
@@ -109,30 +97,16 @@ def get_premium_shops(province, category):
     except:
         return []
 
-def get_available_packages():
-    try:
-        df_pkg = conn.read(worksheet="Packages")
-        available = df_pkg[
-            (df_pkg['IsActive'].astype(str).str.upper() == 'TRUE') & 
-            (~df_pkg['PackageName'].str.endswith('VIP', na=False))
-        ]
-        return available.to_dict('records')
-    except Exception as e:
-        return []
-
 # --- 4. ส่วนแสดงผลหลัก (Main App) ---
 with st.sidebar:
     if st.session_state.user_pic:
         st.image(st.session_state.user_pic, width=100)
     st.title(f"สวัสดีคุณ {st.session_state.user_name}")
-    
-    menu = st.radio("เมนูหลัก", ["🔍 ค้นหาร้านอาหาร", "🏪 ลงทะเบียนเจ้าของร้าน", "📢 จัดการโปรโมท"])
-    
+    menu = st.radio("เมนูหลัก", ["🔍 ค้นหาร้านอาหาร", "🏪 ลงทะเบียนเจ้าของร้าน"])
     if st.button("ออกจากระบบ"):
         st.session_state.clear()
         st.rerun()
 
-# --- เมนู: ค้นหาร้านอาหาร ---
 if menu == "🔍 ค้นหาร้านอาหาร":
     st.header("🔎 ค้นหาร้านอาหารใกล้ตัว")
     
@@ -144,11 +118,13 @@ if menu == "🔍 ค้นหาร้านอาหาร":
     
     sel_radius = st.slider("ระยะทาง (กิโลเมตร)", 1, 20, 5)
 
+    # ดึงพิกัดผู้ใช้
     location = get_geolocation()
     if location:
         u_lat = location['coords']['latitude']
         u_lng = location['coords']['longitude']
 
+        # --- ส่วนร้านพรีเมียม ---
         st.subheader("✨ ร้านแนะนำพิเศษ")
         ads = get_premium_shops(sel_province, sel_category)
         if ads:
@@ -162,6 +138,7 @@ if menu == "🔍 ค้นหาร้านอาหาร":
         else:
             st.info("ยังไม่มีร้านแนะนำในหมวดนี้")
 
+        # --- แผนที่และร้านจาก Google Maps ---
         st.divider()
         st.subheader("🗺️ ร้านค้าในพื้นที่")
         g_shops = get_google_shops(u_lat, u_lng, sel_radius, sel_category)
@@ -186,7 +163,6 @@ if menu == "🔍 ค้นหาร้านอาหาร":
     else:
         st.warning("📍 กรุณาอนุญาตการเข้าถึงตำแหน่ง (Location) เพื่อดูร้านใกล้ตัว")
 
-# --- เมนู: ลงทะเบียนเจ้าของร้าน ---
 elif menu == "🏪 ลงทะเบียนเจ้าของร้าน":
     st.header("🏪 ลงทะเบียนร้านของคุณ")
     with st.form("reg_form", clear_on_submit=True):
@@ -197,7 +173,6 @@ elif menu == "🏪 ลงทะเบียนเจ้าของร้าน"
         f_line = st.text_input("Line ID")
         f_ad = st.checkbox("สนใจพื้นที่โฆษณาพรีเมียม")
         
-        # ย้ายปุ่ม Submit กลับมาไว้ในบล็อก Form ของลงทะเบียนอย่างถูกต้อง
         if st.form_submit_button("ส่งข้อมูล"):
             if f_name and f_phone:
                 new_data = pd.DataFrame([{
@@ -214,34 +189,3 @@ elif menu == "🏪 ลงทะเบียนเจ้าของร้าน"
                     st.error("เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล")
             else:
                 st.error("กรุณากรอกชื่อร้านและเบอร์โทรศัพท์")
-
-# --- เมนู: จัดการโปรโมท ---
-elif menu == "📢 จัดการโปรโมท":
-    st.header("📢 ระบบโปรโมทร้านค้า")
-    
-    has_package = False 
-    
-    if not has_package:
-        st.info("💡 พื้นที่สำหรับเช่าซื้อโฆษณา เพื่อให้ร้านของคุณขึ้นเป็น 'ร้านแนะนำพิเศษ'")
-        
-        if st.button("สนใจคลิ๊กเพื่อดูแพ็กเกจ 🚀", type="primary"):
-            st.divider()
-            st.subheader("📦 แพ็กเกจโปรโมทที่เปิดให้บริการ")
-            
-            packages = get_available_packages()
-            
-            if packages:
-                cols = st.columns(len(packages))
-                for i, pkg in enumerate(packages):
-                    with cols[i]:
-                        st.container(border=True)
-                        st.markdown(f"### {pkg['PackageName']}")
-                        st.write(f"⏱️ ระยะเวลา: {pkg['Days']} วัน")
-                        st.write(f"💰 ราคา: {pkg['Price']} บาท")
-                        st.button(f"เลือก {pkg['PackageName']}", key=f"btn_{pkg['PackageID']}")
-            else:
-                st.warning("ขณะนี้ยังไม่มีแพ็กเกจเปิดให้บริการ (หรือยังไม่ได้สร้าง Sheet 'Packages')")
-                
-    else:
-        st.success("✅ คุณมีแพ็กเกจโปรโมทที่กำลังใช้งานอยู่")
-        st.write("ฟอร์มแก้ไขรูปภาพและข้อความจะอยู่ตรงนี้...")
