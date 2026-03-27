@@ -193,6 +193,42 @@ elif menu == "🏪 ลงทะเบียนเจ้าของร้าน"
         f_cat = st.selectbox("ประเภทอาหาร", ["หมูกระทะ", "แจ่วฮ้อน", "ชาบู", "ร้านอาหารทั่วไป"])
         f_line = st.text_input("Line ID")
         f_ad = st.checkbox("สนใจพื้นที่โฆษณาพรีเมียม")
+
+elif menu == "📢 จัดการโปรโมท":
+    st.header("📢 ระบบโปรโมทร้านค้า")
+    
+    # สมมติว่าดึงข้อมูลจาก GSheets แล้วพบว่าร้านนี้ "ยังไม่มีแพ็กเกจ" (เดี๋ยวเราค่อยทำระบบเช็กสิทธิ์ทีหลัง)
+    has_package = False 
+    
+    if not has_package:
+        # 1. โชว์ป้ายโฆษณาพื้นที่ว่าง
+        st.info("💡 พื้นที่สำหรับเช่าซื้อโฆษณา เพื่อให้ร้านของคุณขึ้นเป็น 'ร้านแนะนำพิเศษ'")
+        
+        # 2. ถ้ากดปุ่ม ให้แสดงแพ็กเกจ
+        if st.button("สนใจคลิ๊กเพื่อดูแพ็กเกจ 🚀", type="primary"):
+            st.divider()
+            st.subheader("📦 แพ็กเกจโปรโมทที่เปิดให้บริการ")
+            
+            # เรียกใช้ฟังก์ชันที่เราสร้างไว้ด้านบน
+            packages = get_available_packages()
+            
+            if packages:
+                # วนลูปสร้างกล่อง (Card) แสดงแพ็กเกจให้เลือก
+                cols = st.columns(len(packages))
+                for i, pkg in enumerate(packages):
+                    with cols[i]:
+                        st.container(border=True)
+                        st.markdown(f"### {pkg['PackageName']}")
+                        st.write(f"⏱️ ระยะเวลา: {pkg['Days']} วัน")
+                        st.write(f"💰 ราคา: {pkg['Price']} บาท")
+                        st.button(f"เลือก {pkg['PackageName']}", key=f"btn_{pkg['PackageID']}")
+            else:
+                st.warning("ขณะนี้ยังไม่มีแพ็กเกจเปิดให้บริการ (หรือยังไม่ได้สร้าง Sheet 'Packages')")
+                
+    else:
+        # ถ้าร้านมีแพ็กเกจแล้ว จะโชว์ฟอร์มให้อัปโหลดรูป 3 รูป (ทำในสเตปต่อไป)
+        st.success("✅ คุณมีแพ็กเกจโปรโมทที่กำลังใช้งานอยู่")
+        st.write("ฟอร์มแก้ไขรูปภาพและข้อความจะอยู่ตรงนี้...") 
         
         if st.form_submit_button("ส่งข้อมูล"):
             if f_name and f_phone:
