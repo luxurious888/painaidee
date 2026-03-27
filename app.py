@@ -97,6 +97,21 @@ def get_premium_shops(province, category):
     except:
         return []
 
+def get_available_packages():
+    try:
+        # อ่านข้อมูลจาก Sheet ชื่อ 'Packages' (คุณต้องไปสร้าง Sheet นี้เพิ่มใน Google Sheets)
+        df_pkg = conn.read(worksheet="Packages")
+        
+        # กรองเอาเฉพาะที่ IsActive เป็น TRUE และชื่อ (PackageName) ไม่ลงท้ายด้วย 'VIP'
+        available = df_pkg[
+            (df_pkg['IsActive'].astype(str).str.upper() == 'TRUE') & 
+            (~df_pkg['PackageName'].str.endswith('VIP', na=False))
+        ]
+        return available.to_dict('records')
+    except Exception as e:
+        # ถ้ายังไม่ได้สร้าง Sheet หรือมี Error จะคืนค่าเป็นลิสต์ว่าง
+        return []
+
 # --- 4. ส่วนแสดงผลหลัก (Main App) ---
 with st.sidebar:
     if st.session_state.user_pic:
