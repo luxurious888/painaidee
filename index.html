@@ -422,12 +422,9 @@
         checkDataAndSearch();
     }
 
+    // ⚡ แก้บั๊กโหลดค้าง: สั่งให้โหลดพิกัดแผนที่ทันทีโดยไม่ต้องรอข้อมูลหมวดหมู่
     function checkDataAndSearch() {
-        if(appData && appData.categories && appData.categories.length > 0) {
-            changeLocation();
-        } else {
-            setTimeout(checkDataAndSearch, 500); 
-        }
+        changeLocation();
     }
 
     function changeLocation() {
