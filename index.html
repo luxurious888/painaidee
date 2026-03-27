@@ -537,6 +537,40 @@
         const stores = appData.registeredStores || []; 
         const now = Date.now();
 
+        let html = '';
+
+        // ⚡ [NEW] ค้นหาร้าน VIP ที่หมวดหมู่ตรงกับคำค้นหา ให้มาโชว์บนสุด!
+        const matchingPromos = (appData.activePromotions || []).filter(p => {
+            const isValid = p.expireTimestamp && now < p.expireTimestamp;
+            // เช็คว่าหมวดหมู่ตรง หรือชื่อร้านตรงกับคำที่ลูกค้ากำลังค้นหา
+            const isMatch = p.category && (p.category === keywordSearched || keywordSearched.includes(p.category) || p.category.includes(keywordSearched));
+            const isNameMatch = p.storeName.includes(keywordSearched);
+            return isValid && (isMatch || isNameMatch);
+        });
+
+        // ⚡ [NEW] สร้างการ์ดร้าน VIP (ถ้ามีที่ตรงหมวดหมู่)
+        matchingPromos.forEach(p => {
+            const store = stores.find(s => s.name === p.storeName);
+            const hasLine = store && store.lineUrl && store.lineUrl.trim() !== '';
+            const hasFb = store && store.fbUrl && store.fbUrl.trim() !== '';
+            
+            html += `
+            <div class="place-card card-vip" onclick="searchAndFocusStore('${p.storeName}')">
+                <div class="vip-crown-badge">👑 แนะนำ (ตรงหมวดหมู่)</div>
+                <img src="${p.image}" style="width: 100%; height: 180px; object-fit: cover;">
+                <div class="place-info">
+                    <h3 style="margin:0 0 8px 0; font-size: 18px; color:#FFD700; font-weight:600;">✨ ${p.storeName}</h3>
+                    <p style="font-size:13px; color:var(--text-main); margin:0 0 10px 0;">${p.detail}</p>
+                    <div class="action-buttons">
+                        ${hasLine ? `<button class="btn-action btn-line" onclick="window.open('${store.lineUrl.startsWith('http') ? store.lineUrl : 'https://'+store.lineUrl}', '_blank'); event.stopPropagation();">LINE</button>` : ''}
+                        ${hasFb ? `<button class="btn-action btn-fb" onclick="window.open('${store.fbUrl.startsWith('http') ? store.fbUrl : 'https://'+store.fbUrl}', '_blank'); event.stopPropagation();">FB</button>` : ''}
+                        <button class="btn-action btn-nav" style="background:#4285F4;" onclick="searchAndFocusStore('${p.storeName}'); event.stopPropagation();">📍 ดูพิกัด</button>
+                    </div>
+                </div>
+            </div>`;
+        });
+
+        // หลังจากโชว์ VIP ด้านบนเสร็จแล้ว ก็เรียงลำดับร้านจาก Google Maps ตามปกติ
         const sorted = googlePlaces.sort((a, b) => {
             const isVipA = stores.find(s => s.name === a.name)?.isVIP ? 1 : 0;
             const isVipB = stores.find(s => s.name === b.name)?.isVIP ? 1 : 0;
@@ -551,7 +585,7 @@
             return 0;
         });
         
-        let html = sorted.slice(0, 80).map(p => {
+        html += sorted.slice(0, 80).map(p => {
             const store = stores.find(s => s.name === p.name);
             let isVIP = false;
             
@@ -730,6 +764,7 @@
         });
     }
 
+    // ⚡ [NEW] แก้ไขให้แอบดูและบันทึก userId ลงไปส่งให้แอดมินตอนกดลงทะเบียน
     async function submitStoreRegistration() {
         const btn = document.getElementById('btnSubmitReg'); 
         const n = document.getElementById('regStoreName').value;
@@ -740,6 +775,16 @@
         if(!n || !p1 || !p2 || !p3) return alert("กรุณากรอกข้อมูลและแนบรูปให้ครบครับ");
         
         btn.innerText = "กำลังอัปโหลดข้อมูล... ⏳"; btn.disabled = true;
+
+        // ⚡ ดึง userId จาก LINE (LIFF) แบบลับๆ
+        let userId = "";
+        try {
+            if (liff.isLoggedIn()) {
+                const profile = await liff.getProfile();
+                userId = profile.userId;
+            }
+        } catch(e) { console.error("LIFF User ID Error: ", e); }
+
         const photo = await resizeImg(p1);
         const idCard = await resizeImg(p2);
         let comm = "";
@@ -748,9 +793,20 @@
         }
         
         if (!appData.registrationRequests) appData.registrationRequests = [];
-        appData.registrationRequests.push({ id: Date.now(), storeName: n, phone: p3, storePhoto: photo, idCard: idCard, commercial: comm });
+        
+        // ⚡ เพิ่ม userId เข้าไปในข้อมูลที่ส่งไปให้แอดมินด้วย
+        appData.registrationRequests.push({ 
+            id: Date.now(), 
+            storeName: n, 
+            phone: p3, 
+            userId: userId, 
+            storePhoto: photo, 
+            idCard: idCard, 
+            commercial: comm 
+        });
+        
         await saveToCloud(); 
-        alert("ส่งข้อมูลสำเร็จ! รอรับ PIN จากแอดมินครับ");
+        alert("ส่งข้อมูลสำเร็จ! รอรับรหัส PIN จากแอดมิน (แจ้งเตือนผ่านช่องทาง LINE) ครับ");
         btn.innerText = "🚀 ส่งเอกสารเพื่อตรวจสอบ"; btn.disabled = false;
         
         ['regStoreName','regPhone','regStorePhoto','regIdCard','regCommercial'].forEach(id => document.getElementById(id).value = '');
