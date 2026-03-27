@@ -378,6 +378,20 @@
                         window.location.href = "https://lin.ee/5SBoptj";
                         return; 
                     }
+                if (!liff.isLoggedIn()) {
+                liff.login({ redirectUri: window.location.href });
+                return; // หยุดการทำงานอื่นเพื่อรอ Login
+            }
+
+            // ... โค้ดส่วนอื่นๆ ที่เช็คสถานะเพื่อนและโหลดข้อมูล ...
+            
+        } catch (err) { 
+            console.error("LIFF Init Error:", err);
+            // ถ้า Error ให้พยายามโชว์ปุ่ม Login สำรอง
+            document.getElementById('loadingSpinner').style.display = 'none';
+            document.getElementById('loginCard').style.display = 'block';
+        }
+    }
                 } catch(friendErr) {
                     console.log("ข้ามการเช็คเพื่อน");
                 }
