@@ -29,6 +29,12 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .edit-input { padding: 6px; border: 1px solid #ccc; border-radius: 6px; font-family: 'Kanit'; font-size: 13px; width: 100%; box-sizing: border-box; margin-bottom: 6px; background: #fff;}
         .edit-input:focus { border-color: var(--primary); box-shadow: 0 0 5px rgba(197,160,89,0.3); outline: none;}
+        
+        /* ⚡ ตกแต่งแถบรายละเอียดพับเก็บได้ */
+        details summary { cursor: pointer; padding: 15px; background: #f7f0ff; border-radius: 10px; font-weight: bold; color: #8e44ad; font-size: 16px; transition: 0.3s; list-style: none; }
+        details summary::-webkit-details-marker { display: none; }
+        details summary:hover { background: #ebdfff; }
+        details[open] summary { border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-bottom: 2px solid #ddd; }
     </style>
 </head>
 <body>
@@ -42,33 +48,44 @@
     <h1>👑 Painaidee - ระบบจัดการหลังบ้าน</h1>
 
     <div class="card" style="border-left-color: #f39c12;">
-        <h2>💰 1. ตั้งค่าอัตราค่าบริการ (แพ็กเกจโฆษณา)</h2>
+        <h2>💰 1. ตั้งค่าแพ็กเกจ (กำหนดอายุแพ็กเกจได้)</h2>
         <div style="background: #fff9f0; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
-            <input type="text" id="sName" placeholder="ชื่อแพ็กเกจ (เช่น โปรโมท 30 วัน)">
-            <input type="number" id="sPrice" placeholder="ราคา (บาท)">
+            <input type="text" id="sName" placeholder="ชื่อแพ็กเกจ" style="width: 20%;">
+            <input type="number" id="sPrice" placeholder="ราคา (บาท)" style="width: 15%;">
+            <input type="number" id="sDays" placeholder="อายุ (วัน) เช่น 30" style="width: 15%;">
+            <input type="text" id="sDetail" placeholder="รายละเอียดโปรโมชั่น" style="width: 30%;">
             <button class="btn btn-ok" onclick="addService()">➕ เพิ่มแพ็กเกจ</button>
         </div>
         <table id="sTable"></table>
     </div>
 
-    <div class="card" style="border-left-color: #8e44ad;">
-        <h2>🏷️ 2. จัดการหมวดหมู่ค้นหา (แสดงหน้าลูกค้า)</h2>
-        <div style="background: #f7f0ff; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
-            <select id="cGroup">
-                <option value="food">🍽️ อาหาร/เครื่องดื่ม</option>
-                <option value="beauty">💆‍♀️ ความงาม/พักผ่อน</option>
-                <option value="activity">🎯 กิจกรรม/ท่องเที่ยว</option>
-                <option value="sport">🏋️ กีฬา/ออกกำลังกาย</option>
-            </select>
-            <input type="text" id="cLabel" placeholder="ชื่อที่ลูกค้าเห็น (เช่น ชาบู)">
-            <input type="text" id="cKey" placeholder="คำค้นหา Google Maps">
-            <button class="btn btn-ok" onclick="addCategory()">➕ เพิ่มหมวดหมู่</button>
-        </div>
-        <table id="cTable"></table>
+    <div class="card" style="border-left-color: #8e44ad; padding: 0; overflow: hidden;">
+        <details>
+            <summary>🔽 2. จัดการหมวดหมู่ค้นหา (คลิกเพื่อเปิด/ปิด)</summary>
+            <div style="padding: 25px;">
+                <div style="background: #f7f0ff; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                    <select id="cGroup">
+                        <option value="food">🍽️ อาหาร/เครื่องดื่ม</option>
+                        <option value="beauty">💆‍♀️ ความงาม/พักผ่อน</option>
+                        <option value="activity">🎯 กิจกรรม/ท่องเที่ยว</option>
+                        <option value="sport">🏋️ กีฬา/ออกกำลังกาย</option>
+                    </select>
+                    <input type="text" id="cLabel" placeholder="ชื่อที่ลูกค้าเห็น">
+                    <input type="text" id="cKey" placeholder="คำค้นหา Google Maps">
+                    <button class="btn btn-ok" onclick="addCategory()">➕ เพิ่มหมวดหมู่ใหม่</button>
+                </div>
+                
+                <div style="margin-bottom: 15px;">
+                    <button class="btn btn-info" onclick="saveCategories()">💾 บันทึกการแก้ไขทั้งหมด</button>
+                    <button class="btn btn-del" onclick="deleteSelectedCategories()">🗑️ ลบหมวดหมู่ที่เลือกติ๊กถูก</button>
+                </div>
+                <table id="cTable"></table>
+            </div>
+        </details>
     </div>
 
     <div class="card" style="border-left-color: var(--info);">
-        <h2>📌 3. คำขออัปเดต / ขึ้นแบนเนอร์โปรโมท (แอดมินแก้ไขก่อนอนุมัติได้)</h2>
+        <h2>📌 3. คำขออัปเดต / ขึ้นแบนเนอร์โปรโมท</h2>
         <table id="pTable"></table>
     </div>
 
@@ -98,7 +115,6 @@
     
     let appData = { registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], categories: [], closedReports: [], blacklistedPlaces: [], services: [] };
 
-    // ⚡ ระบบเช็ควันหมดอายุอัตโนมัติ (จะทำงานตอนโหลดข้อมูล)
     function checkAutoRenew() {
         let needSave = false;
         const now = Date.now();
@@ -106,24 +122,20 @@
         if (appData.registeredStores) {
             appData.registeredStores.forEach(s => {
                 if (s.isVIP && s.vipExpireTimestamp && now > s.vipExpireTimestamp) {
-                    if (s.vipAutoRenew) {
-                        s.vipExpireTimestamp += (30 * 24 * 60 * 60 * 1000); // ต่ออายุอัตโนมัติ 30 วัน
-                        needSave = true;
-                    } else {
-                        s.isVIP = false; // ตัดสิทธิ์ VIP ทิ้ง
-                        needSave = true;
-                    }
+                    if (s.vipAutoRenew) { s.vipExpireTimestamp += (30 * 24 * 60 * 60 * 1000); needSave = true; } 
+                    else { s.isVIP = false; needSave = true; }
                 }
             });
         }
         
         if (appData.activePromotions) {
             appData.activePromotions.forEach(p => {
-                if (p.expireTimestamp && now > p.expireTimestamp) {
-                    if (p.autoRenew) {
-                        p.expireTimestamp += (30 * 24 * 60 * 60 * 1000); // ต่ออายุอัตโนมัติ 30 วัน
-                        needSave = true;
-                    }
+                if (p.expireTimestamp && now > p.expireTimestamp && p.autoRenew) {
+                    // ถ้าแพ็กเกจมีระบุวัน ให้ต่ออายุตามแพ็กเกจ ถ้าไม่มีก็ 30 วัน
+                    const svc = (appData.services || []).find(s => s.name === p.service);
+                    const addDays = (svc && svc.days) ? parseInt(svc.days) : 30;
+                    p.expireTimestamp += (addDays * 24 * 60 * 60 * 1000); 
+                    needSave = true;
                 }
             });
         }
@@ -142,16 +154,13 @@
         showLoading(false);
     }
 
-    // ⚡ อัปเดตข้อมูลอัตโนมัติแบบฝ่าแคช
     setInterval(async () => {
         try {
             const res = await fetch(API_URL + "?t=" + new Date().getTime());
             const data = await res.json();
             if (data && Object.keys(data).length > 0) {
                 appData = data;
-                if (!document.activeElement.classList.contains('edit-input')) {
-                    checkAutoRenew(); 
-                }
+                if (!document.activeElement.classList.contains('edit-input')) { checkAutoRenew(); }
             }
         } catch (e) {}
     }, 15000);
@@ -164,11 +173,31 @@
     }
 
     function render() {
-        document.getElementById('sTable').innerHTML = '<tr><th>ชื่อแพ็กเกจ</th><th>ราคา</th><th>จัดการ</th></tr>' + 
-            (appData.services || []).map((s,i) => `<tr><td><strong>${s.name}</strong></td><td style="color:#C5A059; font-weight:bold;">${s.price} ฿</td><td><button class="btn btn-del" onclick="deleteItem('services', ${i})">🗑️ ลบ</button></td></tr>`).join('');
+        // ⚡ อัปเกรดตารางแพ็กเกจ
+        document.getElementById('sTable').innerHTML = '<tr><th>ชื่อแพ็กเกจ</th><th>อายุ(วัน)</th><th>ราคา</th><th>รายละเอียด</th><th>จัดการ</th></tr>' + 
+            (appData.services || []).map((s,i) => `<tr>
+                <td><strong>${s.name}</strong></td>
+                <td>${s.days || 30} วัน</td>
+                <td style="color:#C5A059; font-weight:bold;">${s.price} ฿</td>
+                <td><span style="font-size:12px; color:#666;">${s.detail || '-'}</span></td>
+                <td><button class="btn btn-del" onclick="deleteItem('services', ${i})">🗑️ ลบ</button></td>
+            </tr>`).join('');
 
-        document.getElementById('cTable').innerHTML = '<tr><th>กลุ่มหลัก</th><th>ชื่อที่แสดง</th><th>คำค้น (Maps)</th><th>จัดการ</th></tr>' + 
-            (appData.categories || []).map((c,i) => `<tr><td><span class="status-badge" style="background:#8e44ad;">${c.group}</span></td><td><strong>${c.label}</strong></td><td style="color:var(--info);">${c.keyword}</td><td><button class="btn btn-del" onclick="deleteItem('categories', ${i})">🗑️ ลบ</button></td></tr>`).join('');
+        // ⚡ อัปเกรดตารางหมวดหมู่ (พิมพ์แก้ได้ + เลือกกล่องได้)
+        document.getElementById('cTable').innerHTML = '<tr><th style="width:40px;">เลือก</th><th>กลุ่มหลัก</th><th>ชื่อที่ลูกค้าเห็น</th><th>คำค้น Maps</th></tr>' + 
+            (appData.categories || []).map((c,i) => `<tr>
+                <td><input type="checkbox" class="cat-checkbox" value="${i}" style="width:20px; height:20px; cursor:pointer;"></td>
+                <td>
+                    <select id="editCGroup_${i}" class="edit-input" style="margin-bottom:0;">
+                        <option value="food" ${c.group==='food'?'selected':''}>food (อาหาร)</option>
+                        <option value="beauty" ${c.group==='beauty'?'selected':''}>beauty (ความงาม)</option>
+                        <option value="activity" ${c.group==='activity'?'selected':''}>activity (เที่ยว)</option>
+                        <option value="sport" ${c.group==='sport'?'selected':''}>sport (กีฬา)</option>
+                    </select>
+                </td>
+                <td><input type="text" id="editCLabel_${i}" class="edit-input" value="${c.label}" style="margin-bottom:0;"></td>
+                <td><input type="text" id="editCKey_${i}" class="edit-input" value="${c.keyword}" style="margin-bottom:0;"></td>
+            </tr>`).join('');
 
         document.getElementById('pTable').innerHTML = '<tr><th style="width:25%;">ร้านค้า / จังหวัด</th><th style="width:25%;">หมวดหมู่ / แพ็กเกจ</th><th>รายละเอียด (แก้ได้)</th><th>รูปที่แนบ</th><th>จัดการ</th></tr>' + 
             (appData.pendingPromotions || []).map((p,i) => `<tr>
@@ -183,7 +212,7 @@
                 <td><textarea id="editPDetail_${i}" class="edit-input" rows="2">${p.detail || ''}</textarea></td>
                 <td><img src="${p.image}" class="img-preview" onclick="viewPromoImage(${i})" title="คลิกเพื่อดูรูปใหญ่"></td>
                 <td>
-                    <button class="btn btn-ok" onclick="approvePromotion(${i})">✅ บันทึก & อนุมัติ (30วัน)</button>
+                    <button class="btn btn-ok" onclick="approvePromotion(${i})">✅ บันทึก & อนุมัติ</button>
                     <button class="btn btn-del" onclick="deleteItem('pendingPromotions', ${i})">❌ ลบทิ้ง</button>
                 </td>
             </tr>`).join('');
@@ -249,6 +278,27 @@
             (appData.closedReports || []).map((c,i) => `<tr><td><strong>${c.storeName}</strong><br><small style="color:#888;">${c.placeId}</small></td><td>${c.date}</td><td><button class="btn btn-del" onclick="blacklistPlace('${c.placeId}', ${i})">🚩 ยืนยัน แบนร้านถาวร</button><button class="btn btn-info" onclick="deleteItem('closedReports', ${i})">❌ ลบรายงานทิ้ง</button></td></tr>`).join('');
     }
 
+    // ⚡ ฟังก์ชันหมวดหมู่ (ลบเยอะ + เซฟรวดเดียว)
+    function deleteSelectedCategories() {
+        const checkboxes = document.querySelectorAll('.cat-checkbox:checked');
+        if(checkboxes.length === 0) return alert('กรุณาเลือกหมวดหมู่ที่ต้องการลบอย่างน้อย 1 รายการ');
+        if(confirm('ยืนยันลบหมวดหมู่ที่เลือกทั้งหมดใช่หรือไม่?')) {
+            const indices = Array.from(checkboxes).map(cb => parseInt(cb.value)).sort((a,b) => b - a);
+            indices.forEach(idx => { appData.categories.splice(idx, 1); });
+            save();
+        }
+    }
+    
+    function saveCategories() {
+        appData.categories.forEach((c, i) => {
+            c.group = document.getElementById(`editCGroup_${i}`).value;
+            c.label = document.getElementById(`editCLabel_${i}`).value;
+            c.keyword = document.getElementById(`editCKey_${i}`).value;
+        });
+        save();
+        alert('💾 บันทึกการแก้ไขหมวดหมู่เรียบร้อยแล้ว!');
+    }
+
     function toggleVipAutoRenew(i) {
         appData.registeredStores[i].vipAutoRenew = !appData.registeredStores[i].vipAutoRenew;
         save();
@@ -270,10 +320,15 @@
     }
 
     function addService() {
-        const name = document.getElementById('sName').value.trim(); const price = document.getElementById('sPrice').value.trim();
-        if(!name || !price) return alert("กรุณากรอกข้อมูลให้ครบถ้วนครับ");
-        if(!appData.services) appData.services = []; appData.services.push({ name, price: parseInt(price) }); save();
+        const name = document.getElementById('sName').value.trim(); 
+        const price = document.getElementById('sPrice').value.trim();
+        const days = document.getElementById('sDays').value.trim();
+        const detail = document.getElementById('sDetail').value.trim();
+        if(!name || !price) return alert("กรุณากรอกชื่อและราคาให้ครบถ้วนครับ");
+        if(!appData.services) appData.services = []; 
+        appData.services.push({ name, price: parseInt(price), days: parseInt(days)||30, detail }); save();
         document.getElementById('sName').value = ''; document.getElementById('sPrice').value = '';
+        document.getElementById('sDays').value = ''; document.getElementById('sDetail').value = '';
     }
 
     function addCategory() {
@@ -290,8 +345,12 @@
         p.category = document.getElementById(`editPCat_${i}`).value;
         p.service = document.getElementById(`editPServ_${i}`).value;
         p.detail = document.getElementById(`editPDetail_${i}`).value;
-        p.expireTimestamp = Date.now() + (30 * 24 * 60 * 60 * 1000); // 30 วัน
-        p.autoRenew = false; // ปิดต่ออายุอัตโนมัติไว้เป็นค่าเริ่มต้น
+        
+        // ⚡ ดึงจำนวนวันจากแพ็กเกจที่เลือกมาคำนวณวันหมดอายุ
+        const svc = (appData.services || []).find(s => s.name === p.service);
+        const addDays = (svc && svc.days) ? parseInt(svc.days) : 30;
+        p.expireTimestamp = Date.now() + (addDays * 24 * 60 * 60 * 1000); 
+        p.autoRenew = false; 
         
         if(!appData.activePromotions) appData.activePromotions = [];
         const existingIndex = appData.activePromotions.findIndex(act => act.storeName === p.storeName);
@@ -308,6 +367,7 @@
         p.province = document.getElementById(`editAProv_${i}`).value;
         p.detail = document.getElementById(`editADetail_${i}`).value;
         save();
+        alert("💾 บันทึกการแก้ไขข้อมูลเรียบร้อยแล้ว!");
     }
 
     function approveStore(i) {
@@ -319,11 +379,11 @@
     function toggleVIP(i) { 
         let s = appData.registeredStores[i];
         if (s.isVIP) {
-            s.isVIP = false; // ปิด VIP
+            s.isVIP = false; 
         } else {
-            s.isVIP = true; // เปิด VIP
-            s.vipExpireTimestamp = Date.now() + (30 * 24 * 60 * 60 * 1000); // ตั้งหมดอายุ 30 วัน
-            s.vipAutoRenew = false; // ค่าเริ่มต้นปิด Auto-renew
+            s.isVIP = true; 
+            s.vipExpireTimestamp = Date.now() + (30 * 24 * 60 * 60 * 1000); 
+            s.vipAutoRenew = false; 
         }
         save(); 
     }
