@@ -293,7 +293,7 @@
 
 <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbypHrQKt_SWFWOYNFmqCz3hSgX-1EMt1lphWvl6p4bXe5HYObRiXj9-xFls2fSLAtKT/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbzdha6RwLDH1aYfxazAXPZ5Bvh5uTxAWN8TqoFKS05747T58M6jsSV-6OvOWGZNkq4/exec";
     
     // ⚡ ฐานข้อมูลหมวดหมู่ 35 หมวด ครอบคลุมที่สุด!
     const defaultCategories = [
@@ -430,7 +430,7 @@
 
     let isAppReady = false;
 
-    // ⚡ ระบบแก้อาการค้างจาก Messenger แบบ 100%
+    // ⚡ ระบบแก้อาการค้างจาก Messenger / FB
     document.addEventListener('DOMContentLoaded', () => {
         const ua = navigator.userAgent || navigator.vendor || window.opera;
         const isMobile = /iPhone|iPad|iPod|Android/i.test(ua);
@@ -460,16 +460,26 @@
 
             if (liff.isLoggedIn()) {
                 isAppReady = true; 
-                document.getElementById('loadingText').innerText = "กำลังดึงข้อมูลแผนที่...";
+                document.getElementById('loadingText').innerText = "กำลังตรวจสอบสถานะเพื่อน...";
 
                 try {
                     const friend = await liff.getFriendship();
                     if (!friend.friendFlag) {
-                        window.location.href = "https://lin.ee/5SBoptj"; 
-                        return; 
+                        // 🚨 ใช้งาน UX ใหม่: โชว์ป๊อปอัปแอดเพื่อนแทนที่จะเตะออก
+                        document.getElementById('loadingSpinner').style.display = 'none';
+                        document.getElementById('loginCard').innerHTML = `
+                            <div style="font-size: 40px; margin-bottom: 10px;">🛑</div>
+                            <h2 style="color: #FFF; margin: 0 0 10px 0;">ต้องเพิ่มเพื่อนก่อน</h2>
+                            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 25px;">เพื่อรับสิทธิพิเศษและใช้งานแอปไปไหนดี กรุณาเพิ่มเพื่อนกับ LINE OA ของเราก่อนนะครับ</p>
+                            <button class="btn-line-login" style="margin-bottom: 15px;" onclick="window.open('https://lin.ee/5SBoptj', '_blank')">➕ กดเพิ่มเพื่อนที่นี่</button>
+                            <button class="btn-outline" style="width:100%; border-color: var(--primary); color: var(--primary-light);" onclick="location.reload()">🔄 ฉันเพิ่มเพื่อนแล้ว (เข้าแอป)</button>
+                        `;
+                        document.getElementById('loginCard').style.display = 'block';
+                        return; // หยุดการโหลดรอให้ลูกค้าแอดเพื่อนเสร็จ
                     }
                 } catch(e) { console.log("Friendship API error", e); }
 
+                document.getElementById('loadingText').innerText = "กำลังดึงข้อมูลแผนที่...";
                 const profile = await liff.getProfile();
                 document.getElementById('header-profile').innerHTML = `<img src="${profile.pictureUrl}" style="width:100%; height:100%; object-fit:cover;">`;
                 
