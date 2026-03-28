@@ -382,6 +382,7 @@
         };
     });
 
+    // ⚡ หน่วงเวลาเล็กน้อยเพื่อความเสถียร
     window.onload = function() {
         setTimeout(initSystem, 500);
     };
@@ -412,16 +413,19 @@
         document.getElementById('appContent').style.display = 'block';
     }
     
-    // ⚡ [NEW] โค้ดสำหรับดีดเข้าแอป LINE โดยเฉพาะ
+    // ⚡ แก้บั๊ก 404 ใน Android โดยส่ง URL ที่ไม่มีทางเบิ้ลเครื่องหมายทับ
     function loginWithLine() { 
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
         
+        // บังคับลิงก์ให้สะอาดที่สุด (เช่น https://painaidee.online หรือ https://painaidee.online/index.html)
+        let exactUrl = window.location.origin + window.location.pathname;
+        
         if (isMobile && !liff.isInClient()) {
-            // ถ้าเป็นมือถือและเปิดในเบราว์เซอร์อื่น ให้ดีดเข้า LIFF URL (ซึ่งจะพาเข้าแอป LINE)
+            // ถ้าเป็นมือถือ เปิดผ่าน Chrome/Safari ให้ดีดเข้าแอป LINE ทันที
             window.location.href = "https://liff.line.me/2009598846-wiCUeV35";
         } else {
-            // ถ้าเป็นคอมพิวเตอร์ หรือกรณีอื่นๆ ให้ใช้วิธี Login ปกติ
-            liff.login({ redirectUri: "https://painaidee.online/" }); 
+            // สำหรับคอมพิวเตอร์ หรือเปิดใน LINE อยู่แล้ว ให้ส่ง Callback กลับมาลิงก์ปัจจุบัน
+            liff.login({ redirectUri: exactUrl }); 
         }
     }
 
