@@ -26,7 +26,7 @@
             --info: #17a2b8;
         }
 
-        body { font-family: 'Kanit', sans-serif; margin: 0; background-color: var(--bg-light); padding-bottom: 50px; color: var(--text-gold); overflow-x: hidden; }
+        body { font-family: 'Kanit', sans-serif; margin: 0; background-color: var(--bg-light); padding-bottom: 50px; color: var(--text-gold); overflow-x: hidden; scroll-behavior: smooth; }
         
         nav { display: flex; justify-content: space-around; background: var(--surface); padding: 12px 0; position: sticky; top: 0; z-index: 2000; box-shadow: 0 4px 20px rgba(0,0,0,0.1); border-bottom: 1px solid var(--border); }
         nav div { cursor: pointer; font-weight: 500; color: var(--text-muted); padding: 12px 20px; transition: 0.3s; position: relative; letter-spacing: 0.5px; }
@@ -61,11 +61,11 @@
         .place-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; margin-top: 24px; }
         .place-card { background: var(--surface); border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid rgba(197,160,89,0.15); transition: 0.4s; cursor: pointer; position: relative; display: flex; flex-direction: column; }
         .place-card:hover { transform: translateY(-6px); box-shadow: 0 15px 40px rgba(197, 160, 89, 0.25); border-color: rgba(197, 160, 89, 0.5); }
-        .place-card img { width: 100%; height: 180px; object-fit: cover; background-color: var(--dark-muted); }
-        .place-info { padding: 20px; display: flex; flex-direction: column; flex-grow: 1; }
+        .place-card img { width: 100%; height: 180px; object-fit: cover; background-color: var(--dark-muted); pointer-events: none; }
+        .place-info { padding: 20px; display: flex; flex-direction: column; flex-grow: 1; pointer-events: none; }
         .distance-badge { position: absolute; top: 15px; right: 15px; background: rgba(26, 28, 32, 0.9); color: var(--primary-light); padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; backdrop-filter: blur(5px); border: 1px solid rgba(197, 160, 89, 0.3); box-shadow: 0 3px 10px rgba(0,0,0,0.2); z-index: 10; }
         
-        .action-buttons { display: flex; gap: 8px; margin-top: auto; padding-top: 15px; flex-wrap: wrap; }
+        .action-buttons { display: flex; gap: 8px; margin-top: auto; padding-top: 15px; flex-wrap: wrap; pointer-events: auto; }
         .btn-action { flex: 1; text-align: center; color: white; text-decoration: none; padding: 10px 5px; border-radius: 10px; font-weight: 500; font-size: 12px; transition: 0.3s; border: none; cursor: pointer; font-family: 'Kanit'; min-width: 30%; }
         .btn-nav { background: #4285F4 !important; color: #FFF !important; border: none !important; font-weight: 600; box-shadow: 0 4px 10px rgba(66, 133, 244, 0.3); }
         .btn-nav:hover { background: #357AE8 !important; transform: translateY(-2px); }
@@ -97,7 +97,7 @@
         
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(18, 20, 24, 0.95); backdrop-filter: blur(15px); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .login-card { background: var(--surface); padding: 40px; border-radius: 24px; text-align: center; max-width: 350px; width: 90%; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid var(--border); animation: fadeIn 0.5s ease; }
-        .btn-line-login { background-color: var(--line-green); color: white; border: none; padding: 15px 20px; border-radius: 12px; font-family: 'Kanit'; font-weight: 600; font-size: 16px; width: 100%; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 5px 15px rgba(6, 199, 85, 0.3); }
+        .btn-line-login { background-color: var(--line-green); color: white; border: none; padding: 15px 20px; border-radius: 12px; font-family: 'Kanit'; font-weight: 600; font-size: 16px; width: 100%; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 5px 15px rgba(6, 199, 85, 0.3); text-decoration: none;}
         .spinner { width: 50px; height: 50px; border: 5px solid var(--surface); border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
@@ -119,7 +119,7 @@
         </div>
         <h2 style="color: #FFF; margin: 0 0 10px 0;">ยินดีต้อนรับ</h2>
         <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 30px;">กรุณาเข้าสู่ระบบผ่าน LINE เพื่อค้นหาและรับโปรโมชั่นพิเศษ</p>
-        <button class="btn-line-login" onclick="loginWithLine()">📱 เข้าสู่ระบบ / เปิดในแอป LINE</button>
+        <a href="https://liff.line.me/2009598846-wiCUeV35" class="btn-line-login">📱 เข้าสู่ระบบ / เปิดในแอป LINE</a>
     </div>
 </div>
 
@@ -295,7 +295,6 @@
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbypHrQKt_SWFWOYNFmqCz3hSgX-1EMt1lphWvl6p4bXe5HYObRiXj9-xFls2fSLAtKT/exec";
     
-    // ⚡ ฐานข้อมูลหมวดหมู่ 35 หมวด ครอบคลุมที่สุด!
     const defaultCategories = [
         { id: 1, group: 'food', label: 'หมูกระทะ / แจ่วฮ้อน', keyword: 'หมูกระทะ' },
         { id: 2, group: 'food', label: 'ชาบู / สุกี้', keyword: 'ชาบู' },
@@ -309,14 +308,12 @@
         { id: 10, group: 'food', label: 'อาหารตามสั่ง / จานด่วน', keyword: 'อาหารตามสั่ง' },
         { id: 11, group: 'food', label: 'ก๋วยเตี๋ยว / บะหมี่', keyword: 'ก๋วยเตี๋ยว' },
         { id: 12, group: 'food', label: 'ข้าวต้มโต้รุ่ง / รอบดึก', keyword: 'ร้านข้าวต้ม' },
-
         { id: 13, group: 'beauty', label: 'ร้านนวดแผนไทย / นวดสปา', keyword: 'ร้านนวด' },
         { id: 14, group: 'beauty', label: 'คลินิกเสริมความงาม', keyword: 'คลินิกความงาม' },
         { id: 15, group: 'beauty', label: 'ทำผม / ซาลอน / บาร์เบอร์', keyword: 'ร้านทำผม' },
         { id: 16, group: 'beauty', label: 'ทำเล็บ / ต่อขนตา', keyword: 'ร้านทำเล็บ' },
         { id: 17, group: 'beauty', label: 'ทำฟัน / คลินิกทันตกรรม', keyword: 'คลินิกทำฟัน' },
         { id: 18, group: 'beauty', label: 'ออนเซ็น / แช่น้ำร้อน', keyword: 'ออนเซ็น' },
-
         { id: 19, group: 'activity', label: 'สถานที่ท่องเที่ยว / แลนด์มาร์ค', keyword: 'สถานที่ท่องเที่ยว' },
         { id: 20, group: 'activity', label: 'วัด / ไหว้พระ / สายมู', keyword: 'วัด' },
         { id: 21, group: 'activity', label: 'ตลาดนัด / ถนนคนเดิน', keyword: 'ตลาดนัด' },
@@ -327,7 +324,6 @@
         { id: 26, group: 'activity', label: 'สวนสนุก / สวนน้ำ', keyword: 'สวนน้ำ' },
         { id: 27, group: 'activity', label: 'สวนสาธารณะ / พักผ่อน', keyword: 'สวนสาธารณะ' },
         { id: 28, group: 'activity', label: 'พิพิธภัณฑ์ / หอศิลป์', keyword: 'พิพิธภัณฑ์' },
-
         { id: 29, group: 'sport', label: 'ฟิตเนส / ยิม', keyword: 'ฟิตเนส' },
         { id: 30, group: 'sport', label: 'สนามฟุตบอล / หญ้าเทียม', keyword: 'สนามฟุตบอล' },
         { id: 31, group: 'sport', label: 'สนามแบดมินตัน', keyword: 'สนามแบดมินตัน' },
@@ -337,10 +333,7 @@
         { id: 35, group: 'sport', label: 'สนามกอล์ฟ / ไดร์ฟกอล์ฟ', keyword: 'สนามกอล์ฟ' }
     ];
 
-    const defaultServices = [
-        { id: 1, name: 'อัปเดตแก้ไขแบนเนอร์ (ต่อครั้ง)', price: 150 }
-    ];
-
+    const defaultServices = [{ id: 1, name: 'อัปเดตแก้ไขแบนเนอร์ (ต่อครั้ง)', price: 150 }];
     let appData = { registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], categories: [], closedReports: [], blacklistedPlaces: [], services: [], pendingVipRequests: [], vipSettings: { price: 500, bankAccount: 'กสิกรไทย 123-x-xxxxx-x ชื่อบัญชี' } };
 
     const provinces = [
@@ -406,23 +399,13 @@
             const img = new Image(); img.src = e.target.result;
             img.onload = () => {
                 const canvas = document.createElement('canvas');
-                let width = img.width;
-                let height = img.height;
-                const max_size = 800; // บีบอัดให้ขนาดไม่เกิน 800px เพื่อให้แอปโหลดไว
-
+                let width = img.width; let height = img.height; const max_size = 800;
                 if (width > max_size || height > max_size) {
-                    if (width > height) {
-                        height = Math.round((height *= max_size / width));
-                        width = max_size;
-                    } else {
-                        width = Math.round((width *= max_size / height));
-                        height = max_size;
-                    }
+                    if (width > height) { height = Math.round((height *= max_size / width)); width = max_size; } 
+                    else { width = Math.round((width *= max_size / height)); height = max_size; }
                 }
-                
                 canvas.width = width; canvas.height = height; 
-                const ctx = canvas.getContext('2d'); 
-                ctx.drawImage(img, 0, 0, width, height);
+                canvas.getContext('2d').drawImage(img, 0, 0, width, height);
                 resolve(canvas.toDataURL('image/jpeg', 0.8)); 
             };
         };
@@ -430,23 +413,14 @@
 
     let isAppReady = false;
 
-    // ⚡ ระบบแก้อาการค้างจาก Messenger / FB แบบ 100%
+    // ⚡ เช็คโหลดเริ่มต้น
     document.addEventListener('DOMContentLoaded', () => {
-        const ua = navigator.userAgent || navigator.vendor || window.opera;
-        const isMobile = /iPhone|iPad|iPod|Android/i.test(ua);
-        const isLineApp = /Line/i.test(ua);
-
-        if (isMobile && !isLineApp) {
-            showLoginCard();
-        } else {
-            initSystem();
-            
-            setTimeout(() => {
-                if (!isAppReady && document.getElementById('loginCard').style.display === 'none') {
-                    showLoginCard();
-                }
-            }, 4000);
-        }
+        initSystem();
+        setTimeout(() => {
+            if (!isAppReady && document.getElementById('loginCard').style.display === 'none') {
+                showLoginCard();
+            }
+        }, 4000);
     });
 
     function showLoginCard() {
@@ -461,8 +435,6 @@
             if (liff.isLoggedIn()) {
                 isAppReady = true; 
                 document.getElementById('loadingText').innerText = "กำลังดึงข้อมูลแผนที่...";
-
-                // ⚡ ถอดระบบบังคับแอดเพื่อนออก โหลดโปรไฟล์และเข้าแอปทันที ไหลลื่นๆ
                 const profile = await liff.getProfile();
                 document.getElementById('header-profile').innerHTML = `<img src="${profile.pictureUrl}" style="width:100%; height:100%; object-fit:cover;">`;
                 
@@ -480,19 +452,6 @@
             showLoginCard();
         }
     }
-    
-    // ⚡ เตะเข้าแอป LINE โดยตรงเวลาลูกค้ากดจาก Messenger
-    function loginWithLine() { 
-        const ua = navigator.userAgent || navigator.vendor || window.opera;
-        const isMobile = /iPhone|iPad|iPod|Android/i.test(ua);
-        const isLineApp = /Line/i.test(ua);
-        
-        if (isMobile && !isLineApp) {
-            window.location.href = "https://liff.line.me/2009598846-wiCUeV35";
-        } else {
-            liff.login({ redirectUri: window.location.origin + window.location.pathname }); 
-        }
-    }
 
     function switchPage(p) { 
         document.querySelectorAll('.page').forEach(el => el.classList.remove('active')); 
@@ -502,7 +461,7 @@
     }
 
     let map, service, infoWindow, currentCoords = { lat: 15.2287, lng: 104.8564 }, googlePlaces = [], currentPagination = null;
-    let gpsMarker = null;
+    let gpsMarker = null, activeMarker = null;
 
     function initMap() {
         const pSel = document.getElementById('provinceSelect'), prSel = document.getElementById('promoProvinceSelect');
@@ -520,13 +479,12 @@
         checkDataAndSearch();
     }
 
-    function checkDataAndSearch() {
-        changeLocation();
-    }
+    function checkDataAndSearch() { changeLocation(); }
 
     function changeLocation() {
         const val = document.getElementById('provinceSelect').value;
         if (gpsMarker) gpsMarker.setMap(null); 
+        if (activeMarker) activeMarker.setMap(null);
 
         if(val === 'current') {
             document.getElementById('placeList').innerHTML = '<p style="text-align:center; grid-column:1/-1; padding:50px; color:var(--text-muted);">📍 กำลังขอพิกัด GPS...</p>';
@@ -537,12 +495,8 @@
                     map.setCenter(currentCoords); 
                     executeSearch('food'); 
                 }, () => { 
-                    // ⚡ เปลี่ยนจาก Alert กวนใจ เป็นการแสดงข้อความนุ่มนวลแทน
                     document.getElementById('placeList').innerHTML = '<p style="text-align:center; grid-column:1/-1; padding:50px; color:var(--danger);">📍 ไม่สามารถดึงพิกัดปัจจุบันได้<br><span style="font-size:13px; color:var(--text-muted);">ระบบกำลังสลับไปแสดงข้อมูล จ.อุบลราชธานี แทนครับ...</span></p>';
-                    setTimeout(() => {
-                        document.getElementById('provinceSelect').value = 'ubon'; 
-                        changeLocation(); 
-                    }, 1500);
+                    setTimeout(() => { document.getElementById('provinceSelect').value = 'ubon'; changeLocation(); }, 1500);
                 }, { timeout: 10000, enableHighAccuracy: true });
             }
         } else {
@@ -555,6 +509,24 @@
         }
     }
 
+    // ⚡ ฟังก์ชันเวลากดคลิกที่ร้าน ให้เลื่อนไปปักหมุดที่แผนที่
+    function focusPlace(placeId) {
+        const place = googlePlaces.find(p => p.place_id === placeId);
+        if (place && place.geometry && place.geometry.location) {
+            map.panTo(place.geometry.location);
+            map.setZoom(17);
+            
+            if (activeMarker) activeMarker.setMap(null);
+            activeMarker = new google.maps.Marker({
+                position: place.geometry.location,
+                map: map,
+                animation: google.maps.Animation.DROP
+            });
+            
+            window.scrollTo({ top: document.getElementById('map').offsetTop - 20, behavior: 'smooth' });
+        }
+    }
+
     function searchAndFocusStore(storeName) {
         document.getElementById('searchBox').value = storeName;
         executeSearch('text');
@@ -564,6 +536,13 @@
             if (status === "OK" && res.length > 0) {
                 map.panTo(res[0].geometry.location);
                 map.setZoom(17);
+                
+                if (activeMarker) activeMarker.setMap(null);
+                activeMarker = new google.maps.Marker({
+                    position: res[0].geometry.location,
+                    map: map,
+                    animation: google.maps.Animation.DROP
+                });
             }
         });
     }
@@ -572,9 +551,7 @@
         if (!currentCoords) return; 
         const searchBox = document.getElementById('searchBox');
         const searchVal = searchBox ? searchBox.value.trim() : ""; 
-        
         let keywordToSearch = "ร้านอาหาร"; 
-        
         const foodSelect = document.getElementById('foodSelect'), beautySelect = document.getElementById('beautySelect'), actSelect = document.getElementById('activitySelect'), sportSelect = document.getElementById('sportSelect');
 
         if (searchVal !== "" && type === 'text') {
@@ -613,7 +590,6 @@
         const originPoint = new google.maps.LatLng(currentCoords.lat, currentCoords.lng); 
         const stores = appData.registeredStores || []; 
         const now = Date.now();
-
         let html = '';
 
         const matchingPromos = (appData.activePromotions || []).filter(p => {
@@ -627,7 +603,6 @@
             const store = stores.find(s => s.name === p.storeName);
             const hasLine = store && store.lineUrl && store.lineUrl.trim() !== '';
             const hasFb = store && store.fbUrl && store.fbUrl.trim() !== '';
-            
             html += `
             <div class="place-card card-vip" onclick="searchAndFocusStore('${p.storeName}')">
                 <div class="vip-crown-badge">👑 แนะนำ (ตรงหมวดหมู่)</div>
@@ -647,9 +622,7 @@
         const sorted = googlePlaces.sort((a, b) => {
             const isVipA = stores.find(s => s.name === a.name)?.isVIP ? 1 : 0;
             const isVipB = stores.find(s => s.name === b.name)?.isVIP ? 1 : 0;
-
             if (isVipA !== isVipB) return isVipB - isVipA; 
-            
             if (window.google && window.google.maps && window.google.maps.geometry) {
                 const distA = google.maps.geometry.spherical.computeDistanceBetween(originPoint, a.geometry.location);
                 const distB = google.maps.geometry.spherical.computeDistanceBetween(originPoint, b.geometry.location);
@@ -661,19 +634,11 @@
         html += sorted.slice(0, 80).map(p => {
             const store = stores.find(s => s.name === p.name);
             let isVIP = false;
-            
-            if (store && store.isVIP) {
-                if (!store.vipExpireTimestamp || store.vipExpireTimestamp > now || store.vipAutoRenew) {
-                    isVIP = true;
-                }
-            }
+            if (store && store.isVIP && (!store.vipExpireTimestamp || store.vipExpireTimestamp > now || store.vipAutoRenew)) isVIP = true;
 
             const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${p.geometry.location.lat()},${p.geometry.location.lng()}`;
-            
             let distanceKm = "0.0";
-            if (window.google && window.google.maps && window.google.maps.geometry) {
-                distanceKm = (google.maps.geometry.spherical.computeDistanceBetween(originPoint, p.geometry.location) / 1000).toFixed(1); 
-            }
+            if (window.google && window.google.maps && window.google.maps.geometry) { distanceKm = (google.maps.geometry.spherical.computeDistanceBetween(originPoint, p.geometry.location) / 1000).toFixed(1); }
 
             let openStatusHtml = '<span class="status-tag" style="background:var(--bg-light); color:var(--text-muted); border:1px solid var(--border);">⚪ ไม่ระบุเวลา</span>'; 
             if (p.business_status === 'CLOSED_TEMPORARILY') { openStatusHtml = '<span class="status-tag" style="background:#FFF3F3; color:var(--danger); border:1px solid rgba(217,83,79,0.2);">🔴 ปิดชั่วคราว</span>'; } 
@@ -721,23 +686,15 @@
     function renderPromos() {
         let curProv = document.getElementById('provinceSelect').value;
         const now = Date.now();
-        
-        const activePromos = (appData.activePromotions || []).filter(p => {
-            if (p.expireTimestamp && now > p.expireTimestamp && !p.autoRenew) return false;
-            return true;
-        }); 
+        const activePromos = (appData.activePromotions || []).filter(p => { if (p.expireTimestamp && now > p.expireTimestamp && !p.autoRenew) return false; return true; }); 
         
         if (curProv === 'current' && currentCoords && window.google && window.google.maps && window.google.maps.geometry) {
-            let minDist = Infinity;
-            const originPoint = new google.maps.LatLng(currentCoords.lat, currentCoords.lng);
+            let minDist = Infinity; const originPoint = new google.maps.LatLng(currentCoords.lat, currentCoords.lng);
             provinces.forEach(p => {
-                const destPoint = new google.maps.LatLng(p.lat, p.lng);
-                const dist = google.maps.geometry.spherical.computeDistanceBetween(originPoint, destPoint);
+                const destPoint = new google.maps.LatLng(p.lat, p.lng); const dist = google.maps.geometry.spherical.computeDistanceBetween(originPoint, destPoint);
                 if (dist < minDist) { minDist = dist; curProv = p.id; }
             });
-        } else if (curProv === 'current') {
-            curProv = 'ubon'; 
-        }
+        } else if (curProv === 'current') { curProv = 'ubon'; }
         
         const promos = activePromos.filter(p => p.province === curProv);
         const banner = document.getElementById('promoBanner');
@@ -747,27 +704,17 @@
             document.getElementById('approvedPromoList').innerHTML = promos.map(p => {
                 const store = (appData.registeredStores || []).find(s => s.name === p.storeName);
                 let isVIP = false;
-                if (store && store.isVIP) {
-                    if (!store.vipExpireTimestamp || store.vipExpireTimestamp > now || store.vipAutoRenew) {
-                        isVIP = true;
-                    }
-                }
-
-                const hasLine = isVIP && store && store.lineUrl && store.lineUrl.trim() !== '';
-                const hasFb = isVIP && store && store.fbUrl && store.fbUrl.trim() !== '';
+                if (store && store.isVIP && (!store.vipExpireTimestamp || store.vipExpireTimestamp > now || store.vipAutoRenew)) isVIP = true;
+                const hasLine = isVIP && store && store.lineUrl && store.lineUrl.trim() !== ''; const hasFb = isVIP && store && store.fbUrl && store.fbUrl.trim() !== '';
                 
                 return `
                 <div class="place-card" style="border:2px solid var(--primary); box-shadow: 0 0 20px rgba(197,160,89,0.2);">
                     <div style="position:absolute; top:12px; right:-28px; background:#D9534F; color:#FFF; padding:4px 30px; transform:rotate(45deg); font-size:11px; font-weight:800; z-index:10; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">HOT 🔥</div>
-                    <div style="position:relative; width:100%; height:180px; overflow:hidden;" class="shine-effect">
-                        <img src="${p.image}" style="width:100%; height:100%; object-fit:cover;">
-                    </div>
+                    <div style="position:relative; width:100%; height:180px; overflow:hidden;" class="shine-effect"><img src="${p.image}" style="width:100%; height:100%; object-fit:cover;"></div>
                     <div style="padding:18px; display:flex; flex-direction:column; flex-grow:1;">
                         ${p.category ? `<span style="background:var(--primary); color:#000; padding:2px 10px; border-radius:12px; font-size:11px; font-weight:600; display:inline-block; margin-bottom:8px; align-self:flex-start;">📌 ${p.category}</span>` : ''}
                         <h3 style="margin:0 0 8px 0; font-size:18px; color:#FFD700; font-weight:600; text-shadow:0 0 5px rgba(255,215,0,0.3);">✨ ${p.storeName}</h3>
-                        <div style="background: rgba(197, 160, 89, 0.1); padding: 12px; border-radius: 8px; border: 1px dashed var(--primary); margin-bottom: 15px;">
-                            <p style="font-size:14px; color:var(--text-main); margin:0;">${p.detail}</p>
-                        </div>
+                        <div style="background: rgba(197, 160, 89, 0.1); padding: 12px; border-radius: 8px; border: 1px dashed var(--primary); margin-bottom: 15px;"><p style="font-size:14px; color:var(--text-main); margin:0;">${p.detail}</p></div>
                         <div style="display:flex; gap:8px; margin-top:auto;">
                             ${hasLine ? `<button onclick="window.open('${store.lineUrl.startsWith('http') ? store.lineUrl : 'https://'+store.lineUrl}', '_blank')" class="promo-btn-hover" style="flex:1; background:var(--line-green); color:white; border:none; padding:10px; border-radius:8px; font-family:'Kanit'; font-weight:600; font-size:13px; cursor:pointer;">💬 LINE</button>` : ''}
                             ${hasFb ? `<button onclick="window.open('${store.fbUrl.startsWith('http') ? store.fbUrl : 'https://'+store.fbUrl}', '_blank')" class="promo-btn-hover" style="flex:1; background:var(--fb-blue); color:white; border:none; padding:10px; border-radius:8px; font-family:'Kanit'; font-weight:600; font-size:13px; cursor:pointer;">👍 FB</button>` : ''}
@@ -782,7 +729,6 @@
     function renderUI() {
         const cData = (appData.categories && appData.categories.length > 0) ? appData.categories : defaultCategories;
         const sData = (appData.services && appData.services.length > 0) ? appData.services : defaultServices;
-
         const groups = ['food', 'beauty', 'activity', 'sport'];
         const labels = ['🍽️ หมวดอาหาร', '💆‍♀️ ความงาม/พักผ่อน', '🎯 กิจกรรม/เที่ยว', '🏋️ กีฬา/ออกกำลังกาย'];
         const defaultKws = ['ร้านอาหาร', 'สปา', 'สถานที่ท่องเที่ยว', 'ฟิตเนส'];
@@ -800,9 +746,7 @@
         if(pCat) {
             let ph = '';
             groups.forEach((g, i) => {
-                ph += `<optgroup label="${labels[i]}">`;
-                cData.filter(c => c.group === g).forEach(c => { ph += `<option value="${c.label}">${c.label}</option>`; });
-                ph += `</optgroup>`;
+                ph += `<optgroup label="${labels[i]}">`; cData.filter(c => c.group === g).forEach(c => { ph += `<option value="${c.label}">${c.label}</option>`; }); ph += `</optgroup>`;
             });
             pCat.innerHTML = ph;
         }
@@ -838,42 +782,18 @@
     }
 
     async function submitStoreRegistration() {
-        const btn = document.getElementById('btnSubmitReg'); 
-        const n = document.getElementById('regStoreName').value;
-        const p1 = document.getElementById('regStorePhoto').files[0];
-        const p2 = document.getElementById('regIdCard').files[0];
-        const p3 = document.getElementById('regPhone').value; 
-        
+        const btn = document.getElementById('btnSubmitReg'); const n = document.getElementById('regStoreName').value; const p1 = document.getElementById('regStorePhoto').files[0]; const p2 = document.getElementById('regIdCard').files[0]; const p3 = document.getElementById('regPhone').value; 
         if(!n || !p1 || !p2 || !p3) return alert("กรุณากรอกข้อมูลและแนบรูปให้ครบครับ");
         
         btn.innerText = "กำลังอัปโหลดข้อมูล... ⏳"; btn.disabled = true;
-
         let userId = "";
-        try {
-            if (liff.isLoggedIn()) {
-                const profile = await liff.getProfile();
-                userId = profile.userId;
-            }
-        } catch(e) { console.error("LIFF User ID Error: ", e); }
+        try { if (liff.isLoggedIn()) { const profile = await liff.getProfile(); userId = profile.userId; } } catch(e) {}
 
-        const photo = await resizeImg(p1);
-        const idCard = await resizeImg(p2);
-        let comm = "";
-        if (document.getElementById('regCommercial').files[0]) {
-            comm = await resizeImg(document.getElementById('regCommercial').files[0]);
-        }
+        const photo = await resizeImg(p1); const idCard = await resizeImg(p2); let comm = "";
+        if (document.getElementById('regCommercial').files[0]) { comm = await resizeImg(document.getElementById('regCommercial').files[0]); }
         
         if (!appData.registrationRequests) appData.registrationRequests = [];
-        
-        appData.registrationRequests.push({ 
-            id: Date.now(), 
-            storeName: n, 
-            phone: p3, 
-            userId: userId, 
-            storePhoto: photo, 
-            idCard: idCard, 
-            commercial: comm 
-        });
+        appData.registrationRequests.push({ id: Date.now(), storeName: n, phone: p3, userId: userId, storePhoto: photo, idCard: idCard, commercial: comm });
         
         await saveToCloud(); 
         alert("ส่งข้อมูลสำเร็จ! รอรับรหัส PIN จากแอดมิน (แจ้งเตือนผ่านช่องทาง LINE) ครับ");
@@ -887,29 +807,20 @@
         const stores = appData.registeredStores || [];
         const store = stores.find(s => s.pin === document.getElementById('storePinInput').value);
         if(store) { 
-            document.getElementById('lockedFeatures').style.display = 'block'; 
-            document.getElementById('storeVerifyCard').style.display = 'none'; 
-            
-            const now = Date.now();
-            let isVIP = false;
-            if (store.isVIP && (!store.vipExpireTimestamp || store.vipExpireTimestamp > now || store.vipAutoRenew)) {
-                isVIP = true;
-            }
+            document.getElementById('lockedFeatures').style.display = 'block'; document.getElementById('storeVerifyCard').style.display = 'none'; 
+            const now = Date.now(); let isVIP = false;
+            if (store.isVIP && (!store.vipExpireTimestamp || store.vipExpireTimestamp > now || store.vipAutoRenew)) isVIP = true;
 
             const vipPrice = (appData.vipSettings && appData.vipSettings.price) ? appData.vipSettings.price : 500;
             const bankAcc = (appData.vipSettings && appData.vipSettings.bankAccount) ? appData.vipSettings.bankAccount : 'รอแอดมินตั้งค่าบัญชี (ไปไหนดี)';
-            document.getElementById('displayVipPrice').innerText = vipPrice;
-            document.getElementById('displayBankAcc').innerText = bankAcc;
+            document.getElementById('displayVipPrice').innerText = vipPrice; document.getElementById('displayBankAcc').innerText = bankAcc;
 
             if(isVIP) {
-                document.getElementById('vipUpdateSection').style.display = 'block';
-                document.getElementById('vipSubscribeSection').style.display = 'block';
+                document.getElementById('vipUpdateSection').style.display = 'block'; document.getElementById('vipSubscribeSection').style.display = 'block';
                 document.getElementById('vipSubscribeTitle').innerHTML = '👑 ต่ออายุ VIP <span style="font-size:12px; color:#06C755;">(สถานะ: ใช้งานได้)</span>';
-                document.getElementById('vipLineInput').value = store.lineUrl || '';
-                document.getElementById('vipFbInput').value = store.fbUrl || '';
+                document.getElementById('vipLineInput').value = store.lineUrl || ''; document.getElementById('vipFbInput').value = store.fbUrl || '';
             } else {
-                document.getElementById('vipUpdateSection').style.display = 'none';
-                document.getElementById('vipSubscribeSection').style.display = 'block';
+                document.getElementById('vipUpdateSection').style.display = 'none'; document.getElementById('vipSubscribeSection').style.display = 'block';
                 document.getElementById('vipSubscribeTitle').innerHTML = '👑 สมัครสมาชิก VIP';
             }
 
@@ -917,13 +828,10 @@
             const pendingPromo = (appData.pendingPromotions || []).find(p => p.storeName === store.name);
             
             if (activePromo) {
-                document.getElementById('editPromoSection').style.display = 'block';
-                document.getElementById('buyPromoSection').style.display = 'none';
+                document.getElementById('editPromoSection').style.display = 'block'; document.getElementById('buyPromoSection').style.display = 'none';
                 document.getElementById('editPromoDetailInput').value = activePromo.detail || '';
             } else {
-                document.getElementById('editPromoSection').style.display = 'none';
-                document.getElementById('buyPromoSection').style.display = 'block';
-                
+                document.getElementById('editPromoSection').style.display = 'none'; document.getElementById('buyPromoSection').style.display = 'block';
                 let refPromo = pendingPromo || null;
                 if (refPromo) {
                     if(document.getElementById('promoProvinceSelect')) document.getElementById('promoProvinceSelect').value = refPromo.province || 'ubon';
@@ -933,7 +841,6 @@
                     window.currentPromoImage = refPromo.image; 
                 }
             }
-
             alert("ยืนยันตัวตนสำเร็จ! ยินดีต้อนรับร้าน " + store.name); 
         } else alert("รหัส PIN ไม่ถูกต้อง");
     }
@@ -941,116 +848,55 @@
     async function submitVipRequest() {
         const store = appData.registeredStores.find(s => s.pin === document.getElementById('storePinInput').value);
         const slipFile = document.getElementById('vipSlipInput').files[0];
-        
-        if(!store) return alert("กรุณาเข้าสู่ระบบด้วยรหัส PIN ก่อนครับ");
-        if(!slipFile) return alert("กรุณาแนบสลิปการโอนเงินครับ");
-
-        const btn = document.getElementById('btnSubmitVip');
-        btn.innerText = "กำลังส่งสลิป... ⏳"; btn.disabled = true;
-
+        if(!store) return alert("กรุณาเข้าสู่ระบบด้วยรหัส PIN ก่อนครับ"); if(!slipFile) return alert("กรุณาแนบสลิปการโอนเงินครับ");
+        const btn = document.getElementById('btnSubmitVip'); btn.innerText = "กำลังส่งสลิป... ⏳"; btn.disabled = true;
         const slipImg = await resizeImg(slipFile);
-
         if(!appData.pendingVipRequests) appData.pendingVipRequests = [];
-        
         appData.pendingVipRequests = appData.pendingVipRequests.filter(r => r.storeName !== store.name);
-        
-        appData.pendingVipRequests.push({
-            id: Date.now().toString(),
-            storeName: store.name,
-            slipImage: slipImg,
-            requestDate: new Date().toLocaleString()
-        });
-
+        appData.pendingVipRequests.push({ id: Date.now().toString(), storeName: store.name, slipImage: slipImg, requestDate: new Date().toLocaleString() });
         await saveToCloud();
         alert("ส่งสลิปสำเร็จ! กรุณารอแอดมินอนุมัติสถานะ VIP ครับ (หลังจากอนุมัติ ช่องกรอก LINE/FB จะเปิดให้ใช้งาน)");
-
-        btn.innerText = "ส่งสลิปเพื่ออัปเกรด VIP"; btn.disabled = false;
-        document.getElementById('vipSlipInput').value = '';
+        btn.innerText = "ส่งสลิปเพื่ออัปเกรด VIP"; btn.disabled = false; document.getElementById('vipSlipInput').value = '';
     }
 
     async function updateVipData() {
-        const stores = appData.registeredStores || [];
-        const store = stores.find(s => s.pin === document.getElementById('storePinInput').value);
-        if(store) { 
-            store.lineUrl = document.getElementById('vipLineInput').value; 
-            store.fbUrl = document.getElementById('vipFbInput').value; 
-            await saveToCloud(); alert("บันทึกข้อมูลติดต่อแล้ว ลูกค้าสามารถกดเข้า LINE/FB ได้ทันที"); 
-        }
+        const stores = appData.registeredStores || []; const store = stores.find(s => s.pin === document.getElementById('storePinInput').value);
+        if(store) { store.lineUrl = document.getElementById('vipLineInput').value; store.fbUrl = document.getElementById('vipFbInput').value; await saveToCloud(); alert("บันทึกข้อมูลติดต่อแล้ว ลูกค้าสามารถกดเข้า LINE/FB ได้ทันที"); }
     }
 
     async function submitPromoWithPIN() {
-        const btn = document.getElementById('btnSubmitPromo'); 
-        const stores = appData.registeredStores || [];
+        const btn = document.getElementById('btnSubmitPromo'); const stores = appData.registeredStores || [];
         const store = stores.find(s => s.pin === document.getElementById('storePinInput').value);
-        const pImgFile = document.getElementById('promoImageInput').files[0];
-        const pDet = document.getElementById('promoDetail').value;
-        
-        if(!store) return alert("กรุณายืนยัน PIN ก่อน");
-        if(!pImgFile && !window.currentPromoImage) return alert("กรุณาแนบรูปและกรอกรายละเอียด");
+        const pImgFile = document.getElementById('promoImageInput').files[0]; const pDet = document.getElementById('promoDetail').value;
+        if(!store) return alert("กรุณายืนยัน PIN ก่อน"); if(!pImgFile && !window.currentPromoImage) return alert("กรุณาแนบรูปและกรอกรายละเอียด");
 
         btn.innerText = "กำลังประมวลผลรูป... ⏳"; btn.disabled = true;
-        
-        let img = window.currentPromoImage;
-        if(pImgFile) { img = await resizeImg(pImgFile); }
+        let img = window.currentPromoImage; if(pImgFile) { img = await resizeImg(pImgFile); }
         
         if (!appData.pendingPromotions) appData.pendingPromotions = [];
         appData.pendingPromotions = appData.pendingPromotions.filter(p => p.storeName !== store.name);
-        
-        appData.pendingPromotions.push({ 
-            id: Date.now().toString(), 
-            storeName: store.name, 
-            province: document.getElementById('promoProvinceSelect').value, 
-            detail: pDet, 
-            image: img, 
-            service: document.getElementById('promoServiceSelect').value, 
-            category: document.getElementById('promoStoreCategory').value,
-            lineUrl: store.lineUrl || '', 
-            fbUrl: store.fbUrl || '',
-            isUpdateOnly: false 
-        });
-        
+        appData.pendingPromotions.push({ id: Date.now().toString(), storeName: store.name, province: document.getElementById('promoProvinceSelect').value, detail: pDet, image: img, service: document.getElementById('promoServiceSelect').value, category: document.getElementById('promoStoreCategory').value, lineUrl: store.lineUrl || '', fbUrl: store.fbUrl || '', isUpdateOnly: false });
         await saveToCloud(); 
-        alert("ส่งข้อมูลอัปเดตแบนเนอร์สำเร็จ! รอแอดมินอนุมัติครับ");
-        btn.innerText = "🚀 สั่งซื้อและส่งเรื่องอัปเดตข้อมูล"; btn.disabled = false;
-        document.getElementById('promoImageInput').value = '';
+        alert("ส่งข้อมูลอัปเดตแบนเนอร์สำเร็จ! รอแอดมินอนุมัติครับ"); btn.innerText = "🚀 สั่งซื้อและส่งเรื่องอัปเดตข้อมูล"; btn.disabled = false; document.getElementById('promoImageInput').value = '';
     }
 
     async function submitEditPromo() {
-        const btn = document.getElementById('btnEditPromo'); 
-        const stores = appData.registeredStores || [];
+        const btn = document.getElementById('btnEditPromo'); const stores = appData.registeredStores || [];
         const store = stores.find(s => s.pin === document.getElementById('storePinInput').value);
         const activePromo = (appData.activePromotions || []).find(p => p.storeName === store.name);
-        
         if(!store || !activePromo) return alert("ไม่พบโปรโมชั่นที่กำลังแสดงผลให้แก้ไขครับ");
 
         btn.innerText = "กำลังส่งข้อมูล... ⏳"; btn.disabled = true;
-        
-        const pImgFile = document.getElementById('editPromoImageInput').files[0];
-        const pDet = document.getElementById('editPromoDetailInput').value;
-
-        let img = activePromo.image; 
-        if(pImgFile) { img = await resizeImg(pImgFile); }
+        const pImgFile = document.getElementById('editPromoImageInput').files[0]; const pDet = document.getElementById('editPromoDetailInput').value;
+        let img = activePromo.image; if(pImgFile) { img = await resizeImg(pImgFile); }
         
         if (!appData.pendingPromotions) appData.pendingPromotions = [];
         appData.pendingPromotions = appData.pendingPromotions.filter(p => p.storeName !== store.name);
-        
-        appData.pendingPromotions.push({ 
-            id: Date.now().toString(), 
-            storeName: store.name, 
-            province: activePromo.province, 
-            detail: pDet, 
-            image: img, 
-            service: activePromo.service, 
-            category: activePromo.category, 
-            lineUrl: store.lineUrl || '', 
-            fbUrl: store.fbUrl || '',
-            isUpdateOnly: true 
-        });
+        appData.pendingPromotions.push({ id: Date.now().toString(), storeName: store.name, province: activePromo.province, detail: pDet, image: img, service: activePromo.service, category: activePromo.category, lineUrl: store.lineUrl || '', fbUrl: store.fbUrl || '', isUpdateOnly: true });
         
         await saveToCloud(); 
         alert("ส่งข้อมูลขอแก้ไขเรียบร้อย! รอแอดมินตรวจสอบการเปลี่ยนแปลงครับ (วันหมดอายุจะคงเดิม)");
-        btn.innerText = "🔄 ส่งเรื่องขอแก้ไขข้อมูล"; btn.disabled = false;
-        document.getElementById('editPromoImageInput').value = '';
+        btn.innerText = "🔄 ส่งเรื่องขอแก้ไขข้อมูล"; btn.disabled = false; document.getElementById('editPromoImageInput').value = '';
     }
 </script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD7Qqf1Z9KQBuvipDzgIc5laJLz9SiOBH8&libraries=places,geometry&callback=initMap" async defer></script>
