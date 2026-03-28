@@ -409,10 +409,11 @@
     });
 
     // ⚡ 1. หน่วงเวลาเล็กน้อย + ระบบ Fail-Safe ป้องกัน Messenger บล็อก
+   // ⚡ 1. ระบบ Fail-Safe ป้องกัน Messenger/IG บล็อก (ไม้ตาย 3 วินาที)
     window.onload = function() {
         setTimeout(initSystem, 500);
 
-        // 🚨 ไม้ตาย: ถ้าผ่านไป 3 วินาทีแล้วยังหมุนอยู่ (โดนแอปอื่นบล็อก) ให้บังคับโชว์ปุ่ม Login ทันที!
+        // 🚨 ถ้าผ่านไป 3 วินาทีแล้วยังหมุนอยู่ (โดน Messenger บล็อกสคริปต์) ให้บังคับโชว์ปุ่ม Login!
         setTimeout(() => {
             if (document.getElementById('loadingSpinner').style.display !== 'none') {
                 document.getElementById('loadingSpinner').style.display = 'none';
@@ -429,7 +430,7 @@
                 try {
                     const friend = await liff.getFriendship();
                     if (!friend.friendFlag) {
-                        window.location.href = "https://lin.ee/5SBoptj"; 
+                        window.location.href = "https://lin.ee/5SBoptj"; // 📌 ตรงนี้คือลิงก์เพิ่มเพื่อน ถูกต้องแล้วครับ
                         return; 
                     }
                 } catch(e) {
@@ -457,11 +458,20 @@
         document.getElementById('appContent').style.display = 'block';
     }
     
-    // ⚡ 2. ปรับปุ่ม Login ให้ฉลาดขึ้น หลบการบล็อกของแอปโซเชียล
+    // ⚡ 2. ฟังก์ชันเตะเข้าแอป LINE ที่ถูกต้อง
     function loginWithLine() { 
         const ua = navigator.userAgent || navigator.vendor || window.opera;
         const isMobile = /iPhone|iPad|iPod|Android/i.test(ua);
         let exactUrl = window.location.origin + window.location.pathname;
+        
+        // ถ้าเป็นมือถือ (แต่ไม่ได้เปิดอยู่ในแอป LINE) ให้เตะเข้าลิงก์ LIFF เพื่อเปิดแอป LINE
+        if (isMobile && !liff.isInClient()) {
+            window.location.href = "https://liff.line.me/2009598846-wiCUeV35";
+        } else {
+            // สำหรับคอมพิวเตอร์ หรือเปิดในแอป LINE อยู่แล้ว
+            liff.login({ redirectUri: exactUrl }); 
+        }
+    }
         
         // ถ้ายูสเซอร์ใช้มือถือ แต่ไม่ได้เปิดผ่านแอป LINE (เช่น กดจาก Messenger, FB, IG)
         if (isMobile && !/Line/i.test(ua)) {
