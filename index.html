@@ -2,8 +2,8 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ไปไหนดี - Painaidee (Premium VIP)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ไปไหนดี - Painaidee</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap');
         
@@ -43,17 +43,12 @@
         
         #map { width: 100%; height: 320px; border-radius: 16px; border: 1px solid var(--border); background: #eee; box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
         .search-area { background: var(--surface); padding: 25px; border-radius: 16px; margin-top: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); border: 1px solid var(--border); }
-        .input-row { display: flex; gap: 12px; margin-bottom: 12px; }
         
         select, input[type="text"], input[type="password"], input[type="number"], input[type="file"], textarea { 
             padding: 14px; border-radius: 10px; border: 1px solid var(--border); font-family: 'Kanit'; font-size: 15px; outline: none; box-sizing: border-box; width: 100%; 
             background: var(--dark); color: var(--primary-light); transition: 0.3s; 
         }
         select:focus, input:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(197, 160, 89, 0.15); background: var(--dark-light); }
-        .input-row select { flex: 1; width: 50%; }
-        option, optgroup { background-color: var(--dark-light); color: var(--primary-light); font-weight: 400; }
-        optgroup { font-weight: 600; color: var(--primary); }
-        ::placeholder { color: rgba(223, 191, 139, 0.4); } 
         .search-box-container { display: flex; gap: 12px; width: 100%; }
 
         .btn-primary { padding: 14px 24px; background: var(--primary); color: white; border: none; border-radius: 10px; font-family: 'Kanit'; font-weight: 500; font-size: 15px; cursor: pointer; transition: 0.3s; white-space: nowrap; width: 100%; box-shadow: 0 4px 10px rgba(197, 160, 89, 0.3); }
@@ -114,7 +109,7 @@
 <div id="loginOverlay">
     <div id="loadingSpinner" style="display: flex; flex-direction: column; align-items: center;">
         <div class="spinner"></div>
-        <h3 style="color: var(--primary); margin: 0;">กำลังเตรียมระบบ...</h3>
+        <h3 style="color: var(--primary); margin: 0;" id="loadingText">กำลังเตรียมระบบ...</h3>
         <p style="color: var(--text-muted); font-size: 14px;">กรุณารอสักครู่เพื่อเข้าสู่แอปไปไหนดี</p>
     </div>
 
@@ -124,7 +119,7 @@
         </div>
         <h2 style="color: #FFF; margin: 0 0 10px 0;">ยินดีต้อนรับ</h2>
         <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 30px;">กรุณาเข้าสู่ระบบผ่าน LINE เพื่อค้นหาและรับโปรโมชั่นพิเศษ</p>
-        <button class="btn-line-login" onclick="loginWithLine()">📱 เปิดแอป LINE เพื่อเข้าสู่ระบบ</button>
+        <button class="btn-line-login" onclick="loginWithLine()">📱 เข้าสู่ระบบ / เปิดในแอป LINE</button>
     </div>
 </div>
 
@@ -153,10 +148,10 @@
             </div>
             
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
-                <select id="foodSelect" onchange="executeSearch('food')"><option value="ร้านอาหาร">🍽️ หมวดอาหาร</option></select>
-                <select id="beautySelect" onchange="executeSearch('beauty')"><option value="สปา">💆‍♀️ พักผ่อน/ความงาม</option></select>
-                <select id="activitySelect" onchange="executeSearch('activity')"><option value="สถานที่ท่องเที่ยว">🎯 กิจกรรม/เที่ยว</option></select>
-                <select id="sportSelect" onchange="executeSearch('sport')"><option value="ฟิตเนส">🏋️ กีฬา/ออกกำลังกาย</option></select>
+                <select id="foodSelect" onchange="executeSearch('food')"></select>
+                <select id="beautySelect" onchange="executeSearch('beauty')"></select>
+                <select id="activitySelect" onchange="executeSearch('activity')"></select>
+                <select id="sportSelect" onchange="executeSearch('sport')"></select>
             </div>
 
             <div class="search-box-container">
@@ -298,10 +293,10 @@
 
 <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbzdha6RwLDH1aYfxazAXPZ5Bvh5uTxAWN8TqoFKS05747T58M6jsSV-6OvOWGZNkq4/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbypHrQKt_SWFWOYNFmqCz3hSgX-1EMt1lphWvl6p4bXe5HYObRiXj9-xFls2fSLAtKT/exec";
     
-   const defaultCategories = [
-        // 🍽️ หมวดอาหาร/เครื่องดื่ม (Food)
+    // ⚡ ฐานข้อมูลหมวดหมู่ 35 หมวด ครอบคลุมที่สุด!
+    const defaultCategories = [
         { id: 1, group: 'food', label: 'หมูกระทะ / แจ่วฮ้อน', keyword: 'หมูกระทะ' },
         { id: 2, group: 'food', label: 'ชาบู / สุกี้', keyword: 'ชาบู' },
         { id: 3, group: 'food', label: 'ปิ้งย่าง / บาร์บีคิว', keyword: 'ปิ้งย่าง' },
@@ -315,7 +310,6 @@
         { id: 11, group: 'food', label: 'ก๋วยเตี๋ยว / บะหมี่', keyword: 'ก๋วยเตี๋ยว' },
         { id: 12, group: 'food', label: 'ข้าวต้มโต้รุ่ง / รอบดึก', keyword: 'ร้านข้าวต้ม' },
 
-        // 💆‍♀️ หมวดความงาม/พักผ่อน (Beauty)
         { id: 13, group: 'beauty', label: 'ร้านนวดแผนไทย / นวดสปา', keyword: 'ร้านนวด' },
         { id: 14, group: 'beauty', label: 'คลินิกเสริมความงาม', keyword: 'คลินิกความงาม' },
         { id: 15, group: 'beauty', label: 'ทำผม / ซาลอน / บาร์เบอร์', keyword: 'ร้านทำผม' },
@@ -323,7 +317,6 @@
         { id: 17, group: 'beauty', label: 'ทำฟัน / คลินิกทันตกรรม', keyword: 'คลินิกทำฟัน' },
         { id: 18, group: 'beauty', label: 'ออนเซ็น / แช่น้ำร้อน', keyword: 'ออนเซ็น' },
 
-        // 🎯 หมวดกิจกรรม/ท่องเที่ยว/ที่พัก (Activity)
         { id: 19, group: 'activity', label: 'สถานที่ท่องเที่ยว / แลนด์มาร์ค', keyword: 'สถานที่ท่องเที่ยว' },
         { id: 20, group: 'activity', label: 'วัด / ไหว้พระ / สายมู', keyword: 'วัด' },
         { id: 21, group: 'activity', label: 'ตลาดนัด / ถนนคนเดิน', keyword: 'ตลาดนัด' },
@@ -335,7 +328,6 @@
         { id: 27, group: 'activity', label: 'สวนสาธารณะ / พักผ่อน', keyword: 'สวนสาธารณะ' },
         { id: 28, group: 'activity', label: 'พิพิธภัณฑ์ / หอศิลป์', keyword: 'พิพิธภัณฑ์' },
 
-        // 🏋️ หมวดกีฬา/ออกกำลังกาย (Sport)
         { id: 29, group: 'sport', label: 'ฟิตเนส / ยิม', keyword: 'ฟิตเนส' },
         { id: 30, group: 'sport', label: 'สนามฟุตบอล / หญ้าเทียม', keyword: 'สนามฟุตบอล' },
         { id: 31, group: 'sport', label: 'สนามแบดมินตัน', keyword: 'สนามแบดมินตัน' },
@@ -344,12 +336,12 @@
         { id: 34, group: 'sport', label: 'โยคะ / พิลาทิส', keyword: 'โยคะ' },
         { id: 35, group: 'sport', label: 'สนามกอล์ฟ / ไดร์ฟกอล์ฟ', keyword: 'สนามกอล์ฟ' }
     ];
-    
+
     const defaultServices = [
         { id: 1, name: 'อัปเดตแก้ไขแบนเนอร์ (ต่อครั้ง)', price: 150 }
     ];
 
-    let appData = { registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], categories: [], closedReports: [], blacklistedPlaces: [], services: [], pendingVipRequests: [], vipSettings: { price: 500, bankAccount: 'กสิกรไทย 123-4-56789-0 (ไปไหนดี)' } };
+    let appData = { registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], categories: [], closedReports: [], blacklistedPlaces: [], services: [], pendingVipRequests: [], vipSettings: { price: 500, bankAccount: 'กสิกรไทย 123-x-xxxxx-x ชื่อบัญชี' } };
 
     const provinces = [
         {id:'bkk',name:'กรุงเทพมหานคร',lat:13.7563,lng:100.5018},{id:'krabi',name:'กระบี่',lat:8.0863,lng:98.9063},{id:'kanchanaburi',name:'กาญจนบุรี',lat:14.0159,lng:99.5336},
@@ -436,78 +428,76 @@
         };
     });
 
-    // ⚡ 1. หน่วงเวลาเล็กน้อย + ระบบ Fail-Safe ป้องกัน Messenger บล็อก
-   // ⚡ 1. ระบบ Fail-Safe ป้องกัน Messenger/IG บล็อก (ไม้ตาย 3 วินาที)
-    window.onload = function() {
-        setTimeout(initSystem, 500);
+    let isAppReady = false;
 
-        // 🚨 ถ้าผ่านไป 3 วินาทีแล้วยังหมุนอยู่ (โดน Messenger บล็อกสคริปต์) ให้บังคับโชว์ปุ่ม Login!
-        setTimeout(() => {
-            if (document.getElementById('loadingSpinner').style.display !== 'none') {
-                document.getElementById('loadingSpinner').style.display = 'none';
-                document.getElementById('loginCard').style.display = 'block';
-            }
-        }, 3000); 
-    };
+    // ⚡ ระบบแก้อาการค้างจาก Messenger แบบ 100%
+    document.addEventListener('DOMContentLoaded', () => {
+        const ua = navigator.userAgent || navigator.vendor || window.opera;
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(ua);
+        const isLineApp = /Line/i.test(ua);
+
+        if (isMobile && !isLineApp) {
+            showLoginCard();
+        } else {
+            initSystem();
+            
+            setTimeout(() => {
+                if (!isAppReady && document.getElementById('loginCard').style.display === 'none') {
+                    showLoginCard();
+                }
+            }, 4000);
+        }
+    });
+
+    function showLoginCard() {
+        document.getElementById('loadingSpinner').style.display = 'none';
+        document.getElementById('loginCard').style.display = 'block';
+    }
 
     async function initSystem() {
         try {
             await liff.init({ liffId: "2009598846-wiCUeV35" });
 
             if (liff.isLoggedIn()) {
+                isAppReady = true; 
+                document.getElementById('loadingText').innerText = "กำลังดึงข้อมูลแผนที่...";
+
                 try {
                     const friend = await liff.getFriendship();
                     if (!friend.friendFlag) {
-                        window.location.href = "https://lin.ee/5SBoptj"; // 📌 ตรงนี้คือลิงก์เพิ่มเพื่อน ถูกต้องแล้วครับ
+                        window.location.href = "https://lin.ee/5SBoptj"; 
                         return; 
                     }
-                } catch(e) {
-                    console.log("Friendship API error", e);
-                }
+                } catch(e) { console.log("Friendship API error", e); }
 
                 const profile = await liff.getProfile();
                 document.getElementById('header-profile').innerHTML = `<img src="${profile.pictureUrl}" style="width:100%; height:100%; object-fit:cover;">`;
                 
                 await loadFromCloud();
-                hideLoginOverlay();
+                
+                document.getElementById('loginOverlay').style.display = 'none';
+                document.getElementById('appContent').style.display = 'block';
             } else {
-                document.getElementById('loadingSpinner').style.display = 'none';
-                document.getElementById('loginCard').style.display = 'block';
+                isAppReady = true;
+                showLoginCard();
             }
         } catch (err) { 
             console.error("LIFF Init Error:", err);
-            document.getElementById('loadingSpinner').style.display = 'none';
-            document.getElementById('loginCard').style.display = 'block';
+            isAppReady = true;
+            showLoginCard();
         }
     }
-
-    function hideLoginOverlay() {
-        document.getElementById('loginOverlay').style.display = 'none';
-        document.getElementById('appContent').style.display = 'block';
-    }
     
-    // ⚡ 2. ฟังก์ชันเตะเข้าแอป LINE ที่ถูกต้อง
+    // ⚡ เตะเข้าแอป LINE โดยตรงเวลาลูกค้ากดจาก Messenger
     function loginWithLine() { 
         const ua = navigator.userAgent || navigator.vendor || window.opera;
         const isMobile = /iPhone|iPad|iPod|Android/i.test(ua);
-        let exactUrl = window.location.origin + window.location.pathname;
+        const isLineApp = /Line/i.test(ua);
         
-        // ถ้าเป็นมือถือ (แต่ไม่ได้เปิดอยู่ในแอป LINE) ให้เตะเข้าลิงก์ LIFF เพื่อเปิดแอป LINE
-        if (isMobile && !liff.isInClient()) {
+        if (isMobile && !isLineApp) {
             window.location.href = "https://liff.line.me/2009598846-wiCUeV35";
         } else {
-            // สำหรับคอมพิวเตอร์ หรือเปิดในแอป LINE อยู่แล้ว
-            liff.login({ redirectUri: exactUrl }); 
-        }
-    }
-        
-        // ถ้ายูสเซอร์ใช้มือถือ แต่ไม่ได้เปิดผ่านแอป LINE (เช่น กดจาก Messenger, FB, IG)
-        if (isMobile && !/Line/i.test(ua)) {
-            // บังคับเตะเข้าแอป LINE โดยตรงเพื่อล็อกอิน
-            window.location.href = "https://liff.line.me/2009598846-wiCUeV35";
-        } else {
-            // กรณีเปิดในคอมพิวเตอร์ หรืออยู่ในแอป LINE อยู่แล้ว
-            liff.login({ redirectUri: exactUrl }); 
+            liff.login({ redirectUri: window.location.origin + window.location.pathname }); 
         }
     }
 
@@ -897,7 +887,6 @@
         document.getElementById('regStoreVerifyCard').style.display = 'none';
     }
 
-    // ⚡ เช็คว่าร้านค้านี้มีโปรแล้วหรือยัง ถ้ามีให้โชว์หน้าแก้ไข
     function verifyStore() {
         const stores = appData.registeredStores || [];
         const store = stores.find(s => s.pin === document.getElementById('storePinInput').value);
@@ -928,17 +917,14 @@
                 document.getElementById('vipSubscribeTitle').innerHTML = '👑 สมัครสมาชิก VIP';
             }
 
-            // --- ⚡ ระบบเช็คสถานะโปรโมชั่น (สลับหน้าจอซื้อ/แก้ไข) ---
             const activePromo = (appData.activePromotions || []).find(p => p.storeName === store.name);
             const pendingPromo = (appData.pendingPromotions || []).find(p => p.storeName === store.name);
             
             if (activePromo) {
-                // มีโปรแสดงอยู่ -> ให้โชว์หน้าต่าง แก้ไข
                 document.getElementById('editPromoSection').style.display = 'block';
                 document.getElementById('buyPromoSection').style.display = 'none';
                 document.getElementById('editPromoDetailInput').value = activePromo.detail || '';
             } else {
-                // ไม่มีโปรแสดงอยู่ -> ให้โชว์หน้าต่าง ซื้อใหม่
                 document.getElementById('editPromoSection').style.display = 'none';
                 document.getElementById('buyPromoSection').style.display = 'block';
                 
@@ -996,7 +982,6 @@
         }
     }
 
-    // ⚡ ส่งข้อมูลซื้อแพ็กเกจใหม่
     async function submitPromoWithPIN() {
         const btn = document.getElementById('btnSubmitPromo'); 
         const stores = appData.registeredStores || [];
@@ -1025,7 +1010,7 @@
             category: document.getElementById('promoStoreCategory').value,
             lineUrl: store.lineUrl || '', 
             fbUrl: store.fbUrl || '',
-            isUpdateOnly: false // บอกระบบแอดมินว่า "ซื้อใหม่ ต้องเพิ่มวัน"
+            isUpdateOnly: false 
         });
         
         await saveToCloud(); 
@@ -1034,7 +1019,6 @@
         document.getElementById('promoImageInput').value = '';
     }
 
-    // ⚡ ส่งเรื่องขอแก้ไขรูป/ข้อความ (ฟรี ไม่เพิ่มวัน)
     async function submitEditPromo() {
         const btn = document.getElementById('btnEditPromo'); 
         const stores = appData.registeredStores || [];
@@ -1048,7 +1032,6 @@
         const pImgFile = document.getElementById('editPromoImageInput').files[0];
         const pDet = document.getElementById('editPromoDetailInput').value;
 
-        // ถ้าอัปโหลดรูปใหม่ก็ใช้รูปใหม่ ถ้าไม่อัปก็ใช้รูปเดิม
         let img = activePromo.image; 
         if(pImgFile) { img = await resizeImg(pImgFile); }
         
@@ -1058,14 +1041,14 @@
         appData.pendingPromotions.push({ 
             id: Date.now().toString(), 
             storeName: store.name, 
-            province: activePromo.province, // ดึงค่าเดิมมาใช้
+            province: activePromo.province, 
             detail: pDet, 
             image: img, 
-            service: activePromo.service, // ดึงค่าเดิมมาใช้
-            category: activePromo.category, // ดึงค่าเดิมมาใช้
+            service: activePromo.service, 
+            category: activePromo.category, 
             lineUrl: store.lineUrl || '', 
             fbUrl: store.fbUrl || '',
-            isUpdateOnly: true // ⚡ บอกแอดมินว่านี่คือการ "แก้ไขข้อมูล"
+            isUpdateOnly: true 
         });
         
         await saveToCloud(); 
