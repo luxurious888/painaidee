@@ -86,7 +86,7 @@
         .shine-effect::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%); transform: skewX(-25deg); animation: shine 3s infinite; pointer-events: none; }
         .promo-btn-hover:hover { filter: brightness(1.1); transform: translateY(-2px); }
 
-        .highlight-banner { background: linear-gradient(135deg, var(--dark), var(--dark-light)); color: white; padding: 25px; border-radius: 166px; margin-top: 24px; box-shadow: 0 15px 35px rgba(26, 28, 32, 0.4); display: none; position: relative; overflow: hidden; border: 1px solid var(--border); }
+        .highlight-banner { background: linear-gradient(135deg, var(--dark), var(--dark-light)); color: white; padding: 25px; border-radius: 16px; margin-top: 24px; box-shadow: 0 15px 35px rgba(26, 28, 32, 0.4); display: none; position: relative; overflow: hidden; border: 1px solid var(--border); }
         .highlight-banner::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(197,160,89,0.15) 0%, transparent 60%); pointer-events: none; }
         .highlight-banner h3 { margin: 0 0 5px 0; font-size: 20px; color: var(--primary); font-weight: 500; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
 
@@ -99,7 +99,7 @@
         .login-card { background: var(--surface); padding: 40px; border-radius: 24px; text-align: center; max-width: 350px; width: 90%; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid var(--border); animation: fadeIn 0.5s ease; }
         .btn-line-login { background-color: var(--line-green); color: white; border: none; padding: 15px 20px; border-radius: 12px; font-family: 'Kanit'; font-weight: 600; font-size: 16px; width: 100%; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 5px 15px rgba(6, 199, 85, 0.3); text-decoration: none;}
         
-        /* 🛡️ สไตล์สำหรับหน้าจอ "บังคับเพิ่มเพื่อน" ของร้านค้า (เกมใหม่) */
+        /* 🛡️ สไตล์สำหรับหน้าจอ "บังคับเพิ่มเพื่อน" ของร้านค้า */
         #partner-friend-blocker { display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 50px 20px; background: var(--surface); border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         #partner-actual-content { display: none; }
         .line-logo-vertical { width: 100px; height: auto; margin-bottom: 25px; }
@@ -187,7 +187,6 @@
                 สำหรับร้านค้าจำเป็นต้องเพิ่มเพื่อนก่อน เพื่อรับรหัสผ่านในการใช้งานครับ
             </div>
             <button class="btn-line-login" style="width: auto; padding: 12px 24px;" onclick="window.open('https://lin.ee/5SBoptj', '_blank')">➕ เพิ่มเพื่อน LINE OA ของเรา</button>
-            
             <button class="btn-outline" style="margin-top: 20px; font-size: 13px; border-color:var(--dark-muted); color:var(--text-muted);" onclick="checkFriendshipForPartner(true)">ฉันเพิ่มเพื่อนแล้ว ตรวจสอบอีกครั้ง</button>
         </div>
 
@@ -397,8 +396,27 @@
         renderUI(); 
     }
 
+    // ⚡ ระบบเซฟข้อมูลแบบดักจับ Error (ช่วยป้องกันหน้าจอค้าง)
     async function saveToCloud() { 
-        try { await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(appData) }); } catch(e) {} 
+        try { 
+            const res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(appData) }); 
+            const data = await res.json();
+            if(data.result === "error") throw new Error("Backend limits");
+            return true;
+        } catch(e) { 
+            throw e; 
+        } 
+    }
+
+    // ⚡ ฟังก์ชันสำหรับยิงแจ้งเตือนแอดมินทาง Telegram
+    async function notifyTelegram(msg) {
+        try {
+            await fetch(API_URL, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: "NOTIFY_TELEGRAM", message: msg }) 
+            });
+        } catch(e) { console.error("Telegram Error", e); }
     }
 
     setInterval(async () => {
@@ -413,23 +431,29 @@
         } catch(e) {}
     }, 15000);
 
-    const resizeImg = (file) => new Promise(resolve => {
+    // ⚡ ระบบบีบอัดรูปแบบใหม่ให้เบาลง (ป้องกันเบราว์เซอร์มือถือค้าง)
+    const resizeImg = (file) => new Promise((resolve) => {
         if(!file) return resolve('');
-        const reader = new FileReader(); reader.readAsDataURL(file);
+        const reader = new FileReader(); 
+        reader.readAsDataURL(file);
         reader.onload = e => {
-            const img = new Image(); img.src = e.target.result;
+            const img = new Image(); 
+            img.src = e.target.result;
             img.onload = () => {
                 const canvas = document.createElement('canvas');
-                let width = img.width; let height = img.height; const max_size = 800;
+                let width = img.width; let height = img.height; 
+                const max_size = 500; 
                 if (width > max_size || height > max_size) {
                     if (width > height) { height = Math.round((height *= max_size / width)); width = max_size; } 
                     else { width = Math.round((width *= max_size / height)); height = max_size; }
                 }
                 canvas.width = width; canvas.height = height; 
                 canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-                resolve(canvas.toDataURL('image/jpeg', 0.8)); 
+                resolve(canvas.toDataURL('image/jpeg', 0.6)); 
             };
+            img.onerror = () => resolve('');
         };
+        reader.onerror = () => resolve('');
     });
 
     let isAppReady = false;
@@ -474,51 +498,41 @@
         }
     }
 
-    // ⚡ แก้เกมใหม่: ฟังก์ชันนำทางไปหน้าร้านค้า พร้อมเช็คความเป็นเพื่อน
+    // ⚡ ฟังก์ชันนำทางไปหน้าร้านค้า พร้อมเช็คความเป็นเพื่อน
     async function navigateToPartner() {
-        // 1. สลับหน้ามาที่ 'partner' ทันที
         switchPage('partner');
-        
-        // 2. ตรวจสอบความเป็นเพื่อน (Friendship) ผ่าน LIFF
-        checkFriendshipForPartner(false); // false = เช็คเงียบๆ ไม่ต้องแจ้งเตือนถ้าผ่าน
+        checkFriendshipForPartner(false); 
     }
 
-    // ฟังก์ชันหลักในการเช็คเงื่อนไขเพื่อนของหน้าร้านค้า
     async function checkFriendshipForPartner(showAlert) {
         const blocker = document.getElementById('partner-friend-blocker');
         const content = document.getElementById('partner-actual-content');
         
-        // โชว์ Loading สั้นๆ ระหว่างเช็ค
-        if(showAlert) blockers.innerHTML = '<div class="spinner"></div><p style="color:#FFF;">กำลังตรวจสอบ...</p>';
+        if(showAlert) blocker.innerHTML = '<div class="spinner"></div><p style="color:#FFF;">กำลังตรวจสอบ...</p>';
 
         try {
             if (liff.isLoggedIn()) {
-                // ยิง API ของ Line เช็คว่ายังเป็นเพื่อนกันอยู่ไหม
                 const friend = await liff.getFriendship();
                 
                 if (friend.friendFlag) {
-                    // ✅ เป็นเพื่อนแล้ว -> โชว์เนื้อหาจริง, ซ่อนตัวบล็อก
                     blocker.style.display = 'none';
                     content.style.display = 'block';
                     if(showAlert) alert("✅ ขอบคุณที่เพิ่มเพื่อนครับ! คุณสามารถใช้งานหน้าร้านค้าได้แล้ว");
                 } else {
-                    // ❌ ยังไม่เป็นเพื่อน -> โชว์ตัวบล็อก, ซ่อนเนื้อหาจริง
                     blocker.style.display = 'flex';
                     content.style.display = 'none';
-                    // รีเซ็ตเนื้อหาตัวบล็อกกลับมาเผื่อตะกี้กดเช็คแล้วขึ้น Loading
                     renderFriendBlocker(); 
                     if(showAlert) alert("⚠️ ระบบตรวจไม่พบความเป็นเพื่อน กรุณากดปุ่มเพิ่มเพื่อนและรอสักครู่ แล้วลองกดตรวจสอบอีกครั้งครับ");
                 }
             }
         } catch(e) {
             console.log("Friendship Check Error", e);
-            // ถ้าเช็คไม่ผ่าน (เช่น LIFF เอ๋อ) ให้โชว์ตัวบล็อกไว้ก่อนเพื่อความชัวร์ของ PIN
             blocker.style.display = 'flex';
             content.style.display = 'none';
+            renderFriendBlocker();
         }
     }
 
-    // ฟังก์ชันวาดหน้าตา Blocker (ก๊อปจาก HTML มาไว้นี่เผื่อต้องรีเซ็ต)
     function renderFriendBlocker() {
         document.getElementById('partner-friend-blocker').innerHTML = `
             <img src="https://official-static.line-scdn.net/branding/logo-vertical.png" alt="LINE Official Account" class="line-logo-vertical">
@@ -788,7 +802,6 @@
                 <div class="place-card" style="border:2px solid var(--primary); box-shadow: 0 0 20px rgba(197,160,89,0.2);">
                     <div style="position:absolute; top:12px; right:-28px; background:#D9534F; color:#FFF; padding:4px 30px; transform:rotate(45deg); font-size:11px; font-weight:800; z-index:10; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">HOT 🔥</div>
                     <div style="position:relative; width:100%; height:180px; overflow:hidden;" class="shine-effect"><img src="${p.image}" style="width:100%; height:100%; object-fit:cover;"></div>
-🍕
                     <div style="padding:18px; display:flex; flex-direction:column; flex-grow:1;">
                         ${p.category ? `<span style="background:var(--primary); color:#000; padding:2px 10px; border-radius:12px; font-size:11px; font-weight:600; display:inline-block; margin-bottom:8px; align-self:flex-start;">📌 ${p.category}</span>` : ''}
                         <h3 style="margin:0 0 8px 0; font-size:18px; color:#FFD700; font-weight:600; text-shadow:0 0 5px rgba(255,215,0,0.3);">✨ ${p.storeName}</h3>
@@ -859,26 +872,51 @@
         });
     }
 
+    // ⚡ ฟังก์ชันลงทะเบียนร้านค้า (มี Telegram + ดักจับเพื่อน + ดัก Error รูปภาพใหญ่)
     async function submitStoreRegistration() {
         const btn = document.getElementById('btnSubmitReg'); const n = document.getElementById('regStoreName').value; const p1 = document.getElementById('regStorePhoto').files[0]; const p2 = document.getElementById('regIdCard').files[0]; const p3 = document.getElementById('regPhone').value; 
         if(!n || !p1 || !p2 || !p3) return alert("กรุณากรอกข้อมูลและแนบรูปให้ครบครับ");
         
-        btn.innerText = "กำลังอัปโหลดข้อมูล... ⏳"; btn.disabled = true;
-        let userId = "";
-        try { if (liff.isLoggedIn()) { const profile = await liff.getProfile(); userId = profile.userId; } } catch(e) {}
+        try {
+            if (liff.isLoggedIn()) {
+                const friend = await liff.getFriendship();
+                if (!friend.friendFlag) {
+                    alert("⚠️ คุณต้องเพิ่มเพื่อนกับ LINE OA ของเราก่อน เพื่อใช้รับ 'รหัส PIN' จากแอดมินครับ\n\nระบบจะเปิดหน้าเพิ่มเพื่อนให้คุณอัตโนมัติ...");
+                    window.open('https://lin.ee/5SBoptj', '_blank'); 
+                    return; 
+                }
+            }
+        } catch(e) { console.log("Friendship Check Error", e); }
 
-        const photo = await resizeImg(p1); const idCard = await resizeImg(p2); let comm = "";
-        if (document.getElementById('regCommercial').files[0]) { comm = await resizeImg(document.getElementById('regCommercial').files[0]); }
-        
-        if (!appData.registrationRequests) appData.registrationRequests = [];
-        appData.registrationRequests.push({ id: Date.now(), storeName: n, phone: p3, userId: userId, storePhoto: photo, idCard: idCard, commercial: comm });
-        
-        await saveToCloud(); 
-        alert("ส่งข้อมูลสำเร็จ! รอรับรหัส PIN จากแอดมิน (แจ้งเตือนผ่านช่องทาง LINE) ครับ");
-        btn.innerText = "🚀 ส่งเอกสารเพื่อตรวจสอบ"; btn.disabled = false;
-        
-        ['regStoreName','regPhone','regStorePhoto','regIdCard','regCommercial'].forEach(id => document.getElementById(id).value = '');
-        document.getElementById('regStoreVerifyCard').style.display = 'none';
+        btn.innerText = "กำลังเตรียมรูปภาพ... ⏳"; btn.disabled = true;
+
+        try {
+            let userId = "";
+            if (liff.isLoggedIn()) { const profile = await liff.getProfile(); userId = profile.userId; }
+
+            const photo = await resizeImg(p1); const idCard = await resizeImg(p2); let comm = "";
+            if (document.getElementById('regCommercial').files[0]) { comm = await resizeImg(document.getElementById('regCommercial').files[0]); }
+            
+            btn.innerText = "กำลังส่งข้อมูล... ⏳";
+            if (!appData.registrationRequests) appData.registrationRequests = [];
+            appData.registrationRequests.push({ id: Date.now(), storeName: n, phone: p3, userId: userId, storePhoto: photo, idCard: idCard, commercial: comm });
+            
+            await saveToCloud(); 
+            
+            // ยิงแจ้งเตือน Telegram
+            await notifyTelegram(`🚨 <b>มีคำร้องลงทะเบียนร้านค้าใหม่!</b>\n\n🏬 ร้าน: <b>${n}</b>\n📞 โทร: ${p3}\n\n👉 กรุณาเข้าหน้าแอดมินเพื่ออนุมัติ PIN ครับ`);
+
+            alert("ส่งข้อมูลสำเร็จ! รอรับรหัส PIN จากแอดมิน (แจ้งเตือนผ่านช่องทาง LINE) ครับ");
+            ['regStoreName','regPhone','regStorePhoto','regIdCard','regCommercial'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('regStoreVerifyCard').style.display = 'none';
+
+        } catch (error) {
+            console.error("Submit Error:", error);
+            alert("❌ ไม่สามารถส่งข้อมูลได้!\n(อินเทอร์เน็ตอาจไม่เสถียร กรุณาลองใหม่อีกครั้งครับ)");
+            if(appData.registrationRequests.length > 0 && appData.registrationRequests[appData.registrationRequests.length-1].storeName === n) { appData.registrationRequests.pop(); }
+        } finally {
+            btn.innerText = "ส่งข้อมูลเพื่อตรวจสอบ"; btn.disabled = false;
+        }
     }
 
     function verifyStore() {
@@ -923,18 +961,30 @@
         } else alert("รหัส PIN ไม่ถูกต้อง");
     }
 
+    // ⚡ ฟังก์ชันขอ VIP (มี Telegram)
     async function submitVipRequest() {
         const store = appData.registeredStores.find(s => s.pin === document.getElementById('storePinInput').value);
         const slipFile = document.getElementById('vipSlipInput').files[0];
         if(!store) return alert("กรุณาเข้าสู่ระบบด้วยรหัส PIN ก่อนครับ"); if(!slipFile) return alert("กรุณาแนบสลิปการโอนเงินครับ");
         const btn = document.getElementById('btnSubmitVip'); btn.innerText = "กำลังส่งสลิป... ⏳"; btn.disabled = true;
-        const slipImg = await resizeImg(slipFile);
-        if(!appData.pendingVipRequests) appData.pendingVipRequests = [];
-        appData.pendingVipRequests = appData.pendingVipRequests.filter(r => r.storeName !== store.name);
-        appData.pendingVipRequests.push({ id: Date.now().toString(), storeName: store.name, slipImage: slipImg, requestDate: new Date().toLocaleString() });
-        await saveToCloud();
-        alert("ส่งสลิปสำเร็จ! กรุณารอแอดมินอนุมัติสถานะ VIP ครับ (หลังจากอนุมัติ ช่องกรอก LINE/FB จะเปิดให้ใช้งาน)");
-        btn.innerText = "ส่งสลิปเพื่ออัปเกรด VIP"; btn.disabled = false; document.getElementById('vipSlipInput').value = '';
+        
+        try {
+            const slipImg = await resizeImg(slipFile);
+            if(!appData.pendingVipRequests) appData.pendingVipRequests = [];
+            appData.pendingVipRequests = appData.pendingVipRequests.filter(r => r.storeName !== store.name);
+            appData.pendingVipRequests.push({ id: Date.now().toString(), storeName: store.name, slipImage: slipImg, requestDate: new Date().toLocaleString() });
+            
+            await saveToCloud();
+            await notifyTelegram(`👑 <b>มีร้านค้าส่งสลิปขอเปิด VIP!</b>\n\n🏬 ร้าน: <b>${store.name}</b>\n\n👉 กรุณาเข้าหน้าแอดมินเพื่อตรวจสอบสลิปครับ`);
+
+            alert("ส่งสลิปสำเร็จ! กรุณารอแอดมินอนุมัติสถานะ VIP ครับ (หลังจากอนุมัติ ช่องกรอก LINE/FB จะเปิดให้ใช้งาน)");
+            document.getElementById('vipSlipInput').value = '';
+        } catch (error) {
+            console.error(error);
+            alert("❌ ไม่สามารถส่งข้อมูลได้ กรุณาลองใหม่อีกครั้ง");
+        } finally {
+            btn.innerText = "ส่งสลิปเพื่ออัปเกรด VIP"; btn.disabled = false;
+        }
     }
 
     async function updateVipData() {
@@ -942,6 +992,7 @@
         if(store) { store.lineUrl = document.getElementById('vipLineInput').value; store.fbUrl = document.getElementById('vipFbInput').value; await saveToCloud(); alert("บันทึกข้อมูลติดต่อแล้ว ลูกค้าสามารถกดเข้า LINE/FB ได้ทันที"); }
     }
 
+    // ⚡ ฟังก์ชันขอลงโปรโมชั่น (มี Telegram)
     async function submitPromoWithPIN() {
         const btn = document.getElementById('btnSubmitPromo'); const stores = appData.registeredStores || [];
         const store = stores.find(s => s.pin === document.getElementById('storePinInput').value);
@@ -949,13 +1000,25 @@
         if(!store) return alert("กรุณายืนยัน PIN ก่อน"); if(!pImgFile && !window.currentPromoImage) return alert("กรุณาแนบรูปและกรอกรายละเอียด");
 
         btn.innerText = "กำลังประมวลผลรูป... ⏳"; btn.disabled = true;
-        let img = window.currentPromoImage; if(pImgFile) { img = await resizeImg(pImgFile); }
         
-        if (!appData.pendingPromotions) appData.pendingPromotions = [];
-        appData.pendingPromotions = appData.pendingPromotions.filter(p => p.storeName !== store.name);
-        appData.pendingPromotions.push({ id: Date.now().toString(), storeName: store.name, province: document.getElementById('promoProvinceSelect').value, detail: pDet, image: img, service: document.getElementById('promoServiceSelect').value, category: document.getElementById('promoStoreCategory').value, lineUrl: store.lineUrl || '', fbUrl: store.fbUrl || '', isUpdateOnly: false });
-        await saveToCloud(); 
-        alert("ส่งข้อมูลอัปเดตแบนเนอร์สำเร็จ! รอแอดมินอนุมัติครับ"); btn.innerText = "🚀 สั่งซื้อและส่งเรื่องอัปเดตข้อมูล"; btn.disabled = false; document.getElementById('promoImageInput').value = '';
+        try {
+            let img = window.currentPromoImage; if(pImgFile) { img = await resizeImg(pImgFile); }
+            
+            if (!appData.pendingPromotions) appData.pendingPromotions = [];
+            appData.pendingPromotions = appData.pendingPromotions.filter(p => p.storeName !== store.name);
+            appData.pendingPromotions.push({ id: Date.now().toString(), storeName: store.name, province: document.getElementById('promoProvinceSelect').value, detail: pDet, image: img, service: document.getElementById('promoServiceSelect').value, category: document.getElementById('promoStoreCategory').value, lineUrl: store.lineUrl || '', fbUrl: store.fbUrl || '', isUpdateOnly: false });
+            
+            await saveToCloud(); 
+            await notifyTelegram(`🔥 <b>มีคำสั่งซื้อแบนเนอร์โปรโมท!</b>\n\n🏬 ร้าน: <b>${store.name}</b>\n📌 หมวด: ${document.getElementById('promoStoreCategory').value}\n\n👉 กรุณาตรวจสอบและอนุมัติในหน้าแอดมินครับ`);
+
+            alert("ส่งข้อมูลอัปเดตแบนเนอร์สำเร็จ! รอแอดมินอนุมัติครับ"); 
+            document.getElementById('promoImageInput').value = '';
+        } catch (error) {
+            console.error(error);
+            alert("❌ ไม่สามารถส่งข้อมูลได้ กรุณาลองใหม่อีกครั้ง");
+        } finally {
+            btn.innerText = "🚀 สั่งซื้อและส่งเรื่องอัปเดตข้อมูล"; btn.disabled = false; 
+        }
     }
 
     async function submitEditPromo() {
@@ -965,16 +1028,23 @@
         if(!store || !activePromo) return alert("ไม่พบโปรโมชั่นที่กำลังแสดงผลให้แก้ไขครับ");
 
         btn.innerText = "กำลังส่งข้อมูล... ⏳"; btn.disabled = true;
-        const pImgFile = document.getElementById('editPromoImageInput').files[0]; const pDet = document.getElementById('editPromoDetailInput').value;
-        let img = activePromo.image; if(pImgFile) { img = await resizeImg(pImgFile); }
-        
-        if (!appData.pendingPromotions) appData.pendingPromotions = [];
-        appData.pendingPromotions = appData.pendingPromotions.filter(p => p.storeName !== store.name);
-        appData.pendingPromotions.push({ id: Date.now().toString(), storeName: store.name, province: activePromo.province, detail: pDet, image: img, service: activePromo.service, category: activePromo.category, lineUrl: store.lineUrl || '', fbUrl: store.fbUrl || '', isUpdateOnly: true });
-        
-        await saveToCloud(); 
-        alert("ส่งข้อมูลขอแก้ไขเรียบร้อย! รอแอดมินตรวจสอบการเปลี่ยนแปลงครับ (วันหมดอายุจะคงเดิม)");
-        btn.innerText = "🔄 ส่งเรื่องขอแก้ไขข้อมูล"; btn.disabled = false; document.getElementById('editPromoImageInput').value = '';
+        try {
+            const pImgFile = document.getElementById('editPromoImageInput').files[0]; const pDet = document.getElementById('editPromoDetailInput').value;
+            let img = activePromo.image; if(pImgFile) { img = await resizeImg(pImgFile); }
+            
+            if (!appData.pendingPromotions) appData.pendingPromotions = [];
+            appData.pendingPromotions = appData.pendingPromotions.filter(p => p.storeName !== store.name);
+            appData.pendingPromotions.push({ id: Date.now().toString(), storeName: store.name, province: activePromo.province, detail: pDet, image: img, service: activePromo.service, category: activePromo.category, lineUrl: store.lineUrl || '', fbUrl: store.fbUrl || '', isUpdateOnly: true });
+            
+            await saveToCloud(); 
+            alert("ส่งข้อมูลขอแก้ไขเรียบร้อย! รอแอดมินตรวจสอบการเปลี่ยนแปลงครับ (วันหมดอายุจะคงเดิม)");
+            document.getElementById('editPromoImageInput').value = '';
+        } catch (error) {
+            console.error(error);
+            alert("❌ ไม่สามารถส่งข้อมูลได้ กรุณาลองใหม่อีกครั้ง");
+        } finally {
+            btn.innerText = "🔄 ส่งเรื่องขอแก้ไขข้อมูล"; btn.disabled = false; 
+        }
     }
 </script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD7Qqf1Z9KQBuvipDzgIc5laJLz9SiOBH8&libraries=places,geometry&callback=initMap" async defer></script>
