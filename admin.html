@@ -12,13 +12,13 @@
         .card { background: #1A1D23; border: 1px solid rgba(197, 160, 89, 0.2); border-radius: 16px; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
         .input-dark { background-color: #2A2E36; border: 1px solid #4A5568; color: white; border-radius: 8px; padding: 8px 12px; outline: none; transition: 0.3s; width: 100%; font-size: 14px;}
         .input-dark:focus { border-color: #C5A059; box-shadow: 0 0 0 2px rgba(197, 160, 89, 0.2); }
-        .btn-primary { background: linear-gradient(135deg, #FFD700, #C5A059); color: #000; font-weight: 600; padding: 8px 16px; border-radius: 8px; transition: 0.2s; }
+        .btn-primary { background: linear-gradient(135deg, #FFD700, #C5A059); color: #000; font-weight: 600; padding: 8px 16px; border-radius: 8px; transition: 0.2s; cursor: pointer; }
         .btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); }
-        .btn-success { background: #06C755; color: white; font-weight: 500; padding: 8px 16px; border-radius: 8px; transition: 0.2s; }
+        .btn-success { background: #06C755; color: white; font-weight: 500; padding: 8px 16px; border-radius: 8px; transition: 0.2s; cursor: pointer; }
         .btn-success:hover { background: #05A044; transform: translateY(-1px); }
-        .btn-danger { background: #D9534F; color: white; font-weight: 500; padding: 8px 16px; border-radius: 8px; transition: 0.2s; }
+        .btn-danger { background: #D9534F; color: white; font-weight: 500; padding: 8px 16px; border-radius: 8px; transition: 0.2s; cursor: pointer; }
         .btn-danger:hover { background: #C9302C; transform: translateY(-1px); }
-        .btn-info { background: #17a2b8; color: white; font-weight: 500; padding: 8px 16px; border-radius: 8px; transition: 0.2s; }
+        .btn-info { background: #17a2b8; color: white; font-weight: 500; padding: 8px 16px; border-radius: 8px; transition: 0.2s; cursor: pointer; }
         .btn-info:hover { background: #138496; }
         
         #loading { position: fixed; inset: 0; background: rgba(18, 20, 24, 0.9); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; }
@@ -37,7 +37,7 @@
     <div class="text-white font-bold text-lg">กำลังประมวลผลข้อมูล... ⏳</div>
 </div>
 
-<div class="max-w-6xl mx-auto">
+<div class="max-w-6xl mx-auto pb-24">
     <h1 class="text-3xl md:text-4xl font-bold gold-text mb-8 text-center bg-[#1A1D23] py-6 rounded-2xl border border-gray-700 shadow-lg">👑 แผงควบคุมแอดมิน (Painaidee)</h1>
 
     <div class="card border-l-4 border-yellow-500">
@@ -81,7 +81,7 @@
                         <option value="food">🍽️ อาหาร/เครื่องดื่ม</option>
                         <option value="beauty">💆‍♀️ ความงาม/พักผ่อน</option>
                         <option value="activity">🎯 กิจกรรม/ท่องเที่ยว</option>
-                        <option value="sport">🏋️ กีฬา/ออกกำลังกาย</option>
+                        <option value="sport">🏋️ กีฬา/ฟิตเนส</option>
                     </select>
                     <input type="text" id="cLabel" class="input-dark" placeholder="ชื่อที่ลูกค้าเห็น">
                     <input type="text" id="cKey" class="input-dark" placeholder="คำค้นหา Google Maps">
@@ -122,55 +122,14 @@
     </div>
 </div>
 
+<button onclick="load()" class="fixed bottom-6 right-6 bg-gradient-to-r from-[#FFD700] to-[#C5A059] text-black px-5 py-4 rounded-full shadow-[0_10px_25px_rgba(0,0,0,0.5)] hover:scale-110 transition z-50 font-bold flex items-center gap-2 border-2 border-white">
+    🔄 รีเฟรชข้อมูล
+</button>
+
 <script>
-    // ⚡ วางลิงก์ API 
+    // ⚡ วางลิงก์ API ของแอดมิน
     const API_URL = "https://script.google.com/macros/s/AKfycbypHrQKt_SWFWOYNFmqCz3hSgX-1EMt1lphWvl6p4bXe5HYObRiXj9-xFls2fSLAtKT/exec";
     
-    const defaultCategories = [
-        // 🍽️ หมวดอาหาร/เครื่องดื่ม (Food)
-        { id: 1, group: 'food', label: 'หมูกระทะ / แจ่วฮ้อน', keyword: 'หมูกระทะ' },
-        { id: 2, group: 'food', label: 'ชาบู / สุกี้', keyword: 'ชาบู' },
-        { id: 3, group: 'food', label: 'ปิ้งย่าง / บาร์บีคิว', keyword: 'ปิ้งย่าง' },
-        { id: 4, group: 'food', label: 'บุฟเฟ่ต์สุดคุ้ม', keyword: 'บุฟเฟ่ต์' },
-        { id: 5, group: 'food', label: 'คาเฟ่ / กาแฟ / ขนม', keyword: 'คาเฟ่' },
-        { id: 6, group: 'food', label: 'อาหารทะเล / ซีฟู้ด', keyword: 'อาหารทะเล' },
-        { id: 7, group: 'food', label: 'ร้านนั่งชิล / บาร์ / ดนตรีสด', keyword: 'ร้านเหล้า' },
-        { id: 8, group: 'food', label: 'ส้มตำ / อาหารอีสาน', keyword: 'ร้านส้มตำ' },
-        { id: 9, group: 'food', label: 'อาหารญี่ปุ่น / ซูชิ', keyword: 'อาหารญี่ปุ่น' },
-        { id: 10, group: 'food', label: 'อาหารตามสั่ง / จานด่วน', keyword: 'อาหารตามสั่ง' },
-        { id: 11, group: 'food', label: 'ก๋วยเตี๋ยว / บะหมี่', keyword: 'ก๋วยเตี๋ยว' },
-        { id: 12, group: 'food', label: 'ข้าวต้มโต้รุ่ง / รอบดึก', keyword: 'ร้านข้าวต้ม' },
-
-        // 💆‍♀️ หมวดความงาม/พักผ่อน (Beauty)
-        { id: 13, group: 'beauty', label: 'ร้านนวดแผนไทย / นวดสปา', keyword: 'ร้านนวด' },
-        { id: 14, group: 'beauty', label: 'คลินิกเสริมความงาม', keyword: 'คลินิกความงาม' },
-        { id: 15, group: 'beauty', label: 'ทำผม / ซาลอน / บาร์เบอร์', keyword: 'ร้านทำผม' },
-        { id: 16, group: 'beauty', label: 'ทำเล็บ / ต่อขนตา', keyword: 'ร้านทำเล็บ' },
-        { id: 17, group: 'beauty', label: 'ทำฟัน / คลินิกทันตกรรม', keyword: 'คลินิกทำฟัน' },
-        { id: 18, group: 'beauty', label: 'ออนเซ็น / แช่น้ำร้อน', keyword: 'ออนเซ็น' },
-
-        // 🎯 หมวดกิจกรรม/ท่องเที่ยว/ที่พัก (Activity)
-        { id: 19, group: 'activity', label: 'สถานที่ท่องเที่ยว / แลนด์มาร์ค', keyword: 'สถานที่ท่องเที่ยว' },
-        { id: 20, group: 'activity', label: 'วัด / ไหว้พระ / สายมู', keyword: 'วัด' },
-        { id: 21, group: 'activity', label: 'ตลาดนัด / ถนนคนเดิน', keyword: 'ตลาดนัด' },
-        { id: 22, group: 'activity', label: 'ห้างสรรพสินค้า / ช้อปปิ้ง', keyword: 'ห้างสรรพสินค้า' },
-        { id: 23, group: 'activity', label: 'แคมป์ปิ้ง / กางเต็นท์', keyword: 'แคมป์ปิ้ง' },
-        { id: 24, group: 'activity', label: 'โรงแรม / รีสอร์ท / ที่พัก', keyword: 'โรงแรม' },
-        { id: 25, group: 'activity', label: 'พูลวิลล่า / บ้านพักตากอากาศ', keyword: 'พูลวิลล่า' },
-        { id: 26, group: 'activity', label: 'สวนสนุก / สวนน้ำ', keyword: 'สวนน้ำ' },
-        { id: 27, group: 'activity', label: 'สวนสาธารณะ / พักผ่อน', keyword: 'สวนสาธารณะ' },
-        { id: 28, group: 'activity', label: 'พิพิธภัณฑ์ / หอศิลป์', keyword: 'พิพิธภัณฑ์' },
-
-        // 🏋️ หมวดกีฬา/ออกกำลังกาย (Sport)
-        { id: 29, group: 'sport', label: 'ฟิตเนส / ยิม', keyword: 'ฟิตเนส' },
-        { id: 30, group: 'sport', label: 'สนามฟุตบอล / หญ้าเทียม', keyword: 'สนามฟุตบอล' },
-        { id: 31, group: 'sport', label: 'สนามแบดมินตัน', keyword: 'สนามแบดมินตัน' },
-        { id: 32, group: 'sport', label: 'สระว่ายน้ำ', keyword: 'สระว่ายน้ำ' },
-        { id: 33, group: 'sport', label: 'มวยไทย / ค่ายมวย', keyword: 'ค่ายมวย' },
-        { id: 34, group: 'sport', label: 'โยคะ / พิลาทิส', keyword: 'โยคะ' },
-        { id: 35, group: 'sport', label: 'สนามกอล์ฟ / ไดร์ฟกอล์ฟ', keyword: 'สนามกอล์ฟ' }
-    ];
-
     let appData = { registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], categories: [], closedReports: [], blacklistedPlaces: [], services: [], pendingVipRequests: [], vipSettings: { price: 500, bankAccount: 'กสิกรไทย 123-x-xxxxx-x ชื่อบัญชี' } };
 
     function formatDateTime(ms) {
@@ -210,11 +169,9 @@
             const res = await fetch(API_URL + "?t=" + new Date().getTime());
             const data = await res.json();
             if (data && Object.keys(data).length > 0) { appData = { ...appData, ...data }; }
-            if (!appData.categories || appData.categories.length === 0) { appData.categories = JSON.parse(JSON.stringify(defaultCategories)); }
             if (!appData.vipSettings) { appData.vipSettings = { price: 500, bankAccount: 'กสิกรไทย 123-4-56789-0 (ไปไหนดี)' }; }
             
-            // ป้องกัน undefined arrays
-            ['registrationRequests','registeredStores','pendingPromotions','activePromotions','closedReports','blacklistedPlaces','services','pendingVipRequests'].forEach(key => {
+            ['registrationRequests','registeredStores','pendingPromotions','activePromotions','categories','closedReports','blacklistedPlaces','services','pendingVipRequests'].forEach(key => {
                 if(!appData[key]) appData[key] = [];
             });
 
@@ -255,7 +212,7 @@
             `).join('');
         }
 
-        // 2. Services (Cards)
+        // 2. Services
         document.getElementById('sTable').innerHTML = appData.services.map((s,i) => `
             <div class="bg-[#2A2E36] p-4 rounded-xl border border-gray-600 flex flex-col justify-between">
                 <div>
@@ -267,7 +224,7 @@
             </div>
         `).join('');
 
-        // 3. Categories (Compact Flex Cards)
+        // 3. Categories 
         document.getElementById('cTable').innerHTML = appData.categories.map((c,i) => `
             <div class="bg-[#2A2E36] p-3 rounded-lg flex flex-col md:flex-row gap-3 items-center border border-gray-700">
                 <input type="checkbox" class="cat-checkbox w-5 h-5 accent-[#C5A059] cursor-pointer shrink-0" value="${i}">
@@ -282,7 +239,7 @@
             </div>
         `).join('');
 
-        // 4. Pending Promos (Cards)
+        // 4. Pending Promos 
         const pendingPList = document.getElementById('pending-promo-list');
         document.getElementById('promo-count').innerText = appData.pendingPromotions.length;
         if(appData.pendingPromotions.length === 0) { pendingPList.innerHTML = '<p class="text-gray-500 italic">ไม่มีรายการรออนุมัติ</p>'; }
@@ -310,7 +267,7 @@
             `).join('');
         }
 
-        // 5. Active Promos (Cards)
+        // 5. Active Promos
         const activePList = document.getElementById('active-promo-list');
         const now = Date.now();
         if(appData.activePromotions.length === 0) { activePList.innerHTML = '<p class="text-gray-500 italic">ยังไม่มีแบนเนอร์ที่แสดงผล</p>'; }
@@ -342,7 +299,7 @@
             }).join('');
         }
 
-        // 6. Registration Requests (Cards)
+        // 6. Registration Requests 
         const regList = document.getElementById('registration-list');
         document.getElementById('reg-count').innerText = appData.registrationRequests.length;
         if(appData.registrationRequests.length === 0) { regList.innerHTML = '<p class="text-gray-500 italic">ไม่มีคำร้องใหม่</p>'; }
@@ -366,7 +323,7 @@
             `).join('');
         }
 
-        // 7. All Stores (Cards)
+        // 7. All Stores
         document.getElementById('store-management-list').innerHTML = appData.registeredStores.map((s,i) => `
             <div class="bg-[#2A2E36] p-4 rounded-xl border ${s.isVIP ? 'border-yellow-500' : 'border-gray-700'} relative flex flex-col h-full">
                 ${s.isVIP ? '<div class="absolute top-3 right-3 bg-yellow-500 text-black text-[10px] px-2 py-1 rounded font-bold shadow">VIP</div>' : ''}
@@ -391,7 +348,7 @@
             </div>
         `).join('');
 
-        // 8. Closed Reports (Cards)
+        // 8. Closed Reports
         const closedList = document.getElementById('closedTable');
         if(appData.closedReports.length === 0) { closedList.innerHTML = '<p class="text-gray-500 italic">ไม่มีรายงาน</p>'; }
         else {
@@ -520,13 +477,14 @@
     function addService() {
         const name = document.getElementById('sName').value.trim(), price = document.getElementById('sPrice').value.trim(), days = document.getElementById('sDays').value.trim(), detail = document.getElementById('sDetail').value.trim();
         if(!name || !price) return alert("กรุณากรอกชื่อและราคาให้ครบถ้วนครับ");
+        if(!appData.services) appData.services = []; 
         appData.services.push({ name, price: parseInt(price), days: parseInt(days)||30, detail }); save();
     }
 
     function addCategory() {
         const group = document.getElementById('cGroup').value, label = document.getElementById('cLabel').value.trim(), keyword = document.getElementById('cKey').value.trim();
         if(!label || !keyword) return alert("กรุณากรอกข้อมูลให้ครบถ้วนครับ");
-        appData.categories.push({ group, label, keyword }); save();
+        if(!appData.categories) appData.categories = []; appData.categories.push({ group, label, keyword }); save();
     }
 
     function deleteStore(index, name) {
@@ -545,6 +503,7 @@
 
     function blacklistPlace(placeId, reportIndex) {
         if(confirm('⚠️ ยืนยันแบนร้านนี้ถาวร?')) {
+            if(!appData.blacklistedPlaces) appData.blacklistedPlaces = [];
             if(!appData.blacklistedPlaces.includes(placeId)) appData.blacklistedPlaces.push(placeId);
             appData.closedReports.splice(reportIndex, 1); save();
         }
@@ -556,7 +515,26 @@
     function openImageTab(base64Str) { const newWindow = window.open(); if (newWindow) { newWindow.document.write(`<html><body style="margin:0; background:#121418; display:flex; align-items:center; justify-content:center; height:100vh;"><img src="${base64Str}" style="max-width:95%; max-height:95vh; border-radius:12px;"></body></html>`); } }
     function showLoading(show) { document.getElementById('loading').style.display = show ? 'flex' : 'none'; }
 
+    // ⚡ โหลดครั้งแรก
     window.onload = load;
+
+    // ⚡ ระบบ Auto-Refresh อัจฉริยะ ดึงข้อมูลใหม่ทุกๆ 10 วินาที
+    setInterval(async () => {
+        const isTyping = document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA';
+        if (!isTyping && document.getElementById('loading').style.display === 'none') {
+            try {
+                const res = await fetch(API_URL + "?t=" + new Date().getTime());
+                const data = await res.json();
+                if (data && Object.keys(data).length > 0) { 
+                    appData = { ...appData, ...data }; 
+                    ['registrationRequests','registeredStores','pendingPromotions','activePromotions','categories','closedReports','blacklistedPlaces','services','pendingVipRequests'].forEach(key => {
+                        if(!appData[key]) appData[key] = [];
+                    });
+                    render(); 
+                }
+            } catch (e) { console.log("Auto-refresh failed", e); }
+        }
+    }, 10000);
 </script>
 </body>
 </html>
