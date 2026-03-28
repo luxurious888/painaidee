@@ -388,16 +388,31 @@
     };
 
     async function initSystem() {
+       async function initSystem() {
         try {
             await liff.init({ liffId: "2009598846-wiCUeV35" });
 
             if (liff.isLoggedIn()) {
+                // ⚡ 1. เช็คสถานะก่อนว่าลูกค้าเป็นเพื่อนกับ LINE OA หรือยัง
+                try {
+                    const friend = await liff.getFriendship();
+                    if (!friend.friendFlag) {
+                        // ❌ ถ้ายังไม่ได้เป็นเพื่อน ให้เด้งพาไปหน้าเพิ่มเพื่อนทันที!
+                        window.location.href = "https://lin.ee/5SBoptj"; // 📌 [อย่าลืมเปลี่ยนเป็นลิงก์ LINE OA ของพี่นะครับ]
+                        return; // หยุดการโหลดแอปชั่วคราว รอให้แอดเพื่อนก่อน
+                    }
+                } catch(e) {
+                    console.log("Friendship API error", e);
+                }
+
+                // ✅ 2. ถ้าแอดเพื่อนแล้ว (หรือเช็คผ่านแล้ว) โหลดข้อมูลเข้าแอปตามปกติ
                 const profile = await liff.getProfile();
                 document.getElementById('header-profile').innerHTML = `<img src="${profile.pictureUrl}" style="width:100%; height:100%; object-fit:cover;">`;
                 
                 await loadFromCloud();
                 hideLoginOverlay();
             } else {
+                // โชว์ปุ่มเข้าสู่ระบบแบบปกติ
                 document.getElementById('loadingSpinner').style.display = 'none';
                 document.getElementById('loginCard').style.display = 'block';
             }
@@ -422,7 +437,7 @@
         
         if (isMobile && !liff.isInClient()) {
             // ถ้าเป็นมือถือ เปิดผ่าน Chrome/Safari ให้ดีดเข้าแอป LINE ทันที
-            window.location.href = "https://liff.line.me/2009598846-wiCUeV35";
+            window.location.href = "https://lin.ee/PieOcOC";
         } else {
             // สำหรับคอมพิวเตอร์ หรือเปิดใน LINE อยู่แล้ว ให้ส่ง Callback กลับมาลิงก์ปัจจุบัน
             liff.login({ redirectUri: exactUrl }); 
