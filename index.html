@@ -53,7 +53,7 @@
 
         .btn-primary { padding: 14px 24px; background: var(--primary); color: white; border: none; border-radius: 10px; font-family: 'Kanit'; font-weight: 500; font-size: 15px; cursor: pointer; transition: 0.3s; white-space: nowrap; width: 100%; box-shadow: 0 4px 10px rgba(197, 160, 89, 0.3); }
         .btn-primary:hover { background: var(--primary-hover); transform: translateY(-2px); }
-        .btn-secondary { background: var(--dark); color: var(--primary); padding: 12px 15px; border-radius: 10px; border: 1px solid var(--primary); cursor: pointer; font-family: 'Kanit'; font-weight: 500; text-align: center; transition: 0.3s; }
+        .btn-secondary { background: var(--dark); color: var(--primary); padding: 12px 15px; border-radius: 10px; border: 1px solid var(--primary); cursor: pointer; font-family: 'Kanit'; font-weight: 500; text-align: center; transition: 0.3s; text-decoration: none; display: inline-block;}
         .btn-secondary:hover { background: var(--primary); color: white; transform: translateY(-2px); }
         .btn-outline { background: transparent; color: var(--primary); border: 1px solid var(--border); padding: 10px 15px; border-radius: 10px; cursor: pointer; font-family: 'Kanit'; font-weight: 500; transition: 0.3s; }
         .btn-outline:hover { border-color: var(--primary); background: rgba(197, 160, 89, 0.1); }
@@ -86,7 +86,7 @@
         .shine-effect::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%); transform: skewX(-25deg); animation: shine 3s infinite; pointer-events: none; }
         .promo-btn-hover:hover { filter: brightness(1.1); transform: translateY(-2px); }
 
-        .highlight-banner { background: linear-gradient(135deg, var(--dark), var(--dark-light)); color: white; padding: 25px; border-radius: 16px; margin-top: 24px; box-shadow: 0 15px 35px rgba(26, 28, 32, 0.4); display: none; position: relative; overflow: hidden; border: 1px solid var(--border); }
+        .highlight-banner { background: linear-gradient(135deg, var(--dark), var(--dark-light)); color: white; padding: 25px; border-radius: 166px; margin-top: 24px; box-shadow: 0 15px 35px rgba(26, 28, 32, 0.4); display: none; position: relative; overflow: hidden; border: 1px solid var(--border); }
         .highlight-banner::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(197,160,89,0.15) 0%, transparent 60%); pointer-events: none; }
         .highlight-banner h3 { margin: 0 0 5px 0; font-size: 20px; color: var(--primary); font-weight: 500; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
 
@@ -98,6 +98,13 @@
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(18, 20, 24, 0.95); backdrop-filter: blur(15px); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .login-card { background: var(--surface); padding: 40px; border-radius: 24px; text-align: center; max-width: 350px; width: 90%; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid var(--border); animation: fadeIn 0.5s ease; }
         .btn-line-login { background-color: var(--line-green); color: white; border: none; padding: 15px 20px; border-radius: 12px; font-family: 'Kanit'; font-weight: 600; font-size: 16px; width: 100%; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 5px 15px rgba(6, 199, 85, 0.3); text-decoration: none;}
+        
+        /* 🛡️ สไตล์สำหรับหน้าจอ "บังคับเพิ่มเพื่อน" ของร้านค้า (เกมใหม่) */
+        #partner-friend-blocker { display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 50px 20px; background: var(--surface); border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        #partner-actual-content { display: none; }
+        .line-logo-vertical { width: 100px; height: auto; margin-bottom: 25px; }
+        .friend-note { color: #FFF; font-size: 16px; font-weight: 400; line-height: 1.6; max-width: 300px; margin-bottom: 30px; }
+
         .spinner { width: 50px; height: 50px; border: 5px solid var(--surface); border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
@@ -126,7 +133,7 @@
 <div id="appContent">
     <nav>
         <div id="tab-home" class="active" onclick="switchPage('home')">หน้าแรก</div>
-        <div id="tab-partner" onclick="switchPage('partner')">สำหรับร้านค้า</div>
+        <div id="tab-partner" onclick="navigateToPartner()">สำหรับร้านค้า</div>
     </nav>
 
     <div id="page-home" class="page active">
@@ -172,120 +179,134 @@
     </div>
 
     <div id="page-partner" class="page">
-        <div class="dashboard-card" id="registerNewStoreCard" style="border-top: 3px solid var(--primary); border-bottom: 3px solid var(--primary);">
-            <h3 style="border:none;">ลงทะเบียนร้านค้าใหม่</h3>
-            <p style="font-size: 14px; color: var(--text-muted); margin-top: -10px;">ส่งเอกสารให้แอดมินตรวจสอบ เพื่อรับ "รหัสลับ (Store PIN)"</p>
-            <div class="form-group">
-                <label>1. ค้นหาพิกัดร้านจากแผนที่</label>
-                <div style="display: flex; gap: 10px;">
-                    <input type="text" id="regStoreName" placeholder="พิมพ์ชื่อร้านเพื่อค้นหา...">
-                    <button class="btn-outline" style="width: auto; white-space: nowrap;" onclick="searchRegStore()">ค้นหา</button>
-                </div>
-                <div id="regStoreVerifyCard" style="display:none; background:var(--bg-light); padding:15px; border-radius:10px; margin-top:10px; border:1px solid var(--border);">
-                    <h4 id="regVerifyStoreName" style="margin:0 0 10px 0; color:var(--primary);"></h4>
-                    <div id="regMiniMap" style="width:100%; height:150px; border-radius:10px;"></div>
-                </div>
+        
+        <div id="partner-friend-blocker">
+            <img src="https://official-static.line-scdn.net/branding/logo-vertical.png" alt="LINE Official Account" class="line-logo-vertical">
+            <div class="friend-note">
+                <span style="color:var(--primary); font-weight:600;">⚠️ สำคัญมาก</span><br>
+                สำหรับร้านค้าจำเป็นต้องเพิ่มเพื่อนก่อน เพื่อรับรหัสผ่านในการใช้งานครับ
             </div>
-            <div class="form-group"><label>2. รูปถ่ายหน้าร้านคู่เจ้าของร้าน <span style="color:var(--danger);">*</span></label><input type="file" id="regStorePhoto" accept="image/*"></div>
-            <div class="form-group"><label>3. สำเนาบัตรประชาชน/พาสปอร์ต <span style="color:var(--danger);">*</span></label><input type="file" id="regIdCard" accept="image/*"></div>
-            <div class="form-group"><label>4. ใบทะเบียนพาณิชย์ (ถ้ามี)</label><input type="file" id="regCommercial" accept="image/*"></div>
-            <div class="form-group">
-                <label>5. เบอร์โทรศัพท์ติดต่อ <span style="color:var(--danger);">*</span></label>
-                <input type="text" id="regPhone" placeholder="08X-XXX-XXXX">
-            </div>
-
-            <button class="btn-secondary" id="btnSubmitReg" style="width: 100%; margin-top: 10px;" onclick="submitStoreRegistration()">ส่งข้อมูลเพื่อตรวจสอบ</button>
+            <button class="btn-line-login" style="width: auto; padding: 12px 24px;" onclick="window.open('https://lin.ee/5SBoptj', '_blank')">➕ เพิ่มเพื่อน LINE OA ของเรา</button>
+            
+            <button class="btn-outline" style="margin-top: 20px; font-size: 13px; border-color:var(--dark-muted); color:var(--text-muted);" onclick="checkFriendshipForPartner(true)">ฉันเพิ่มเพื่อนแล้ว ตรวจสอบอีกครั้ง</button>
         </div>
 
-        <div class="dashboard-card">
-            <h3>จัดการร้านค้า / อัปเดตโปรโมชั่น</h3>
-            <div class="form-group">
-                <label>รหัสลับร้านค้า (Store PIN)</label>
-                <div style="display: flex; gap: 10px;">
-                    <input type="password" id="storePinInput" placeholder="รหัส PIN">
-                    <button class="btn-outline" style="width: auto; white-space: nowrap;" onclick="verifyStore()">ตรวจสอบ</button>
+        <div id="partner-actual-content">
+            <div class="dashboard-card" id="registerNewStoreCard" style="border-top: 3px solid var(--primary); border-bottom: 3px solid var(--primary);">
+                <h3 style="border:none;">ลงทะเบียนร้านค้าใหม่</h3>
+                <p style="font-size: 14px; color: var(--text-muted); margin-top: -10px;">ส่งเอกสารให้แอดมินตรวจสอบ เพื่อรับ "รหัสลับ (Store PIN)"</p>
+                <div class="form-group">
+                    <label>1. ค้นหาพิกัดร้านจากแผนที่</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="regStoreName" placeholder="พิมพ์ชื่อร้านเพื่อค้นหา...">
+                        <button class="btn-outline" style="width: auto; white-space: nowrap;" onclick="searchRegStore()">ค้นหา</button>
+                    </div>
+                    <div id="regStoreVerifyCard" style="display:none; background:var(--bg-light); padding:15px; border-radius:10px; margin-top:10px; border:1px solid var(--border);">
+                        <h4 id="regVerifyStoreName" style="margin:0 0 10px 0; color:var(--primary);"></h4>
+                        <div id="regMiniMap" style="width:100%; height:150px; border-radius:10px;"></div>
+                    </div>
                 </div>
+                <div class="form-group"><label>2. รูปถ่ายหน้าร้านคู่เจ้าของร้าน <span style="color:var(--danger);">*</span></label><input type="file" id="regStorePhoto" accept="image/*"></div>
+                <div class="form-group"><label>3. สำเนาบัตรประชาชน/พาสปอร์ต <span style="color:var(--danger);">*</span></label><input type="file" id="regIdCard" accept="image/*"></div>
+                <div class="form-group"><label>4. ใบทะเบียนพาณิชย์ (ถ้ามี)</label><input type="file" id="regCommercial" accept="image/*"></div>
+                <div class="form-group">
+                    <label>5. เบอร์โทรศัพท์ติดต่อ <span style="color:var(--danger);">*</span></label>
+                    <input type="text" id="regPhone" placeholder="08X-XXX-XXXX">
+                </div>
+
+                <button class="btn-secondary" id="btnSubmitReg" style="width: 100%; margin-top: 10px;" onclick="submitStoreRegistration()">ส่งข้อมูลเพื่อตรวจสอบ</button>
             </div>
-            <div id="storeVerifyCard" style="display:none; background:var(--bg-light); padding:15px; border-radius:10px; margin-bottom:15px; border:1px solid var(--border);">
-                <h4 id="verifyStoreName" style="margin:0 0 10px 0; color:var(--primary);"></h4>
-                <div id="miniMap" style="width:100%; height:150px; border-radius:10px;"></div>
-            </div>
 
-            <div id="lockedFeatures" style="display: none; margin-top: 20px;">
-                
-                <div id="vipSubscribeSection" style="padding: 20px; border: 2px solid #FFD700; border-radius: 16px; background: linear-gradient(180deg, rgba(255, 215, 0, 0.1) 0%, var(--surface) 100%); margin-bottom: 25px; text-align: center;">
-                    <h4 id="vipSubscribeTitle" style="margin: 0 0 10px 0; color: #FFD700; font-size: 18px;">👑 สมัครสมาชิก VIP</h4>
-                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">ปลดล็อกการใส่ลิงก์ LINE, Facebook และป้ายกำกับร้านแนะนำ</p>
-                    
-                    <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid rgba(197, 160, 89, 0.3);">
-                        <p style="margin: 0; color: #FFF; font-size: 16px;">ค่าบริการ: <strong style="color: var(--line-green); font-size: 20px;" id="displayVipPrice">500</strong> <strong>บาท/เดือน</strong></p>
-                        <p style="margin: 5px 0 0 0; font-size: 13px; color: var(--primary-light);">บัญชีโอนเงิน: <span id="displayBankAcc">รอแอดมินตั้งค่าบัญชี</span></p>
+            <div class="dashboard-card">
+                <h3>จัดการร้านค้า / อัปเดตโปรโมชั่น</h3>
+                <div class="form-group">
+                    <label>รหัสลับร้านค้า (Store PIN)</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="password" id="storePinInput" placeholder="รหัส PIN">
+                        <button class="btn-outline" style="width: auto; white-space: nowrap;" onclick="verifyStore()">ตรวจสอบ</button>
                     </div>
-                    
-                    <div class="form-group" style="text-align: left;">
-                        <label>🧾 แนบสลิปการโอนเงิน <span style="color:var(--danger);">*</span></label>
-                        <input type="file" id="vipSlipInput" accept="image/*">
-                    </div>
-                    
-                    <button id="btnSubmitVip" class="btn-primary" style="background: linear-gradient(135deg, #FFD700, #C5A059); color: #000; font-weight: 600; padding: 12px; font-size: 16px;" onclick="submitVipRequest()">
-                        ส่งสลิปเพื่ออัปเกรด VIP
-                    </button>
+                </div>
+                <div id="storeVerifyCard" style="display:none; background:var(--bg-light); padding:15px; border-radius:10px; margin-bottom:15px; border:1px solid var(--border);">
+                    <h4 id="verifyStoreName" style="margin:0 0 10px 0; color:var(--primary);"></h4>
+                    <div id="miniMap" style="width:100%; height:150px; border-radius:10px;"></div>
                 </div>
 
-                <div id="vipUpdateSection" style="padding: 15px; border: 1px dashed var(--primary); border-radius: 12px; margin-bottom: 25px; background: rgba(197, 160, 89, 0.05); display: none;">
-                    <div style="text-align: center; margin-bottom: 15px;">
-                        <span style="background: var(--line-green); color: white; padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: bold;">✅ สถานะ VIP ใช้งานได้</span>
+                <div id="lockedFeatures" style="display: none; margin-top: 20px;">
+                    
+                    <div id="vipSubscribeSection" style="padding: 20px; border: 2px solid #FFD700; border-radius: 16px; background: linear-gradient(180deg, rgba(255, 215, 0, 0.1) 0%, var(--surface) 100%); margin-bottom: 25px; text-align: center;">
+                        <h4 id="vipSubscribeTitle" style="margin: 0 0 10px 0; color: #FFD700; font-size: 18px;">👑 สมัครสมาชิก VIP</h4>
+                        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">ปลดล็อกการใส่ลิงก์ LINE, Facebook และป้ายกำกับร้านแนะนำ</p>
+                        
+                        <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid rgba(197, 160, 89, 0.3);">
+                            <p style="margin: 0; color: #FFF; font-size: 16px;">ค่าบริการ: <strong style="color: var(--line-green); font-size: 20px;" id="displayVipPrice">500</strong> <strong>บาท/เดือน</strong></p>
+                            <p style="margin: 5px 0 0 0; font-size: 13px; color: var(--primary-light);">บัญชีโอนเงิน: <span id="displayBankAcc">รอแอดมินตั้งค่าบัญชี</span></p>
+                        </div>
+                        
+                        <div class="form-group" style="text-align: left;">
+                            <label>🧾 แนบสลิปการโอนเงิน <span style="color:var(--danger);">*</span></label>
+                            <input type="file" id="vipSlipInput" accept="image/*">
+                        </div>
+                        
+                        <button id="btnSubmitVip" class="btn-primary" style="background: linear-gradient(135deg, #FFD700, #C5A059); color: #000; font-weight: 600; padding: 12px; font-size: 16px;" onclick="submitVipRequest()">
+                            ส่งสลิปเพื่ออัปเกรด VIP
+                        </button>
                     </div>
-                    <h4 style="margin: 0 0 5px 0; color: #FFD700; font-size: 16px;">🔗 ข้อมูลติดต่อพิเศษ (VIP Links)</h4>
-                    <p style="font-size: 12px; color: var(--text-muted); margin-top: 0; margin-bottom: 10px;">ลูกค้าร้าน VIP สามารถกดลิงก์ติดต่อได้ทันที</p>
-                    <div class="form-group"><label style="font-size: 12px;">ลิงก์ LINE OA</label><input type="text" id="vipLineInput" placeholder="https://line.me/R/ti/p/..."></div>
-                    <div class="form-group" style="margin-bottom: 10px;"><label style="font-size: 12px;">ลิงก์ Facebook Page</label><input type="text" id="vipFbInput" placeholder="https://facebook.com/..."></div>
-                    <button class="btn-outline" style="width: 100%; border-color: var(--primary);" onclick="updateVipData()">💾 บันทึกข้อมูลลิงก์โซเชียล</button>
+
+                    <div id="vipUpdateSection" style="padding: 15px; border: 1px dashed var(--primary); border-radius: 12px; margin-bottom: 25px; background: rgba(197, 160, 89, 0.05); display: none;">
+                        <div style="text-align: center; margin-bottom: 15px;">
+                            <span style="background: var(--line-green); color: white; padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: bold;">✅ สถานะ VIP ใช้งานได้</span>
+                        </div>
+                        <h4 style="margin: 0 0 5px 0; color: #FFD700; font-size: 16px;">🔗 ข้อมูลติดต่อพิเศษ (VIP Links)</h4>
+                        <p style="font-size: 12px; color: var(--text-muted); margin-top: 0; margin-bottom: 10px;">ลูกค้าร้าน VIP สามารถกดลิงก์ติดต่อได้ทันที</p>
+                        <div class="form-group"><label style="font-size: 12px;">ลิงก์ LINE OA</label><input type="text" id="vipLineInput" placeholder="https://line.me/R/ti/p/..."></div>
+                        <div class="form-group" style="margin-bottom: 10px;"><label style="font-size: 12px;">ลิงก์ Facebook Page</label><input type="text" id="vipFbInput" placeholder="https://facebook.com/..."></div>
+                        <button class="btn-outline" style="width: 100%; border-color: var(--primary);" onclick="updateVipData()">💾 บันทึกข้อมูลลิงก์โซเชียล</button>
+                    </div>
+
+                    <div id="buyPromoSection" style="padding: 20px; border: 2px solid var(--primary); border-radius: 16px; background: linear-gradient(180deg, rgba(197, 160, 89, 0.1) 0%, var(--surface) 100%); position: relative; overflow: hidden; margin-top: 30px;">
+                        <div style="position: absolute; top: 20px; right: -35px; background: #D9534F; color: white; padding: 5px 40px; transform: rotate(45deg); font-size: 12px; font-weight: bold; box-shadow: 0 2px 10px rgba(0,0,0,0.5);">HOT 🔥</div>
+                        <h4 style="margin: 0 0 5px 0; color: var(--primary); font-size: 18px; text-align: center;">🚀 ดันยอดขายพุ่ง! พื้นที่โปรโมทหน้าแรก</h4>
+                        <p style="text-align: center; font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">ให้ลูกค้าในจังหวัดเห็นร้านคุณเป็นอันดับแรก ทันทีที่เปิดแอป</p>
+
+                        <div class="form-group"><label>📍 เลือกจังหวัดที่จะโปรโมท</label><select id="promoProvinceSelect"></select></div>
+                        <div class="form-group"><label>🏷️ หมวดหมู่ร้านค้าของคุณ</label><select id="promoStoreCategory"></select></div>
+                        <div class="form-group"><label>💎 เลือกแพ็กเกจค่าบริการ</label><select id="promoServiceSelect"></select></div>
+                        
+                        <div class="form-group">
+                            <label>🖼️ รูปภาพป้ายโฆษณา (แนวนอน 3:2)</label>
+                            <input type="file" id="promoImageInput" accept="image/*">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>📝 รายละเอียดโปรโมชั่น (แคปชั่นดึงดูดลูกค้า)</label>
+                            <textarea id="promoDetail" rows="3" placeholder="เช่น ลด 50% ทันทีเมื่อโชว์แอปนี้! หรือ มา 4 จ่าย 3 ด่วน หมดเขตสิ้นเดือน..."></textarea>
+                        </div>
+                        
+                        <button id="btnSubmitPromo" class="btn-primary promo-btn-hover" style="width: 100%; background: linear-gradient(135deg, #FFD700, #C5A059); color: #000; font-size: 16px; font-weight: 600; padding: 16px; margin-top: 10px; border: none; box-shadow: 0 6px 20px rgba(255, 215, 0, 0.3);" onclick="submitPromoWithPIN()">
+                            🚀 สั่งซื้อและส่งเรื่องอัปเดตข้อมูล
+                        </button>
+                    </div>
+
+                    <div id="editPromoSection" style="display: none; padding: 20px; border: 2px solid var(--info); border-radius: 16px; background: linear-gradient(180deg, rgba(23, 162, 184, 0.1) 0%, var(--surface) 100%); margin-top: 30px;">
+                        <h4 style="margin: 0 0 5px 0; color: var(--info); font-size: 18px; text-align: center;">📝 แก้ไขข้อมูลแบนเนอร์ (ฟรี)</h4>
+                        <p style="text-align: center; font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">อัปเดตแบนเนอร์หรือโปรโมชั่นปัจจุบันของคุณ (ไม่บวกวันเพิ่ม)</p>
+
+                        <div class="form-group">
+                            <label>🖼️ รูปภาพป้ายโฆษณาใหม่ (ถ้าต้องการเปลี่ยน)</label>
+                            <input type="file" id="editPromoImageInput" accept="image/*">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>📝 แคปชั่น/รายละเอียดโปรโมชั่น</label>
+                            <textarea id="editPromoDetailInput" rows="3"></textarea>
+                        </div>
+                        
+                        <button id="btnEditPromo" class="btn-primary promo-btn-hover" style="width: 100%; background: var(--info); color: #FFF; font-size: 16px; font-weight: 600; padding: 16px; margin-top: 10px; border: none; box-shadow: 0 6px 20px rgba(23, 162, 184, 0.3);" onclick="submitEditPromo()">
+                            🔄 ส่งเรื่องขอแก้ไขข้อมูล
+                        </button>
+                    </div>
+
                 </div>
-
-                <div id="buyPromoSection" style="padding: 20px; border: 2px solid var(--primary); border-radius: 16px; background: linear-gradient(180deg, rgba(197, 160, 89, 0.1) 0%, var(--surface) 100%); position: relative; overflow: hidden; margin-top: 30px;">
-                    <div style="position: absolute; top: 20px; right: -35px; background: #D9534F; color: white; padding: 5px 40px; transform: rotate(45deg); font-size: 12px; font-weight: bold; box-shadow: 0 2px 10px rgba(0,0,0,0.5);">HOT 🔥</div>
-                    <h4 style="margin: 0 0 5px 0; color: var(--primary); font-size: 18px; text-align: center;">🚀 ดันยอดขายพุ่ง! พื้นที่โปรโมทหน้าแรก</h4>
-                    <p style="text-align: center; font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">ให้ลูกค้าในจังหวัดเห็นร้านคุณเป็นอันดับแรก ทันทีที่เปิดแอป</p>
-
-                    <div class="form-group"><label>📍 เลือกจังหวัดที่จะโปรโมท</label><select id="promoProvinceSelect"></select></div>
-                    <div class="form-group"><label>🏷️ หมวดหมู่ร้านค้าของคุณ</label><select id="promoStoreCategory"></select></div>
-                    <div class="form-group"><label>💎 เลือกแพ็กเกจค่าบริการ</label><select id="promoServiceSelect"></select></div>
-                    
-                    <div class="form-group">
-                        <label>🖼️ รูปภาพป้ายโฆษณา (แนวนอน 3:2)</label>
-                        <input type="file" id="promoImageInput" accept="image/*">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>📝 รายละเอียดโปรโมชั่น (แคปชั่นดึงดูดลูกค้า)</label>
-                        <textarea id="promoDetail" rows="3" placeholder="เช่น ลด 50% ทันทีเมื่อโชว์แอปนี้! หรือ มา 4 จ่าย 3 ด่วน หมดเขตสิ้นเดือน..."></textarea>
-                    </div>
-                    
-                    <button id="btnSubmitPromo" class="btn-primary promo-btn-hover" style="width: 100%; background: linear-gradient(135deg, #FFD700, #C5A059); color: #000; font-size: 16px; font-weight: 600; padding: 16px; margin-top: 10px; border: none; box-shadow: 0 6px 20px rgba(255, 215, 0, 0.3);" onclick="submitPromoWithPIN()">
-                        🚀 สั่งซื้อและส่งเรื่องอัปเดตข้อมูล
-                    </button>
-                </div>
-
-                <div id="editPromoSection" style="display: none; padding: 20px; border: 2px solid var(--info); border-radius: 16px; background: linear-gradient(180deg, rgba(23, 162, 184, 0.1) 0%, var(--surface) 100%); margin-top: 30px;">
-                    <h4 style="margin: 0 0 5px 0; color: var(--info); font-size: 18px; text-align: center;">📝 แก้ไขข้อมูลแบนเนอร์ (ฟรี)</h4>
-                    <p style="text-align: center; font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">อัปเดตแบนเนอร์หรือโปรโมชั่นปัจจุบันของคุณ (ไม่บวกวันเพิ่ม)</p>
-
-                    <div class="form-group">
-                        <label>🖼️ รูปภาพป้ายโฆษณาใหม่ (ถ้าต้องการเปลี่ยน)</label>
-                        <input type="file" id="editPromoImageInput" accept="image/*">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>📝 แคปชั่น/รายละเอียดโปรโมชั่น</label>
-                        <textarea id="editPromoDetailInput" rows="3"></textarea>
-                    </div>
-                    
-                    <button id="btnEditPromo" class="btn-primary promo-btn-hover" style="width: 100%; background: var(--info); color: #FFF; font-size: 16px; font-weight: 600; padding: 16px; margin-top: 10px; border: none; box-shadow: 0 6px 20px rgba(23, 162, 184, 0.3);" onclick="submitEditPromo()">
-                        🔄 ส่งเรื่องขอแก้ไขข้อมูล
-                    </button>
-                </div>
-
             </div>
         </div>
     </div>
@@ -413,7 +434,7 @@
 
     let isAppReady = false;
 
-    // ⚡ เช็คโหลดเริ่มต้น
+    // เช็คโหลดเริ่มต้น
     document.addEventListener('DOMContentLoaded', () => {
         initSystem();
         setTimeout(() => {
@@ -451,6 +472,63 @@
             isAppReady = true;
             showLoginCard();
         }
+    }
+
+    // ⚡ แก้เกมใหม่: ฟังก์ชันนำทางไปหน้าร้านค้า พร้อมเช็คความเป็นเพื่อน
+    async function navigateToPartner() {
+        // 1. สลับหน้ามาที่ 'partner' ทันที
+        switchPage('partner');
+        
+        // 2. ตรวจสอบความเป็นเพื่อน (Friendship) ผ่าน LIFF
+        checkFriendshipForPartner(false); // false = เช็คเงียบๆ ไม่ต้องแจ้งเตือนถ้าผ่าน
+    }
+
+    // ฟังก์ชันหลักในการเช็คเงื่อนไขเพื่อนของหน้าร้านค้า
+    async function checkFriendshipForPartner(showAlert) {
+        const blocker = document.getElementById('partner-friend-blocker');
+        const content = document.getElementById('partner-actual-content');
+        
+        // โชว์ Loading สั้นๆ ระหว่างเช็ค
+        if(showAlert) blockers.innerHTML = '<div class="spinner"></div><p style="color:#FFF;">กำลังตรวจสอบ...</p>';
+
+        try {
+            if (liff.isLoggedIn()) {
+                // ยิง API ของ Line เช็คว่ายังเป็นเพื่อนกันอยู่ไหม
+                const friend = await liff.getFriendship();
+                
+                if (friend.friendFlag) {
+                    // ✅ เป็นเพื่อนแล้ว -> โชว์เนื้อหาจริง, ซ่อนตัวบล็อก
+                    blocker.style.display = 'none';
+                    content.style.display = 'block';
+                    if(showAlert) alert("✅ ขอบคุณที่เพิ่มเพื่อนครับ! คุณสามารถใช้งานหน้าร้านค้าได้แล้ว");
+                } else {
+                    // ❌ ยังไม่เป็นเพื่อน -> โชว์ตัวบล็อก, ซ่อนเนื้อหาจริง
+                    blocker.style.display = 'flex';
+                    content.style.display = 'none';
+                    // รีเซ็ตเนื้อหาตัวบล็อกกลับมาเผื่อตะกี้กดเช็คแล้วขึ้น Loading
+                    renderFriendBlocker(); 
+                    if(showAlert) alert("⚠️ ระบบตรวจไม่พบความเป็นเพื่อน กรุณากดปุ่มเพิ่มเพื่อนและรอสักครู่ แล้วลองกดตรวจสอบอีกครั้งครับ");
+                }
+            }
+        } catch(e) {
+            console.log("Friendship Check Error", e);
+            // ถ้าเช็คไม่ผ่าน (เช่น LIFF เอ๋อ) ให้โชว์ตัวบล็อกไว้ก่อนเพื่อความชัวร์ของ PIN
+            blocker.style.display = 'flex';
+            content.style.display = 'none';
+        }
+    }
+
+    // ฟังก์ชันวาดหน้าตา Blocker (ก๊อปจาก HTML มาไว้นี่เผื่อต้องรีเซ็ต)
+    function renderFriendBlocker() {
+        document.getElementById('partner-friend-blocker').innerHTML = `
+            <img src="https://official-static.line-scdn.net/branding/logo-vertical.png" alt="LINE Official Account" class="line-logo-vertical">
+            <div class="friend-note">
+                <span style="color:var(--primary); font-weight:600;">⚠️ สำคัญมาก</span><br>
+                สำหรับร้านค้าจำเป็นต้องเพิ่มเพื่อนก่อน เพื่อรับรหัสผ่านในการใช้งานครับ
+            </div>
+            <button class="btn-line-login" style="width: auto; padding: 12px 24px;" onclick="window.open('https://lin.ee/5SBoptj', '_blank')">➕ เพิ่มเพื่อน LINE OA ของเรา</button>
+            <button class="btn-outline" style="margin-top: 20px; font-size: 13px; border-color:var(--dark-muted); color:var(--text-muted);" onclick="checkFriendshipForPartner(true)">ฉันเพิ่มเพื่อนแล้ว ตรวจสอบอีกครั้ง</button>
+        `;
     }
 
     function switchPage(p) { 
@@ -509,7 +587,6 @@
         }
     }
 
-    // ⚡ ฟังก์ชันเวลากดคลิกที่ร้าน ให้เลื่อนไปปักหมุดที่แผนที่
     function focusPlace(placeId) {
         const place = googlePlaces.find(p => p.place_id === placeId);
         if (place && place.geometry && place.geometry.location) {
@@ -711,6 +788,7 @@
                 <div class="place-card" style="border:2px solid var(--primary); box-shadow: 0 0 20px rgba(197,160,89,0.2);">
                     <div style="position:absolute; top:12px; right:-28px; background:#D9534F; color:#FFF; padding:4px 30px; transform:rotate(45deg); font-size:11px; font-weight:800; z-index:10; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">HOT 🔥</div>
                     <div style="position:relative; width:100%; height:180px; overflow:hidden;" class="shine-effect"><img src="${p.image}" style="width:100%; height:100%; object-fit:cover;"></div>
+🍕
                     <div style="padding:18px; display:flex; flex-direction:column; flex-grow:1;">
                         ${p.category ? `<span style="background:var(--primary); color:#000; padding:2px 10px; border-radius:12px; font-size:11px; font-weight:600; display:inline-block; margin-bottom:8px; align-self:flex-start;">📌 ${p.category}</span>` : ''}
                         <h3 style="margin:0 0 8px 0; font-size:18px; color:#FFD700; font-weight:600; text-shadow:0 0 5px rgba(255,215,0,0.3);">✨ ${p.storeName}</h3>
