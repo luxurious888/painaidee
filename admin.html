@@ -287,13 +287,40 @@
                 </div>`).join('');
         }
 
+        // 7. All Stores
         document.getElementById('store-management-list').innerHTML = appData.registeredStores.map((s,i) => `
-            <div class="bg-[#2A2E36] p-4 rounded-xl border ${s.isVIP ? 'border-yellow-500' : 'border-gray-700'} relative flex flex-col h-full">
-                ${s.isVIP ? '<div class="absolute top-3 right-3 bg-yellow-500 text-black text-[10px] px-2 py-1 rounded font-bold shadow">VIP</div>' : ''}
-                <h3 class="font-bold text-lg text-white mb-2 pr-10">${s.name}</h3><div class="bg-[#1A1D23] p-2 rounded flex justify-between items-center mb-3 border border-gray-700"><span class="text-gray-400 text-sm">🔑 PIN:</span><span class="text-[#C5A059] font-bold text-xl tracking-wider">${s.pin}</span></div>
-                <p class="text-xs text-gray-400 mb-1">📞 ${s.phone || 'ไม่ระบุ'}</p><p class="text-xs text-gray-400 mb-4">หมดอายุ: ${(s.isVIP && s.vipExpireTimestamp) ? new Date(s.vipExpireTimestamp).toLocaleDateString('th-TH') : '-'}</p>
-                <div class="flex flex-col gap-2 mt-auto"><button class="${s.isVIP ? 'bg-red-500/20 text-red-400' : 'bg-yellow-500/20 text-yellow-400'} py-1.5 rounded text-sm transition font-medium" onclick="toggleVIP(${i})">${s.isVIP ? '❌ ยกเลิก VIP' : '👑 เปิดสิทธิ์ VIP 30 วัน'}</button>${s.isVIP ? `<button class="${s.vipAutoRenew ? 'bg-green-500/20 text-green-400' : 'bg-gray-600/50 text-gray-300'} py-1.5 rounded text-sm transition font-medium" onclick="toggleVipAutoRenew(${i})">🔄 ออโต้ต่ออายุ: ${s.vipAutoRenew ? 'ON' : 'OFF'}</button>` : ''}<button class="text-red-500 hover:text-red-400 text-xs mt-2 underline text-right" onclick="deleteStore(${i}, '${s.name}')">ลบร้านนี้ถาวร</button></div>
-            </div>`).join('');
+            <div class="bg-[#242730] p-5 rounded-xl border border-gray-700 ${s.isVIP ? '!border-[#FFD700] shadow-[0_0_15px_rgba(255,215,0,0.1)]' : ''} relative flex flex-col h-full transition-all">
+                ${s.isVIP ? '<div class="absolute top-4 right-4 bg-[#FFD700] text-black text-[11px] px-3 py-1 rounded font-bold shadow">VIP</div>' : ''}
+                
+                <h3 class="font-bold text-lg text-white mb-1 pr-12">${s.name}</h3>
+                
+                <div class="bg-[#1A1D23] p-3 rounded-lg flex justify-between items-center my-3 border border-gray-800">
+                    <span class="text-gray-400 text-sm">🔑 PIN:</span>
+                    <span class="text-[#FFD700] font-bold text-xl tracking-wider">${s.pin}</span>
+                </div>
+                
+                <p class="text-sm text-gray-400 mb-1">📞 ${s.phone || 'ไม่ระบุ'}</p>
+                <p class="text-sm text-gray-400 mb-5">หมดอายุ: ${(s.isVIP && s.vipExpireTimestamp) ? new Date(s.vipExpireTimestamp).toLocaleDateString('th-TH') : '-'}</p>
+                
+                <div class="flex flex-col gap-2 mt-auto">
+                    ${!s.isVIP ? `
+                        <button class="w-full bg-[#453715] hover:bg-[#5A461A] text-[#FFD700] py-2.5 rounded-lg text-sm font-bold transition flex justify-center items-center gap-2" onclick="toggleVIP(${i})">
+                            👑 เปิดสิทธิ์ VIP 30 วัน
+                        </button>
+                    ` : `
+                        <button class="w-full bg-[#4B1E25] hover:bg-[#632731] text-[#FF5A5A] py-2.5 rounded-lg text-sm font-bold transition flex justify-center items-center gap-2" onclick="toggleVIP(${i})">
+                            ❌ ยกเลิก VIP
+                        </button>
+                        <button class="w-full ${s.vipAutoRenew ? 'bg-[#184632] text-[#4ADE80] hover:bg-[#205C42]' : 'bg-[#374151] text-gray-300 hover:bg-[#4B5563]'} py-2.5 rounded-lg text-sm font-bold transition flex justify-center items-center gap-2" onclick="toggleVipAutoRenew(${i})">
+                            🔄 ออโต้ต่ออายุ: ${s.vipAutoRenew ? 'ON' : 'OFF'}
+                        </button>
+                    `}
+                    <button class="text-[#FF5A5A] hover:text-red-400 text-xs mt-3 underline text-right transition" onclick="deleteStore(${i}, '${s.name}')">
+                        ลบร้านนี้ถาวร
+                    </button>
+                </div>
+            </div>
+        `).join('');
 
         const closedList = document.getElementById('closedTable');
         if(appData.closedReports.length === 0) { closedList.innerHTML = '<p class="text-gray-500 italic">ไม่มีรายงาน</p>'; }
