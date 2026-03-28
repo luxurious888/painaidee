@@ -2,8 +2,8 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ไปไหนดี - Painaidee</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ไปไหนดี - Painaidee (Premium VIP)</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap');
         
@@ -23,6 +23,7 @@
             --danger: #D9534F;
             --line-green: #06C755;
             --fb-blue: #1877F2;
+            --info: #17a2b8;
         }
 
         body { font-family: 'Kanit', sans-serif; margin: 0; background-color: var(--bg-light); padding-bottom: 50px; color: var(--text-gold); overflow-x: hidden; }
@@ -42,18 +43,25 @@
         
         #map { width: 100%; height: 320px; border-radius: 16px; border: 1px solid var(--border); background: #eee; box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
         .search-area { background: var(--surface); padding: 25px; border-radius: 16px; margin-top: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); border: 1px solid var(--border); }
+        .input-row { display: flex; gap: 12px; margin-bottom: 12px; }
         
         select, input[type="text"], input[type="password"], input[type="number"], input[type="file"], textarea { 
             padding: 14px; border-radius: 10px; border: 1px solid var(--border); font-family: 'Kanit'; font-size: 15px; outline: none; box-sizing: border-box; width: 100%; 
             background: var(--dark); color: var(--primary-light); transition: 0.3s; 
         }
         select:focus, input:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(197, 160, 89, 0.15); background: var(--dark-light); }
+        .input-row select { flex: 1; width: 50%; }
+        option, optgroup { background-color: var(--dark-light); color: var(--primary-light); font-weight: 400; }
+        optgroup { font-weight: 600; color: var(--primary); }
+        ::placeholder { color: rgba(223, 191, 139, 0.4); } 
         .search-box-container { display: flex; gap: 12px; width: 100%; }
 
         .btn-primary { padding: 14px 24px; background: var(--primary); color: white; border: none; border-radius: 10px; font-family: 'Kanit'; font-weight: 500; font-size: 15px; cursor: pointer; transition: 0.3s; white-space: nowrap; width: 100%; box-shadow: 0 4px 10px rgba(197, 160, 89, 0.3); }
         .btn-primary:hover { background: var(--primary-hover); transform: translateY(-2px); }
         .btn-secondary { background: var(--dark); color: var(--primary); padding: 12px 15px; border-radius: 10px; border: 1px solid var(--primary); cursor: pointer; font-family: 'Kanit'; font-weight: 500; text-align: center; transition: 0.3s; }
+        .btn-secondary:hover { background: var(--primary); color: white; transform: translateY(-2px); }
         .btn-outline { background: transparent; color: var(--primary); border: 1px solid var(--border); padding: 10px 15px; border-radius: 10px; cursor: pointer; font-family: 'Kanit'; font-weight: 500; transition: 0.3s; }
+        .btn-outline:hover { border-color: var(--primary); background: rgba(197, 160, 89, 0.1); }
 
         .place-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; margin-top: 24px; }
         .place-card { background: var(--surface); border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid rgba(197,160,89,0.15); transition: 0.4s; cursor: pointer; position: relative; display: flex; flex-direction: column; }
@@ -64,7 +72,6 @@
         
         .action-buttons { display: flex; gap: 8px; margin-top: auto; padding-top: 15px; flex-wrap: wrap; }
         .btn-action { flex: 1; text-align: center; color: white; text-decoration: none; padding: 10px 5px; border-radius: 10px; font-weight: 500; font-size: 12px; transition: 0.3s; border: none; cursor: pointer; font-family: 'Kanit'; min-width: 30%; }
-        
         .btn-nav { background: #4285F4 !important; color: #FFF !important; border: none !important; font-weight: 600; box-shadow: 0 4px 10px rgba(66, 133, 244, 0.3); }
         .btn-nav:hover { background: #357AE8 !important; transform: translateY(-2px); }
         .btn-call { background: var(--primary); color: white; }
@@ -241,7 +248,7 @@
                     <button class="btn-outline" style="width: 100%; border-color: var(--primary);" onclick="updateVipData()">💾 บันทึกข้อมูลลิงก์โซเชียล</button>
                 </div>
 
-                <div style="padding: 20px; border: 2px solid var(--primary); border-radius: 16px; background: linear-gradient(180deg, rgba(197, 160, 89, 0.1) 0%, var(--surface) 100%); position: relative; overflow: hidden; margin-top: 30px;">
+                <div id="buyPromoSection" style="padding: 20px; border: 2px solid var(--primary); border-radius: 16px; background: linear-gradient(180deg, rgba(197, 160, 89, 0.1) 0%, var(--surface) 100%); position: relative; overflow: hidden; margin-top: 30px;">
                     <div style="position: absolute; top: 20px; right: -35px; background: #D9534F; color: white; padding: 5px 40px; transform: rotate(45deg); font-size: 12px; font-weight: bold; box-shadow: 0 2px 10px rgba(0,0,0,0.5);">HOT 🔥</div>
                     <h4 style="margin: 0 0 5px 0; color: var(--primary); font-size: 18px; text-align: center;">🚀 ดันยอดขายพุ่ง! พื้นที่โปรโมทหน้าแรก</h4>
                     <p style="text-align: center; font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">ให้ลูกค้าในจังหวัดเห็นร้านคุณเป็นอันดับแรก ทันทีที่เปิดแอป</p>
@@ -252,7 +259,6 @@
                     
                     <div class="form-group">
                         <label>🖼️ รูปภาพป้ายโฆษณา (แนวนอน 3:2)</label>
-                        <p style="font-size: 11px; color: var(--text-muted); margin: -5px 0 8px 0;">* อัปโหลดรูปใหม่เฉพาะเมื่อต้องการเปลี่ยนรูปเดิม</p>
                         <input type="file" id="promoImageInput" accept="image/*">
                     </div>
                     
@@ -265,6 +271,26 @@
                         🚀 สั่งซื้อและส่งเรื่องอัปเดตข้อมูล
                     </button>
                 </div>
+
+                <div id="editPromoSection" style="display: none; padding: 20px; border: 2px solid var(--info); border-radius: 16px; background: linear-gradient(180deg, rgba(23, 162, 184, 0.1) 0%, var(--surface) 100%); margin-top: 30px;">
+                    <h4 style="margin: 0 0 5px 0; color: var(--info); font-size: 18px; text-align: center;">📝 แก้ไขข้อมูลแบนเนอร์ (ฟรี)</h4>
+                    <p style="text-align: center; font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">อัปเดตแบนเนอร์หรือโปรโมชั่นปัจจุบันของคุณ (ไม่บวกวันเพิ่ม)</p>
+
+                    <div class="form-group">
+                        <label>🖼️ รูปภาพป้ายโฆษณาใหม่ (ถ้าต้องการเปลี่ยน)</label>
+                        <input type="file" id="editPromoImageInput" accept="image/*">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>📝 แคปชั่น/รายละเอียดโปรโมชั่น</label>
+                        <textarea id="editPromoDetailInput" rows="3"></textarea>
+                    </div>
+                    
+                    <button id="btnEditPromo" class="btn-primary promo-btn-hover" style="width: 100%; background: var(--info); color: #FFF; font-size: 16px; font-weight: 600; padding: 16px; margin-top: 10px; border: none; box-shadow: 0 6px 20px rgba(23, 162, 184, 0.3);" onclick="submitEditPromo()">
+                        🔄 ส่งเรื่องขอแก้ไขข้อมูล
+                    </button>
+                </div>
+
             </div>
         </div>
     </div>
@@ -382,37 +408,31 @@
         };
     });
 
-    // ⚡ หน่วงเวลาเล็กน้อยเพื่อความเสถียร
     window.onload = function() {
         setTimeout(initSystem, 500);
     };
 
     async function initSystem() {
-       async function initSystem() {
         try {
             await liff.init({ liffId: "2009598846-wiCUeV35" });
 
             if (liff.isLoggedIn()) {
-                // ⚡ 1. เช็คสถานะก่อนว่าลูกค้าเป็นเพื่อนกับ LINE OA หรือยัง
                 try {
                     const friend = await liff.getFriendship();
                     if (!friend.friendFlag) {
-                        // ❌ ถ้ายังไม่ได้เป็นเพื่อน ให้เด้งพาไปหน้าเพิ่มเพื่อนทันที!
-                        window.location.href = "https://lin.ee/5SBoptj"; // 📌 [อย่าลืมเปลี่ยนเป็นลิงก์ LINE OA ของพี่นะครับ]
-                        return; // หยุดการโหลดแอปชั่วคราว รอให้แอดเพื่อนก่อน
+                        window.location.href = "https://lin.ee/5SBoptj"; 
+                        return; 
                     }
                 } catch(e) {
                     console.log("Friendship API error", e);
                 }
 
-                // ✅ 2. ถ้าแอดเพื่อนแล้ว (หรือเช็คผ่านแล้ว) โหลดข้อมูลเข้าแอปตามปกติ
                 const profile = await liff.getProfile();
                 document.getElementById('header-profile').innerHTML = `<img src="${profile.pictureUrl}" style="width:100%; height:100%; object-fit:cover;">`;
                 
                 await loadFromCloud();
                 hideLoginOverlay();
             } else {
-                // โชว์ปุ่มเข้าสู่ระบบแบบปกติ
                 document.getElementById('loadingSpinner').style.display = 'none';
                 document.getElementById('loginCard').style.display = 'block';
             }
@@ -428,18 +448,13 @@
         document.getElementById('appContent').style.display = 'block';
     }
     
-    // ⚡ แก้บั๊ก 404 ใน Android โดยส่ง URL ที่ไม่มีทางเบิ้ลเครื่องหมายทับ
     function loginWithLine() { 
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-        
-        // บังคับลิงก์ให้สะอาดที่สุด (เช่น https://painaidee.online หรือ https://painaidee.online/index.html)
         let exactUrl = window.location.origin + window.location.pathname;
         
         if (isMobile && !liff.isInClient()) {
-            // ถ้าเป็นมือถือ เปิดผ่าน Chrome/Safari ให้ดีดเข้าแอป LINE ทันที
-            window.location.href = "https://lin.ee/PieOcOC";
+            window.location.href = "https://liff.line.me/2009598846-wiCUeV35";
         } else {
-            // สำหรับคอมพิวเตอร์ หรือเปิดใน LINE อยู่แล้ว ให้ส่ง Callback กลับมาลิงก์ปัจจุบัน
             liff.login({ redirectUri: exactUrl }); 
         }
     }
@@ -563,7 +578,6 @@
 
         let html = '';
 
-        // ค้นหาร้าน VIP ที่หมวดหมู่ตรงกับคำค้นหา ให้มาโชว์บนสุด!
         const matchingPromos = (appData.activePromotions || []).filter(p => {
             const isValid = p.expireTimestamp && now < p.expireTimestamp;
             const isMatch = p.category && (p.category === keywordSearched || keywordSearched.includes(p.category) || p.category.includes(keywordSearched));
@@ -571,7 +585,6 @@
             return isValid && (isMatch || isNameMatch);
         });
 
-        // สร้างการ์ดร้าน VIP (ถ้ามีที่ตรงหมวดหมู่)
         matchingPromos.forEach(p => {
             const store = stores.find(s => s.name === p.storeName);
             const hasLine = store && store.lineUrl && store.lineUrl.trim() !== '';
@@ -593,7 +606,6 @@
             </div>`;
         });
 
-        // เรียงลำดับร้านจาก Google Maps ตามปกติ
         const sorted = googlePlaces.sort((a, b) => {
             const isVipA = stores.find(s => s.name === a.name)?.isVIP ? 1 : 0;
             const isVipB = stores.find(s => s.name === b.name)?.isVIP ? 1 : 0;
@@ -833,6 +845,7 @@
         document.getElementById('regStoreVerifyCard').style.display = 'none';
     }
 
+    // ⚡ เช็คว่าร้านค้านี้มีโปรแล้วหรือยัง ถ้ามีให้โชว์หน้าแก้ไข
     function verifyStore() {
         const stores = appData.registeredStores || [];
         const store = stores.find(s => s.pin === document.getElementById('storePinInput').value);
@@ -863,15 +876,28 @@
                 document.getElementById('vipSubscribeTitle').innerHTML = '👑 สมัครสมาชิก VIP';
             }
 
-            const existingPromo = (appData.activePromotions || []).find(p => p.storeName === store.name) || 
-                                  (appData.pendingPromotions || []).find(p => p.storeName === store.name);
+            // --- ⚡ ระบบเช็คสถานะโปรโมชั่น (สลับหน้าจอซื้อ/แก้ไข) ---
+            const activePromo = (appData.activePromotions || []).find(p => p.storeName === store.name);
+            const pendingPromo = (appData.pendingPromotions || []).find(p => p.storeName === store.name);
             
-            if (existingPromo) {
-                if(document.getElementById('promoProvinceSelect')) document.getElementById('promoProvinceSelect').value = existingPromo.province || 'ubon';
-                if(document.getElementById('promoStoreCategory')) document.getElementById('promoStoreCategory').value = existingPromo.category || '';
-                if(document.getElementById('promoServiceSelect')) document.getElementById('promoServiceSelect').value = existingPromo.service || '';
-                if(document.getElementById('promoDetail')) document.getElementById('promoDetail').value = existingPromo.detail || '';
-                window.currentPromoImage = existingPromo.image; 
+            if (activePromo) {
+                // มีโปรแสดงอยู่ -> ให้โชว์หน้าต่าง แก้ไข
+                document.getElementById('editPromoSection').style.display = 'block';
+                document.getElementById('buyPromoSection').style.display = 'none';
+                document.getElementById('editPromoDetailInput').value = activePromo.detail || '';
+            } else {
+                // ไม่มีโปรแสดงอยู่ -> ให้โชว์หน้าต่าง ซื้อใหม่
+                document.getElementById('editPromoSection').style.display = 'none';
+                document.getElementById('buyPromoSection').style.display = 'block';
+                
+                let refPromo = pendingPromo || null;
+                if (refPromo) {
+                    if(document.getElementById('promoProvinceSelect')) document.getElementById('promoProvinceSelect').value = refPromo.province || 'ubon';
+                    if(document.getElementById('promoStoreCategory')) document.getElementById('promoStoreCategory').value = refPromo.category || '';
+                    if(document.getElementById('promoServiceSelect')) document.getElementById('promoServiceSelect').value = refPromo.service || '';
+                    if(document.getElementById('promoDetail')) document.getElementById('promoDetail').value = refPromo.detail || '';
+                    window.currentPromoImage = refPromo.image; 
+                }
             }
 
             alert("ยืนยันตัวตนสำเร็จ! ยินดีต้อนรับร้าน " + store.name); 
@@ -918,6 +944,7 @@
         }
     }
 
+    // ⚡ ส่งข้อมูลซื้อแพ็กเกจใหม่
     async function submitPromoWithPIN() {
         const btn = document.getElementById('btnSubmitPromo'); 
         const stores = appData.registeredStores || [];
@@ -937,15 +964,62 @@
         appData.pendingPromotions = appData.pendingPromotions.filter(p => p.storeName !== store.name);
         
         appData.pendingPromotions.push({ 
-            id: Date.now().toString(), storeName: store.name, province: document.getElementById('promoProvinceSelect').value, 
-            detail: pDet, image: img, service: document.getElementById('promoServiceSelect').value, category: document.getElementById('promoStoreCategory').value,
-            lineUrl: store.lineUrl || '', fbUrl: store.fbUrl || ''
+            id: Date.now().toString(), 
+            storeName: store.name, 
+            province: document.getElementById('promoProvinceSelect').value, 
+            detail: pDet, 
+            image: img, 
+            service: document.getElementById('promoServiceSelect').value, 
+            category: document.getElementById('promoStoreCategory').value,
+            lineUrl: store.lineUrl || '', 
+            fbUrl: store.fbUrl || '',
+            isUpdateOnly: false // บอกระบบแอดมินว่า "ซื้อใหม่ ต้องเพิ่มวัน"
         });
         
         await saveToCloud(); 
         alert("ส่งข้อมูลอัปเดตแบนเนอร์สำเร็จ! รอแอดมินอนุมัติครับ");
         btn.innerText = "🚀 สั่งซื้อและส่งเรื่องอัปเดตข้อมูล"; btn.disabled = false;
         document.getElementById('promoImageInput').value = '';
+    }
+
+    // ⚡ ส่งเรื่องขอแก้ไขรูป/ข้อความ (ฟรี ไม่เพิ่มวัน)
+    async function submitEditPromo() {
+        const btn = document.getElementById('btnEditPromo'); 
+        const stores = appData.registeredStores || [];
+        const store = stores.find(s => s.pin === document.getElementById('storePinInput').value);
+        const activePromo = (appData.activePromotions || []).find(p => p.storeName === store.name);
+        
+        if(!store || !activePromo) return alert("ไม่พบโปรโมชั่นที่กำลังแสดงผลให้แก้ไขครับ");
+
+        btn.innerText = "กำลังส่งข้อมูล... ⏳"; btn.disabled = true;
+        
+        const pImgFile = document.getElementById('editPromoImageInput').files[0];
+        const pDet = document.getElementById('editPromoDetailInput').value;
+
+        // ถ้าอัปโหลดรูปใหม่ก็ใช้รูปใหม่ ถ้าไม่อัปก็ใช้รูปเดิม
+        let img = activePromo.image; 
+        if(pImgFile) { img = await resizeImg(pImgFile); }
+        
+        if (!appData.pendingPromotions) appData.pendingPromotions = [];
+        appData.pendingPromotions = appData.pendingPromotions.filter(p => p.storeName !== store.name);
+        
+        appData.pendingPromotions.push({ 
+            id: Date.now().toString(), 
+            storeName: store.name, 
+            province: activePromo.province, // ดึงค่าเดิมมาใช้
+            detail: pDet, 
+            image: img, 
+            service: activePromo.service, // ดึงค่าเดิมมาใช้
+            category: activePromo.category, // ดึงค่าเดิมมาใช้
+            lineUrl: store.lineUrl || '', 
+            fbUrl: store.fbUrl || '',
+            isUpdateOnly: true // ⚡ บอกแอดมินว่านี่คือการ "แก้ไขข้อมูล"
+        });
+        
+        await saveToCloud(); 
+        alert("ส่งข้อมูลขอแก้ไขเรียบร้อย! รอแอดมินตรวจสอบการเปลี่ยนแปลงครับ (วันหมดอายุจะคงเดิม)");
+        btn.innerText = "🔄 ส่งเรื่องขอแก้ไขข้อมูล"; btn.disabled = false;
+        document.getElementById('editPromoImageInput').value = '';
     }
 </script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD7Qqf1Z9KQBuvipDzgIc5laJLz9SiOBH8&libraries=places,geometry&callback=initMap" async defer></script>
