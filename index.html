@@ -313,6 +313,7 @@
 
 <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <script>
+    // ⚡ 1. ลิงก์ API ตัวใหม่ล่าสุด (ทะลวง Google Drive ได้ไม่อั้น)
     const API_URL = "https://script.google.com/macros/s/AKfycbwojqh2ry1b_xkuVp28w5q8Cs0CX9xBcI-upICxz98NtRrwnJ99GwLneWXFGQJySN1T/exec";
     
     const defaultCategories = [
@@ -396,7 +397,7 @@
         renderUI(); 
     }
 
-    // ⚡ ระบบเซฟข้อมูลแบบดักจับ Error (ช่วยป้องกันหน้าจอค้าง)
+    // ⚡ 2. ระบบเซฟข้อมูลแบบดักจับ Error 
     async function saveToCloud() { 
         try { 
             const res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(appData) }); 
@@ -406,17 +407,6 @@
         } catch(e) { 
             throw e; 
         } 
-    }
-
-    // ⚡ ฟังก์ชันสำหรับยิงแจ้งเตือนแอดมินทาง Telegram
-    async function notifyTelegram(msg) {
-        try {
-            await fetch(API_URL, { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action: "NOTIFY_TELEGRAM", message: msg }) 
-            });
-        } catch(e) { console.error("Telegram Error", e); }
     }
 
     setInterval(async () => {
@@ -431,7 +421,7 @@
         } catch(e) {}
     }, 15000);
 
-    // ⚡ ระบบบีบอัดรูปแบบใหม่ให้เบาลง (ป้องกันเบราว์เซอร์มือถือค้าง)
+    // ⚡ 3. ระบบบีบอัดรูปแบบใหม่ (ขนาด 500px ช่วยลดภาระมือถือ ไม่ค้างตอนอัปโหลด)
     const resizeImg = (file) => new Promise((resolve) => {
         if(!file) return resolve('');
         const reader = new FileReader(); 
@@ -458,7 +448,6 @@
 
     let isAppReady = false;
 
-    // เช็คโหลดเริ่มต้น
     document.addEventListener('DOMContentLoaded', () => {
         initSystem();
         setTimeout(() => {
@@ -498,7 +487,7 @@
         }
     }
 
-    // ⚡ ฟังก์ชันนำทางไปหน้าร้านค้า พร้อมเช็คความเป็นเพื่อน
+    // ⚡ 4. ฟังก์ชันนำทางไปหน้าร้านค้า พร้อมเช็คความเป็นเพื่อน
     async function navigateToPartner() {
         switchPage('partner');
         checkFriendshipForPartner(false); 
@@ -872,7 +861,7 @@
         });
     }
 
-    // ⚡ ฟังก์ชันลงทะเบียนร้านค้า (มี Telegram + ดักจับเพื่อน + ดัก Error รูปภาพใหญ่)
+    // ⚡ 5. ฟังก์ชันลงทะเบียนร้านค้า (ฝาก Telegram ไปพร้อมข้อมูลหลัก ป้องกัน Error)
     async function submitStoreRegistration() {
         const btn = document.getElementById('btnSubmitReg'); const n = document.getElementById('regStoreName').value; const p1 = document.getElementById('regStorePhoto').files[0]; const p2 = document.getElementById('regIdCard').files[0]; const p3 = document.getElementById('regPhone').value; 
         if(!n || !p1 || !p2 || !p3) return alert("กรุณากรอกข้อมูลและแนบรูปให้ครบครับ");
@@ -881,12 +870,11 @@
             if (liff.isLoggedIn()) {
                 const friend = await liff.getFriendship();
                 if (!friend.friendFlag) {
-                    alert("⚠️ คุณต้องเพิ่มเพื่อนกับ LINE OA ของเราก่อน เพื่อใช้รับ 'รหัส PIN' จากแอดมินครับ\n\nระบบจะเปิดหน้าเพิ่มเพื่อนให้คุณอัตโนมัติ...");
-                    window.open('https://lin.ee/5SBoptj', '_blank'); 
-                    return; 
+                    alert("⚠️ คุณต้องเพิ่มเพื่อนกับ LINE OA ของเราก่อน เพื่อใช้รับ 'รหัส PIN' จากแอดมินครับ");
+                    window.open('https://lin.ee/5SBoptj', '_blank'); return; 
                 }
             }
-        } catch(e) { console.log("Friendship Check Error", e); }
+        } catch(e) {}
 
         btn.innerText = "กำลังเตรียมรูปภาพ... ⏳"; btn.disabled = true;
 
@@ -901,22 +889,20 @@
             if (!appData.registrationRequests) appData.registrationRequests = [];
             appData.registrationRequests.push({ id: Date.now(), storeName: n, phone: p3, userId: userId, storePhoto: photo, idCard: idCard, commercial: comm });
             
-            await saveToCloud(); 
+            // ยัดข้อความ Telegram แนบไปกับข้อมูลเลย
+            appData.telegramMsg = `🚨 <b>มีคำร้องลงทะเบียนร้านค้าใหม่!</b>\n\n🏬 ร้าน: <b>${n}</b>\n📞 โทร: ${p3}\n\n👉 กรุณาเข้าหน้าแอดมินเพื่ออนุมัติ PIN ครับ`;
             
-            // ยิงแจ้งเตือน Telegram
-            await notifyTelegram(`🚨 <b>มีคำร้องลงทะเบียนร้านค้าใหม่!</b>\n\n🏬 ร้าน: <b>${n}</b>\n📞 โทร: ${p3}\n\n👉 กรุณาเข้าหน้าแอดมินเพื่ออนุมัติ PIN ครับ`);
+            await saveToCloud(); 
+            delete appData.telegramMsg; 
 
             alert("ส่งข้อมูลสำเร็จ! รอรับรหัส PIN จากแอดมิน (แจ้งเตือนผ่านช่องทาง LINE) ครับ");
             ['regStoreName','regPhone','regStorePhoto','regIdCard','regCommercial'].forEach(id => document.getElementById(id).value = '');
             document.getElementById('regStoreVerifyCard').style.display = 'none';
-
         } catch (error) {
             console.error("Submit Error:", error);
-            alert("❌ ไม่สามารถส่งข้อมูลได้!\n(อินเทอร์เน็ตอาจไม่เสถียร กรุณาลองใหม่อีกครั้งครับ)");
+            alert("❌ ไม่สามารถส่งข้อมูลได้ กรุณาลองใหม่อีกครั้งครับ");
             if(appData.registrationRequests.length > 0 && appData.registrationRequests[appData.registrationRequests.length-1].storeName === n) { appData.registrationRequests.pop(); }
-        } finally {
-            btn.innerText = "ส่งข้อมูลเพื่อตรวจสอบ"; btn.disabled = false;
-        }
+        } finally { btn.innerText = "ส่งข้อมูลเพื่อตรวจสอบ"; btn.disabled = false; }
     }
 
     function verifyStore() {
@@ -961,7 +947,7 @@
         } else alert("รหัส PIN ไม่ถูกต้อง");
     }
 
-    // ⚡ ฟังก์ชันขอ VIP (มี Telegram)
+    // ⚡ 6. ฟังก์ชันขอ VIP (ฝาก Telegram)
     async function submitVipRequest() {
         const store = appData.registeredStores.find(s => s.pin === document.getElementById('storePinInput').value);
         const slipFile = document.getElementById('vipSlipInput').files[0];
@@ -974,17 +960,15 @@
             appData.pendingVipRequests = appData.pendingVipRequests.filter(r => r.storeName !== store.name);
             appData.pendingVipRequests.push({ id: Date.now().toString(), storeName: store.name, slipImage: slipImg, requestDate: new Date().toLocaleString() });
             
+            appData.telegramMsg = `👑 <b>มีร้านค้าส่งสลิปขอเปิด VIP!</b>\n\n🏬 ร้าน: <b>${store.name}</b>\n\n👉 กรุณาเข้าหน้าแอดมินเพื่อตรวจสอบสลิปครับ`;
+            
             await saveToCloud();
-            await notifyTelegram(`👑 <b>มีร้านค้าส่งสลิปขอเปิด VIP!</b>\n\n🏬 ร้าน: <b>${store.name}</b>\n\n👉 กรุณาเข้าหน้าแอดมินเพื่อตรวจสอบสลิปครับ`);
+            delete appData.telegramMsg;
 
             alert("ส่งสลิปสำเร็จ! กรุณารอแอดมินอนุมัติสถานะ VIP ครับ (หลังจากอนุมัติ ช่องกรอก LINE/FB จะเปิดให้ใช้งาน)");
             document.getElementById('vipSlipInput').value = '';
-        } catch (error) {
-            console.error(error);
-            alert("❌ ไม่สามารถส่งข้อมูลได้ กรุณาลองใหม่อีกครั้ง");
-        } finally {
-            btn.innerText = "ส่งสลิปเพื่ออัปเกรด VIP"; btn.disabled = false;
-        }
+        } catch (error) { alert("❌ ไม่สามารถส่งข้อมูลได้ กรุณาลองใหม่อีกครั้ง"); } 
+        finally { btn.innerText = "ส่งสลิปเพื่ออัปเกรด VIP"; btn.disabled = false; }
     }
 
     async function updateVipData() {
@@ -992,7 +976,7 @@
         if(store) { store.lineUrl = document.getElementById('vipLineInput').value; store.fbUrl = document.getElementById('vipFbInput').value; await saveToCloud(); alert("บันทึกข้อมูลติดต่อแล้ว ลูกค้าสามารถกดเข้า LINE/FB ได้ทันที"); }
     }
 
-    // ⚡ ฟังก์ชันขอลงโปรโมชั่น (มี Telegram)
+    // ⚡ 7. ฟังก์ชันขอลงโปรโมชั่น (ฝาก Telegram)
     async function submitPromoWithPIN() {
         const btn = document.getElementById('btnSubmitPromo'); const stores = appData.registeredStores || [];
         const store = stores.find(s => s.pin === document.getElementById('storePinInput').value);
@@ -1008,17 +992,15 @@
             appData.pendingPromotions = appData.pendingPromotions.filter(p => p.storeName !== store.name);
             appData.pendingPromotions.push({ id: Date.now().toString(), storeName: store.name, province: document.getElementById('promoProvinceSelect').value, detail: pDet, image: img, service: document.getElementById('promoServiceSelect').value, category: document.getElementById('promoStoreCategory').value, lineUrl: store.lineUrl || '', fbUrl: store.fbUrl || '', isUpdateOnly: false });
             
+            appData.telegramMsg = `🔥 <b>มีคำสั่งซื้อแบนเนอร์โปรโมท!</b>\n\n🏬 ร้าน: <b>${store.name}</b>\n📌 หมวด: ${document.getElementById('promoStoreCategory').value}\n\n👉 กรุณาตรวจสอบและอนุมัติในหน้าแอดมินครับ`;
+            
             await saveToCloud(); 
-            await notifyTelegram(`🔥 <b>มีคำสั่งซื้อแบนเนอร์โปรโมท!</b>\n\n🏬 ร้าน: <b>${store.name}</b>\n📌 หมวด: ${document.getElementById('promoStoreCategory').value}\n\n👉 กรุณาตรวจสอบและอนุมัติในหน้าแอดมินครับ`);
+            delete appData.telegramMsg;
 
             alert("ส่งข้อมูลอัปเดตแบนเนอร์สำเร็จ! รอแอดมินอนุมัติครับ"); 
             document.getElementById('promoImageInput').value = '';
-        } catch (error) {
-            console.error(error);
-            alert("❌ ไม่สามารถส่งข้อมูลได้ กรุณาลองใหม่อีกครั้ง");
-        } finally {
-            btn.innerText = "🚀 สั่งซื้อและส่งเรื่องอัปเดตข้อมูล"; btn.disabled = false; 
-        }
+        } catch (error) { alert("❌ ไม่สามารถส่งข้อมูลได้ กรุณาลองใหม่อีกครั้ง"); } 
+        finally { btn.innerText = "🚀 สั่งซื้อและส่งเรื่องอัปเดตข้อมูล"; btn.disabled = false; }
     }
 
     async function submitEditPromo() {
@@ -1036,7 +1018,11 @@
             appData.pendingPromotions = appData.pendingPromotions.filter(p => p.storeName !== store.name);
             appData.pendingPromotions.push({ id: Date.now().toString(), storeName: store.name, province: activePromo.province, detail: pDet, image: img, service: activePromo.service, category: activePromo.category, lineUrl: store.lineUrl || '', fbUrl: store.fbUrl || '', isUpdateOnly: true });
             
+            appData.telegramMsg = `📝 <b>มีการขอแก้ไขแบนเนอร์!</b>\n\n🏬 ร้าน: <b>${store.name}</b>\n\n👉 กรุณาตรวจสอบในหน้าแอดมินครับ`;
+            
             await saveToCloud(); 
+            delete appData.telegramMsg;
+
             alert("ส่งข้อมูลขอแก้ไขเรียบร้อย! รอแอดมินตรวจสอบการเปลี่ยนแปลงครับ (วันหมดอายุจะคงเดิม)");
             document.getElementById('editPromoImageInput').value = '';
         } catch (error) {
