@@ -2,8 +2,8 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ไปไหนดี - Painaidee (Premium VIP)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ไปไหนดี - Painaidee</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap');
         
@@ -42,25 +42,18 @@
         
         #map { width: 100%; height: 320px; border-radius: 16px; border: 1px solid var(--border); background: #eee; box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
         .search-area { background: var(--surface); padding: 25px; border-radius: 16px; margin-top: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); border: 1px solid var(--border); }
-        .input-row { display: flex; gap: 12px; margin-bottom: 12px; }
         
         select, input[type="text"], input[type="password"], input[type="number"], input[type="file"], textarea { 
             padding: 14px; border-radius: 10px; border: 1px solid var(--border); font-family: 'Kanit'; font-size: 15px; outline: none; box-sizing: border-box; width: 100%; 
             background: var(--dark); color: var(--primary-light); transition: 0.3s; 
         }
         select:focus, input:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(197, 160, 89, 0.15); background: var(--dark-light); }
-        .input-row select { flex: 1; width: 50%; }
-        option, optgroup { background-color: var(--dark-light); color: var(--primary-light); font-weight: 400; }
-        optgroup { font-weight: 600; color: var(--primary); }
-        ::placeholder { color: rgba(223, 191, 139, 0.4); } 
         .search-box-container { display: flex; gap: 12px; width: 100%; }
 
         .btn-primary { padding: 14px 24px; background: var(--primary); color: white; border: none; border-radius: 10px; font-family: 'Kanit'; font-weight: 500; font-size: 15px; cursor: pointer; transition: 0.3s; white-space: nowrap; width: 100%; box-shadow: 0 4px 10px rgba(197, 160, 89, 0.3); }
         .btn-primary:hover { background: var(--primary-hover); transform: translateY(-2px); }
         .btn-secondary { background: var(--dark); color: var(--primary); padding: 12px 15px; border-radius: 10px; border: 1px solid var(--primary); cursor: pointer; font-family: 'Kanit'; font-weight: 500; text-align: center; transition: 0.3s; }
-        .btn-secondary:hover { background: var(--primary); color: white; transform: translateY(-2px); }
         .btn-outline { background: transparent; color: var(--primary); border: 1px solid var(--border); padding: 10px 15px; border-radius: 10px; cursor: pointer; font-family: 'Kanit'; font-weight: 500; transition: 0.3s; }
-        .btn-outline:hover { border-color: var(--primary); background: rgba(197, 160, 89, 0.1); }
 
         .place-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; margin-top: 24px; }
         .place-card { background: var(--surface); border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid rgba(197,160,89,0.15); transition: 0.4s; cursor: pointer; position: relative; display: flex; flex-direction: column; }
@@ -71,6 +64,7 @@
         
         .action-buttons { display: flex; gap: 8px; margin-top: auto; padding-top: 15px; flex-wrap: wrap; }
         .btn-action { flex: 1; text-align: center; color: white; text-decoration: none; padding: 10px 5px; border-radius: 10px; font-weight: 500; font-size: 12px; transition: 0.3s; border: none; cursor: pointer; font-family: 'Kanit'; min-width: 30%; }
+        
         .btn-nav { background: #4285F4 !important; color: #FFF !important; border: none !important; font-weight: 600; box-shadow: 0 4px 10px rgba(66, 133, 244, 0.3); }
         .btn-nav:hover { background: #357AE8 !important; transform: translateY(-2px); }
         .btn-call { background: var(--primary); color: white; }
@@ -113,7 +107,7 @@
 <div id="loginOverlay">
     <div id="loadingSpinner" style="display: flex; flex-direction: column; align-items: center;">
         <div class="spinner"></div>
-        <h3 style="color: var(--primary); margin: 0;">กำลังเชื่อมต่อระบบ LINE...</h3>
+        <h3 style="color: var(--primary); margin: 0;">กำลังเตรียมระบบ...</h3>
         <p style="color: var(--text-muted); font-size: 14px;">กรุณารอสักครู่เพื่อเข้าสู่แอปไปไหนดี</p>
     </div>
 
@@ -370,7 +364,6 @@
                 let height = img.height;
                 const max_size = 800; // บีบอัดให้ขนาดไม่เกิน 800px เพื่อให้แอปโหลดไว
 
-                // คำนวณสัดส่วนใหม่โดย "ไม่ตัดภาพทิ้ง" (คงสัดส่วนเดิมเป๊ะ)
                 if (width > max_size || height > max_size) {
                     if (width > height) {
                         height = Math.round((height *= max_size / width));
@@ -389,34 +382,28 @@
         };
     });
 
-    async function initializeLiff() {
+    // ⚡ แก้ปัญหา Loop 100% โดยไม่บังคับ Redirect อัตโนมัติ
+    window.onload = function() {
+        setTimeout(initSystem, 500);
+    };
+
+    async function initSystem() {
         try {
             await liff.init({ liffId: "2009598846-wiCUeV35" });
-            
-            // ⚡ 1. ถ้าลูกค้าใช้มือถือเปิด (Safari/Chrome) ให้บังคับสลับไปเปิดในแอป LINE ทันที! (แก้ปัญหา Safari บล็อก)
-            if (!liff.isInClient() && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-                window.location.replace("https://liff.line.me/2009598846-wiCUeV35");
-                return; // หยุดทำงานตรงนี้ เพื่อรอระบบสลับแอป
-            }
 
-            // ⚡ 2. ถ้าลูกค้าใช้คอมพิวเตอร์เปิด (PC/Mac) แล้วยังไม่ได้ล็อกอิน ให้โชว์ปุ่มสีเขียว
-            if (!liff.isLoggedIn()) {
+            if (liff.isLoggedIn()) {
+                const profile = await liff.getProfile();
+                document.getElementById('header-profile').innerHTML = `<img src="${profile.pictureUrl}" style="width:100%; height:100%; object-fit:cover;">`;
+                
+                await loadFromCloud();
+                hideLoginOverlay();
+            } else {
+                // รอให้ผู้ใช้กดปุ่มล็อกอินเอง ป้องกัน iPhone บล็อกการสลับหน้า
                 document.getElementById('loadingSpinner').style.display = 'none';
                 document.getElementById('loginCard').style.display = 'block';
-                return;
             }
-
-            // 3. ถ้าล็อกอินแล้ว ดึงรูปโปรไฟล์มาแสดง
-            const profile = await liff.getProfile();
-            document.getElementById('header-profile').innerHTML = `<img src="${profile.pictureUrl}" style="width:100%; height:100%; object-fit:cover;">`;
-            
-            // 4. เข้าสู่แอป
-            await loadFromCloud();
-            hideLoginOverlay();
-
         } catch (err) { 
             console.error("LIFF Init Error:", err);
-            await loadFromCloud();
             document.getElementById('loadingSpinner').style.display = 'none';
             document.getElementById('loginCard').style.display = 'block';
         }
@@ -427,7 +414,10 @@
         document.getElementById('appContent').style.display = 'block';
     }
     
-    function loginWithLine() { liff.login({ redirectUri: "https://painaidee.online/" }); }
+    // ⚡ ให้กลับมาที่หน้าเว็บเสมอ ไม่ต้องเดา
+    function loginWithLine() { 
+        liff.login({ redirectUri: "https://painaidee.online/" }); 
+    }
 
     function switchPage(p) { 
         document.querySelectorAll('.page').forEach(el => el.classList.remove('active')); 
@@ -548,16 +538,15 @@
 
         let html = '';
 
-        // ⚡ [NEW] ค้นหาร้าน VIP ที่หมวดหมู่ตรงกับคำค้นหา ให้มาโชว์บนสุด!
+        // ค้นหาร้าน VIP ที่หมวดหมู่ตรงกับคำค้นหา ให้มาโชว์บนสุด!
         const matchingPromos = (appData.activePromotions || []).filter(p => {
             const isValid = p.expireTimestamp && now < p.expireTimestamp;
-            // เช็คว่าหมวดหมู่ตรง หรือชื่อร้านตรงกับคำที่ลูกค้ากำลังค้นหา
             const isMatch = p.category && (p.category === keywordSearched || keywordSearched.includes(p.category) || p.category.includes(keywordSearched));
             const isNameMatch = p.storeName.includes(keywordSearched);
             return isValid && (isMatch || isNameMatch);
         });
 
-        // ⚡ [NEW] สร้างการ์ดร้าน VIP (ถ้ามีที่ตรงหมวดหมู่)
+        // สร้างการ์ดร้าน VIP (ถ้ามีที่ตรงหมวดหมู่)
         matchingPromos.forEach(p => {
             const store = stores.find(s => s.name === p.storeName);
             const hasLine = store && store.lineUrl && store.lineUrl.trim() !== '';
@@ -579,7 +568,7 @@
             </div>`;
         });
 
-        // หลังจากโชว์ VIP ด้านบนเสร็จแล้ว ก็เรียงลำดับร้านจาก Google Maps ตามปกติ
+        // เรียงลำดับร้านจาก Google Maps ตามปกติ
         const sorted = googlePlaces.sort((a, b) => {
             const isVipA = stores.find(s => s.name === a.name)?.isVIP ? 1 : 0;
             const isVipB = stores.find(s => s.name === b.name)?.isVIP ? 1 : 0;
@@ -773,7 +762,6 @@
         });
     }
 
-    // ⚡ [NEW] แก้ไขให้แอบดูและบันทึก userId ลงไปส่งให้แอดมินตอนกดลงทะเบียน
     async function submitStoreRegistration() {
         const btn = document.getElementById('btnSubmitReg'); 
         const n = document.getElementById('regStoreName').value;
@@ -785,7 +773,6 @@
         
         btn.innerText = "กำลังอัปโหลดข้อมูล... ⏳"; btn.disabled = true;
 
-        // ⚡ ดึง userId จาก LINE (LIFF) แบบลับๆ
         let userId = "";
         try {
             if (liff.isLoggedIn()) {
@@ -803,7 +790,6 @@
         
         if (!appData.registrationRequests) appData.registrationRequests = [];
         
-        // ⚡ เพิ่ม userId เข้าไปในข้อมูลที่ส่งไปให้แอดมินด้วย
         appData.registrationRequests.push({ 
             id: Date.now(), 
             storeName: n, 
@@ -937,7 +923,7 @@
         document.getElementById('promoImageInput').value = '';
     }
 
-    window.onload = initializeLiff;
+    window.onload = function() { setTimeout(initSystem, 500); };
 </script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD7Qqf1Z9KQBuvipDzgIc5laJLz9SiOBH8&libraries=places,geometry&callback=initMap" async defer></script>
 </body>
