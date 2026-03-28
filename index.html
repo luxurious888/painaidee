@@ -408,8 +408,17 @@
         };
     });
 
+    // ⚡ 1. หน่วงเวลาเล็กน้อย + ระบบ Fail-Safe ป้องกัน Messenger บล็อก
     window.onload = function() {
         setTimeout(initSystem, 500);
+
+        // 🚨 ไม้ตาย: ถ้าผ่านไป 3 วินาทีแล้วยังหมุนอยู่ (โดนแอปอื่นบล็อก) ให้บังคับโชว์ปุ่ม Login ทันที!
+        setTimeout(() => {
+            if (document.getElementById('loadingSpinner').style.display !== 'none') {
+                document.getElementById('loadingSpinner').style.display = 'none';
+                document.getElementById('loginCard').style.display = 'block';
+            }
+        }, 3000); 
     };
 
     async function initSystem() {
@@ -448,13 +457,18 @@
         document.getElementById('appContent').style.display = 'block';
     }
     
+    // ⚡ 2. ปรับปุ่ม Login ให้ฉลาดขึ้น หลบการบล็อกของแอปโซเชียล
     function loginWithLine() { 
-        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        const ua = navigator.userAgent || navigator.vendor || window.opera;
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(ua);
         let exactUrl = window.location.origin + window.location.pathname;
         
-        if (isMobile && !liff.isInClient()) {
+        // ถ้ายูสเซอร์ใช้มือถือ แต่ไม่ได้เปิดผ่านแอป LINE (เช่น กดจาก Messenger, FB, IG)
+        if (isMobile && !/Line/i.test(ua)) {
+            // บังคับเตะเข้าแอป LINE โดยตรงเพื่อล็อกอิน
             window.location.href = "https://liff.line.me/2009598846-wiCUeV35";
         } else {
+            // กรณีเปิดในคอมพิวเตอร์ หรืออยู่ในแอป LINE อยู่แล้ว
             liff.login({ redirectUri: exactUrl }); 
         }
     }
