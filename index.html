@@ -117,7 +117,7 @@
         </div>
         <h2 style="color: #FFF; margin: 0 0 10px 0;">ยินดีต้อนรับ</h2>
         <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 30px;">กรุณาเข้าสู่ระบบผ่าน LINE เพื่อค้นหาและรับโปรโมชั่นพิเศษ</p>
-        <button class="btn-line-login" onclick="loginWithLine()">เข้าสู่ระบบด้วย LINE</button>
+        <button class="btn-line-login" onclick="loginWithLine()">📱 เปิดแอป LINE เพื่อเข้าสู่ระบบ</button>
     </div>
 </div>
 
@@ -382,7 +382,6 @@
         };
     });
 
-    // ⚡ แก้ปัญหา Loop 100% โดยไม่บังคับ Redirect อัตโนมัติ
     window.onload = function() {
         setTimeout(initSystem, 500);
     };
@@ -398,7 +397,6 @@
                 await loadFromCloud();
                 hideLoginOverlay();
             } else {
-                // รอให้ผู้ใช้กดปุ่มล็อกอินเอง ป้องกัน iPhone บล็อกการสลับหน้า
                 document.getElementById('loadingSpinner').style.display = 'none';
                 document.getElementById('loginCard').style.display = 'block';
             }
@@ -414,9 +412,17 @@
         document.getElementById('appContent').style.display = 'block';
     }
     
-    // ⚡ ให้กลับมาที่หน้าเว็บเสมอ ไม่ต้องเดา
+    // ⚡ [NEW] โค้ดสำหรับดีดเข้าแอป LINE โดยเฉพาะ
     function loginWithLine() { 
-        liff.login({ redirectUri: "https://painaidee.online/" }); 
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        
+        if (isMobile && !liff.isInClient()) {
+            // ถ้าเป็นมือถือและเปิดในเบราว์เซอร์อื่น ให้ดีดเข้า LIFF URL (ซึ่งจะพาเข้าแอป LINE)
+            window.location.href = "https://liff.line.me/2009598846-wiCUeV35";
+        } else {
+            // ถ้าเป็นคอมพิวเตอร์ หรือกรณีอื่นๆ ให้ใช้วิธี Login ปกติ
+            liff.login({ redirectUri: "https://painaidee.online/" }); 
+        }
     }
 
     function switchPage(p) { 
@@ -922,8 +928,6 @@
         btn.innerText = "🚀 สั่งซื้อและส่งเรื่องอัปเดตข้อมูล"; btn.disabled = false;
         document.getElementById('promoImageInput').value = '';
     }
-
-    window.onload = function() { setTimeout(initSystem, 500); };
 </script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD7Qqf1Z9KQBuvipDzgIc5laJLz9SiOBH8&libraries=places,geometry&callback=initMap" async defer></script>
 </body>
