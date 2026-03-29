@@ -85,7 +85,7 @@
         .shine-effect::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%); transform: skewX(-25deg); animation: shine 3s infinite; pointer-events: none; }
         .promo-btn-hover:hover { filter: brightness(1.1); transform: translateY(-2px); }
 
-        .highlight-banner { background: linear-gradient(135deg, var(--dark), var(--dark-light)); color: white; padding: 25px; border-radius: 16px; margin-top: 24px; box-shadow: 0 15px 35px rgba(26, 28, 32, 0.4); display: none; position: relative; overflow: hidden; border: 1px solid var(--border); }
+        .highlight-banner { background: linear-gradient(135deg, var(--dark), var(--dark-light)); color: white; padding: 25px; border-radius: 16px; margin-top: 24px; box-shadow: 0 15px 35px rgba(26, 28, 32, 0.4); position: relative; overflow: hidden; border: 1px solid var(--border); }
         .highlight-banner::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(197,160,89,0.15) 0%, transparent 60%); pointer-events: none; }
         .highlight-banner h3 { margin: 0 0 5px 0; font-size: 20px; color: var(--primary); font-weight: 500; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
 
@@ -109,38 +109,18 @@
         .logo-circle { width: 110px; height: 110px; border-radius: 50%; background: linear-gradient(135deg, #1A1D23, #0b0f19); border: 2px solid #C5A059; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 0 25px rgba(197,160,89,0.4), inset 0 0 15px rgba(197,160,89,0.2); }
         .logo-text { color: #FFD700; font-family: 'Kanit'; font-weight: 700; font-size: 26px; line-height: 1.1; text-shadow: 0 0 10px rgba(255,215,0,0.5); margin: 0; }
         
-        /* ปุ่มเข้าใช้งานแอป */
-        .btn-enter-glow { 
-            background: linear-gradient(135deg, #FFD700, #C5A059); color: #000; border: none; padding: 14px 20px; border-radius: 12px; 
-            font-family: 'Kanit'; font-weight: 600; font-size: 16px; width: 100%; cursor: pointer; transition: 0.3s; 
-            display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; position: relative; overflow: hidden; 
-            box-shadow: 0 8px 20px rgba(197, 160, 89, 0.4); animation: pulse-gold 2.5s infinite; box-sizing: border-box;
-        }
+        .btn-enter-glow { background: linear-gradient(135deg, #FFD700, #C5A059); color: #000; border: none; padding: 14px 20px; border-radius: 12px; font-family: 'Kanit'; font-weight: 600; font-size: 16px; width: 100%; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; position: relative; overflow: hidden; box-shadow: 0 8px 20px rgba(197, 160, 89, 0.4); animation: pulse-gold 2.5s infinite; box-sizing: border-box; }
         .btn-enter-glow:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(197, 160, 89, 0.6); }
         .btn-enter-glow::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, transparent, rgba(255,255,255,0.4), transparent); transform: skewX(-25deg); animation: shineBtn 3s infinite; }
-        @keyframes pulse-gold { 0% { box-shadow: 0 0 10px rgba(197, 160, 89, 0.3); } 50% { box-shadow: 0 0 20px rgba(197, 160, 89, 0.6); } 100% { box-shadow: 0 0 10px rgba(197, 160, 89, 0.3); } }
-        @keyframes shineBtn { 0% { left: -100%; } 20% { left: 200%; } 100% { left: 200%; } }
-
-        .btn-line-glow { 
-            background: linear-gradient(90deg, #06C755, #05A044); color: white; border: none; padding: 14px 20px; border-radius: 12px; 
-            font-family: 'Kanit'; font-weight: 600; font-size: 16px; width: 100%; cursor: pointer; transition: 0.3s; 
-            display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; position: relative; overflow: hidden; 
-            box-shadow: 0 8px 20px rgba(6, 199, 85, 0.4); box-sizing: border-box;
-        }
+        
+        .btn-line-glow { background: linear-gradient(90deg, #06C755, #05A044); color: white; border: none; padding: 14px 20px; border-radius: 12px; font-family: 'Kanit'; font-weight: 600; font-size: 16px; width: 100%; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; position: relative; overflow: hidden; box-shadow: 0 8px 20px rgba(6, 199, 85, 0.4); box-sizing: border-box; }
         .btn-line-glow:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(6, 199, 85, 0.6); }
-
-        /* 🛡️ แจ้งเตือนแอดเพื่อน / เข้าสู่ระบบร้านค้า */
-        #partner-friend-blocker { display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 50px 20px; background: var(--surface); border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        #partner-actual-content { display: none; }
-        .line-logo-vertical { width: 100px; height: auto; margin-bottom: 25px; }
-        .friend-note { color: #FFF; font-size: 16px; font-weight: 400; line-height: 1.6; max-width: 300px; margin-bottom: 30px; }
 
         .spinner { width: 50px; height: 50px; border: 5px solid rgba(197,160,89,0.2); border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
         #appContent { display: none; }
 
-        /* 🚀 CSS สไลด์โปรโมทแนวนอน */
         .promo-carousel { display: flex; overflow-x: auto; gap: 16px; padding-bottom: 15px; scroll-snap-type: x mandatory; scrollbar-width: none; margin-top: 15px; }
         .promo-carousel::-webkit-scrollbar { display: none; }
         .promo-item { flex: 0 0 85%; max-width: 340px; scroll-snap-align: center; }
@@ -189,6 +169,14 @@
 
     <div id="page-home" class="page active">
         <header>
+            <div id="header-aff-section" style="display: none; margin-bottom: 15px;">
+                <div style="display: inline-flex; align-items: center; background: rgba(197, 160, 89, 0.15); border: 1px solid var(--primary); border-radius: 30px; padding: 6px 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+                    <span style="font-size: 12px; color: var(--text-muted); margin-right: 8px;">รหัสแนะนำ:</span>
+                    <span id="header-aff-code" style="color: #FFD700; font-weight: 600; letter-spacing: 1px; font-size: 15px;">-</span>
+                    <button onclick="copyHeaderAffCode()" style="background: none; border: none; color: #FFF; margin-left: 8px; cursor: pointer; font-size: 14px; padding: 0;" title="คัดลอกรหัส">📋</button>
+                </div>
+            </div>
+
             <div style="margin: 0 auto 15px; display: flex; justify-content: center;">
                 <div id="header-profile" style="width:100px; height:100px; border-radius:50%; background:var(--surface); border: 2px solid var(--primary); display: flex; flex-direction: column; align-items:center; justify-content:center; overflow: hidden; box-shadow: 0 0 15px rgba(197,160,89,0.3);"></div>
             </div>
@@ -212,12 +200,8 @@
                 </select>
             </div>
             
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
-                <select id="foodSelect" onchange="executeSearch('food')"></select>
-                <select id="beautySelect" onchange="executeSearch('beauty')"></select>
-                <select id="activitySelect" onchange="executeSearch('activity')"></select>
-                <select id="sportSelect" onchange="executeSearch('sport')"></select>
-            </div>
+            <div id="dynamic-category-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+                </div>
 
             <div class="search-box-container">
                 <input type="text" id="searchBox" placeholder="พิมพ์ชื่อร้านที่ต้องการค้นหา..." onkeydown="if(event.key === 'Enter') executeSearch('text')">
@@ -242,6 +226,7 @@
     </div>
 
     <div id="page-affiliate" class="page">
+        
         <div id="affiliate-guest-view" style="display: none; text-align: center; padding: 40px 20px; background: var(--surface); border-radius: 16px; border: 1px solid var(--border);">
             <div style="font-size: 60px; margin-bottom: 10px;">💸</div>
             <h2 style="color: var(--primary); margin-top: 0;">สร้างรายได้กับเรา</h2>
@@ -257,13 +242,6 @@
                 <p style="font-size: 13.5px; color: var(--text-muted); margin-top: -10px; margin-bottom: 20px;">
                     คัดลอกลิงก์ด้านล่าง ส่งให้เพื่อนมาลงทะเบียนร้านค้า<br>รับค่าคอมมิชชั่นทันทีที่ร้านค้าซื้อโปรโมชั่นสำเร็จ!
                 </p>
-                
-                <div style="padding: 15px; border: 1px solid rgba(23, 162, 184, 0.3); border-radius: 12px; background: rgba(0,0,0,0.3); margin-bottom: 20px;">
-                    <p style="margin: 0 0 5px 0; color: #FFF; font-size: 14px;">🎁 รหัสแนะนำเพื่อน (Affiliate)</p>
-                    <p style="margin: 0 0 10px 0; color: var(--text-muted); font-size: 12px;">ให้ร้านค้าใหม่กรอกรหัสนี้ตอนสมัคร เพื่อรับค่าคอมมิชชั่น!</p>
-                    <h3 id="myAffiliateCode" style="margin: 0 0 10px 0; color: var(--info); font-size: 26px; letter-spacing: 2px; font-weight: bold;">-</h3>
-                    <button class="btn-outline" style="padding: 6px 20px; font-size: 13px; border-color: var(--info); color: var(--info); width: auto; background: transparent;" onclick="copyHeaderAffCode()">📋 คัดลอกรหัส</button>
-                </div>
                 
                 <div style="background: rgba(0,0,0,0.4); border: 1px solid rgba(6, 199, 85, 0.3); border-radius: 16px; padding: 25px 20px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
                     <p style="margin: 0 0 5px 0; font-size: 14px; color: var(--text-muted);">ยอดเงินค่าคอมมิชชั่นสะสม</p>
@@ -401,7 +379,7 @@
                         <p style="text-align: center; font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">ให้ลูกค้าในจังหวัดเห็นร้านคุณเป็นอันดับแรก ทันทีที่เปิดแอป</p>
 
                         <div class="form-group"><label>📍 เลือกจังหวัดที่จะโปรโมท</label><select id="promoProvinceSelect"></select></div>
-                        <div class="form-group"><label>🏷️ หมวดหมู่ร้านค้าของคุณ</label><select id="promoStoreCategory"></select></div>
+                        <div class="form-group"><label>🏷️ หมวดหมู่ร้านค้า</label><select id="promoStoreCategory"></select></div>
                         <div class="form-group"><label>💎 เลือกแพ็กเกจค่าบริการ</label><select id="promoServiceSelect"></select></div>
                         
                         <div class="form-group">
@@ -457,6 +435,14 @@
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbwojqh2ry1b_xkuVp28w5q8Cs0CX9xBcI-upICxz98NtRrwnJ99GwLneWXFGQJySN1T/exec";
     
+    // ข้อมูลเริ่มต้นสำหรับหมวดหมู่หลัก (แก้ไขได้ใน Admin)
+    const defaultMainCats = [
+        { id: 'food', label: '🍽️ หมวดอาหาร', keyword: 'ร้านอาหาร' },
+        { id: 'beauty', label: '💆‍♀️ ความงาม/พักผ่อน', keyword: 'สปา' },
+        { id: 'activity', label: '🎯 กิจกรรม/เที่ยว', keyword: 'สถานที่ท่องเที่ยว' },
+        { id: 'sport', label: '🏋️ กีฬา/ออกกำลังกาย', keyword: 'ฟิตเนส' }
+    ];
+
     const defaultCategories = [
         { id: 1, group: 'food', label: 'หมูกระทะ / แจ่วฮ้อน', keyword: 'หมูกระทะ' },
         { id: 2, group: 'food', label: 'ชาบู / สุกี้', keyword: 'ชาบู' },
@@ -472,7 +458,7 @@
 
     let appData = { 
         registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], 
-        categories: [], closedReports: [], blacklistedPlaces: [], services: [], pendingVipRequests: [], 
+        mainCategories: [], categories: [], closedReports: [], blacklistedPlaces: [], services: [], pendingVipRequests: [], 
         vipSettings: { price: 500, bankAccount: 'กสิกรไทย 123-x-xxxxx-x ชื่อบัญชี' },
         affiliateSettings: { commissionPercent: 10, minWithdrawal: 300 },
         affiliateWallets: [], withdrawalRequests: []
@@ -612,6 +598,7 @@
             const targetPage = urlParams.get('page');
             const refParam = urlParams.get('ref');
             
+            // ⚡ จำรหัสแนะนำเพื่อนไว้ในเครื่อง
             if (refParam) {
                 sessionStorage.setItem('savedRefCode', refParam);
             }
@@ -622,21 +609,23 @@
                 const profile = await liff.getProfile();
                 document.getElementById('header-profile').innerHTML = `<img src="${profile.pictureUrl}" style="width:100%; height:100%; object-fit:cover;">`;
                 
+                // ⚡ สร้างรหัสแนะนำ (Affiliate)
                 const myCode = "AFF" + profile.userId.substring(0, 5).toUpperCase();
                 window.myAffCode = myCode;
                 
-                if(document.getElementById('myAffiliateCode')) {
-                    document.getElementById('myAffiliateCode').innerText = myCode;
-                }
-                
-                document.getElementById('affiliate-actual-content').style.display = 'block';
-                document.getElementById('affiliate-guest-view').style.display = 'none';
+                document.getElementById('header-aff-section').style.display = 'block';
+                document.getElementById('header-aff-code').innerText = myCode;
+                document.getElementById('header-guest-login').style.display = 'none';
 
                 document.getElementById('loginOverlay').style.display = 'none';
                 document.getElementById('appContent').style.display = 'block';
                 
+                document.getElementById('affiliate-actual-content').style.display = 'block';
+                document.getElementById('affiliate-guest-view').style.display = 'none';
+                
                 updateWalletUI(); 
                 
+                // ⚡ ดึงรหัสที่จำไว้มากรอกให้อัตโนมัติ (แต่ต้องไม่ใช่รหัสตัวเอง)
                 const savedRef = sessionStorage.getItem('savedRefCode');
                 if (savedRef && document.getElementById('regRefCode')) {
                     if (savedRef.toUpperCase() !== myCode.toUpperCase()) {
@@ -649,7 +638,10 @@
 
             } else {
                 isAppReady = true;
+                // โหมด Guest (ยังไม่ล็อกอิน)
                 document.getElementById('header-profile').innerHTML = `<div style="font-size: 50px; line-height: 100px; text-align: center;">👤</div>`;
+                document.getElementById('header-aff-section').style.display = 'none';
+                document.getElementById('header-guest-login').style.display = 'block';
                 
                 document.getElementById('affiliate-actual-content').style.display = 'none';
                 document.getElementById('affiliate-guest-view').style.display = 'block';
@@ -904,26 +896,68 @@
         });
     }
 
+    // ⚡ ฟังก์ชันสร้าง Dropdown หมวดหมู่แบบ Dynamic
+    function renderUI() {
+        const cData = (appData.categories && appData.categories.length > 0) ? appData.categories : defaultCategories;
+        const sData = (appData.services && appData.services.length > 0) ? appData.services : defaultServices;
+        const mainCats = (appData.mainCategories && appData.mainCategories.length > 0) ? appData.mainCategories : defaultMainCats;
+
+        // โซนกล่องค้นหาแบบ Dynamic
+        const catContainer = document.getElementById('dynamic-category-container');
+        if(catContainer) {
+            let catHtml = '';
+            mainCats.forEach((m) => {
+                catHtml += `<select id="${m.id}Select" class="input-dark" onchange="executeSearch('${m.id}')" style="width: 100%;">
+                    <option value="${m.keyword}">${m.label}</option>
+                    ${cData.filter(c => c.group === m.id).map(c => `<option value="${c.keyword}">${c.label}</option>`).join('')}
+                </select>`;
+            });
+            catContainer.innerHTML = catHtml;
+        }
+
+        const pCat = document.getElementById('promoStoreCategory');
+        if(pCat) {
+            let ph = '';
+            mainCats.forEach((m) => {
+                ph += `<optgroup label="${m.label}">`; 
+                cData.filter(c => c.group === m.id).forEach(c => { ph += `<option value="${c.label}">${c.label}</option>`; }); 
+                ph += `</optgroup>`;
+            });
+            pCat.innerHTML = ph;
+        }
+
+        const sSel = document.getElementById('promoServiceSelect');
+        if(sSel) sSel.innerHTML = sData.map(s => `<option value="${s.name} - ${s.price}฿">${s.name} - ${s.price}฿</option>`).join('');
+    }
+
     function executeSearch(type) {
         if (!currentCoords) return; 
         const searchBox = document.getElementById('searchBox');
         const searchVal = searchBox ? searchBox.value.trim() : ""; 
         let keywordToSearch = "ร้านอาหาร"; 
-        const foodSelect = document.getElementById('foodSelect'), beautySelect = document.getElementById('beautySelect'), actSelect = document.getElementById('activitySelect'), sportSelect = document.getElementById('sportSelect');
+        
+        const mainCats = (appData.mainCategories && appData.mainCategories.length > 0) ? appData.mainCategories : defaultMainCats;
 
         if (searchVal !== "" && type === 'text') {
             keywordToSearch = searchVal;
-            if(foodSelect) foodSelect.selectedIndex = 0; if(beautySelect) beautySelect.selectedIndex = 0; if(actSelect) actSelect.selectedIndex = 0; if(sportSelect) sportSelect.selectedIndex = 0;
+            mainCats.forEach(m => { const s = document.getElementById(m.id+'Select'); if(s) s.selectedIndex = 0; });
         } else {
-            if (type === 'beauty') { keywordToSearch = (beautySelect && beautySelect.value) ? beautySelect.value : "สปา"; if(foodSelect) foodSelect.selectedIndex = 0; if(actSelect) actSelect.selectedIndex = 0; if(sportSelect) sportSelect.selectedIndex = 0; if(searchBox) searchBox.value = "";
-            } else if (type === 'food') { keywordToSearch = (foodSelect && foodSelect.value) ? foodSelect.value : "ร้านอาหาร"; if(beautySelect) beautySelect.selectedIndex = 0; if(actSelect) actSelect.selectedIndex = 0; if(sportSelect) sportSelect.selectedIndex = 0; if(searchBox) searchBox.value = "";
-            } else if (type === 'activity') { keywordToSearch = (actSelect && actSelect.value) ? actSelect.value : "สถานที่ท่องเที่ยว"; if(foodSelect) foodSelect.selectedIndex = 0; if(beautySelect) beautySelect.selectedIndex = 0; if(sportSelect) sportSelect.selectedIndex = 0; if(searchBox) searchBox.value = "";
-            } else if (type === 'sport') { keywordToSearch = (sportSelect && sportSelect.value) ? sportSelect.value : "ฟิตเนส"; if(foodSelect) foodSelect.selectedIndex = 0; if(beautySelect) beautySelect.selectedIndex = 0; if(actSelect) actSelect.selectedIndex = 0; if(searchBox) searchBox.value = "";
+            const targetCat = mainCats.find(m => m.id === type);
+            if (targetCat) {
+                const sel = document.getElementById(targetCat.id + 'Select');
+                keywordToSearch = (sel && sel.value) ? sel.value : targetCat.keyword;
+                
+                mainCats.forEach(m => { 
+                    if(m.id !== type) { const s = document.getElementById(m.id+'Select'); if(s) s.selectedIndex = 0; } 
+                });
+                if(searchBox) searchBox.value = "";
             } else {
-                if (beautySelect && beautySelect.selectedIndex > 0) keywordToSearch = beautySelect.value;
-                else if (actSelect && actSelect.selectedIndex > 0) keywordToSearch = actSelect.value;
-                else if (sportSelect && sportSelect.selectedIndex > 0) keywordToSearch = sportSelect.value;
-                else if (foodSelect && foodSelect.selectedIndex > 0) keywordToSearch = foodSelect.value;
+                let found = false;
+                for(let m of mainCats) {
+                    const sel = document.getElementById(m.id + 'Select');
+                    if(sel && sel.selectedIndex > 0) { keywordToSearch = sel.value; found = true; break; }
+                }
+                if(!found && mainCats.length > 0) keywordToSearch = mainCats[0].keyword;
             }
         }
         
@@ -1056,35 +1090,6 @@
         } else { banner.style.display = 'none'; }
     }
 
-    function renderUI() {
-        const cData = (appData.categories && appData.categories.length > 0) ? appData.categories : defaultCategories;
-        const sData = (appData.services && appData.services.length > 0) ? appData.services : defaultServices;
-        const groups = ['food', 'beauty', 'activity', 'sport'];
-        const labels = ['🍽️ หมวดอาหาร', '💆‍♀️ ความงาม/พักผ่อน', '🎯 กิจกรรม/เที่ยว', '🏋️ กีฬา/ออกกำลังกาย'];
-        const defaultKws = ['ร้านอาหาร', 'สปา', 'สถานที่ท่องเที่ยว', 'ฟิตเนส'];
-        
-        groups.forEach((g, i) => {
-            const sel = document.getElementById(g+'Select');
-            if(sel) {
-                let h = `<option value="${defaultKws[i]}">${labels[i]}</option>`;
-                cData.filter(c => c.group === g).forEach(c => h += `<option value="${c.keyword}">${c.label}</option>`);
-                sel.innerHTML = h;
-            }
-        });
-
-        const pCat = document.getElementById('promoStoreCategory');
-        if(pCat) {
-            let ph = '';
-            groups.forEach((g, i) => {
-                ph += `<optgroup label="${labels[i]}">`; cData.filter(c => c.group === g).forEach(c => { ph += `<option value="${c.label}">${c.label}</option>`; }); ph += `</optgroup>`;
-            });
-            pCat.innerHTML = ph;
-        }
-
-        const sSel = document.getElementById('promoServiceSelect');
-        if(sSel) sSel.innerHTML = sData.map(s => `<option value="${s.name} - ${s.price}฿">${s.name} - ${s.price}฿</option>`).join('');
-    }
-
     function reportClosed(id, n) { 
         if(confirm('ยืนยันแจ้งปิดร้าน '+n+' ถาวร?')) { 
             if(!appData.closedReports) appData.closedReports = [];
@@ -1117,6 +1122,7 @@
 
         if(!n || !p1 || !p2 || !p3) return alert("กรุณากรอกข้อมูลและแนบรูปให้ครบครับ");
         
+        // ⚡ ดักจับการใส่รหัสแนะนำตัวเอง
         if (refCode && window.myAffCode && refCode.toUpperCase() === window.myAffCode.toUpperCase()) {
             return alert("⚠️ ไม่สามารถใช้รหัสแนะนำของตัวเองได้ครับ");
         }
