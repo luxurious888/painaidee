@@ -188,6 +188,22 @@
                 </div>
             </details>
         </div>
+
+        <div class="card border-l-4 border-red-600 p-0 overflow-hidden mt-10">
+            <details>
+                <summary class="text-red-500 bg-[#2A1E1E]">🧨 ล้างข้อมูลระบบทั้งหมด (Factory Reset)</summary>
+                <div class="p-8 bg-[#1A1D23] text-center border-t border-red-900">
+                    <div class="text-6xl mb-4">⚠️</div>
+                    <h3 class="text-xl font-bold text-red-500 mb-2">เขตอันตราย! (Danger Zone)</h3>
+                    <p class="text-gray-400 mb-6 max-w-md mx-auto">
+                        การกดปุ่มนี้จะล้างข้อมูล ร้านค้าทั้งหมด, สลิป, โปรโมชั่น, กระเป๋าเงินนายหน้า และประวัติการโอนเงิน ทิ้งทั้งหมด เพื่อเริ่มต้นระบบใหม่ (ข้อมูลหมวดหมู่และแพ็กเกจจะยังคงอยู่)
+                    </p>
+                    <button class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-lg shadow-[0_0_15px_rgba(220,38,38,0.5)] transition hover:scale-105" onclick="factoryResetSystem()">
+                        💥 ยืนยันการล้างข้อมูลทั้งหมด
+                    </button>
+                </div>
+            </details>
+        </div>
     </div>
 
     <div id="page-affiliate" class="admin-page">
@@ -200,14 +216,14 @@
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
                     <div class="bg-[#1A1D23] p-4 rounded-lg border border-gray-600">
-                        <label class="block text-[#FFD700] text-sm mb-2 font-bold">🎯 แนะนำครั้งแรก (ร้านใหม่จ่ายเงินครั้งแรก)</label>
+                        <label class="block text-[#FFD700] text-sm mb-2 font-bold">🎯 แนะนำครั้งแรก (ร้านใหม่จ่ายครั้งแรก)</label>
                         <div class="flex gap-2">
                             <select id="affFirstType" class="input-dark w-1/3 text-center font-bold"><option value="fixed">บาท (฿)</option><option value="percent">เปอร์เซ็น (%)</option></select>
                             <input type="number" id="affFirstVal" class="input-dark w-2/3 text-xl font-bold text-white py-2" placeholder="จำนวน">
                         </div>
                     </div>
                     <div class="bg-[#1A1D23] p-4 rounded-lg border border-gray-600">
-                        <label class="block text-cyan-400 text-sm mb-2 font-bold">🔄 ผลตอบแทนต่อเนื่อง (ร้านเดิมต่ออายุแพ็กเกจ)</label>
+                        <label class="block text-cyan-400 text-sm mb-2 font-bold">🔄 ผลตอบแทนต่อเนื่อง (ต่ออายุแพ็กเกจ)</label>
                         <div class="flex gap-2">
                             <select id="affRecurType" class="input-dark w-1/3 text-center font-bold"><option value="percent">เปอร์เซ็น (%)</option><option value="fixed">บาท (฿)</option></select>
                             <input type="number" id="affRecurVal" class="input-dark w-2/3 text-xl font-bold text-white py-2" placeholder="จำนวน">
@@ -298,12 +314,7 @@
         { id: 2, group: 'food', label: 'ชาบู / สุกี้', keyword: 'ชาบู' },
         { id: 3, group: 'food', label: 'ปิ้งย่าง / บาร์บีคิว', keyword: 'ปิ้งย่าง' },
         { id: 4, group: 'food', label: 'บุฟเฟ่ต์สุดคุ้ม', keyword: 'บุฟเฟ่ต์' },
-        { id: 5, group: 'food', label: 'คาเฟ่ / กาแฟ / ขนม', keyword: 'คาเฟ่' },
-        { id: 6, group: 'food', label: 'อาหารทะเล / ซีฟู้ด', keyword: 'อาหารทะเล' },
-        { id: 7, group: 'food', label: 'ร้านนั่งชิล / บาร์ / ดนตรีสด', keyword: 'ร้านเหล้า' },
-        { id: 8, group: 'food', label: 'ส้มตำ / อาหารอีสาน', keyword: 'ร้านส้มตำ' },
-        { id: 9, group: 'food', label: 'อาหารญี่ปุ่น / ซูชิ', keyword: 'อาหารญี่ปุ่น' },
-        { id: 10, group: 'food', label: 'อาหารตามสั่ง / จานด่วน', keyword: 'อาหารตามสั่ง' }
+        { id: 5, group: 'food', label: 'คาเฟ่ / กาแฟ / ขนม', keyword: 'คาเฟ่' }
     ];
 
     let appData = { 
@@ -363,6 +374,31 @@
         showLoading(true);
         try { await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(appData) }); render(); } catch(e) { alert("⚠️ เกิดข้อผิดพลาดในการบันทึกข้อมูล"); } 
         showLoading(false);
+    }
+
+    // 🚀 ระบบ Factory Reset 
+    async function factoryResetSystem() {
+        const confirmWord = prompt('⚠️ เขตอันตราย! ⚠️\nการล้างระบบจะทำให้ข้อมูลร้านค้าและกระเป๋าเงินหายทั้งหมด ไม่สามารถกู้คืนได้\n\nพิมพ์คำว่า "RESET" (ตัวพิมพ์ใหญ่) เพื่อยืนยัน:');
+        
+        if (confirmWord === "RESET") {
+            showLoading(true);
+            
+            // เก็บเฉพาะข้อมูลตั้งค่าระบบไว้ (หมวดหมู่ และ แพ็กเกจ) ล้างเฉพาะ User Data
+            appData.registrationRequests = [];
+            appData.registeredStores = [];
+            appData.pendingPromotions = [];
+            appData.activePromotions = [];
+            appData.closedReports = [];
+            appData.pendingVipRequests = [];
+            appData.affiliateWallets = [];
+            appData.withdrawalRequests = [];
+            
+            await save();
+            alert("🧨 ล้างข้อมูล User ในระบบเสร็จสิ้น! ระบบเริ่มต้นใหม่แล้วครับ");
+            window.location.reload();
+        } else {
+            if(confirmWord !== null) alert("❌ พิมพ์คำยืนยันไม่ถูกต้อง ยกเลิกการล้างข้อมูล");
+        }
     }
 
     function render() {
@@ -531,7 +567,7 @@
         }
     }
 
-    // ⚡ ฟังก์ชันคำนวณและเพิ่มเงินให้นายหน้า (อัปเดตใหม่)
+    // ⚡ ฟังก์ชันคำนวณและเพิ่มเงินให้นายหน้า (แยกจ่ายครั้งแรก/ต่ออายุ)
     function addCommissionToWallet(store, packageAmount) {
         if (!store || !store.refCode || store.refCode.trim() === '') return;
         
@@ -753,7 +789,7 @@
             refCode: r.refCode || '', 
             isVIP: false, 
             freePromoDays: 0,
-            hasPaidFirstComm: false, // ⚡ เพิ่ม Flag นี้
+            hasPaidFirstComm: false, 
             storePhoto: r.storePhoto || '',
             idCard: r.idCard || '',
             commercial: r.commercial || ''
