@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painaidee Admin - ระบบจัดการหลังบ้าน</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap');
         body { font-family: 'Kanit', sans-serif; background-color: #121418; color: #fff; }
@@ -30,9 +34,6 @@
         details summary::after { content: "▼"; font-size: 14px; color: #999; }
         details[open] summary::after { content: "▲"; color: #C5A059; }
         details[open] summary { border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-bottom: 1px solid #4A5568; }
-
-        .toggle-checkbox:checked { right: 0; border-color: #06C755; }
-        .toggle-checkbox:checked + .toggle-label { background-color: #06C755; }
 
         .tab-nav { display: flex; gap: 10px; margin-bottom: 25px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
         .tab-nav::-webkit-scrollbar { display: none; }
@@ -216,14 +217,14 @@
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
                     <div class="bg-[#1A1D23] p-4 rounded-lg border border-gray-600">
-                        <label class="block text-[#FFD700] text-sm mb-2 font-bold">🎯 แนะนำครั้งแรก (ร้านใหม่จ่ายครั้งแรก)</label>
+                        <label class="block text-[#FFD700] text-sm mb-2 font-bold">🎯 แนะนำครั้งแรก (ร้านใหม่จ่ายเงินครั้งแรก)</label>
                         <div class="flex gap-2">
                             <select id="affFirstType" class="input-dark w-1/3 text-center font-bold"><option value="fixed">บาท (฿)</option><option value="percent">เปอร์เซ็น (%)</option></select>
                             <input type="number" id="affFirstVal" class="input-dark w-2/3 text-xl font-bold text-white py-2" placeholder="จำนวน">
                         </div>
                     </div>
                     <div class="bg-[#1A1D23] p-4 rounded-lg border border-gray-600">
-                        <label class="block text-cyan-400 text-sm mb-2 font-bold">🔄 ผลตอบแทนต่อเนื่อง (ต่ออายุแพ็กเกจ)</label>
+                        <label class="block text-cyan-400 text-sm mb-2 font-bold">🔄 ผลตอบแทนต่อเนื่อง (ร้านเดิมต่ออายุแพ็กเกจ)</label>
                         <div class="flex gap-2">
                             <select id="affRecurType" class="input-dark w-1/3 text-center font-bold"><option value="percent">เปอร์เซ็น (%)</option><option value="fixed">บาท (฿)</option></select>
                             <input type="number" id="affRecurVal" class="input-dark w-2/3 text-xl font-bold text-white py-2" placeholder="จำนวน">
@@ -264,14 +265,24 @@
 
 </div>
 
-<button onclick="load()" class="fixed bottom-6 right-6 bg-gradient-to-r from-[#FFD700] to-[#C5A059] text-black px-5 py-4 rounded-full shadow-[0_10px_25px_rgba(0,0,0,0.5)] hover:scale-110 transition z-50 font-bold flex items-center gap-2 border-2 border-white">
-    🔄 รีเฟรชข้อมูล
-</button>
-
 <script>
+    // ⚡ ตั้งค่าเชื่อมต่อ Google Apps Script (ไว้สำหรับยิงแจ้งเตือน LINE)
     const API_URL = "https://script.google.com/macros/s/AKfycbwojqh2ry1b_xkuVp28w5q8Cs0CX9xBcI-upICxz98NtRrwnJ99GwLneWXFGQJySN1T/exec";
     const ADMIN_PASSWORD = "250899"; 
     
+    // ⚡ ตั้งค่าเชื่อมต่อ Firebase
+    const firebaseConfig = {
+        apiKey: "AIzaSyBSFWKdLCjLWqzo2_mzUE95CyoiUv5TdnY",
+        authDomain: "painaid-88c53.firebaseapp.com",
+        projectId: "painaid-88c53",
+        storageBucket: "painaid-88c53.firebasestorage.app",
+        messagingSenderId: "229290700458",
+        appId: "1:229290700458:web:74a57d0be5df9326c5ead3",
+        measurementId: "G-BF74QEHLQ7"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
     function switchAdminPage(pageId, btnElement) {
         document.querySelectorAll('.admin-page').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
@@ -352,12 +363,12 @@
         if (needSave) { save(); } else { render(); }
     }
 
+    // ⚡ ดึงข้อมูลจาก Firebase
     async function load() {
         showLoading(true);
         try {
-            const res = await fetch(API_URL + "?t=" + new Date().getTime());
-            const data = await res.json();
-            if (data && Object.keys(data).length > 0) { appData = { ...appData, ...data }; }
+            const doc = await db.collection('painaidee').doc('systemData').get();
+            if (doc.exists) { appData = { ...appData, ...doc.data() }; }
             
             if (!appData.mainCategories || appData.mainCategories.length === 0) { appData.mainCategories = JSON.parse(JSON.stringify(defaultMainCats)); }
             if (!appData.categories || appData.categories.length === 0) { appData.categories = JSON.parse(JSON.stringify(defaultCategories)); }
@@ -370,9 +381,13 @@
         showLoading(false);
     }
 
+    // ⚡ บันทึกข้อมูลลง Firebase
     async function save() { 
         showLoading(true);
-        try { await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(appData) }); render(); } catch(e) { alert("⚠️ เกิดข้อผิดพลาดในการบันทึกข้อมูล"); } 
+        try { 
+            await db.collection('painaidee').doc('systemData').set(appData); 
+            render(); 
+        } catch(e) { alert("⚠️ เกิดข้อผิดพลาดในการบันทึกข้อมูล"); } 
         showLoading(false);
     }
 
@@ -383,7 +398,6 @@
         if (confirmWord === "RESET") {
             showLoading(true);
             
-            // เก็บเฉพาะข้อมูลตั้งค่าระบบไว้ (หมวดหมู่ และ แพ็กเกจ) ล้างเฉพาะ User Data
             appData.registrationRequests = [];
             appData.registeredStores = [];
             appData.pendingPromotions = [];
@@ -518,7 +532,7 @@
                 </div>`).join('');
         }
 
-        // 7. Store Management (Dashboard เดิม)
+        // 7. Store Management
         document.getElementById('store-management-list').innerHTML = appData.registeredStores.map((s,i) => `
             <div class="bg-[#242730] p-5 rounded-xl border border-gray-700 ${s.isVIP ? '!border-[#FFD700] shadow-[0_0_15px_rgba(255,215,0,0.1)]' : ''} relative flex flex-col h-full transition-all">
                 ${s.isVIP ? '<div class="absolute top-4 right-4 bg-[#FFD700] text-black text-[11px] px-3 py-1 rounded font-bold shadow">VIP</div>' : ''}
@@ -546,6 +560,12 @@
 
         if (document.getElementById('page-affiliate').classList.contains('active')) renderAffiliate();
         if (document.getElementById('page-storeinfo').classList.contains('active')) renderStoreInfo();
+    }
+
+    function saveVipSettings() {
+        appData.vipSettings.price = parseInt(document.getElementById('vipPriceSetting').value) || 500;
+        appData.vipSettings.bankAccount = document.getElementById('vipBankSetting').value || '';
+        save(); alert("💾 บันทึกตั้งค่าระบบ VIP เรียบร้อยแล้ว!");
     }
 
     function addMainCategory() {
@@ -706,17 +726,14 @@
         req.status = 'completed';
         req.approveDate = new Date().toLocaleString();
 
-        showLoading(true);
-        await fetch(API_URL, { method: 'POST', body: JSON.stringify(appData) });
+        await save();
         
         if(req.userId && req.userId.trim() !== '') {
             const lineMsg = `💸 แจ้งเตือนจาก แอดมินไปไหนดี\n\nระบบได้ดำเนินการโอนเงินค่าคอมมิชชั่น จำนวน ${req.amount.toLocaleString()} บาท เข้าบัญชีของท่านเรียบร้อยแล้วครับ!\n\nขอบคุณที่แนะนำร้านค้าดีๆ เข้ามาในระบบครับ 😊`;
             try { await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "SEND_LINE_PIN", targetUserId: req.userId, message: lineMsg }) }); } catch(e){}
         }
 
-        showLoading(false);
         alert(`✅ อนุมัติการถอนเงิน ${req.amount} บาท เรียบร้อยแล้ว!`);
-        load();
     }
 
     // ⚡ ฟังก์ชันเรนเดอร์หน้า Store Info & LINE ID
@@ -789,7 +806,7 @@
             refCode: r.refCode || '', 
             isVIP: false, 
             freePromoDays: 0,
-            hasPaidFirstComm: false, 
+            hasPaidFirstComm: false, // ⚡ เช็คว่าเคยจ่ายค่าคอมเปิดร้านให้คนแนะนำหรือยัง
             storePhoto: r.storePhoto || '',
             idCard: r.idCard || '',
             commercial: r.commercial || ''
@@ -797,13 +814,12 @@
 
         appData.registeredStores.unshift(newStore); 
         appData.registrationRequests.splice(index, 1);
-        showLoading(true); await fetch(API_URL, { method: 'POST', body: JSON.stringify(appData) });
+        await save();
         
         if (newStore.userId) {
             const lineMsg = `✅ ยินดีด้วย! อนุมัติร้านค้า ${newStore.name} เรียบร้อยแล้ว\n\n🔑 รหัส PIN จัดการร้านของคุณคือ: ${newStore.pin}\n\n🌐 เข้าใช้งานแอปได้เลยที่: https://liff.line.me/2009598846-wiCUeV35`;
             try { await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "SEND_LINE_PIN", targetUserId: newStore.userId, message: lineMsg }) }); alert("✅ ส่ง PIN เข้า LINE สำเร็จ!"); } catch(e) {}
         } else { prompt(`✅ อนุมัติร้านสำเร็จ!\nลูกค้าไม่ได้ผูก LINE ไว้ ให้ก๊อปปี้รหัสส่งให้ลูกค้า:`, newStore.pin); }
-        load();
     }
 
     async function resendPinToStore(index) {
@@ -838,16 +854,13 @@
             addCommissionToWallet(store, vipPrice);
 
             appData.pendingVipRequests.splice(index, 1); 
-            showLoading(true);
-            await fetch(API_URL, { method: 'POST', body: JSON.stringify(appData) });
+            await save();
             
             if (store.userId) {
                 const lineMsg = `👑 แจ้งเตือนจาก แอดมินไปไหนดี\n\nร้าน ${store.name} ได้รับการอนุมัติสถานะ VIP เรียบร้อยแล้วครับ!\n\n🎁 พิเศษ! คุณได้รับสิทธิ์โปรโมทแบนเนอร์หน้าร้านฟรี 7 วัน เข้าไปอัปเดตโปรโมชั่นได้เลยครับที่: https://liff.line.me/2009598846-wiCUeV35`;
                 try { await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "SEND_LINE_PIN", targetUserId: store.userId, message: lineMsg }) }); } catch(e) {}
             }
-            showLoading(false);
             alert(`👑 อนุมัติสถานะ VIP ให้ร้าน ${store.name} สำเร็จ!\nระบบได้แบ่งค่าคอมให้นายหน้าแล้ว (ถ้ามี)`); 
-            load();
         } else { alert("⚠️ ไม่พบข้อมูลร้านค้านี้ในระบบ"); }
     }
 
@@ -881,16 +894,13 @@
         }
 
         appData.pendingPromotions.splice(i, 1);
-        showLoading(true);
-        await fetch(API_URL, { method: 'POST', body: JSON.stringify(appData) });
+        await save();
 
         if (store && store.userId) {
             try { await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "SEND_LINE_PIN", targetUserId: store.userId, message: lineMsg }) }); } catch(e) {}
         }
         
-        showLoading(false);
         alert(isUpdateAlert ? "✅ อนุมัติอัปเดตรูปและข้อความเรียบร้อย!" : "✅ อนุมัติแพ็กเกจและขึ้นแบนเนอร์เรียบร้อย!\nระบบได้แบ่งค่าคอมให้นายหน้าแล้ว (ถ้ามี)");
-        load();
     }
 
     function saveActivePromo(i) { let p = appData.activePromotions[i]; p.storeName = document.getElementById(`editAStore_${i}`).value; p.province = document.getElementById(`editAProv_${i}`).value; p.category = document.getElementById(`editACat_${i}`).value; p.detail = document.getElementById(`editADetail_${i}`).value; const newExpStr = document.getElementById(`editAExpire_${i}`).value; if(newExpStr) { p.expireTimestamp = new Date(newExpStr).getTime(); } save(); alert("💾 บันทึกการแก้ไขข้อมูลและเวลาเรียบร้อยแล้ว!"); }
@@ -913,10 +923,9 @@
         const isTyping = document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA';
         if (!isTyping && document.getElementById('loading').style.display === 'none') {
             try {
-                const res = await fetch(API_URL + "?t=" + new Date().getTime());
-                const data = await res.json();
-                if (data && Object.keys(data).length > 0) { 
-                    appData = { ...appData, ...data }; 
+                const doc = await db.collection('painaidee').doc('systemData').get();
+                if (doc.exists) { 
+                    appData = { ...appData, ...doc.data() }; 
                     ['registrationRequests','registeredStores','pendingPromotions','activePromotions','mainCategories','categories','closedReports','blacklistedPlaces','services','pendingVipRequests','affiliateWallets','withdrawalRequests'].forEach(key => { if(!appData[key]) appData[key] = []; });
                     render(); 
                 }
