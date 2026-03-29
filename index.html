@@ -198,11 +198,26 @@
 
     <div id="page-home" class="page active">
         <header>
+            <div id="header-aff-section" style="display: none; margin-bottom: 15px;">
+                <div style="display: inline-flex; align-items: center; background: rgba(197, 160, 89, 0.15); border: 1px solid var(--primary); border-radius: 30px; padding: 6px 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+                    <span style="font-size: 12px; color: var(--text-muted); margin-right: 8px;">รหัสแนะนำ:</span>
+                    <span id="header-aff-code" style="color: #FFD700; font-weight: 600; letter-spacing: 1px; font-size: 15px;">-</span>
+                    <button onclick="copyHeaderAffCode()" style="background: none; border: none; color: #FFF; margin-left: 8px; cursor: pointer; font-size: 14px; padding: 0;" title="คัดลอกรหัส">📋</button>
+                </div>
+            </div>
+
             <div style="margin: 0 auto 15px; display: flex; justify-content: center;">
-                <div id="header-profile" style="width:100px; height:100px; border-radius:50%; background:var(--surface); border: 2px solid var(--primary); display: flex; flex-direction: column; align-items:center; justify-content:center; overflow: hidden;"></div>
+                <div id="header-profile" style="width:100px; height:100px; border-radius:50%; background:var(--surface); border: 2px solid var(--primary); display: flex; flex-direction: column; align-items:center; justify-content:center; overflow: hidden; box-shadow: 0 0 15px rgba(197,160,89,0.3);"></div>
             </div>
             <h1 id="header-name">ไปไหนดี</h1>
             <p>ค้นหาร้านอาหารและสถานที่น่าสนใจทั่วไทย</p>
+
+            <div id="header-guest-login" style="display: none; margin-top: 20px;">
+                <button class="btn-line-glow" style="width: auto; margin: 0 auto; padding: 10px 24px; border-radius: 20px; font-size: 14px; box-shadow: 0 4px 15px rgba(6, 199, 85, 0.3);" onclick="liff.login()">
+                    📱 ล็อคอินด้วย LINE
+                </button>
+                <p style="font-size: 12px; color: var(--text-muted); margin-top: 10px; line-height: 1.4;">ล็อคอินไลน์เพื่อรับรหัสแนะนำเพื่อน<br>เพื่อสร้างรายได้กับเรา!</p>
+            </div>
         </header>
         
         <div id="map"></div>
@@ -263,7 +278,7 @@
                 <p style="margin: 0 0 5px 0; color: var(--text-main); font-size: 14px;">🎁 รหัสแนะนำเพื่อน (Affiliate)</p>
                 <p style="margin: 0 0 10px 0; color: var(--text-muted); font-size: 12px;">ให้ร้านค้าใหม่กรอกรหัสนี้ตอนสมัคร เพื่อรับค่าคอมมิชชั่น!</p>
                 <h3 id="myAffiliateCode" style="margin: 0 0 10px 0; color: var(--info); font-size: 26px; letter-spacing: 2px;">-</h3>
-                <button class="btn-outline" style="padding: 6px 20px; font-size: 13px; border-color: var(--info); color: var(--info); width: auto;" onclick="copyAffCode()">📋 คัดลอกรหัส</button>
+                <button class="btn-outline" style="padding: 6px 20px; font-size: 13px; border-color: var(--info); color: var(--info); width: auto;" onclick="copyHeaderAffCode()">📋 คัดลอกรหัส</button>
             </div>
 
             <div class="dashboard-card" id="registerNewStoreCard" style="border-top: 3px solid var(--primary); border-bottom: 3px solid var(--primary);">
@@ -544,17 +559,16 @@
         document.getElementById('loginCard').style.display = 'block';
     }
 
-    // ⚡ ฟังก์ชันเข้าแอปแบบ Guest (สำหรับลูกค้าทั่วไป)
     function enterApp() {
         document.getElementById('loginOverlay').style.display = 'none';
         document.getElementById('appContent').style.display = 'block';
     }
 
-    // ⚡ ก๊อปปี้รหัส Affiliate
-    function copyAffCode() {
+    // ⚡ ฟังก์ชันคัดลอกรหัส (สำหรับทั้ง 2 จุดที่มีปุ่ม)
+    function copyHeaderAffCode() {
         if(window.myAffCode) {
             navigator.clipboard.writeText(window.myAffCode).then(() => {
-                alert("คัดลอกรหัสแนะนำ " + window.myAffCode + " สำเร็จ! ส่งให้เพื่อนกรอกตอนสมัครเพื่อรับค่าคอมได้เลยครับ");
+                alert("คัดลอกรหัสแนะนำ " + window.myAffCode + " สำเร็จ! นำไปแชร์ให้เพื่อนหรือร้านค้าเพื่อรับสิทธิพิเศษได้เลยครับ");
             });
         }
     }
@@ -564,7 +578,6 @@
             await liff.init({ liffId: "2009598846-wiCUeV35" });
             await loadFromCloud();
             
-            // ⚡ ดึงพารามิเตอร์จาก URL ว่าเปิดลิงก์ตั้งใจจะไปหน้าไหน
             const urlParams = new URLSearchParams(window.location.search);
             const targetPage = urlParams.get('page');
 
@@ -574,25 +587,36 @@
                 const profile = await liff.getProfile();
                 document.getElementById('header-profile').innerHTML = `<img src="${profile.pictureUrl}" style="width:100%; height:100%; object-fit:cover;">`;
                 
-                // ⚡ สร้างรหัสแนะนำ Affiliate ประจำตัว
+                // ⚡ สร้างรหัส Affiliate อัตโนมัติ (เช่น AFF12345)
                 const myCode = "AFF" + profile.userId.substring(0, 5).toUpperCase();
+                window.myAffCode = myCode;
+                
+                // โชว์รหัสในหน้าหน้าร้านค้า
                 if(document.getElementById('myAffiliateCode')) {
                     document.getElementById('myAffiliateCode').innerText = myCode;
-                    window.myAffCode = myCode;
                 }
+                
+                // โชว์รหัสในหน้า Header ของหน้าแรก (และซ่อนปุ่มล็อกอินของ Guest)
+                document.getElementById('header-aff-section').style.display = 'block';
+                document.getElementById('header-aff-code').innerText = myCode;
+                document.getElementById('header-guest-login').style.display = 'none';
 
                 document.getElementById('loginOverlay').style.display = 'none';
                 document.getElementById('appContent').style.display = 'block';
 
-                // ⚡ ถ้าล็อกอินเสร็จแล้วพบพารามิเตอร์ลับ ให้เตะไปหน้าร้านค้าอัตโนมัติ!
                 if (targetPage === 'partner') {
                     setTimeout(() => { navigateToPartner(); }, 300);
                 }
 
             } else {
-                // ถ้ายังไม่ล็อกอิน ให้โชว์หน้า Welcome แบบให้เลือกเข้า
                 isAppReady = true;
+                // ถ้ายังไม่ล็อกอิน ให้โชว์หน้า Profile สีเทา
                 document.getElementById('header-profile').innerHTML = `<div style="font-size: 50px; line-height: 100px; text-align: center;">👤</div>`;
+                
+                // ซ่อนรหัส AFF และโชว์ปุ่ม Login ตรงหน้า Header
+                document.getElementById('header-aff-section').style.display = 'none';
+                document.getElementById('header-guest-login').style.display = 'block';
+                
                 showLoginCard();
             }
         } catch (err) { 
@@ -604,7 +628,6 @@
     }
 
     async function navigateToPartner() {
-        // ⚡ ถ้ายังไม่ล็อกอิน LINE บังคับเตะให้ไปเข้าผ่านลิงก์ LIFF เพื่อเปิด LINE อัตโนมัติ
         if (!liff.isLoggedIn()) {
             const blocker = document.getElementById('partner-friend-blocker');
             const content = document.getElementById('partner-actual-content');
@@ -973,7 +996,7 @@
     // ⚡ ฟังก์ชันลงทะเบียน
     async function submitStoreRegistration() {
         const btn = document.getElementById('btnSubmitReg'); const n = document.getElementById('regStoreName').value; const p1 = document.getElementById('regStorePhoto').files[0]; const p2 = document.getElementById('regIdCard').files[0]; const p3 = document.getElementById('regPhone').value; 
-        const refCode = document.getElementById('regRefCode').value; 
+        const refCode = document.getElementById('regRefCode').value;
 
         if(!n || !p1 || !p2 || !p3) return alert("กรุณากรอกข้อมูลและแนบรูปให้ครบครับ");
         
@@ -1065,6 +1088,7 @@
             } else {
                 document.getElementById('editPromoSection').style.display = 'none'; document.getElementById('buyPromoSection').style.display = 'block';
                 
+                // ตรวจสอบสิทธิ์ฟรี
                 if(hasFreePromo) {
                     promoTitle.innerHTML = '🎁 สิทธิพิเศษ VIP: ฟรีพื้นที่โปรโมท 7 วัน!';
                     slipArea.style.display = 'none'; 
