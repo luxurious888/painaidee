@@ -78,10 +78,6 @@
         .btn-enter-glow::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, transparent, rgba(255,255,255,0.4), transparent); transform: skewX(-25deg); animation: shineBtn 3s infinite; }
         .btn-line-glow { background: linear-gradient(90deg, #06C755, #05A044); color: white; border: none; padding: 14px 20px; border-radius: 12px; font-family: 'Kanit'; font-weight: 600; font-size: 16px; width: 100%; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; position: relative; overflow: hidden; box-shadow: 0 8px 20px rgba(6, 199, 85, 0.4); box-sizing: border-box; }
         .btn-line-glow:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(6, 199, 85, 0.6); }
-        #partner-friend-blocker { display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 50px 20px; background: var(--surface); border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        #partner-actual-content { display: none; }
-        .line-logo-vertical { width: 100px; height: auto; margin-bottom: 25px; }
-        .friend-note { color: #FFF; font-size: 16px; font-weight: 400; line-height: 1.6; max-width: 300px; margin-bottom: 30px; }
         .spinner { width: 50px; height: 50px; border: 5px solid rgba(197,160,89,0.2); border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         #appContent { display: none; }
@@ -156,7 +152,8 @@
                 </select>
             </div>
             
-            <div id="dynamic-category-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;"></div>
+            <div id="dynamic-category-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+                </div>
 
             <div class="search-box-container">
                 <input type="text" id="searchBox" placeholder="พิมพ์ชื่อร้านที่ต้องการค้นหา..." onkeydown="if(event.key === 'Enter') executeSearch('text')">
@@ -226,6 +223,7 @@
                     <div id="affiliate-history-list" style="max-height: 200px; overflow-y: auto; font-size: 13px; color: var(--text-muted);">
                         </div>
                 </div>
+
             </div>
         </div>
     </div>
@@ -404,7 +402,7 @@
 
 <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <script>
-    // ⚡ ตัวแปร API_URL สำหรับยิงข้อความเข้า LINE และ Telegram
+    // ⚡ ตั้งค่าเชื่อมต่อ Google Apps Script (ยิง LINE / Telegram)
     const API_URL = "https://script.google.com/macros/s/AKfycbwojqh2ry1b_xkuVp28w5q8Cs0CX9xBcI-upICxz98NtRrwnJ99GwLneWXFGQJySN1T/exec";
 
     // ⚡ ตั้งค่าเชื่อมต่อ Firebase
@@ -422,24 +420,23 @@
     const db = firebase.firestore();
     const storage = firebase.storage();
     
+    // โครงสร้างข้อมูลเริ่มต้นเผื่อ Firebase ว่างเปล่า
+    const defaultMainCats = [{ id: 'food', label: '🍽️ หมวดอาหาร', keyword: 'ร้านอาหาร' }, { id: 'beauty', label: '💆‍♀️ ความงาม/พักผ่อน', keyword: 'สปา' }, { id: 'activity', label: '🎯 กิจกรรม/เที่ยว', keyword: 'สถานที่ท่องเที่ยว' }, { id: 'sport', label: '🏋️ กีฬา/ออกกำลังกาย', keyword: 'ฟิตเนส' }];
+    const defaultCategories = [{ id: 1, group: 'food', label: 'หมูกระทะ / แจ่วฮ้อน', keyword: 'หมูกระทะ' }, { id: 2, group: 'food', label: 'ชาบู / สุกี้', keyword: 'ชาบู' }, { id: 3, group: 'food', label: 'ปิ้งย่าง / บาร์บีคิว', keyword: 'ปิ้งย่าง' }, { id: 4, group: 'food', label: 'บุฟเฟ่ต์สุดคุ้ม', keyword: 'บุฟเฟ่ต์' }];
+
     let appData = { registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], mainCategories: [], categories: [], closedReports: [], blacklistedPlaces: [], services: [], pendingVipRequests: [], vipSettings: { price: 500, bankAccount: 'กสิกรไทย 123-x-xxxxx-x ชื่อบัญชี' }, affiliateSettings: { firstTimeType: 'fixed', firstTimeValue: 100, recurringType: 'percent', recurringValue: 10, minWithdrawal: 300 }, affiliateWallets: [], withdrawalRequests: [] };
 
-    // ⚡ ฟังก์ชันแปลงรูปภาพเป็น Data URL (ปรับลดขนาดให้เหลือ 350px โหลดไวขึ้น 40%)
+    // ⚡ ฟังก์ชันแปลงและบีบอัดรูป
     const resizeImg = (file) => new Promise((resolve) => {
         if(!file) return resolve('');
-        const reader = new FileReader(); 
-        reader.readAsDataURL(file);
+        const reader = new FileReader(); reader.readAsDataURL(file);
         reader.onload = e => {
             const img = new Image(); img.src = e.target.result;
             img.onload = () => {
                 const canvas = document.createElement('canvas');
                 let width = img.width; let height = img.height; const max_size = 350; 
-                if (width > max_size || height > max_size) {
-                    if (width > height) { height = Math.round((height *= max_size / width)); width = max_size; } 
-                    else { width = Math.round((width *= max_size / height)); height = max_size; }
-                }
-                canvas.width = width; canvas.height = height; 
-                canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+                if (width > max_size || height > max_size) { if (width > height) { height = Math.round((height *= max_size / width)); width = max_size; } else { width = Math.round((width *= max_size / height)); height = max_size; } }
+                canvas.width = width; canvas.height = height; canvas.getContext('2d').drawImage(img, 0, 0, width, height);
                 resolve(canvas.toDataURL('image/jpeg', 0.4)); 
             };
             img.onerror = () => resolve('');
@@ -447,27 +444,26 @@
         reader.onerror = () => resolve('');
     });
 
-    // ⚡ ฟังก์ชันอัปโหลดรูปขึ้น Firebase Storage (แปลงรูปเป็นลิงก์)
+    // ⚡ อัปโหลดรูปขึ้น Firebase Storage
     async function uploadImageToStorage(dataUrl, folder) {
-        if (!dataUrl) return "";
-        if (dataUrl.startsWith('http')) return dataUrl; 
+        if (!dataUrl) return ""; if (dataUrl.startsWith('http')) return dataUrl; 
         const ref = storage.ref(`${folder}/${Date.now()}_${Math.random().toString(36).substring(2,9)}.jpg`);
         await ref.putString(dataUrl, 'data_url');
         return await ref.getDownloadURL();
     }
 
-    // ⚡ ฟังก์ชันยิงแจ้งเตือน Telegram ไปยัง Apps Script
     async function sendTelegramNotify(msg) {
         try { await fetch(API_URL, { method: 'POST', body: JSON.stringify({ telegramMsg: msg }) }); } catch(e) {}
     }
 
-    // ⚡ ฟังก์ชันดึงข้อมูลแบบ Real-time จาก Firestore (แทนที่ setInterval เดิม)
+    // ⚡ โหลดข้อมูลจาก Firebase (Real-time)
     let unsubscribe = null;
     function loadFromCloud() {
         return new Promise((resolve) => {
             unsubscribe = db.collection('painaidee').doc('systemData').onSnapshot((doc) => {
-                if (doc.exists) { appData = { ...appData, ...doc.data() }; } 
-                else { saveToCloud(); }
+                if (doc.exists) { appData = { ...appData, ...doc.data() }; } else { saveToCloud(); }
+                if (!appData.mainCategories || appData.mainCategories.length === 0) appData.mainCategories = JSON.parse(JSON.stringify(defaultMainCats));
+                if (!appData.categories || appData.categories.length === 0) appData.categories = JSON.parse(JSON.stringify(defaultCategories));
                 
                 ['registeredStores', 'activePromotions', 'mainCategories', 'categories', 'services', 'affiliateWallets', 'withdrawalRequests'].forEach(k => { if(!appData[k]) appData[k] = []; });
                 
@@ -478,11 +474,7 @@
         });
     }
 
-    // ⚡ ฟังก์ชันเซฟข้อมูลลง Firestore
-    async function saveToCloud() { 
-        try { await db.collection('painaidee').doc('systemData').set(appData); return true; } 
-        catch(e) { throw e; } 
-    }
+    async function saveToCloud() { try { await db.collection('painaidee').doc('systemData').set(appData); return true; } catch(e) { throw e; } }
 
     const provinces = [
         {id:'bkk',name:'กรุงเทพมหานคร',lat:13.7563,lng:100.5018},{id:'krabi',name:'กระบี่',lat:8.0863,lng:98.9063},{id:'kanchanaburi',name:'กาญจนบุรี',lat:14.0159,lng:99.5336},
@@ -517,7 +509,7 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         initSystem();
-        setTimeout(() => { if (!isAppReady && document.getElementById('loginCard').style.display === 'none') { showLoginCard(); } }, 4000);
+        setTimeout(() => { if (!isAppReady && document.getElementById('loginCard').style.display === 'none') showLoginCard(); }, 4000);
     });
 
     function showLoginCard() {
@@ -531,9 +523,7 @@
     }
 
     function copyHeaderAffCode() {
-        if(window.myAffCode) {
-            navigator.clipboard.writeText(window.myAffCode).then(() => { alert("คัดลอกรหัสแนะนำ " + window.myAffCode + " สำเร็จ! นำไปแชร์ให้เพื่อนหรือร้านค้าเพื่อรับสิทธิพิเศษได้เลยครับ"); });
-        }
+        if(window.myAffCode) { navigator.clipboard.writeText(window.myAffCode).then(() => { alert("คัดลอกรหัสแนะนำ " + window.myAffCode + " สำเร็จ!"); }); }
     }
 
     function copyAffLink() {
@@ -546,7 +536,7 @@
     async function initSystem() {
         try {
             await liff.init({ liffId: "2009598846-wiCUeV35" });
-            await loadFromCloud(); // ⚡ โหลดผ่าน Firebase OnSnapshot
+            await loadFromCloud(); // โหลดครั้งแรกผ่าน Firebase Snapshot
             
             const urlParams = new URLSearchParams(window.location.search);
             const targetPage = urlParams.get('page');
@@ -567,7 +557,6 @@
                 
                 document.getElementById('affiliate-actual-content').style.display = 'block';
                 document.getElementById('affiliate-guest-view').style.display = 'none';
-
                 document.getElementById('loginOverlay').style.display = 'none';
                 document.getElementById('appContent').style.display = 'block';
                 
@@ -580,7 +569,6 @@
 
                 if (targetPage === 'partner') { setTimeout(() => { navigateToPartner(); }, 300); }
                 if (targetPage === 'affiliate') { setTimeout(() => { navigateToAffiliate(); }, 300); }
-
             } else {
                 isAppReady = true;
                 document.getElementById('header-profile').innerHTML = `<div style="font-size: 50px; line-height: 100px; text-align: center;">👤</div>`;
@@ -633,48 +621,27 @@
     }
 
     async function requestWithdraw() {
-        const wallets = appData.affiliateWallets || [];
-        const myWallet = wallets.find(w => w.refCode === window.myAffCode);
-        if(!myWallet) return;
-        
-        const settings = appData.affiliateSettings || { minWithdrawal: 300 };
-        if(myWallet.balance < settings.minWithdrawal) return;
+        const wallets = appData.affiliateWallets || []; const myWallet = wallets.find(w => w.refCode === window.myAffCode); if(!myWallet) return;
+        const settings = appData.affiliateSettings || { minWithdrawal: 300 }; if(myWallet.balance < settings.minWithdrawal) return;
         
         const bankInfo = prompt(`ยอดเงินที่สามารถถอนได้คือ ${myWallet.balance.toLocaleString()} บาท\n\nกรุณากรอกข้อมูลบัญชีรับเงิน\n(รูปแบบ: ชื่อธนาคาร / เลขบัญชี / ชื่อ-สกุล):`);
         if(!bankInfo || bankInfo.trim() === '') return;
-        
         if(!appData.withdrawalRequests) appData.withdrawalRequests = [];
         
-        const reqAmount = myWallet.balance;
-        myWallet.balance = 0; 
-        
-        let uid = "";
-        try { if(liff.isLoggedIn()) uid = (await liff.getProfile()).userId; } catch(e){}
+        const reqAmount = myWallet.balance; myWallet.balance = 0; 
+        let uid = ""; try { if(liff.isLoggedIn()) uid = (await liff.getProfile()).userId; } catch(e){}
 
-        appData.withdrawalRequests.push({
-            id: Date.now().toString(), refCode: window.myAffCode, userId: uid, amount: reqAmount, bankDetails: bankInfo, status: 'pending', requestDate: new Date().toLocaleString()
-        });
-        
+        appData.withdrawalRequests.push({ id: Date.now().toString(), refCode: window.myAffCode, userId: uid, amount: reqAmount, bankDetails: bankInfo, status: 'pending', requestDate: new Date().toLocaleString() });
         try {
-            document.getElementById('btn-page-withdraw').innerText = 'กำลังส่งเรื่อง...';
-            document.getElementById('btn-page-withdraw').disabled = true;
+            document.getElementById('btn-page-withdraw').innerText = 'กำลังส่งเรื่อง...'; document.getElementById('btn-page-withdraw').disabled = true;
             await saveToCloud();
             sendTelegramNotify(`💸 <b>มีคำร้องขอถอนเงินค่าคอม!</b>\n\nรหัสตัวแทน: ${window.myAffCode}\nยอดถอน: <b>${reqAmount.toLocaleString()} บาท</b>\nบัญชี: ${bankInfo}\n\n👉 กรุณาโอนเงินและกดอนุมัติในหน้าแอดมินครับ`);
             alert("ส่งคำร้องขอถอนเงินเรียบร้อยแล้ว! แอดมินจะตรวจสอบและโอนเงินให้ท่านในเร็วๆ นี้ครับ");
             updateWalletUI(); 
-        } catch(e) {
-            alert("เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่");
-            myWallet.balance = reqAmount; updateWalletUI();
-        }
+        } catch(e) { alert("เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่"); myWallet.balance = reqAmount; updateWalletUI(); }
     }
 
-    function switchPage(p) { 
-        document.querySelectorAll('.page').forEach(el => el.classList.remove('active')); 
-        document.querySelectorAll('nav div').forEach(el => el.classList.remove('active')); 
-        document.getElementById('page-'+p).classList.add('active'); 
-        document.getElementById('tab-'+p).classList.add('active'); 
-    }
-
+    function switchPage(p) { document.querySelectorAll('.page').forEach(el => el.classList.remove('active')); document.querySelectorAll('nav div').forEach(el => el.classList.remove('active')); document.getElementById('page-'+p).classList.add('active'); document.getElementById('tab-'+p).classList.add('active'); }
     async function navigateToAffiliate() { switchPage('affiliate'); }
 
     async function navigateToPartner() {
@@ -703,18 +670,15 @@
         document.getElementById('partner-friend-blocker').innerHTML = `<img src="https://official-static.line-scdn.net/branding/logo-vertical.png" alt="LINE Official Account" class="line-logo-vertical"><div class="friend-note"><span style="color:var(--primary); font-weight:600;">⚠️ สำคัญมาก</span><br>สำหรับร้านค้าจำเป็นต้องเพิ่มเพื่อนก่อน เพื่อรับรหัสผ่านในการใช้งานครับ</div><button class="btn-line-glow" style="width: auto; padding: 14px 24px; border:none; border-radius:12px; font-family:'Kanit'; font-weight:600; font-size:16px; cursor:pointer; animation: none;" onclick="window.location.href='https://lin.ee/5SBoptj'">➕ เพิ่มเพื่อน LINE OA ของเรา</button><button class="btn-outline" style="margin-top: 20px; font-size: 13px; border-color:var(--dark-muted); color:var(--text-muted);" onclick="checkFriendshipForPartner(true)">ฉันเพิ่มเพื่อนแล้ว ตรวจสอบอีกครั้ง</button>`;
     }
 
-    let map, service, infoWindow, currentCoords = { lat: 15.2287, lng: 104.8564 }, googlePlaces = [], currentPagination = null;
-    let gpsMarker = null, activeMarker = null;
+    let map, service, infoWindow, currentCoords = { lat: 15.2287, lng: 104.8564 }, googlePlaces = [], currentPagination = null; let gpsMarker = null, activeMarker = null;
 
     function initMap() {
         const pSel = document.getElementById('provinceSelect'), prSel = document.getElementById('promoProvinceSelect');
-        if(pSel) pSel.innerHTML = '<option value="current">📍 ตำแหน่งปัจจุบัน</option>';
-        if(prSel) prSel.innerHTML = '';
+        if(pSel) pSel.innerHTML = '<option value="current">📍 ตำแหน่งปัจจุบัน</option>'; if(prSel) prSel.innerHTML = '';
         provinces.sort((a,b) => a.name.localeCompare(b.name, 'th')).forEach(p => { if(pSel) pSel.appendChild(new Option(p.name, p.id)); if(prSel) prSel.appendChild(new Option(p.name, p.id)); });
         if(pSel) pSel.value = 'current'; 
         map = new google.maps.Map(document.getElementById("map"), { center: currentCoords, zoom: 14, mapTypeControl: false, streetViewControl: false });
-        service = new google.maps.places.PlacesService(map);
-        infoWindow = new google.maps.InfoWindow();
+        service = new google.maps.places.PlacesService(map); infoWindow = new google.maps.InfoWindow();
         checkDataAndSearch();
     }
 
@@ -744,8 +708,7 @@
         const place = googlePlaces.find(p => p.place_id === placeId);
         if (place && place.geometry && place.geometry.location) {
             map.panTo(place.geometry.location); map.setZoom(17);
-            if (activeMarker) activeMarker.setMap(null);
-            activeMarker = new google.maps.Marker({ position: place.geometry.location, map: map, animation: google.maps.Animation.DROP });
+            if (activeMarker) activeMarker.setMap(null); activeMarker = new google.maps.Marker({ position: place.geometry.location, map: map, animation: google.maps.Animation.DROP });
             window.scrollTo({ top: document.getElementById('map').offsetTop - 20, behavior: 'smooth' });
         }
     }
@@ -755,8 +718,7 @@
         service.textSearch({ query: storeName, location: currentCoords, radius: 50000 }, (res, status) => {
             if (status === "OK" && res.length > 0) {
                 map.panTo(res[0].geometry.location); map.setZoom(17);
-                if (activeMarker) activeMarker.setMap(null);
-                activeMarker = new google.maps.Marker({ position: res[0].geometry.location, map: map, animation: google.maps.Animation.DROP });
+                if (activeMarker) activeMarker.setMap(null); activeMarker = new google.maps.Marker({ position: res[0].geometry.location, map: map, animation: google.maps.Animation.DROP });
             }
         });
     }
@@ -780,13 +742,7 @@
 
         const pCat = document.getElementById('promoStoreCategory');
         if(pCat) {
-            let ph = '';
-            mainCats.forEach((m) => {
-                ph += `<optgroup label="${m.label}">`; 
-                cData.filter(c => c.group === m.id).forEach(c => { ph += `<option value="${c.label}">${c.label}</option>`; }); 
-                ph += `</optgroup>`;
-            });
-            pCat.innerHTML = ph;
+            let ph = ''; mainCats.forEach((m) => { ph += `<optgroup label="${m.label}">`; cData.filter(c => c.group === m.id).forEach(c => { ph += `<option value="${c.label}">${c.label}</option>`; }); ph += `</optgroup>`; }); pCat.innerHTML = ph;
         }
 
         const sSel = document.getElementById('promoServiceSelect');
@@ -794,44 +750,27 @@
     }
 
     function executeSearch(type) {
-        if (!currentCoords) return; 
-        const searchBox = document.getElementById('searchBox');
-        const searchVal = searchBox ? searchBox.value.trim() : ""; 
-        let keywordToSearch = "ร้านอาหาร"; 
-        
-        const mainCats = (appData.mainCategories && appData.mainCategories.length > 0) ? appData.mainCategories : [];
+        if (!currentCoords) return; const searchBox = document.getElementById('searchBox'); const searchVal = searchBox ? searchBox.value.trim() : ""; let keywordToSearch = "ร้านอาหาร"; const mainCats = (appData.mainCategories && appData.mainCategories.length > 0) ? appData.mainCategories : [];
 
         if (searchVal !== "" && type === 'text') {
-            keywordToSearch = searchVal;
-            mainCats.forEach(m => { const s = document.getElementById(m.id+'Select'); if(s) s.selectedIndex = 0; });
+            keywordToSearch = searchVal; mainCats.forEach(m => { const s = document.getElementById(m.id+'Select'); if(s) s.selectedIndex = 0; });
         } else {
             const targetCat = mainCats.find(m => m.id === type);
             if (targetCat) {
-                const sel = document.getElementById(targetCat.id + 'Select');
-                keywordToSearch = (sel && sel.value) ? sel.value : targetCat.keyword;
+                const sel = document.getElementById(targetCat.id + 'Select'); keywordToSearch = (sel && sel.value) ? sel.value : targetCat.keyword;
                 mainCats.forEach(m => { if(m.id !== type) { const s = document.getElementById(m.id+'Select'); if(s) s.selectedIndex = 0; } });
                 if(searchBox) searchBox.value = "";
             } else {
-                let found = false;
-                for(let m of mainCats) {
-                    const sel = document.getElementById(m.id + 'Select');
-                    if(sel && sel.selectedIndex > 0) { keywordToSearch = sel.value; found = true; break; }
-                }
+                let found = false; for(let m of mainCats) { const sel = document.getElementById(m.id + 'Select'); if(sel && sel.selectedIndex > 0) { keywordToSearch = sel.value; found = true; break; } }
                 if(!found && mainCats.length > 0) keywordToSearch = mainCats[0].keyword;
             }
         }
         
-        googlePlaces = [];
-        document.getElementById('placeList').innerHTML = `<p style="text-align:center; grid-column:1/-1; padding:50px; color:var(--text-muted);">กำลังค้นหา <b>"${keywordToSearch}"</b>...</p>`;
+        googlePlaces = []; document.getElementById('placeList').innerHTML = `<p style="text-align:center; grid-column:1/-1; padding:50px; color:var(--text-muted);">กำลังค้นหา <b>"${keywordToSearch}"</b>...</p>`;
         
         service.nearbySearch({ location: currentCoords, radius: 5000, keyword: keywordToSearch }, (res, status, pag) => {
-            if(status === "OK") {
-                const blacklisted = appData.blacklistedPlaces || [];
-                googlePlaces = res.filter(p => !blacklisted.includes(p.place_id));
-                currentPagination = pag; renderCards(keywordToSearch);
-            } else {
-                document.getElementById('placeList').innerHTML = `<p style="text-align:center; grid-column:1/-1; padding:50px; color:var(--text-muted);">ไม่พบ <b>"${keywordToSearch}"</b> ในบริเวณนี้</p>`;
-            }
+            if(status === "OK") { const blacklisted = appData.blacklistedPlaces || []; googlePlaces = res.filter(p => !blacklisted.includes(p.place_id)); currentPagination = pag; renderCards(keywordToSearch);
+            } else { document.getElementById('placeList').innerHTML = `<p style="text-align:center; grid-column:1/-1; padding:50px; color:var(--text-muted);">ไม่พบ <b>"${keywordToSearch}"</b> ในบริเวณนี้</p>`; }
         });
     }
 
@@ -841,9 +780,7 @@
         const sorted = googlePlaces.sort((a, b) => {
             const isVipA = stores.find(s => s.name === a.name)?.isVIP ? 1 : 0; const isVipB = stores.find(s => s.name === b.name)?.isVIP ? 1 : 0;
             if (isVipA !== isVipB) return isVipB - isVipA; 
-            if (window.google && window.google.maps && window.google.maps.geometry) {
-                const distA = google.maps.geometry.spherical.computeDistanceBetween(originPoint, a.geometry.location); const distB = google.maps.geometry.spherical.computeDistanceBetween(originPoint, b.geometry.location); return distA - distB;
-            } return 0;
+            if (window.google && window.google.maps && window.google.maps.geometry) { const distA = google.maps.geometry.spherical.computeDistanceBetween(originPoint, a.geometry.location); const distB = google.maps.geometry.spherical.computeDistanceBetween(originPoint, b.geometry.location); return distA - distB; } return 0;
         });
         
         html += sorted.slice(0, 80).map(p => {
@@ -901,7 +838,11 @@
             provinces.forEach(p => { const destPoint = new google.maps.LatLng(p.lat, p.lng); const dist = google.maps.geometry.spherical.computeDistanceBetween(originPoint, destPoint); if (dist < minDist) { minDist = dist; curProv = p.id; } });
         } else if (curProv === 'current') { curProv = 'ubon'; }
         
-        const promos = activePromos.filter(p => p.province === curProv); const banner = document.getElementById('promoBanner');
+        // 🎲 สุ่มป้ายโปรโมท (Shuffle)
+        let promos = activePromos.filter(p => p.province === curProv);
+        promos = promos.sort(() => Math.random() - 0.5);
+
+        const banner = document.getElementById('promoBanner');
         
         if(promos.length > 0) {
             banner.style.display = 'block';
@@ -951,7 +892,6 @@
         });
     }
 
-    // ⚡ ฟังก์ชันลงทะเบียน (ย้ายรูปไป Firebase 🚀)
     async function submitStoreRegistration() {
         const btn = document.getElementById('btnSubmitReg'); const n = document.getElementById('regStoreName').value; const p1 = document.getElementById('regStorePhoto').files[0]; const p2 = document.getElementById('regIdCard').files[0]; const p3 = document.getElementById('regPhone').value; const refCode = document.getElementById('regRefCode').value;
 
@@ -1064,20 +1004,15 @@
         const btn = document.getElementById('btnSubmitVip'); btn.innerText = "กำลังส่งสลิป... ⏳"; btn.disabled = true;
         
         try {
-            const slipImg64 = await resizeImg(slipFile);
-            const slipUrl = await uploadImageToStorage(slipImg64, 'slips');
-            
+            const slipImg64 = await resizeImg(slipFile); const slipUrl = await uploadImageToStorage(slipImg64, 'slips');
             if(!appData.pendingVipRequests) appData.pendingVipRequests = [];
             appData.pendingVipRequests = appData.pendingVipRequests.filter(r => r.storeName !== store.name);
             appData.pendingVipRequests.push({ id: Date.now().toString(), storeName: store.name, slipImage: slipUrl, requestDate: new Date().toLocaleString() });
             
-            await saveToCloud();
-            sendTelegramNotify(`👑 <b>มีร้านค้าส่งสลิปขอเปิด VIP!</b>\n\n🏬 ร้าน: <b>${store.name}</b>\n\n👉 กรุณาเข้าหน้าแอดมินเพื่อตรวจสอบสลิปครับ`);
-
+            await saveToCloud(); sendTelegramNotify(`👑 <b>มีร้านค้าส่งสลิปขอเปิด VIP!</b>\n\n🏬 ร้าน: <b>${store.name}</b>\n\n👉 กรุณาเข้าหน้าแอดมินเพื่อตรวจสอบสลิปครับ`);
             alert("ส่งสลิปสำเร็จ! กรุณารอแอดมินอนุมัติสถานะ VIP ครับ (หลังจากอนุมัติ ช่องกรอก LINE/FB จะเปิดให้ใช้งาน)");
             document.getElementById('vipSlipInput').value = '';
-        } catch (error) { alert("❌ ไม่สามารถส่งข้อมูลได้ กรุณาลองใหม่อีกครั้ง"); } 
-        finally { btn.innerText = "ส่งสลิปเพื่ออัปเกรด VIP"; btn.disabled = false; }
+        } catch (error) { alert("❌ ไม่สามารถส่งข้อมูลได้ กรุณาลองใหม่อีกครั้ง"); } finally { btn.innerText = "ส่งสลิปเพื่ออัปเกรด VIP"; btn.disabled = false; }
     }
 
     async function updateVipData() {
@@ -1093,24 +1028,17 @@
         btn.innerText = "กำลังอัปโหลดข้อมูล (ความเร็วสูง)... 🚀"; btn.disabled = true;
         
         try {
-            let imgUrl = window.currentPromoImage || ""; 
-            if(pImgFile) { const img64 = await resizeImg(pImgFile); imgUrl = await uploadImageToStorage(img64, 'promos'); }
-            let slipUrl = ""; 
-            if(pSlipFile) { const slip64 = await resizeImg(pSlipFile); slipUrl = await uploadImageToStorage(slip64, 'slips'); }
+            let imgUrl = window.currentPromoImage || ""; if(pImgFile) { const img64 = await resizeImg(pImgFile); imgUrl = await uploadImageToStorage(img64, 'promos'); }
+            let slipUrl = ""; if(pSlipFile) { const slip64 = await resizeImg(pSlipFile); slipUrl = await uploadImageToStorage(slip64, 'slips'); }
             
             if (!appData.pendingPromotions) appData.pendingPromotions = [];
             appData.pendingPromotions = appData.pendingPromotions.filter(p => p.storeName !== store.name);
             appData.pendingPromotions.push({ id: Date.now().toString(), storeName: store.name, province: document.getElementById('promoProvinceSelect').value, detail: document.getElementById('promoDetail').value, image: imgUrl, slipImage: slipUrl, service: document.getElementById('promoServiceSelect').value, category: document.getElementById('promoStoreCategory').value, lineUrl: store.lineUrl || '', fbUrl: store.fbUrl || '', isUpdateOnly: false, isFreeRedeem: isFree });
-            
             if(isFree) { store.freePromoDays = 0; } 
             
-            await saveToCloud(); 
-            sendTelegramNotify(`🔥 <b>มีการสั่งซื้อ/ต่ออายุแบนเนอร์!</b>\n\n🏬 ร้าน: <b>${store.name}</b>\n📌 หมวด: ${document.getElementById('promoStoreCategory').value}\n\n👉 กรุณาตรวจสอบและอนุมัติในหน้าแอดมินครับ`);
-
-            alert(isFree ? "ใช้สิทธิ์โปรโมทฟรีสำเร็จ! รอแอดมินอนุมัติแบนเนอร์ขึ้นระบบครับ" : "สั่งซื้อสำเร็จ! รอแอดมินตรวจสอบสลิปและอนุมัติครับ"); 
-            document.getElementById('promoImageInput').value = '';
-        } catch (error) { alert("❌ ไม่สามารถส่งข้อมูลได้ กรุณาลองใหม่อีกครั้ง"); } 
-        finally { btn.innerText = "🚀 สั่งซื้อและส่งเรื่องอัปเดตข้อมูล"; btn.disabled = false; }
+            await saveToCloud(); sendTelegramNotify(`🔥 <b>มีการสั่งซื้อ/ต่ออายุแบนเนอร์!</b>\n\n🏬 ร้าน: <b>${store.name}</b>\n📌 หมวด: ${document.getElementById('promoStoreCategory').value}\n\n👉 กรุณาตรวจสอบและอนุมัติในหน้าแอดมินครับ`);
+            alert(isFree ? "ใช้สิทธิ์โปรโมทฟรีสำเร็จ! รอแอดมินอนุมัติแบนเนอร์ขึ้นระบบครับ" : "สั่งซื้อสำเร็จ! รอแอดมินตรวจสอบสลิปและอนุมัติครับ"); document.getElementById('promoImageInput').value = '';
+        } catch (error) { alert("❌ ไม่สามารถส่งข้อมูลได้ กรุณาลองใหม่อีกครั้ง"); } finally { btn.innerText = "🚀 สั่งซื้อและส่งเรื่องอัปเดตข้อมูล"; btn.disabled = false; }
     }
 
     async function submitEditPromo() {
@@ -1120,34 +1048,15 @@
         btn.innerText = "กำลังอัปโหลดข้อมูล (ความเร็วสูง)... 🚀"; btn.disabled = true;
         try {
             const pImgFile = document.getElementById('editPromoImageInput').files[0]; const pDet = document.getElementById('editPromoDetailInput').value;
-            let imgUrl = activePromo.image; 
-            if(pImgFile) { const img64 = await resizeImg(pImgFile); imgUrl = await uploadImageToStorage(img64, 'promos'); }
+            let imgUrl = activePromo.image; if(pImgFile) { const img64 = await resizeImg(pImgFile); imgUrl = await uploadImageToStorage(img64, 'promos'); }
             
             if (!appData.pendingPromotions) appData.pendingPromotions = [];
             appData.pendingPromotions = appData.pendingPromotions.filter(p => p.storeName !== store.name);
             appData.pendingPromotions.push({ id: Date.now().toString(), storeName: store.name, province: activePromo.province, detail: pDet, image: imgUrl, service: activePromo.service, category: activePromo.category, lineUrl: store.lineUrl || '', fbUrl: store.fbUrl || '', isUpdateOnly: true });
             
-            await saveToCloud(); 
-            sendTelegramNotify(`📝 <b>มีการขอแก้ไขแบนเนอร์!</b>\n\n🏬 ร้าน: <b>${store.name}</b>\n\n👉 กรุณาตรวจสอบในหน้าแอดมินครับ`);
-
-            alert("ส่งข้อมูลขอแก้ไขเรียบร้อย! รอแอดมินตรวจสอบการเปลี่ยนแปลงครับ (วันหมดอายุจะคงเดิม)");
-            document.getElementById('editPromoImageInput').value = '';
+            await saveToCloud(); sendTelegramNotify(`📝 <b>มีการขอแก้ไขแบนเนอร์!</b>\n\n🏬 ร้าน: <b>${store.name}</b>\n\n👉 กรุณาตรวจสอบในหน้าแอดมินครับ`);
+            alert("ส่งข้อมูลขอแก้ไขเรียบร้อย! รอแอดมินตรวจสอบการเปลี่ยนแปลงครับ (วันหมดอายุจะคงเดิม)"); document.getElementById('editPromoImageInput').value = '';
         } catch (error) { alert("❌ ไม่สามารถส่งข้อมูลได้ กรุณาลองใหม่อีกครั้ง"); } finally { btn.innerText = "🔄 ส่งเรื่องขอแก้ไขข้อมูล"; btn.disabled = false; }
-    }
-
-    function callPlace(placeId, event) {
-        event.stopPropagation();
-        service.getDetails({ placeId: placeId, fields: ['formatted_phone_number'] }, (place, status) => {
-            if (status === google.maps.places.PlacesServiceStatus.OK && place.formatted_phone_number) {
-                window.location.href = 'tel:' + place.formatted_phone_number.replace(/[^0-9+]/g, '');
-            } else { alert("ขออภัยครับ ไม่พบเบอร์โทรศัพท์ของสถานที่นี้ในระบบแผนที่"); }
-        });
-    }
-
-    function sharePlace(name, lat, lng, event) {
-        event.stopPropagation(); const mapUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
-        if (navigator.share) { navigator.share({ title: 'แอปไปไหนดี', text: `ลองดูร้าน "${name}" สิ! น่าสนใจมากเลย 📍 ดูพิกัดได้ที่นี่: `, url: mapUrl }).catch(err => console.log('Share failed:', err));
-        } else { navigator.clipboard.writeText(mapUrl).then(() => { alert('คัดลอกลิงก์พิกัดเรียบร้อยแล้ว! สามารถนำไปวาง (Paste) ส่งให้เพื่อนได้เลยครับ'); }); }
     }
 </script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD7Qqf1Z9KQBuvipDzgIc5laJLz9SiOBH8&libraries=places,geometry&callback=initMap" async defer></script>
