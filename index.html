@@ -180,7 +180,7 @@
         </div>
 
         <div>
-            <a href="https://liff.line.me/2009598846-wiCUeV35" class="btn-line-glow" style="margin-bottom: 8px;">
+            <a href="https://liff.line.me/2009598846-wiCUeV35?page=partner" class="btn-line-glow" style="margin-bottom: 8px;">
                 📱 เข้าสู่ระบบด้วย LINE
             </a>
             <p style="font-size: 12.5px; color: rgba(255,255,255,0.7); margin: 0; line-height: 1.4;">
@@ -251,13 +251,21 @@
                 <span style="color:var(--primary); font-weight:600;">⚠️ สำหรับร้านค้า</span><br>
                 กรุณาเข้าใช้งานผ่านแอป LINE<br>เพื่อรับรหัส PIN ในการจัดการร้านครับ
             </div>
-            <button class="btn-line-glow" style="width: auto; padding: 14px 24px; border:none; border-radius:12px; font-family:'Kanit'; font-weight:600; font-size:16px; cursor:pointer;" onclick="window.open('https://liff.line.me/2009598846-wiCUeV35', '_self')">
+            <button class="btn-line-glow" style="width: auto; padding: 14px 24px; border:none; border-radius:12px; font-family:'Kanit'; font-weight:600; font-size:16px; cursor:pointer; animation: none;" onclick="window.open('https://liff.line.me/2009598846-wiCUeV35?page=partner', '_self')">
                 📱 เปิดใช้งานผ่านแอป LINE
             </button>
             <button class="btn-outline" style="margin-top: 20px; font-size: 13px; border-color:var(--dark-muted); color:var(--text-muted);" onclick="checkFriendshipForPartner(true)">ฉันเพิ่มเพื่อนแล้ว ตรวจสอบอีกครั้ง</button>
         </div>
 
         <div id="partner-actual-content">
+
+            <div class="dashboard-card" style="padding: 15px 20px; border: 2px dashed var(--info); text-align: center; background: rgba(23, 162, 184, 0.05);">
+                <p style="margin: 0 0 5px 0; color: var(--text-main); font-size: 14px;">🎁 รหัสแนะนำเพื่อน (Affiliate)</p>
+                <p style="margin: 0 0 10px 0; color: var(--text-muted); font-size: 12px;">ให้ร้านค้าใหม่กรอกรหัสนี้ตอนสมัคร เพื่อรับค่าคอมมิชชั่น!</p>
+                <h3 id="myAffiliateCode" style="margin: 0 0 10px 0; color: var(--info); font-size: 26px; letter-spacing: 2px;">-</h3>
+                <button class="btn-outline" style="padding: 6px 20px; font-size: 13px; border-color: var(--info); color: var(--info); width: auto;" onclick="copyAffCode()">📋 คัดลอกรหัส</button>
+            </div>
+
             <div class="dashboard-card" id="registerNewStoreCard" style="border-top: 3px solid var(--primary); border-bottom: 3px solid var(--primary);">
                 <h3 style="border:none;">ลงทะเบียนร้านค้าใหม่</h3>
                 <p style="font-size: 14px; color: var(--text-muted); margin-top: -10px; margin-bottom: 20px;">ส่งเอกสารให้แอดมินตรวจสอบ เพื่อรับ "รหัสลับ (Store PIN)"</p>
@@ -430,35 +438,9 @@
         { id: 7, group: 'food', label: 'ร้านนั่งชิล / บาร์ / ดนตรีสด', keyword: 'ร้านเหล้า' },
         { id: 8, group: 'food', label: 'ส้มตำ / อาหารอีสาน', keyword: 'ร้านส้มตำ' },
         { id: 9, group: 'food', label: 'อาหารญี่ปุ่น / ซูชิ', keyword: 'อาหารญี่ปุ่น' },
-        { id: 10, group: 'food', label: 'อาหารตามสั่ง / จานด่วน', keyword: 'อาหารตามสั่ง' },
-        { id: 11, group: 'food', label: 'ก๋วยเตี๋ยว / บะหมี่', keyword: 'ก๋วยเตี๋ยว' },
-        { id: 12, group: 'food', label: 'ข้าวต้มโต้รุ่ง / รอบดึก', keyword: 'ร้านข้าวต้ม' },
-        { id: 13, group: 'beauty', label: 'ร้านนวดแผนไทย / นวดสปา', keyword: 'ร้านนวด' },
-        { id: 14, group: 'beauty', label: 'คลินิกเสริมความงาม', keyword: 'คลินิกความงาม' },
-        { id: 15, group: 'beauty', label: 'ทำผม / ซาลอน / บาร์เบอร์', keyword: 'ร้านทำผม' },
-        { id: 16, group: 'beauty', label: 'ทำเล็บ / ต่อขนตา', keyword: 'ร้านทำเล็บ' },
-        { id: 17, group: 'beauty', label: 'ทำฟัน / คลินิกทันตกรรม', keyword: 'คลินิกทำฟัน' },
-        { id: 18, group: 'beauty', label: 'ออนเซ็น / แช่น้ำร้อน', keyword: 'ออนเซ็น' },
-        { id: 19, group: 'activity', label: 'สถานที่ท่องเที่ยว / แลนด์มาร์ค', keyword: 'สถานที่ท่องเที่ยว' },
-        { id: 20, group: 'activity', label: 'วัด / ไหว้พระ / สายมู', keyword: 'วัด' },
-        { id: 21, group: 'activity', label: 'ตลาดนัด / ถนนคนเดิน', keyword: 'ตลาดนัด' },
-        { id: 22, group: 'activity', label: 'ห้างสรรพสินค้า / ช้อปปิ้ง', keyword: 'ห้างสรรพสินค้า' },
-        { id: 23, group: 'activity', label: 'แคมป์ปิ้ง / กางเต็นท์', keyword: 'แคมป์ปิ้ง' },
-        { id: 24, group: 'activity', label: 'โรงแรม / รีสอร์ท / ที่พัก', keyword: 'โรงแรม' },
-        { id: 25, group: 'activity', label: 'พูลวิลล่า / บ้านพักตากอากาศ', keyword: 'พูลวิลล่า' },
-        { id: 26, group: 'activity', label: 'สวนสนุก / สวนน้ำ', keyword: 'สวนน้ำ' },
-        { id: 27, group: 'activity', label: 'สวนสาธารณะ / พักผ่อน', keyword: 'สวนสาธารณะ' },
-        { id: 28, group: 'activity', label: 'พิพิธภัณฑ์ / หอศิลป์', keyword: 'พิพิธภัณฑ์' },
-        { id: 29, group: 'sport', label: 'ฟิตเนส / ยิม', keyword: 'ฟิตเนส' },
-        { id: 30, group: 'sport', label: 'สนามฟุตบอล / หญ้าเทียม', keyword: 'สนามฟุตบอล' },
-        { id: 31, group: 'sport', label: 'สนามแบดมินตัน', keyword: 'สนามแบดมินตัน' },
-        { id: 32, group: 'sport', label: 'สระว่ายน้ำ', keyword: 'สระว่ายน้ำ' },
-        { id: 33, group: 'sport', label: 'มวยไทย / ค่ายมวย', keyword: 'ค่ายมวย' },
-        { id: 34, group: 'sport', label: 'โยคะ / พิลาทิส', keyword: 'โยคะ' },
-        { id: 35, group: 'sport', label: 'สนามกอล์ฟ / ไดร์ฟกอล์ฟ', keyword: 'สนามกอล์ฟ' }
+        { id: 10, group: 'food', label: 'อาหารตามสั่ง / จานด่วน', keyword: 'อาหารตามสั่ง' }
     ];
 
-    const defaultServices = [{ id: 1, name: 'อัปเดตแก้ไขแบนเนอร์ (ต่อครั้ง)', price: 150 }];
     let appData = { registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], categories: [], closedReports: [], blacklistedPlaces: [], services: [], pendingVipRequests: [], vipSettings: { price: 500, bankAccount: 'กสิกรไทย 123-x-xxxxx-x ชื่อบัญชี' } };
 
     const provinces = [
@@ -568,21 +550,47 @@
         document.getElementById('appContent').style.display = 'block';
     }
 
+    // ⚡ ก๊อปปี้รหัส Affiliate
+    function copyAffCode() {
+        if(window.myAffCode) {
+            navigator.clipboard.writeText(window.myAffCode).then(() => {
+                alert("คัดลอกรหัสแนะนำ " + window.myAffCode + " สำเร็จ! ส่งให้เพื่อนกรอกตอนสมัครเพื่อรับค่าคอมได้เลยครับ");
+            });
+        }
+    }
+
     async function initSystem() {
         try {
             await liff.init({ liffId: "2009598846-wiCUeV35" });
             await loadFromCloud();
             
+            // ⚡ ดึงพารามิเตอร์จาก URL ว่าเปิดลิงก์ตั้งใจจะไปหน้าไหน
+            const urlParams = new URLSearchParams(window.location.search);
+            const targetPage = urlParams.get('page');
+
             if (liff.isLoggedIn()) {
                 isAppReady = true; 
                 document.getElementById('loadingText').innerText = "กำลังดึงข้อมูลแผนที่...";
                 const profile = await liff.getProfile();
                 document.getElementById('header-profile').innerHTML = `<img src="${profile.pictureUrl}" style="width:100%; height:100%; object-fit:cover;">`;
                 
+                // ⚡ สร้างรหัสแนะนำ Affiliate ประจำตัว
+                const myCode = "AFF" + profile.userId.substring(0, 5).toUpperCase();
+                if(document.getElementById('myAffiliateCode')) {
+                    document.getElementById('myAffiliateCode').innerText = myCode;
+                    window.myAffCode = myCode;
+                }
+
                 document.getElementById('loginOverlay').style.display = 'none';
                 document.getElementById('appContent').style.display = 'block';
+
+                // ⚡ ถ้าล็อกอินเสร็จแล้วพบพารามิเตอร์ลับ ให้เตะไปหน้าร้านค้าอัตโนมัติ!
+                if (targetPage === 'partner') {
+                    setTimeout(() => { navigateToPartner(); }, 300);
+                }
+
             } else {
-                // ถ้ายังไม่ล็อกอิน ให้โชว์หน้า Welcome แบบ Guest
+                // ถ้ายังไม่ล็อกอิน ให้โชว์หน้า Welcome แบบให้เลือกเข้า
                 isAppReady = true;
                 document.getElementById('header-profile').innerHTML = `<div style="font-size: 50px; line-height: 100px; text-align: center;">👤</div>`;
                 showLoginCard();
@@ -596,7 +604,7 @@
     }
 
     async function navigateToPartner() {
-        // ⚡ ถ้ายังไม่ล็อกอิน LINE บังคับเตะให้ไปเข้าผ่านลิงก์ LIFF เพื่อเปิด LINE
+        // ⚡ ถ้ายังไม่ล็อกอิน LINE บังคับเตะให้ไปเข้าผ่านลิงก์ LIFF เพื่อเปิด LINE อัตโนมัติ
         if (!liff.isLoggedIn()) {
             const blocker = document.getElementById('partner-friend-blocker');
             const content = document.getElementById('partner-actual-content');
@@ -610,7 +618,7 @@
                     <span style="color:var(--primary); font-weight:600; font-size: 18px;">⚠️ สำหรับร้านค้า</span><br>
                     กรุณาเข้าใช้งานผ่านแอป LINE<br>เพื่อรับรหัส PIN ในการจัดการร้านครับ
                 </div>
-                <button class="btn-line-glow" style="width: auto; padding: 14px 24px; border:none; border-radius:12px; font-family:'Kanit'; font-weight:600; font-size:16px; cursor:pointer;" onclick="window.open('https://liff.line.me/2009598846-wiCUeV35', '_self')">
+                <button class="btn-line-glow" style="width: auto; padding: 14px 24px; border:none; border-radius:12px; font-family:'Kanit'; font-weight:600; font-size:16px; cursor:pointer;" onclick="window.open('https://liff.line.me/2009598846-wiCUeV35?page=partner', '_self')">
                     📱 เปิดใช้งานผ่านแอป LINE
                 </button>
             `;
@@ -965,7 +973,7 @@
     // ⚡ ฟังก์ชันลงทะเบียน
     async function submitStoreRegistration() {
         const btn = document.getElementById('btnSubmitReg'); const n = document.getElementById('regStoreName').value; const p1 = document.getElementById('regStorePhoto').files[0]; const p2 = document.getElementById('regIdCard').files[0]; const p3 = document.getElementById('regPhone').value; 
-        const refCode = document.getElementById('regRefCode').value;
+        const refCode = document.getElementById('regRefCode').value; 
 
         if(!n || !p1 || !p2 || !p3) return alert("กรุณากรอกข้อมูลและแนบรูปให้ครบครับ");
         
