@@ -544,14 +544,14 @@
             img.onload = () => {
                 const canvas = document.createElement('canvas');
                 let width = img.width; let height = img.height; 
-                const max_size = 500; 
+                const max_size = 350; 
                 if (width > max_size || height > max_size) {
                     if (width > height) { height = Math.round((height *= max_size / width)); width = max_size; } 
                     else { width = Math.round((width *= max_size / height)); height = max_size; }
                 }
                 canvas.width = width; canvas.height = height; 
                 canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-                resolve(canvas.toDataURL('image/jpeg', 0.6)); 
+                resolve(canvas.toDataURL('image/jpeg', 0.4)); 
             };
             img.onerror = () => resolve('');
         };
