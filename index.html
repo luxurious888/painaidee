@@ -68,7 +68,6 @@
         .action-buttons { display: flex; gap: 8px; margin-top: auto; padding-top: 15px; flex-wrap: wrap; pointer-events: auto; }
         .btn-action { flex: 1; text-align: center; color: white; text-decoration: none; padding: 10px 5px; border-radius: 10px; font-weight: 500; font-size: 12px; transition: 0.3s; border: none; cursor: pointer; font-family: 'Kanit'; min-width: 30%; }
         .btn-nav { background: #4285F4 !important; color: #FFF !important; border: none !important; font-weight: 600; box-shadow: 0 4px 10px rgba(66, 133, 244, 0.3); }
-        .btn-nav:hover { background: #357AE8 !important; transform: translateY(-2px); }
         .btn-call { background: var(--primary); color: white; }
         .btn-share { background: transparent; color: var(--text-gold); border: 1px solid var(--border); }
         .status-tag { display: inline-flex; align-items: center; justify-content: center; padding: 4px 8px; border-radius: 20px; font-size: 11px; font-weight: 500; white-space: nowrap; box-shadow: 0 2px 5px rgba(0,0,0,0.2); line-height: 1.2; }
@@ -92,25 +91,53 @@
 
         .dashboard-card { background: var(--surface); padding: 25px; border-radius: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); margin-bottom: 24px; border: 1px solid var(--border); }
         .dashboard-card h3 { margin-top: 0; color: var(--primary-light); border-bottom: 2px solid var(--border); padding-bottom: 12px; font-weight: 500; }
-        .form-group { margin-bottom: 18px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px; color: #FFF; }
         
-        #loginOverlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(18, 20, 24, 0.95); backdrop-filter: blur(15px); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .login-card { background: var(--surface); padding: 40px; border-radius: 24px; text-align: center; max-width: 350px; width: 90%; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid var(--border); animation: fadeIn 0.5s ease; }
-        .btn-line-login { background-color: var(--line-green); color: white; border: none; padding: 15px 20px; border-radius: 12px; font-family: 'Kanit'; font-weight: 600; font-size: 16px; width: 100%; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 5px 15px rgba(6, 199, 85, 0.3); text-decoration: none;}
+        /* 📝 จัดฟอร์มใหม่ให้อ่านง่าย */
+        .form-group { margin-bottom: 22px; }
+        .form-group label { display: block; font-weight: 500; font-size: 15px; color: #FFF; margin-bottom: 4px; }
+        .form-group .hint { font-size: 12.5px; color: var(--text-muted); margin-top: 0; margin-bottom: 10px; line-height: 1.4; }
         
-        /* 🛡️ สไตล์สำหรับหน้าจอ "บังคับเพิ่มเพื่อน" ของร้านค้า */
+        /* 🌟 เอฟเฟกต์หน้า Login ล้ำยุค */
+        #loginOverlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #0A0B0E; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
+        
+        .bg-animation { position: absolute; inset: 0; overflow: hidden; z-index: 1; background: radial-gradient(circle at center, #1A1D23 0%, #0A0B0E 100%); }
+        .orb { position: absolute; border-radius: 50%; filter: blur(70px); opacity: 0.6; animation: floatOrb 12s infinite ease-in-out alternate; mix-blend-mode: screen; }
+        .orb-1 { width: 350px; height: 350px; background: #C5A059; top: -10%; left: -10%; animation-delay: 0s; }
+        .orb-2 { width: 400px; height: 400px; background: #17a2b8; bottom: -20%; right: -10%; animation-delay: -4s; }
+        .orb-3 { width: 250px; height: 250px; background: #06C755; top: 30%; left: 50%; animation-delay: -8s; }
+        @keyframes floatOrb { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(40px, 60px) scale(1.1); } }
+
+        .glass-card { 
+            background: rgba(26, 29, 35, 0.6); 
+            backdrop-filter: blur(20px); 
+            -webkit-backdrop-filter: blur(20px); 
+            border: 1px solid rgba(197, 160, 89, 0.3); 
+            padding: 40px; border-radius: 24px; text-align: center; width: 90%; max-width: 360px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5), inset 0 0 20px rgba(197,160,89,0.1); 
+            z-index: 10; animation: fadeIn 0.8s ease; 
+        }
+        
+        .btn-line-login { 
+            background: linear-gradient(90deg, #06C755, #05A044); color: white; border: none; padding: 16px 20px; border-radius: 14px; 
+            font-family: 'Kanit'; font-weight: 600; font-size: 16px; width: 100%; cursor: pointer; transition: 0.3s; 
+            display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none;
+            box-shadow: 0 0 15px rgba(6, 199, 85, 0.4); animation: pulse-green 2.5s infinite;
+        }
+        .btn-line-login:hover { transform: translateY(-2px); box-shadow: 0 0 25px rgba(6, 199, 85, 0.7); }
+        @keyframes pulse-green { 0% { box-shadow: 0 0 10px rgba(6, 199, 85, 0.3); } 50% { box-shadow: 0 0 25px rgba(6, 199, 85, 0.6); } 100% { box-shadow: 0 0 10px rgba(6, 199, 85, 0.3); } }
+
+        /* 🛡️ แจ้งเตือนแอดเพื่อน */
         #partner-friend-blocker { display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 50px 20px; background: var(--surface); border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         #partner-actual-content { display: none; }
         .line-logo-vertical { width: 100px; height: auto; margin-bottom: 25px; }
         .friend-note { color: #FFF; font-size: 16px; font-weight: 400; line-height: 1.6; max-width: 300px; margin-bottom: 30px; }
 
-        .spinner { width: 50px; height: 50px; border: 5px solid var(--surface); border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        .spinner { width: 50px; height: 50px; border: 5px solid rgba(197,160,89,0.2); border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
         #appContent { display: none; }
 
-        /* 🚀 CSS สำหรับสไลด์โปรโมทแนวนอน */
+        /* 🚀 CSS สไลด์โปรโมท */
         .promo-carousel { display: flex; overflow-x: auto; gap: 16px; padding-bottom: 15px; scroll-snap-type: x mandatory; scrollbar-width: none; margin-top: 15px; }
         .promo-carousel::-webkit-scrollbar { display: none; }
         .promo-item { flex: 0 0 85%; max-width: 340px; scroll-snap-align: center; }
@@ -119,19 +146,25 @@
 <body>
 
 <div id="loginOverlay">
-    <div id="loadingSpinner" style="display: flex; flex-direction: column; align-items: center;">
-        <div class="spinner"></div>
-        <h3 style="color: var(--primary); margin: 0;" id="loadingText">กำลังเตรียมระบบ...</h3>
-        <p style="color: var(--text-muted); font-size: 14px;">กรุณารอสักครู่เพื่อเข้าสู่แอปไปไหนดี</p>
+    <div class="bg-animation">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
     </div>
 
-    <div class="login-card" id="loginCard" style="display: none;">
-        <div style="width:100px; height:100px; border-radius:50%; background:var(--dark); border: 2px solid var(--primary); display: flex; flex-direction: column; align-items:center; justify-content:center; margin: 0 auto 20px;">
-            <p style="margin: 0; color:var(--text-gold); font-family: 'Kanit'; font-weight: 600; font-size: 18px;">ไป<br>ไหนดี</p>
+    <div id="loadingSpinner" style="display: flex; flex-direction: column; align-items: center; z-index: 10;">
+        <div class="spinner" style="width: 70px; height: 70px; border-width: 6px;"></div>
+        <h3 style="color: var(--primary); margin: 0; font-size: 20px; letter-spacing: 1px;" id="loadingText">กำลังเตรียมระบบ...</h3>
+        <p style="color: rgba(255,255,255,0.7); font-size: 14px; margin-top: 8px;">กรุณารอสักครู่เพื่อเข้าสู่แอปไปไหนดี</p>
+    </div>
+
+    <div class="glass-card" id="loginCard" style="display: none;">
+        <div style="width:110px; height:110px; border-radius:50%; background:var(--dark); border: 2px solid var(--primary); display: flex; flex-direction: column; align-items:center; justify-content:center; margin: 0 auto 20px; box-shadow: 0 0 20px rgba(197,160,89,0.3);">
+            <p style="margin: 0; color:var(--text-gold); font-family: 'Kanit'; font-weight: 600; font-size: 20px; line-height: 1.2;">ไป<br>ไหนดี</p>
         </div>
-        <h2 style="color: #FFF; margin: 0 0 10px 0;">ยินดีต้อนรับ</h2>
-        <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 30px;">กรุณาเข้าสู่ระบบผ่าน LINE เพื่อค้นหาและรับโปรโมชั่นพิเศษ</p>
-        <a href="https://liff.line.me/2009598846-wiCUeV35" class="btn-line-login">📱 เข้าสู่ระบบ / เปิดในแอป LINE</a>
+        <h2 style="color: #FFF; margin: 0 0 10px 0; font-size: 24px;">ยินดีต้อนรับ</h2>
+        <p style="color: rgba(255,255,255,0.8); font-size: 14px; margin-bottom: 35px; line-height: 1.5;">กรุณาเข้าสู่ระบบผ่าน LINE<br>เพื่อค้นหาและรับโปรโมชั่นพิเศษ</p>
+        <a href="https://liff.line.me/2009598846-wiCUeV35" class="btn-line-login">📱 เข้าสู่ระบบด้วย LINE</a>
     </div>
 </div>
 
@@ -191,16 +224,18 @@
                 <span style="color:var(--primary); font-weight:600;">⚠️ สำคัญมาก</span><br>
                 สำหรับร้านค้าจำเป็นต้องเพิ่มเพื่อนก่อน เพื่อรับรหัสผ่านในการใช้งานครับ
             </div>
-            <button class="btn-line-login" style="width: auto; padding: 12px 24px;" onclick="window.open('https://lin.ee/5SBoptj', '_blank')">➕ เพิ่มเพื่อน LINE OA ของเรา</button>
+            <button class="btn-line-login" style="width: auto; padding: 12px 24px; animation: none;" onclick="window.open('https://lin.ee/5SBoptj', '_blank')">➕ เพิ่มเพื่อน LINE OA ของเรา</button>
             <button class="btn-outline" style="margin-top: 20px; font-size: 13px; border-color:var(--dark-muted); color:var(--text-muted);" onclick="checkFriendshipForPartner(true)">ฉันเพิ่มเพื่อนแล้ว ตรวจสอบอีกครั้ง</button>
         </div>
 
         <div id="partner-actual-content">
             <div class="dashboard-card" id="registerNewStoreCard" style="border-top: 3px solid var(--primary); border-bottom: 3px solid var(--primary);">
                 <h3 style="border:none;">ลงทะเบียนร้านค้าใหม่</h3>
-                <p style="font-size: 14px; color: var(--text-muted); margin-top: -10px;">ส่งเอกสารให้แอดมินตรวจสอบ เพื่อรับ "รหัสลับ (Store PIN)"</p>
+                <p style="font-size: 14px; color: var(--text-muted); margin-top: -10px; margin-bottom: 20px;">ส่งเอกสารให้แอดมินตรวจสอบ เพื่อรับ "รหัสลับ (Store PIN)"</p>
+                
                 <div class="form-group">
                     <label>1. ค้นหาพิกัดร้านจากแผนที่</label>
+                    <p class="hint">พิมพ์ชื่อร้านเพื่อปักหมุดตำแหน่งร้านของคุณบนแผนที่</p>
                     <div style="display: flex; gap: 10px;">
                         <input type="text" id="regStoreName" placeholder="พิมพ์ชื่อร้านเพื่อค้นหา...">
                         <button class="btn-outline" style="width: auto; white-space: nowrap;" onclick="searchRegStore()">ค้นหา</button>
@@ -210,19 +245,38 @@
                         <div id="regMiniMap" style="width:100%; height:150px; border-radius:10px;"></div>
                     </div>
                 </div>
-                <div class="form-group"><label>2. รูปถ่ายหน้าร้านคู่เจ้าของร้าน <span style="color:var(--danger);">*</span></label><input type="file" id="regStorePhoto" accept="image/*"></div>
-                <div class="form-group"><label>3. สำเนาบัตรประชาชน/พาสปอร์ต <span style="color:var(--danger);">*</span></label><input type="file" id="regIdCard" accept="image/*"></div>
-                <div class="form-group"><label>4. ใบทะเบียนพาณิชย์ (ถ้ามี)</label><input type="file" id="regCommercial" accept="image/*"></div>
+                
+                <div class="form-group">
+                    <label>2. รูปถ่ายหน้าร้านคู่เจ้าของร้าน <span style="color:var(--danger);">*</span></label>
+                    <p class="hint">ถ่ายให้เห็นป้ายชื่อร้านและบริเวณหน้าร้านชัดเจน</p>
+                    <input type="file" id="regStorePhoto" accept="image/*">
+                </div>
+                
+                <div class="form-group">
+                    <label>3. สำเนาบัตรประชาชน/พาสปอร์ต <span style="color:var(--danger);">*</span></label>
+                    <p class="hint">ใช้เพื่อยืนยันตัวตนเจ้าของร้านเท่านั้น (สามารถระบุขีดคร่อมได้)</p>
+                    <input type="file" id="regIdCard" accept="image/*">
+                </div>
+                
+                <div class="form-group">
+                    <label>4. ใบทะเบียนพาณิชย์ (ถ้ามี)</label>
+                    <p class="hint">ช่วยเพิ่มความน่าเชื่อถือให้กับร้านของคุณบนระบบ</p>
+                    <input type="file" id="regCommercial" accept="image/*">
+                </div>
+                
                 <div class="form-group">
                     <label>5. เบอร์โทรศัพท์ติดต่อ <span style="color:var(--danger);">*</span></label>
+                    <p class="hint">เบอร์ที่สามารถติดต่อได้จริง</p>
                     <input type="text" id="regPhone" placeholder="08X-XXX-XXXX">
                 </div>
+                
                 <div class="form-group">
                     <label>6. รหัสผู้แนะนำ Affiliate (ถ้ามี)</label>
-                    <input type="text" id="regRefCode" placeholder="กรอกรหัส หรือเบอร์โทรผู้แนะนำ" style="border-color: var(--info);">
+                    <p class="hint">หากมีผู้แนะนำให้ใช้แอป กรอกรหัสหรือเบอร์โทรของผู้แนะนำได้เลย</p>
+                    <input type="text" id="regRefCode" placeholder="กรอกรหัสผู้แนะนำ (ไม่บังคับ)" style="border-color: var(--info);">
                 </div>
 
-                <button class="btn-secondary" id="btnSubmitReg" style="width: 100%; margin-top: 10px;" onclick="submitStoreRegistration()">ส่งข้อมูลเพื่อตรวจสอบ</button>
+                <button class="btn-secondary" id="btnSubmitReg" style="width: 100%; margin-top: 10px; padding: 15px; font-size: 16px;" onclick="submitStoreRegistration()">🚀 ส่งข้อมูลเพื่อรับ PIN</button>
             </div>
 
             <div class="dashboard-card">
@@ -230,10 +284,10 @@
                 <div class="form-group">
                     <label>รหัสลับร้านค้า (Store PIN)</label>
                     <div style="display: flex; gap: 10px;">
-                        <input type="password" id="storePinInput" placeholder="รหัส PIN">
+                        <input type="password" id="storePinInput" placeholder="รหัส PIN 6 หลัก">
                         <button class="btn-outline" style="width: auto; white-space: nowrap;" onclick="verifyStore()">ตรวจสอบ</button>
                     </div>
-                    <div style="text-align: right; margin-top: 5px;">
+                    <div style="text-align: right; margin-top: 8px;">
                         <a href="#" onclick="forgotPin()" style="font-size: 13px; color: var(--info); text-decoration: underline;">ลืมรหัส PIN?</a>
                     </div>
                 </div>
@@ -276,6 +330,7 @@
 
                     <div id="buyPromoSection" style="padding: 20px; border: 2px solid var(--primary); border-radius: 16px; background: linear-gradient(180deg, rgba(197, 160, 89, 0.1) 0%, var(--surface) 100%); position: relative; overflow: hidden; margin-top: 30px;">
                         <div style="position: absolute; top: 20px; right: -35px; background: #D9534F; color: white; padding: 5px 40px; transform: rotate(45deg); font-size: 12px; font-weight: bold; box-shadow: 0 2px 10px rgba(0,0,0,0.5);">HOT 🔥</div>
+                        
                         <h4 id="buyPromoTitle" style="margin: 0 0 5px 0; color: var(--primary); font-size: 18px; text-align: center;">🚀 ดันยอดขายพุ่ง! พื้นที่โปรโมทหน้าแรก</h4>
                         <p style="text-align: center; font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">ให้ลูกค้าในจังหวัดเห็นร้านคุณเป็นอันดับแรก ทันทีที่เปิดแอป</p>
 
@@ -289,8 +344,8 @@
                         </div>
                         
                         <div class="form-group">
-                            <label>📝 รายละเอียดโปรโมชั่น (แคปชั่นดึงดูดลูกค้า)</label>
-                            <textarea id="promoDetail" rows="3" placeholder="เช่น ลด 50% ทันทีเมื่อโชว์แอปนี้! หรือ มา 4 จ่าย 3 ด่วน หมดเขตสิ้นเดือน..."></textarea>
+                            <label>📝 รายละเอียดโปรโมชั่น</label>
+                            <textarea id="promoDetail" rows="3" placeholder="เช่น ลด 50% ทันทีเมื่อโชว์แอปนี้! หรือ มา 4 จ่าย 3 ด่วน..."></textarea>
                         </div>
                         
                         <div id="promoSlipArea" class="form-group">
@@ -544,7 +599,7 @@
                 <span style="color:var(--primary); font-weight:600;">⚠️ สำคัญมาก</span><br>
                 สำหรับร้านค้าจำเป็นต้องเพิ่มเพื่อนก่อน เพื่อรับรหัสผ่านในการใช้งานครับ
             </div>
-            <button class="btn-line-login" style="width: auto; padding: 12px 24px;" onclick="window.open('https://lin.ee/5SBoptj', '_blank')">➕ เพิ่มเพื่อน LINE OA ของเรา</button>
+            <button class="btn-line-login" style="width: auto; padding: 12px 24px; animation: none;" onclick="window.open('https://lin.ee/5SBoptj', '_blank')">➕ เพิ่มเพื่อน LINE OA ของเรา</button>
             <button class="btn-outline" style="margin-top: 20px; font-size: 13px; border-color:var(--dark-muted); color:var(--text-muted);" onclick="checkFriendshipForPartner(true)">ฉันเพิ่มเพื่อนแล้ว ตรวจสอบอีกครั้ง</button>
         `;
     }
@@ -751,7 +806,6 @@
         renderPromos();
     }
 
-    // ⚡ ฟังก์ชันแปลงโปรโมทให้กลายเป็นสไลด์
     function renderPromos() {
         let curProv = document.getElementById('provinceSelect').value;
         const now = Date.now();
@@ -891,7 +945,7 @@
         } catch (error) {
             alert("❌ ไม่สามารถส่งข้อมูลได้ กรุณาลองใหม่อีกครั้งครับ");
             if(appData.registrationRequests.length > 0 && appData.registrationRequests[appData.registrationRequests.length-1].storeName === n) { appData.registrationRequests.pop(); }
-        } finally { btn.innerText = "ส่งข้อมูลเพื่อตรวจสอบ"; btn.disabled = false; }
+        } finally { btn.innerText = "🚀 ส่งข้อมูลเพื่อรับ PIN"; btn.disabled = false; }
     }
 
     // ⚡ ฟังก์ชันลืมรหัสผ่าน
