@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Super Admin - Painaidee</title>
+    <title>Painaidee Admin - ระบบจัดการหลังบ้าน</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap');
@@ -33,6 +33,15 @@
 
         .toggle-checkbox:checked { right: 0; border-color: #06C755; }
         .toggle-checkbox:checked + .toggle-label { background-color: #06C755; }
+
+        /* 🚀 สไตล์แท็บแยกหน้า */
+        .tab-nav { display: flex; gap: 10px; margin-bottom: 25px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
+        .tab-nav::-webkit-scrollbar { display: none; }
+        .tab-btn { background: #2A2E36; color: #aaa; padding: 12px 24px; border-radius: 12px; cursor: pointer; white-space: nowrap; font-weight: bold; transition: 0.3s; border: 1px solid #4A5568; }
+        .tab-btn.active { background: linear-gradient(135deg, #FFD700, #C5A059); color: #000; border-color: #FFD700; box-shadow: 0 4px 15px rgba(197, 160, 89, 0.3); }
+        .admin-page { display: none; animation: fadeIn 0.4s ease; }
+        .admin-page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="p-4 md:p-8 text-sm md:text-base">
@@ -56,116 +65,143 @@
 </div>
 
 <div class="max-w-6xl mx-auto pb-24">
-    <h1 class="text-3xl md:text-4xl font-bold gold-text mb-8 text-center bg-[#1A1D23] py-6 rounded-2xl border border-gray-700 shadow-lg">👑 แผงควบคุมแอดมิน (Painaidee)</h1>
+    <h1 class="text-3xl md:text-4xl font-bold gold-text mb-6 text-center bg-[#1A1D23] py-6 rounded-2xl border border-gray-700 shadow-lg">👑 แผงควบคุมแอดมิน (Painaidee)</h1>
 
-    <div class="card border-l-4 border-yellow-500 p-0 overflow-hidden">
-        <details open>
-            <summary>👑 1. ตั้งค่าระบบ VIP (ราคา & บัญชี)</summary>
-            <div class="p-5 bg-[#1A1D23]">
-                <div class="bg-[#2A2E36] p-4 rounded-xl border border-yellow-600/30 flex flex-col md:flex-row gap-4 items-end mb-6">
-                    <div class="w-full md:w-1/4">
-                        <label class="block text-gray-400 text-xs mb-1">ราคา VIP (บาท/เดือน)</label>
-                        <input type="number" id="vipPriceSetting" class="input-dark">
+    <div class="tab-nav">
+        <div class="tab-btn active" onclick="switchAdminPage('dashboard', this)">🎛️ แผงควบคุมหลัก</div>
+        <div class="tab-btn" onclick="switchAdminPage('affiliate', this)">🤝 จัดการระบบ Affiliate</div>
+        <div class="tab-btn" onclick="switchAdminPage('storeinfo', this)">📂 ข้อมูลเชิงลึก & LINE ID</div>
+    </div>
+
+    <div id="page-dashboard" class="admin-page active">
+        <div class="card border-l-4 border-yellow-500 p-0 overflow-hidden">
+            <details open>
+                <summary>👑 1. ตั้งค่าระบบ VIP (ราคา & บัญชี)</summary>
+                <div class="p-5 bg-[#1A1D23]">
+                    <div class="bg-[#2A2E36] p-4 rounded-xl border border-yellow-600/30 flex flex-col md:flex-row gap-4 items-end mb-6">
+                        <div class="w-full md:w-1/4">
+                            <label class="block text-gray-400 text-xs mb-1">ราคา VIP (บาท/เดือน)</label>
+                            <input type="number" id="vipPriceSetting" class="input-dark">
+                        </div>
+                        <div class="w-full md:w-2/4">
+                            <label class="block text-gray-400 text-xs mb-1">ข้อมูลบัญชีโอนเงิน</label>
+                            <input type="text" id="vipBankSetting" class="input-dark" placeholder="เช่น กสิกรไทย 123-x-xxxxx-x">
+                        </div>
+                        <div class="w-full md:w-1/4">
+                            <button class="btn-primary w-full py-2.5" onclick="saveVipSettings()">💾 บันทึกตั้งค่า VIP</button>
+                        </div>
                     </div>
-                    <div class="w-full md:w-2/4">
-                        <label class="block text-gray-400 text-xs mb-1">ข้อมูลบัญชีโอนเงิน</label>
-                        <input type="text" id="vipBankSetting" class="input-dark" placeholder="เช่น กสิกรไทย 123-x-xxxxx-x">
+                    
+                    <h3 class="text-lg font-bold mb-3 border-b border-gray-700 pb-2">คำขอสมัคร / ต่ออายุ VIP <span id="vip-req-count" class="bg-red-500 text-white text-xs px-2 py-1 rounded-full">0</span></h3>
+                    <div id="vip-request-list" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+                </div>
+            </details>
+        </div>
+
+        <div class="card border-l-4 border-blue-500 p-0 overflow-hidden">
+            <details open>
+                <summary>🆕 2. คำร้องลงทะเบียนร้านค้าใหม่ <span id="reg-count" class="bg-red-500 text-white text-xs px-2 py-1 rounded-full ml-2">0</span></summary>
+                <div class="p-5 bg-[#1A1D23]">
+                    <div id="registration-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                </div>
+            </details>
+        </div>
+
+        <div class="card border-l-4 border-cyan-500 p-0 overflow-hidden">
+            <details open>
+                <summary>📌 3. คำขอขึ้นแบนเนอร์โปรโมท (รออนุมัติ) <span id="promo-count" class="bg-red-500 text-white text-xs px-2 py-1 rounded-full ml-2">0</span></summary>
+                <div class="p-5 bg-[#1A1D23]">
+                    <div id="pending-promo-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                </div>
+            </details>
+        </div>
+
+        <div class="card border-l-4 border-green-500 p-0 overflow-hidden">
+            <details>
+                <summary>✨ 4. แบนเนอร์ที่กำลังแสดงผล (แก้ไข/ต่ออายุได้)</summary>
+                <div class="p-5 bg-[#1A1D23]">
+                    <div id="active-promo-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                </div>
+            </details>
+        </div>
+
+        <div class="card border-l-4 border-gray-400 p-0 overflow-hidden">
+            <details>
+                <summary>🏬 5. จัดการสิทธิ์ร้านค้า (เปิดปิด VIP / ส่ง PIN)</summary>
+                <div class="p-5 bg-[#1A1D23]">
+                    <div id="store-management-list" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+                </div>
+            </details>
+        </div>
+
+        <div class="card border-l-4 border-orange-500 p-0 overflow-hidden">
+            <details>
+                <summary>💰 6. จัดการแพ็กเกจโปรโมท (แบนเนอร์)</summary>
+                <div class="p-5 bg-[#1A1D23]">
+                    <div class="bg-[#2A2E36] p-4 rounded-xl mb-4 grid grid-cols-1 md:grid-cols-5 gap-3">
+                        <input type="text" id="sName" class="input-dark" placeholder="ชื่อแพ็กเกจ">
+                        <input type="number" id="sPrice" class="input-dark" placeholder="ราคา (บาท)">
+                        <input type="number" id="sDays" class="input-dark" placeholder="อายุ (วัน)">
+                        <input type="text" id="sDetail" class="input-dark" placeholder="รายละเอียด">
+                        <button class="btn-success" onclick="addService()">➕ เพิ่มแพ็กเกจ</button>
                     </div>
-                    <div class="w-full md:w-1/4">
-                        <button class="btn-primary w-full py-2.5" onclick="saveVipSettings()">💾 บันทึกตั้งค่า VIP</button>
+                    <div id="sTable" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                </div>
+            </details>
+        </div>
+
+        <div class="card border-l-4 border-purple-500 p-0 overflow-hidden">
+            <details>
+                <summary>🔽 7. จัดการหมวดหมู่ค้นหา</summary>
+                <div class="p-5 bg-[#1A1D23]">
+                    <div class="bg-[#2A2E36] p-4 rounded-xl mb-4 grid grid-cols-1 md:grid-cols-4 gap-3">
+                        <select id="cGroup" class="input-dark">
+                            <option value="food">🍽️ อาหาร/เครื่องดื่ม</option>
+                            <option value="beauty">💆‍♀️ ความงาม/พักผ่อน</option>
+                            <option value="activity">🎯 กิจกรรม/ท่องเที่ยว</option>
+                            <option value="sport">🏋️ กีฬา/ฟิตเนส</option>
+                        </select>
+                        <input type="text" id="cLabel" class="input-dark" placeholder="ชื่อที่ลูกค้าเห็น">
+                        <input type="text" id="cKey" class="input-dark" placeholder="คำค้นหา Google Maps">
+                        <button class="btn-success" onclick="addCategory()">➕ เพิ่มหมวดหมู่</button>
                     </div>
+                    <div class="mb-4 flex gap-2">
+                        <button class="btn-info text-sm" onclick="saveCategories()">💾 บันทึกที่แก้ไข</button>
+                        <button class="btn-danger text-sm" onclick="deleteSelectedCategories()">🗑️ ลบที่ติ๊กถูก</button>
+                    </div>
+                    <div id="cTable" class="flex flex-col gap-2"></div>
                 </div>
-                
-                <h3 class="text-lg font-bold mb-3 border-b border-gray-700 pb-2">คำขอสมัคร / ต่ออายุ VIP <span id="vip-req-count" class="bg-red-500 text-white text-xs px-2 py-1 rounded-full">0</span></h3>
-                <div id="vip-request-list" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
-            </div>
-        </details>
-    </div>
+            </details>
+        </div>
 
-    <div class="card border-l-4 border-blue-500 p-0 overflow-hidden">
-        <details open>
-            <summary>🆕 2. คำร้องลงทะเบียนร้านค้าใหม่ <span id="reg-count" class="bg-red-500 text-white text-xs px-2 py-1 rounded-full ml-2">0</span></summary>
-            <div class="p-5 bg-[#1A1D23]">
-                <div id="registration-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-            </div>
-        </details>
-    </div>
-
-    <div class="card border-l-4 border-cyan-500 p-0 overflow-hidden">
-        <details open>
-            <summary>📌 3. คำขอขึ้นแบนเนอร์โปรโมท (รออนุมัติ) <span id="promo-count" class="bg-red-500 text-white text-xs px-2 py-1 rounded-full ml-2">0</span></summary>
-            <div class="p-5 bg-[#1A1D23]">
-                <div id="pending-promo-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-            </div>
-        </details>
-    </div>
-
-    <div class="card border-l-4 border-green-500 p-0 overflow-hidden">
-        <details>
-            <summary>✨ 4. แบนเนอร์ที่กำลังแสดงผล (แก้ไข/ต่ออายุได้)</summary>
-            <div class="p-5 bg-[#1A1D23]">
-                <div id="active-promo-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-            </div>
-        </details>
-    </div>
-
-    <div class="card border-l-4 border-gray-400 p-0 overflow-hidden">
-        <details>
-            <summary>🏬 5. ฐานข้อมูลร้านค้าทั้งหมด (จัดการสิทธิ์)</summary>
-            <div class="p-5 bg-[#1A1D23]">
-                <div id="store-management-list" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
-            </div>
-        </details>
-    </div>
-
-    <div class="card border-l-4 border-orange-500 p-0 overflow-hidden">
-        <details>
-            <summary>💰 6. จัดการแพ็กเกจโปรโมท (แบนเนอร์)</summary>
-            <div class="p-5 bg-[#1A1D23]">
-                <div class="bg-[#2A2E36] p-4 rounded-xl mb-4 grid grid-cols-1 md:grid-cols-5 gap-3">
-                    <input type="text" id="sName" class="input-dark" placeholder="ชื่อแพ็กเกจ">
-                    <input type="number" id="sPrice" class="input-dark" placeholder="ราคา (บาท)">
-                    <input type="number" id="sDays" class="input-dark" placeholder="อายุ (วัน)">
-                    <input type="text" id="sDetail" class="input-dark" placeholder="รายละเอียด">
-                    <button class="btn-success" onclick="addService()">➕ เพิ่มแพ็กเกจ</button>
+        <div class="card border-l-4 border-red-500 p-0 overflow-hidden">
+            <details>
+                <summary>🚩 8. รายงานร้านปิดถาวร (จากลูกค้า)</summary>
+                <div class="p-5 bg-[#1A1D23]">
+                    <div id="closedTable" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
                 </div>
-                <div id="sTable" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-            </div>
-        </details>
+            </details>
+        </div>
     </div>
 
-    <div class="card border-l-4 border-purple-500 p-0 overflow-hidden">
-        <details>
-            <summary>🔽 7. จัดการหมวดหมู่ค้นหา</summary>
-            <div class="p-5 bg-[#1A1D23]">
-                <div class="bg-[#2A2E36] p-4 rounded-xl mb-4 grid grid-cols-1 md:grid-cols-4 gap-3">
-                    <select id="cGroup" class="input-dark">
-                        <option value="food">🍽️ อาหาร/เครื่องดื่ม</option>
-                        <option value="beauty">💆‍♀️ ความงาม/พักผ่อน</option>
-                        <option value="activity">🎯 กิจกรรม/ท่องเที่ยว</option>
-                        <option value="sport">🏋️ กีฬา/ฟิตเนส</option>
-                    </select>
-                    <input type="text" id="cLabel" class="input-dark" placeholder="ชื่อที่ลูกค้าเห็น">
-                    <input type="text" id="cKey" class="input-dark" placeholder="คำค้นหา Google Maps">
-                    <button class="btn-success" onclick="addCategory()">➕ เพิ่มหมวดหมู่</button>
-                </div>
-                <div class="mb-4 flex gap-2">
-                    <button class="btn-info text-sm" onclick="saveCategories()">💾 บันทึกที่แก้ไข</button>
-                    <button class="btn-danger text-sm" onclick="deleteSelectedCategories()">🗑️ ลบที่ติ๊กถูก</button>
-                </div>
-                <div id="cTable" class="flex flex-col gap-2"></div>
-            </div>
-        </details>
+    <div id="page-affiliate" class="admin-page">
+        <div class="card border-l-4 border-cyan-500">
+            <h2 class="text-xl font-bold mb-4">🤝 สรุปยอดร้านค้าที่แนะนำ (Affiliate)</h2>
+            <p class="text-sm text-gray-400 mb-6">ระบบจะรวบรวมร้านค้าที่ใส่ "รหัสผู้แนะนำ" ตอนสมัครมาจัดกลุ่มให้คุณเห็นภาพรวม</p>
+            <div id="affiliateList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        </div>
     </div>
 
-    <div class="card border-l-4 border-red-500 p-0 overflow-hidden">
-        <details>
-            <summary>🚩 8. รายงานร้านปิดถาวร (จากลูกค้า)</summary>
-            <div class="p-5 bg-[#1A1D23]">
-                <div id="closedTable" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+    <div id="page-storeinfo" class="admin-page">
+        <div class="card border-l-4 border-purple-500">
+            <h2 class="text-xl font-bold mb-4">📂 ข้อมูลเชิงลึกร้านค้า & ตรวจสอบเอกสาร</h2>
+            <div class="mb-6">
+                <input type="text" id="searchStoreInput" class="input-dark text-lg" placeholder="🔍 ค้นหาชื่อร้าน หรือ เบอร์โทร..." onkeyup="renderStoreInfo()">
             </div>
-        </details>
+            <div id="storeInfoList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        </div>
     </div>
+
 </div>
 
 <button onclick="load()" class="fixed bottom-6 right-6 bg-gradient-to-r from-[#FFD700] to-[#C5A059] text-black px-5 py-4 rounded-full shadow-[0_10px_25px_rgba(0,0,0,0.5)] hover:scale-110 transition z-50 font-bold flex items-center gap-2 border-2 border-white">
@@ -174,10 +210,19 @@
 
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbwojqh2ry1b_xkuVp28w5q8Cs0CX9xBcI-upICxz98NtRrwnJ99GwLneWXFGQJySN1T/exec";
-    
-    // ⚡ ตั้งค่ารหัสผ่านเข้า Admin (เปลี่ยนได้ที่นี่)
     const ADMIN_PASSWORD = "250899"; 
     
+    // ⚡ ฟังก์ชันเปลี่ยนหน้า Admin
+    function switchAdminPage(pageId, btnElement) {
+        document.querySelectorAll('.admin-page').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        document.getElementById('page-' + pageId).classList.add('active');
+        btnElement.classList.add('active');
+        
+        if(pageId === 'affiliate') renderAffiliate();
+        if(pageId === 'storeinfo') renderStoreInfo();
+    }
+
     function checkAdminLogin() {
         const pwd = document.getElementById('adminPasswordInput').value;
         if (pwd === ADMIN_PASSWORD) {
@@ -362,56 +407,20 @@
                 </div>`).join('');
         }
 
-        // 7. Store Management (มีเช็คสถานะ LINE ยุคเก่า)
+        // 7. Store Management (Dashboard เดิม)
         document.getElementById('store-management-list').innerHTML = appData.registeredStores.map((s,i) => `
             <div class="bg-[#242730] p-5 rounded-xl border border-gray-700 ${s.isVIP ? '!border-[#FFD700] shadow-[0_0_15px_rgba(255,215,0,0.1)]' : ''} relative flex flex-col h-full transition-all">
                 ${s.isVIP ? '<div class="absolute top-4 right-4 bg-[#FFD700] text-black text-[11px] px-3 py-1 rounded font-bold shadow">VIP</div>' : ''}
-                
                 <h3 class="font-bold text-lg text-white mb-1 pr-12">${s.name}</h3>
-                
                 <div class="bg-[#1A1D23] p-3 rounded-lg flex justify-between items-center my-3 border border-gray-800">
                     <span class="text-gray-400 text-sm">🔑 PIN:</span>
                     <span class="text-[#FFD700] font-bold text-xl tracking-wider">${s.pin}</span>
                 </div>
-                
-                <div class="flex justify-between items-center mb-1">
-                    <p class="text-sm text-gray-400">📞 ${s.phone || 'ไม่ระบุ'}</p>
-                    <span class="text-xs px-2 py-1 rounded-full font-bold ${s.userId ? 'bg-[#06C755]/20 text-[#06C755]' : 'bg-red-500/20 text-red-400'}">
-                        ${s.userId ? '✅ ผูก LINE แล้ว' : '❌ ร้านยุคเก่า'}
-                    </span>
-                </div>
-
-                <p class="text-sm text-gray-400 mb-1">หมดอายุ VIP: ${(s.isVIP && s.vipExpireTimestamp) ? new Date(s.vipExpireTimestamp).toLocaleDateString('th-TH') : '-'}</p>
-                <p class="text-sm text-[#06C755] mb-5 font-bold">สิทธิ์ฟรีโปรโมท: ${s.freePromoDays || 0} วัน</p>
-                
                 <div class="flex flex-col gap-3 mt-auto">
                     <button class="w-full ${s.userId ? 'btn-info' : 'bg-gray-600 text-gray-300'} py-2 rounded-lg text-sm font-bold transition flex justify-center items-center gap-2" onclick="resendPinToStore(${i})">
                         ${s.userId ? '📨 ส่ง PIN ทาง LINE อีกครั้ง' : '⚠️ ก๊อปปี้รหัส PIN (ข้อมูลเก่า)'}
                     </button>
-
-                    ${!s.isVIP ? `
-                        <button class="w-full bg-[#453715] hover:bg-[#5A461A] text-[#FFD700] py-2 rounded-lg text-sm font-bold transition flex justify-center items-center gap-2" onclick="toggleVIP(${i})">
-                            👑 เปิดสิทธิ์ VIP 30 วัน
-                        </button>
-                    ` : `
-                        <button class="w-full bg-[#4B1E25] hover:bg-[#632731] text-[#FF5A5A] py-2 rounded-lg text-sm font-bold transition flex justify-center items-center gap-2" onclick="toggleVIP(${i})">
-                            ❌ ยกเลิก VIP
-                        </button>
-                        
-                        <div class="bg-[#1A1D23] p-3 rounded-lg flex justify-between items-center border border-gray-700 mt-1">
-                            <span class="text-sm font-medium ${s.vipAutoRenew ? 'text-[#06C755]' : 'text-gray-400'}">ออโต้ต่ออายุ</span>
-                            <label class="relative inline-flex items-center cursor-pointer">
-                              <input type="checkbox" class="sr-only peer" ${s.vipAutoRenew ? 'checked' : ''} onchange="toggleVipAutoRenew(${i})">
-                              <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#06C755]"></div>
-                            </label>
-                        </div>
-                    `}
-                    
-                    <div class="text-right mt-1">
-                        <button class="text-[#FF5A5A] hover:text-red-400 text-xs underline transition" onclick="deleteStore(${i}, '${s.name}')">
-                            ลบร้านนี้ถาวร
-                        </button>
-                    </div>
+                    ${!s.isVIP ? `<button class="w-full bg-[#453715] text-[#FFD700] py-2 rounded-lg text-sm font-bold transition" onclick="toggleVIP(${i})">👑 เปิดสิทธิ์ VIP</button>` : `<button class="w-full bg-[#4B1E25] text-[#FF5A5A] py-2 rounded-lg text-sm font-bold transition" onclick="toggleVIP(${i})">❌ ยกเลิก VIP</button>`}
                 </div>
             </div>
         `).join('');
@@ -423,13 +432,109 @@
             closedList.innerHTML = appData.closedReports.map((c,i) => `
                 <div class="bg-[#2A2E36] p-4 rounded-xl border border-red-500 flex flex-col justify-between"><div><h3 class="font-bold text-white text-lg">${c.storeName}</h3><p class="text-xs text-gray-500 mt-1 mb-2 font-mono break-all">${c.placeId}</p><p class="text-sm text-gray-400 mb-4">แจ้งเมื่อ: ${c.date}</p></div><div class="flex gap-2"><button class="btn-danger flex-1 text-xs" onclick="blacklistPlace('${c.placeId}', ${i})">🚩 แบนถาวร</button><button class="bg-gray-600 text-white rounded px-3 py-1 flex-1 text-xs transition" onclick="deleteItem('closedReports', ${i})">❌ ลบรายงาน</button></div></div>`).join('');
         }
+
+        // ================= เรนเดอร์หน้า Affiliate =================
+        renderAffiliate();
+
+        // ================= เรนเดอร์หน้า Store Info =================
+        renderStoreInfo();
+    }
+
+    // ⚡ ฟังก์ชันเรนเดอร์หน้า Affiliate
+    function renderAffiliate() {
+        const affMap = {};
+        appData.registeredStores.forEach(s => {
+            if(s.refCode && s.refCode.trim() !== '') {
+                if(!affMap[s.refCode]) affMap[s.refCode] = [];
+                affMap[s.refCode].push(s);
+            }
+        });
+        
+        const list = document.getElementById('affiliateList');
+        if(Object.keys(affMap).length === 0) {
+            list.innerHTML = '<p class="text-gray-500 italic">ยังไม่มีข้อมูลการแนะนำร้านค้าในระบบ</p>';
+            return;
+        }
+        
+        let html = '';
+        for(let code in affMap) {
+            const stores = affMap[code];
+            html += `
+            <div class="bg-[#2A2E36] p-5 rounded-xl border border-cyan-500 shadow-lg">
+                <div class="flex justify-between items-center mb-3 pb-3 border-b border-gray-700">
+                    <div>
+                        <p class="text-xs text-gray-400">รหัสผู้แนะนำ / เบอร์โทร</p>
+                        <h3 class="text-2xl font-bold text-cyan-400">${code}</h3>
+                    </div>
+                    <div class="bg-cyan-500/20 border border-cyan-500 text-cyan-400 px-3 py-2 rounded-lg text-sm font-bold text-center">
+                        แนะนำแล้ว<br><span class="text-2xl">${stores.length}</span> ร้าน
+                    </div>
+                </div>
+                <p class="text-sm text-gray-400 mb-2">📋 รายชื่อร้านค้าที่แนะนำมา:</p>
+                <ul class="text-sm text-gray-300 list-disc list-inside bg-[#1A1D23] p-3 rounded-lg border border-gray-700 h-32 overflow-y-auto">
+                    ${stores.map(s => `<li class="mb-1">${s.name} ${s.isVIP ? '<span class="bg-[#FFD700] text-black px-1.5 py-0.5 rounded text-[10px] font-bold ml-1">VIP</span>' : ''}</li>`).join('')}
+                </ul>
+            </div>`;
+        }
+        list.innerHTML = html;
+    }
+
+    // ⚡ ฟังก์ชันเรนเดอร์หน้า Store Info & LINE ID
+    function renderStoreInfo() {
+        const q = document.getElementById('searchStoreInput').value.toLowerCase();
+        const list = document.getElementById('storeInfoList');
+        
+        const stores = appData.registeredStores.filter(s => 
+            s.name.toLowerCase().includes(q) || 
+            (s.phone && s.phone.includes(q)) || 
+            (s.refCode && s.refCode.toLowerCase().includes(q))
+        );
+        
+        if(stores.length === 0) {
+            list.innerHTML = '<p class="text-gray-500 italic">ไม่พบข้อมูลร้านค้าที่ค้นหา</p>';
+            return;
+        }
+        
+        list.innerHTML = stores.map((s,i) => `
+        <div class="bg-[#2A2E36] p-5 rounded-xl border border-gray-600 flex flex-col gap-2 shadow-lg hover:border-purple-500 transition">
+            <div class="flex justify-between items-start mb-1">
+                <h3 class="text-lg font-bold text-white">${s.name}</h3>
+                ${s.isVIP ? '<span class="bg-[#FFD700] text-black px-2 py-0.5 rounded text-[10px] font-bold">VIP</span>' : ''}
+            </div>
+            
+            <div class="grid grid-cols-2 gap-2 text-sm">
+                <div class="bg-[#1A1D23] p-2 rounded border border-gray-700">
+                    <p class="text-xs text-gray-500">📞 เบอร์โทรศัพท์:</p>
+                    <p class="text-[#C5A059] font-bold">${s.phone || 'ไม่ระบุ'}</p>
+                </div>
+                <div class="bg-[#1A1D23] p-2 rounded border border-gray-700">
+                    <p class="text-xs text-gray-500">🤝 รหัสแนะนำ (AFF):</p>
+                    <p class="text-cyan-400 font-bold">${s.refCode || '-'}</p>
+                </div>
+            </div>
+
+            <div class="bg-[#1A1D23] p-3 rounded border border-gray-700 mt-1">
+                <div class="flex justify-between items-center mb-1">
+                    <p class="text-xs text-gray-500">LINE User ID (สำหรับระบบยิงข้อความ):</p>
+                    <span class="text-[10px] px-2 py-0.5 rounded-full font-bold ${s.userId ? 'bg-[#06C755]/20 text-[#06C755]' : 'bg-red-500/20 text-red-400'}">
+                        ${s.userId ? '✅ เชื่อมต่อแล้ว' : '❌ ไม่มีข้อมูล'}
+                    </span>
+                </div>
+                <p class="text-xs text-[#06C755] font-mono break-all bg-black/30 p-2 rounded border border-[#06C755]/30 select-all">${s.userId || 'ไม่สามารถยิงข้อความหาลูกค้ารายนี้ได้ เนื่องจากเป็นข้อมูลเก่า'}</p>
+            </div>
+            
+            <p class="text-xs text-gray-400 mt-2 mb-1">เอกสารแนบตอนสมัคร:</p>
+            <div class="flex flex-wrap gap-2">
+                ${s.storePhoto ? `<button class="bg-gray-700 hover:bg-gray-600 px-3 py-1.5 rounded-lg text-xs transition border border-gray-500" onclick="openImageTab('${s.storePhoto}')">🖼️ รูปร้าน</button>` : '<span class="text-xs text-gray-600 border border-gray-700 px-3 py-1.5 rounded-lg">❌ ไม่มีรูปร้าน</span>'}
+                ${s.idCard ? `<button class="bg-gray-700 hover:bg-gray-600 px-3 py-1.5 rounded-lg text-xs transition border border-gray-500" onclick="openImageTab('${s.idCard}')">🆔 ปชช.</button>` : '<span class="text-xs text-gray-600 border border-gray-700 px-3 py-1.5 rounded-lg">❌ ไม่มี ปชช.</span>'}
+                ${s.commercial ? `<button class="bg-gray-700 hover:bg-gray-600 px-3 py-1.5 rounded-lg text-xs transition border border-gray-500" onclick="openImageTab('${s.commercial}')">📄 พาณิชย์</button>` : ''}
+            </div>
+        </div>`).join('');
     }
 
     // --- Action Functions ---
 
-    function saveVipSettings() { appData.vipSettings.price = parseInt(document.getElementById('vipPriceSetting').value) || 500; appData.vipSettings.bankAccount = document.getElementById('vipBankSetting').value; save(); alert("💾 บันทึกการตั้งค่า VIP สำเร็จ!"); }
-
-    // ⚡ ตั้งค่ารหัส PIN เองได้
+    // ⚡ ฟังก์ชันอนุมัติร้านค้า (แก้ไขให้เก็บรูปภาพไว้ในฐานข้อมูลด้วย)
     async function approveStore(index) {
         let r = appData.registrationRequests[index]; 
         let defaultPin = Math.floor(100000 + Math.random() * 900000).toString();
@@ -437,8 +542,22 @@
         
         if (customPin === null || customPin.trim() === "") return; 
 
-        const newStore = { name: r.storeName, pin: customPin.trim(), userId: r.userId, phone: r.phone || 'ไม่ระบุ', refCode: r.refCode || '', isVIP: false, freePromoDays: 0 };
-        appData.registeredStores.unshift(newStore); appData.registrationRequests.splice(index, 1);
+        // ⚡ เพิ่มการเก็บรูปภาพลงใน newStore เพื่อให้ไปโชว์ในแท็บ ข้อมูลเชิงลึก
+        const newStore = { 
+            name: r.storeName, 
+            pin: customPin.trim(), 
+            userId: r.userId, 
+            phone: r.phone || 'ไม่ระบุ', 
+            refCode: r.refCode || '', 
+            isVIP: false, 
+            freePromoDays: 0,
+            storePhoto: r.storePhoto || '',
+            idCard: r.idCard || '',
+            commercial: r.commercial || ''
+        };
+
+        appData.registeredStores.unshift(newStore); 
+        appData.registrationRequests.splice(index, 1);
         showLoading(true); await fetch(API_URL, { method: 'POST', body: JSON.stringify(appData) });
         
         if (newStore.userId) {
@@ -482,7 +601,6 @@
             showLoading(true);
             await fetch(API_URL, { method: 'POST', body: JSON.stringify(appData) });
             
-            // ⚡ ส่ง LINE แจ้งเตือนเมื่ออนุมัติ VIP
             if (store.userId) {
                 const lineMsg = `👑 แจ้งเตือนจาก แอดมินไปไหนดี\n\nร้าน ${store.name} ได้รับการอนุมัติสถานะ VIP เรียบร้อยแล้วครับ!\n\n🎁 พิเศษ! คุณได้รับสิทธิ์โปรโมทแบนเนอร์หน้าร้านฟรี 7 วัน เข้าไปอัปเดตโปรโมชั่นได้เลยครับที่: https://liff.line.me/2009598846-wiCUeV35`;
                 try { await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "SEND_LINE_PIN", targetUserId: store.userId, message: lineMsg }) }); } catch(e) {}
@@ -521,7 +639,6 @@
         showLoading(true);
         await fetch(API_URL, { method: 'POST', body: JSON.stringify(appData) });
 
-        // ⚡ ส่ง LINE แจ้งเตือนเมื่ออนุมัติแบนเนอร์
         if (store && store.userId) {
             try { await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "SEND_LINE_PIN", targetUserId: store.userId, message: lineMsg }) }); } catch(e) {}
         }
