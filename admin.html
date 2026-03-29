@@ -186,8 +186,23 @@
 
     <div id="page-affiliate" class="admin-page">
         <div class="card border-l-4 border-cyan-500">
-            <h2 class="text-xl font-bold mb-4">🤝 สรุปยอดร้านค้าที่แนะนำ (Affiliate)</h2>
-            <p class="text-sm text-gray-400 mb-6">ระบบจะรวบรวมร้านค้าที่ใส่ "รหัสผู้แนะนำ" ตอนสมัครมาจัดกลุ่มให้คุณเห็นภาพรวม</p>
+            <h2 class="text-xl font-bold mb-2">🤝 ระบบจัดการ Affiliate (นายหน้าผู้แนะนำ)</h2>
+            <p class="text-sm text-gray-400 mb-6">ตั้งค่าเรทค่าคอมมิชชั่น และตรวจสอบยอดเงินที่ต้องจ่ายให้กับนายหน้าแต่ละคน</p>
+            
+            <div class="bg-[#2A2E36] p-5 rounded-xl border border-cyan-600/50 shadow-lg flex flex-col md:flex-row gap-4 items-end mb-8 relative overflow-hidden">
+                <div class="absolute top-0 right-0 bg-cyan-600 text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg">SETTING</div>
+                <div class="w-full md:w-3/4">
+                    <label class="block text-gray-300 text-sm mb-2 font-medium">💰 เรทค่าคอมมิชชั่น (บาท / 1 ร้านค้าที่แนะนำสำเร็จ)</label>
+                    <input type="number" id="affCommSetting" class="input-dark text-xl font-bold text-cyan-400 py-3" placeholder="ตัวอย่าง: 100">
+                </div>
+                <div class="w-full md:w-1/4">
+                    <button class="w-full py-3 rounded-lg font-bold text-white shadow-lg transition hover:scale-[1.02]" style="background: linear-gradient(135deg, #00d2ff, #3a7bd5);" onclick="saveAffiliateSettings()">
+                        💾 บันทึกเรทค่าคอม
+                    </button>
+                </div>
+            </div>
+
+            <h3 class="text-lg font-bold mb-4 border-b border-gray-700 pb-2 text-white">ตารางสรุปยอดค่าคอมมิชชั่นของนายหน้า</h3>
             <div id="affiliateList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
         </div>
     </div>
@@ -196,7 +211,7 @@
         <div class="card border-l-4 border-purple-500">
             <h2 class="text-xl font-bold mb-4">📂 ข้อมูลเชิงลึกร้านค้า & ตรวจสอบเอกสาร</h2>
             <div class="mb-6">
-                <input type="text" id="searchStoreInput" class="input-dark text-lg" placeholder="🔍 ค้นหาชื่อร้าน หรือ เบอร์โทร..." onkeyup="renderStoreInfo()">
+                <input type="text" id="searchStoreInput" class="input-dark text-lg py-3" placeholder="🔍 ค้นหาชื่อร้าน, เบอร์โทร หรือ รหัสคนแนะนำ..." onkeyup="renderStoreInfo()">
             </div>
             <div id="storeInfoList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
         </div>
@@ -219,6 +234,7 @@
         document.getElementById('page-' + pageId).classList.add('active');
         btnElement.classList.add('active');
         
+        // เรนเดอร์ข้อมูลของหน้านั้นๆ ทันทีที่กดแท็บ
         if(pageId === 'affiliate') renderAffiliate();
         if(pageId === 'storeinfo') renderStoreInfo();
     }
@@ -256,7 +272,13 @@
         { id: 10, group: 'food', label: 'อาหารตามสั่ง / จานด่วน', keyword: 'อาหารตามสั่ง' }
     ];
 
-    let appData = { registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], categories: [], closedReports: [], blacklistedPlaces: [], services: [], pendingVipRequests: [], vipSettings: { price: 500, bankAccount: 'กสิกรไทย 123-x-xxxxx-x ชื่อบัญชี' } };
+    // เพิ่ม affiliateSettings ไว้ใน appData เผื่อดึงจากฐานข้อมูล
+    let appData = { 
+        registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], 
+        categories: [], closedReports: [], blacklistedPlaces: [], services: [], pendingVipRequests: [], 
+        vipSettings: { price: 500, bankAccount: 'กสิกรไทย 123-x-xxxxx-x ชื่อบัญชี' },
+        affiliateSettings: { commissionReward: 100 } // ค่าเริ่มต้น 100 บาท/ร้าน
+    };
 
     function formatDateTime(ms) {
         if (!ms) return '';
@@ -293,6 +315,7 @@
             if (data && Object.keys(data).length > 0) { appData = { ...appData, ...data }; }
             if (!appData.categories || appData.categories.length === 0) { appData.categories = JSON.parse(JSON.stringify(defaultCategories)); }
             if (!appData.vipSettings) { appData.vipSettings = { price: 500, bankAccount: 'กสิกรไทย 123-4-56789-0 (ไปไหนดี)' }; }
+            if (!appData.affiliateSettings) { appData.affiliateSettings = { commissionReward: 100 }; } // เช็คค่าคอมมิชชั่น
             
             ['registrationRequests','registeredStores','pendingPromotions','activePromotions','categories','closedReports','blacklistedPlaces','services','pendingVipRequests'].forEach(key => { if(!appData[key]) appData[key] = []; });
             checkAutoRenew(); 
@@ -433,15 +456,19 @@
                 <div class="bg-[#2A2E36] p-4 rounded-xl border border-red-500 flex flex-col justify-between"><div><h3 class="font-bold text-white text-lg">${c.storeName}</h3><p class="text-xs text-gray-500 mt-1 mb-2 font-mono break-all">${c.placeId}</p><p class="text-sm text-gray-400 mb-4">แจ้งเมื่อ: ${c.date}</p></div><div class="flex gap-2"><button class="btn-danger flex-1 text-xs" onclick="blacklistPlace('${c.placeId}', ${i})">🚩 แบนถาวร</button><button class="bg-gray-600 text-white rounded px-3 py-1 flex-1 text-xs transition" onclick="deleteItem('closedReports', ${i})">❌ ลบรายงาน</button></div></div>`).join('');
         }
 
-        // ================= เรนเดอร์หน้า Affiliate =================
-        renderAffiliate();
-
-        // ================= เรนเดอร์หน้า Store Info =================
-        renderStoreInfo();
+        // ================= อัปเดตแท็บหน้าอื่นๆ ให้ตรงกัน =================
+        if (document.getElementById('page-affiliate').classList.contains('active')) renderAffiliate();
+        if (document.getElementById('page-storeinfo').classList.contains('active')) renderStoreInfo();
     }
 
-    // ⚡ ฟังก์ชันเรนเดอร์หน้า Affiliate
+    // ⚡ ฟังก์ชันเรนเดอร์หน้า Affiliate (พร้อมคำนวณยอดเงิน)
     function renderAffiliate() {
+        // ดึงค่าคอมตั้งต้นมาโชว์ในช่อง input
+        const currentComm = (appData.affiliateSettings && appData.affiliateSettings.commissionReward) ? appData.affiliateSettings.commissionReward : 0;
+        document.getElementById('affCommSetting').value = currentComm;
+        
+        const commRate = parseInt(currentComm) || 0;
+
         const affMap = {};
         appData.registeredStores.forEach(s => {
             if(s.refCode && s.refCode.trim() !== '') {
@@ -459,15 +486,22 @@
         let html = '';
         for(let code in affMap) {
             const stores = affMap[code];
+            const totalComm = stores.length * commRate; // คำนวณยอดเงินค่าคอม
+
             html += `
             <div class="bg-[#2A2E36] p-5 rounded-xl border border-cyan-500 shadow-lg">
-                <div class="flex justify-between items-center mb-3 pb-3 border-b border-gray-700">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 pb-4 border-b border-gray-700 gap-3">
                     <div>
-                        <p class="text-xs text-gray-400">รหัสผู้แนะนำ / เบอร์โทร</p>
+                        <p class="text-xs text-gray-400 mb-1">รหัสผู้แนะนำ / เบอร์โทร</p>
                         <h3 class="text-2xl font-bold text-cyan-400">${code}</h3>
                     </div>
-                    <div class="bg-cyan-500/20 border border-cyan-500 text-cyan-400 px-3 py-2 rounded-lg text-sm font-bold text-center">
-                        แนะนำแล้ว<br><span class="text-2xl">${stores.length}</span> ร้าน
+                    <div class="flex gap-2 w-full md:w-auto">
+                        <div class="flex-1 md:flex-none bg-cyan-500/20 border border-cyan-500 text-cyan-400 px-4 py-2 rounded-lg text-sm font-bold text-center">
+                            แนะนำแล้ว<br><span class="text-xl">${stores.length}</span> ร้าน
+                        </div>
+                        <div class="flex-1 md:flex-none bg-green-500/20 border border-green-500 text-green-400 px-4 py-2 rounded-lg text-sm font-bold text-center">
+                            ยอดค่าคอมฯ<br><span class="text-xl">${totalComm.toLocaleString()}</span> ฿
+                        </div>
                     </div>
                 </div>
                 <p class="text-sm text-gray-400 mb-2">📋 รายชื่อร้านค้าที่แนะนำมา:</p>
@@ -477,6 +511,14 @@
             </div>`;
         }
         list.innerHTML = html;
+    }
+
+    // ⚡ ฟังก์ชันเซฟค่าคอมมิชชั่น
+    function saveAffiliateSettings() {
+        if(!appData.affiliateSettings) appData.affiliateSettings = {};
+        appData.affiliateSettings.commissionReward = parseInt(document.getElementById('affCommSetting').value) || 0;
+        save();
+        alert("💾 บันทึกการตั้งค่าเรทค่าคอมมิชชั่นเรียบร้อยแล้ว!");
     }
 
     // ⚡ ฟังก์ชันเรนเดอร์หน้า Store Info & LINE ID
@@ -679,48 +721,6 @@
             } catch (e) { console.log("Auto-refresh failed", e); }
         }
     }, 10000);
-
-    // ==========================================
-    // ⚡ ฟังก์ชันสำหรับปุ่ม "โทร" (ดึงเบอร์จาก Google Maps)
-    // ==========================================
-    function callPlace(placeId, event) {
-        event.stopPropagation(); // ป้องกันไม่ให้เด้งไปดูแผนที่ตอนกดปุ่ม
-        
-        // เรียกขอข้อมูลเบอร์โทรจาก Google Places API
-        service.getDetails({ placeId: placeId, fields: ['formatted_phone_number'] }, (place, status) => {
-            if (status === google.maps.places.PlacesServiceStatus.OK && place.formatted_phone_number) {
-                // ล้างอักขระพิเศษออกให้เหลือแค่ตัวเลข แล้วสั่งให้มือถือโทรออก
-                window.location.href = 'tel:' + place.formatted_phone_number.replace(/[^0-9+]/g, '');
-            } else {
-                alert("ขออภัยครับ ไม่พบเบอร์โทรศัพท์ของสถานที่นี้ในระบบแผนที่");
-            }
-        });
-    }
-
-    // ==========================================
-    // ⚡ ฟังก์ชันสำหรับปุ่ม "แชร์" (เด้งหน้าต่างแชร์ของมือถือ)
-    // ==========================================
-    function sharePlace(name, lat, lng, event) {
-        event.stopPropagation(); // ป้องกันไม่ให้เด้งไปดูแผนที่ตอนกดปุ่ม
-        
-        // สร้างลิงก์แผนที่ของสถานที่นั้นๆ
-        const mapUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
-        
-        // ตรวจสอบว่ามือถือรองรับระบบแชร์ของเครื่อง (Web Share API) หรือไม่
-        if (navigator.share) {
-            navigator.share({
-                title: 'แอปไปไหนดี',
-                text: `ลองดูร้าน "${name}" สิ! น่าสนใจมากเลย 📍 ดูพิกัดได้ที่นี่: `,
-                url: mapUrl
-            }).catch(err => console.log('Share failed:', err));
-        } else {
-            // ถ้ารองรับไม่เต็มรูปแบบ (เช่น เปิดในคอม) ให้คัดลอกลิงก์แทน
-            navigator.clipboard.writeText(mapUrl).then(() => {
-                alert('คัดลอกลิงก์พิกัดเรียบร้อยแล้ว! สามารถนำไปวาง (Paste) ส่งให้เพื่อนได้เลยครับ');
-            });
-        }
-    }
-    
 </script>
 </body>
 </html>
