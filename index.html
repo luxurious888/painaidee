@@ -180,9 +180,9 @@
         </div>
 
         <div>
-            <a href="https://liff.line.me/2009598846-wiCUeV35?page=partner" class="btn-line-glow" style="margin-bottom: 8px;">
+            <button onclick="window.location.href='https://liff.line.me/2009598846-wiCUeV35?page=partner'" class="btn-line-glow" style="margin-bottom: 8px;">
                 📱 เข้าสู่ระบบด้วย LINE
-            </a>
+            </button>
             <p style="font-size: 12.5px; color: rgba(255,255,255,0.7); margin: 0; line-height: 1.4;">
                 * เหมาะสำหรับร้านค้า เพื่อลงทะเบียนและจัดการ<br>โปรโมชั่นหน้าร้านของคุณ
             </p>
@@ -213,7 +213,7 @@
             <p>ค้นหาร้านอาหารและสถานที่น่าสนใจทั่วไทย</p>
 
             <div id="header-guest-login" style="display: none; margin-top: 20px;">
-                <button class="btn-line-glow" style="width: auto; margin: 0 auto; padding: 10px 24px; border-radius: 20px; font-size: 14px; box-shadow: 0 4px 15px rgba(6, 199, 85, 0.3);" onclick="liff.login()">
+                <button class="btn-line-glow" style="width: auto; margin: 0 auto; padding: 10px 24px; border-radius: 20px; font-size: 14px; box-shadow: 0 4px 15px rgba(6, 199, 85, 0.3);" onclick="window.location.href='https://liff.line.me/2009598846-wiCUeV35'">
                     📱 ล็อคอินด้วย LINE
                 </button>
                 <p style="font-size: 12px; color: var(--text-muted); margin-top: 10px; line-height: 1.4;">ล็อคอินไลน์เพื่อรับรหัสแนะนำเพื่อน<br>เพื่อสร้างรายได้กับเรา!</p>
@@ -266,7 +266,7 @@
                 <span style="color:var(--primary); font-weight:600;">⚠️ สำหรับร้านค้า</span><br>
                 กรุณาเข้าใช้งานผ่านแอป LINE<br>เพื่อรับรหัส PIN ในการจัดการร้านครับ
             </div>
-            <button class="btn-line-glow" style="width: auto; padding: 14px 24px; border:none; border-radius:12px; font-family:'Kanit'; font-weight:600; font-size:16px; cursor:pointer; animation: none;" onclick="window.open('https://liff.line.me/2009598846-wiCUeV35?page=partner', '_self')">
+            <button class="btn-line-glow" style="width: auto; padding: 14px 24px; border:none; border-radius:12px; font-family:'Kanit'; font-weight:600; font-size:16px; cursor:pointer; animation: none;" onclick="window.location.href='https://liff.line.me/2009598846-wiCUeV35?page=partner'">
                 📱 เปิดใช้งานผ่านแอป LINE
             </button>
             <button class="btn-outline" style="margin-top: 20px; font-size: 13px; border-color:var(--dark-muted); color:var(--text-muted);" onclick="checkFriendshipForPartner(true)">ฉันเพิ่มเพื่อนแล้ว ตรวจสอบอีกครั้ง</button>
@@ -559,12 +559,13 @@
         document.getElementById('loginCard').style.display = 'block';
     }
 
+    // ⚡ ฟังก์ชันเข้าแอปแบบ Guest (สำหรับลูกค้าทั่วไป)
     function enterApp() {
         document.getElementById('loginOverlay').style.display = 'none';
         document.getElementById('appContent').style.display = 'block';
     }
 
-    // ⚡ ฟังก์ชันคัดลอกรหัส (สำหรับทั้ง 2 จุดที่มีปุ่ม)
+    // ⚡ ก๊อปปี้รหัส Affiliate
     function copyHeaderAffCode() {
         if(window.myAffCode) {
             navigator.clipboard.writeText(window.myAffCode).then(() => {
@@ -628,6 +629,7 @@
     }
 
     async function navigateToPartner() {
+        // ⚡ ถ้ายังไม่ล็อกอิน LINE บังคับเตะให้ไปเข้าผ่านลิงก์ LIFF เพื่อเปิด LINE อัตโนมัติ
         if (!liff.isLoggedIn()) {
             const blocker = document.getElementById('partner-friend-blocker');
             const content = document.getElementById('partner-actual-content');
@@ -641,7 +643,7 @@
                     <span style="color:var(--primary); font-weight:600; font-size: 18px;">⚠️ สำหรับร้านค้า</span><br>
                     กรุณาเข้าใช้งานผ่านแอป LINE<br>เพื่อรับรหัส PIN ในการจัดการร้านครับ
                 </div>
-                <button class="btn-line-glow" style="width: auto; padding: 14px 24px; border:none; border-radius:12px; font-family:'Kanit'; font-weight:600; font-size:16px; cursor:pointer;" onclick="window.open('https://liff.line.me/2009598846-wiCUeV35?page=partner', '_self')">
+                <button class="btn-line-glow" style="width: auto; padding: 14px 24px; border:none; border-radius:12px; font-family:'Kanit'; font-weight:600; font-size:16px; cursor:pointer;" onclick="window.location.href='https://liff.line.me/2009598846-wiCUeV35?page=partner'">
                     📱 เปิดใช้งานผ่านแอป LINE
                 </button>
             `;
@@ -688,7 +690,7 @@
                 <span style="color:var(--primary); font-weight:600;">⚠️ สำคัญมาก</span><br>
                 สำหรับร้านค้าจำเป็นต้องเพิ่มเพื่อนก่อน เพื่อรับรหัสผ่านในการใช้งานครับ
             </div>
-            <button class="btn-line-glow" style="width: auto; padding: 14px 24px; border:none; border-radius:12px; font-family:'Kanit'; font-weight:600; font-size:16px; cursor:pointer; animation: none;" onclick="window.open('https://lin.ee/5SBoptj', '_blank')">➕ เพิ่มเพื่อน LINE OA ของเรา</button>
+            <button class="btn-line-glow" style="width: auto; padding: 14px 24px; border:none; border-radius:12px; font-family:'Kanit'; font-weight:600; font-size:16px; cursor:pointer; animation: none;" onclick="window.location.href='https://liff.line.me/2009598846-wiCUeV35'">➕ เพิ่มเพื่อน LINE OA ของเรา</button>
             <button class="btn-outline" style="margin-top: 20px; font-size: 13px; border-color:var(--dark-muted); color:var(--text-muted);" onclick="checkFriendshipForPartner(true)">ฉันเพิ่มเพื่อนแล้ว ตรวจสอบอีกครั้ง</button>
         `;
     }
@@ -1088,7 +1090,6 @@
             } else {
                 document.getElementById('editPromoSection').style.display = 'none'; document.getElementById('buyPromoSection').style.display = 'block';
                 
-                // ตรวจสอบสิทธิ์ฟรี
                 if(hasFreePromo) {
                     promoTitle.innerHTML = '🎁 สิทธิพิเศษ VIP: ฟรีพื้นที่โปรโมท 7 วัน!';
                     slipArea.style.display = 'none'; 
@@ -1104,7 +1105,6 @@
         } else alert("รหัส PIN ไม่ถูกต้อง");
     }
 
-    // ⚡ ฟังก์ชันสำหรับกดปุ่ม ต่อสัญญาโปรโมท
     function openRenewPromo() {
         document.getElementById('editPromoSection').style.display = 'none'; 
         document.getElementById('buyPromoSection').style.display = 'block';
@@ -1149,7 +1149,6 @@
         if(store) { store.lineUrl = document.getElementById('vipLineInput').value; store.fbUrl = document.getElementById('vipFbInput').value; await saveToCloud(); alert("บันทึกข้อมูลติดต่อแล้ว ลูกค้าสามารถกดเข้า LINE/FB ได้ทันที"); }
     }
 
-    // ⚡ อัปเดตฟังก์ชันลงโปรโมท 
     async function submitPromoWithPIN() {
         const btn = document.getElementById('btnSubmitPromo'); const stores = appData.registeredStores || [];
         const store = stores.find(s => s.pin === document.getElementById('storePinInput').value);
@@ -1214,9 +1213,7 @@
         }
     }
 
-    // ==========================================
     // ⚡ ฟังก์ชันสำหรับปุ่ม "โทร"
-    // ==========================================
     function callPlace(placeId, event) {
         event.stopPropagation();
         service.getDetails({ placeId: placeId, fields: ['formatted_phone_number'] }, (place, status) => {
@@ -1228,9 +1225,7 @@
         });
     }
 
-    // ==========================================
     // ⚡ ฟังก์ชันสำหรับปุ่ม "แชร์"
-    // ==========================================
     function sharePlace(name, lat, lng, event) {
         event.stopPropagation(); 
         const mapUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
