@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painaidee Admin - ระบบจัดการหลังบ้าน</title>
+    <title>Super Admin - Painaidee</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap');
@@ -30,6 +30,9 @@
         details summary::after { content: "▼"; font-size: 14px; color: #999; }
         details[open] summary::after { content: "▲"; color: #C5A059; }
         details[open] summary { border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-bottom: 1px solid #4A5568; }
+
+        .toggle-checkbox:checked { right: 0; border-color: #06C755; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #06C755; }
     </style>
 </head>
 <body class="p-4 md:p-8 text-sm md:text-base">
@@ -172,6 +175,7 @@
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbwojqh2ry1b_xkuVp28w5q8Cs0CX9xBcI-upICxz98NtRrwnJ99GwLneWXFGQJySN1T/exec";
     
+    // ⚡ ตั้งค่ารหัสผ่านเข้า Admin (เปลี่ยนได้ที่นี่)
     const ADMIN_PASSWORD = "250899"; 
     
     function checkAdminLogin() {
@@ -438,7 +442,7 @@
         showLoading(true); await fetch(API_URL, { method: 'POST', body: JSON.stringify(appData) });
         
         if (newStore.userId) {
-            const lineMsg = `✅ ยินดีด้วย! อนุมัติร้านค้า ${newStore.name} เรียบร้อยแล้ว\n\n🔑 รหัส PIN จัดการร้านของคุณคือ: ${newStore.pin}\n\n🌐 เข้าใช้งานแอปได้เลยที่: https://painaidee.online`;
+            const lineMsg = `✅ ยินดีด้วย! อนุมัติร้านค้า ${newStore.name} เรียบร้อยแล้ว\n\n🔑 รหัส PIN จัดการร้านของคุณคือ: ${newStore.pin}\n\n🌐 เข้าใช้งานแอปได้เลยที่: https://liff.line.me/2009598846-wiCUeV35`;
             try { await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "SEND_LINE_PIN", targetUserId: newStore.userId, message: lineMsg }) }); alert("✅ ส่ง PIN เข้า LINE สำเร็จ!"); } catch(e) {}
         } else { prompt(`✅ อนุมัติร้านสำเร็จ!\nลูกค้าไม่ได้ผูก LINE ไว้ ให้ก๊อปปี้รหัสส่งให้ลูกค้า:`, newStore.pin); }
         load();
@@ -448,7 +452,7 @@
     async function resendPinToStore(index) {
         const store = appData.registeredStores[index];
         if (store && store.userId) {
-            const lineMsg = `🔑 แจ้งเตือนจากแอดมิน (Painaidee)\n\nรหัส PIN ของร้าน ${store.name} คือ: ${store.pin}`;
+            const lineMsg = `🔑 แจ้งเตือนจาก แอดมินไปไหนดี\n\nรหัส PIN ของร้าน ${store.name} คือ: ${store.pin}\n\nเข้าใช้งานระบบได้ที่: https://liff.line.me/2009598846-wiCUeV35`;
             try {
                 showLoading(true);
                 const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "SEND_LINE_PIN", targetUserId: store.userId, message: lineMsg }) });
@@ -465,8 +469,8 @@
         }
     }
 
-    // ⚡ อนุมัติ VIP + แจกฟรี 7 วัน
-    function approveVipRequest(index) {
+    // ⚡ อนุมัติ VIP + แจกฟรี 7 วัน + ส่ง LINE แจ้งลูกค้า
+    async function approveVipRequest(index) {
         const req = appData.pendingVipRequests[index]; const store = appData.registeredStores.find(s => s.name === req.storeName);
         if(store) { 
             store.isVIP = true; 
@@ -474,17 +478,33 @@
             store.vipAutoRenew = false;
             store.freePromoDays = 7; 
 
-            appData.pendingVipRequests.splice(index, 1); save(); 
+            appData.pendingVipRequests.splice(index, 1); 
+            showLoading(true);
+            await fetch(API_URL, { method: 'POST', body: JSON.stringify(appData) });
+            
+            // ⚡ ส่ง LINE แจ้งเตือนเมื่ออนุมัติ VIP
+            if (store.userId) {
+                const lineMsg = `👑 แจ้งเตือนจาก แอดมินไปไหนดี\n\nร้าน ${store.name} ได้รับการอนุมัติสถานะ VIP เรียบร้อยแล้วครับ!\n\n🎁 พิเศษ! คุณได้รับสิทธิ์โปรโมทแบนเนอร์หน้าร้านฟรี 7 วัน เข้าไปอัปเดตโปรโมชั่นได้เลยครับที่: https://liff.line.me/2009598846-wiCUeV35`;
+                try { await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "SEND_LINE_PIN", targetUserId: store.userId, message: lineMsg }) }); } catch(e) {}
+            }
+            showLoading(false);
             alert(`👑 อนุมัติสถานะ VIP ให้ร้าน ${store.name} สำเร็จ!\n🎁 มอบสิทธิ์พื้นที่โปรโมทฟรี 7 วัน เรียบร้อยแล้ว`); 
+            load();
         } else { alert("⚠️ ไม่พบข้อมูลร้านค้านี้ในระบบ"); }
     }
 
-    function approvePromotion(i) {
+    // ⚡ อนุมัติโปรโมชั่น + ส่ง LINE แจ้งลูกค้า
+    async function approvePromotion(i) {
         let p = appData.pendingPromotions[i]; p.storeName = document.getElementById(`editPStore_${i}`).value; p.province = document.getElementById(`editPProv_${i}`).value; p.category = document.getElementById(`editPCat_${i}`).value; p.detail = document.getElementById(`editPDetail_${i}`).value;
         const existingIndex = appData.activePromotions.findIndex(act => act.storeName === p.storeName);
+        const store = appData.registeredStores.find(s => s.name === p.storeName);
+        let lineMsg = "";
+        let isUpdateAlert = false;
         
         if (p.isUpdateOnly && existingIndex !== -1) {
-            appData.activePromotions[existingIndex].detail = p.detail; appData.activePromotions[existingIndex].image = p.image; appData.activePromotions[existingIndex].category = p.category; appData.activePromotions[existingIndex].province = p.province; alert("✅ อนุมัติอัปเดตรูปและข้อความเรียบร้อย! (วันหมดอายุเท่าเดิม)");
+            appData.activePromotions[existingIndex].detail = p.detail; appData.activePromotions[existingIndex].image = p.image; appData.activePromotions[existingIndex].category = p.category; appData.activePromotions[existingIndex].province = p.province;
+            isUpdateAlert = true;
+            lineMsg = `📝 แจ้งเตือนจาก แอดมินไปไหนดี\n\nข้อมูลโปรโมชั่นแบนเนอร์ของร้าน ${p.storeName} ได้รับการอัปเดตใหม่เรียบร้อยแล้วครับ!`;
         } else {
             p.service = document.getElementById(`editPServ_${i}`).value; const svc = (appData.services || []).find(s => s.name === p.service); 
             const addDays = p.isFreeRedeem ? 7 : (svc && svc.days ? parseInt(svc.days) : 30); 
@@ -493,9 +513,22 @@
             if(existingIndex !== -1) { 
                 let existingPromo = appData.activePromotions[existingIndex]; let baseTime = (existingPromo.expireTimestamp && existingPromo.expireTimestamp > Date.now()) ? existingPromo.expireTimestamp : Date.now(); p.expireTimestamp = baseTime + addMs; appData.activePromotions[existingIndex] = p; 
             } else { p.expireTimestamp = Date.now() + addMs; appData.activePromotions.unshift(p); }
-            alert(`✅ อนุมัติแพ็กเกจ ${addDays} วัน และขึ้นแบนเนอร์เรียบร้อย!`);
+            
+            lineMsg = `🚀 แจ้งเตือนจาก แอดมินไปไหนดี\n\nแบนเนอร์โปรโมชั่นของร้าน ${p.storeName} ได้รับการอนุมัติและกำลังแสดงผลบนหน้าแอปแล้วครับ!\n(อายุการแสดงผลเพิ่มขึ้น ${addDays} วัน)`;
         }
-        appData.pendingPromotions.splice(i, 1); save();
+
+        appData.pendingPromotions.splice(i, 1);
+        showLoading(true);
+        await fetch(API_URL, { method: 'POST', body: JSON.stringify(appData) });
+
+        // ⚡ ส่ง LINE แจ้งเตือนเมื่ออนุมัติแบนเนอร์
+        if (store && store.userId) {
+            try { await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "SEND_LINE_PIN", targetUserId: store.userId, message: lineMsg }) }); } catch(e) {}
+        }
+        
+        showLoading(false);
+        alert(isUpdateAlert ? "✅ อนุมัติอัปเดตรูปและข้อความเรียบร้อย! (ส่งการแจ้งเตือนแล้ว)" : "✅ อนุมัติแพ็กเกจและขึ้นแบนเนอร์เรียบร้อย! (ส่งการแจ้งเตือนแล้ว)");
+        load();
     }
 
     function saveActivePromo(i) { let p = appData.activePromotions[i]; p.storeName = document.getElementById(`editAStore_${i}`).value; p.province = document.getElementById(`editAProv_${i}`).value; p.category = document.getElementById(`editACat_${i}`).value; p.detail = document.getElementById(`editADetail_${i}`).value; const newExpStr = document.getElementById(`editAExpire_${i}`).value; if(newExpStr) { p.expireTimestamp = new Date(newExpStr).getTime(); } save(); alert("💾 บันทึกการแก้ไขข้อมูลและเวลาเรียบร้อยแล้ว!"); }
