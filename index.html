@@ -7,120 +7,79 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap');
         
-        :root {
-            --primary: #C5A059;       
-            --primary-light: #DFBF8B; 
-            --primary-hover: #AF8B48; 
-            --dark: #121418;          
-            --dark-light: #1A1D23;    
-            --dark-muted: #2A2E36;    
-            --bg-light: #121418;      
-            --surface: #1A1D23;       
-            --border: rgba(197, 160, 89, 0.2); 
-            --text-main: #FFFFFF;     
-            --text-gold: #C5A059;     
-            --text-muted: #999999;    
-            --danger: #D9534F;
-            --line-green: #06C755;
-            --fb-blue: #1877F2;
-            --info: #17a2b8;
-        }
-
+        :root { --primary: #C5A059; --primary-light: #DFBF8B; --primary-hover: #AF8B48; --dark: #121418; --dark-light: #1A1D23; --dark-muted: #2A2E36; --bg-light: #121418; --surface: #1A1D23; --border: rgba(197, 160, 89, 0.2); --text-main: #FFFFFF; --text-gold: #C5A059; --text-muted: #999999; --danger: #D9534F; --line-green: #06C755; --fb-blue: #1877F2; --info: #17a2b8; }
         body { font-family: 'Kanit', sans-serif; margin: 0; background-color: var(--bg-light); padding-bottom: 50px; color: var(--text-gold); overflow-x: hidden; scroll-behavior: smooth; }
-        
         nav { display: flex; justify-content: space-around; background: var(--surface); padding: 10px 0; position: sticky; top: 0; z-index: 2000; box-shadow: 0 4px 20px rgba(0,0,0,0.1); border-bottom: 1px solid var(--border); }
         nav div { cursor: pointer; font-weight: 500; color: var(--text-muted); padding: 12px 10px; font-size: 14px; transition: 0.3s; position: relative; letter-spacing: 0.5px; text-align: center; flex: 1; }
         nav div.active { color: var(--primary); font-weight: 600; }
         nav div.active::after { content: ''; position: absolute; bottom: 0; left: 15%; width: 70%; height: 3px; background: var(--primary); border-radius: 3px 3px 0 0; box-shadow: 0 -3px 10px rgba(197, 160, 89, 0.5); }
-
         header { background: var(--dark); color: var(--surface); padding: 30px 20px; text-align: center; border-radius: 0 0 24px 24px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(26, 28, 32, 0.3); border: 1px solid var(--border); border-top: none; }
         header h1 { margin: 0; color: var(--primary); font-weight: 600; letter-spacing: 1px; }
         header p { margin: 8px 0 0 0; font-weight: 300; opacity: 0.8; font-size: 14px; color: #FFF; }
-
         .page { display: none; padding: 15px; max-width: 900px; margin: 0 auto; animation: fadeIn 0.4s ease; }
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
         #map { width: 100%; height: 320px; border-radius: 16px; border: 1px solid var(--border); background: #eee; box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
         .search-area { background: var(--surface); padding: 25px; border-radius: 16px; margin-top: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); border: 1px solid var(--border); }
-        
-        select, input[type="text"], input[type="password"], input[type="number"], input[type="file"], textarea { 
-            padding: 14px; border-radius: 10px; border: 1px solid var(--border); font-family: 'Kanit'; font-size: 15px; outline: none; box-sizing: border-box; width: 100%; 
-            background: var(--dark); color: var(--primary-light); transition: 0.3s; 
-        }
+        select, input[type="text"], input[type="password"], input[type="number"], input[type="file"], textarea { padding: 14px; border-radius: 10px; border: 1px solid var(--border); font-family: 'Kanit'; font-size: 15px; outline: none; box-sizing: border-box; width: 100%; background: var(--dark); color: var(--primary-light); transition: 0.3s; }
         select:focus, input:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(197, 160, 89, 0.15); background: var(--dark-light); }
         .search-box-container { display: flex; gap: 12px; width: 100%; }
-
         .btn-primary { padding: 14px 24px; background: var(--primary); color: white; border: none; border-radius: 10px; font-family: 'Kanit'; font-weight: 500; font-size: 15px; cursor: pointer; transition: 0.3s; white-space: nowrap; width: 100%; box-shadow: 0 4px 10px rgba(197, 160, 89, 0.3); }
         .btn-primary:hover { background: var(--primary-hover); transform: translateY(-2px); }
         .btn-secondary { background: var(--dark); color: var(--primary); padding: 12px 15px; border-radius: 10px; border: 1px solid var(--primary); cursor: pointer; font-family: 'Kanit'; font-weight: 500; text-align: center; transition: 0.3s; text-decoration: none; display: inline-block;}
         .btn-secondary:hover { background: var(--primary); color: white; transform: translateY(-2px); }
         .btn-outline { background: transparent; color: var(--primary); border: 1px solid var(--border); padding: 10px 15px; border-radius: 10px; cursor: pointer; font-family: 'Kanit'; font-weight: 500; transition: 0.3s; }
         .btn-outline:hover { border-color: var(--primary); background: rgba(197, 160, 89, 0.1); }
-
         .place-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; margin-top: 24px; }
         .place-card { background: var(--surface); border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid rgba(197,160,89,0.15); transition: 0.4s; cursor: pointer; position: relative; display: flex; flex-direction: column; }
         .place-card:hover { transform: translateY(-6px); box-shadow: 0 15px 40px rgba(197, 160, 89, 0.25); border-color: rgba(197, 160, 89, 0.5); }
         .place-card img { width: 100%; height: 180px; object-fit: cover; background-color: var(--dark-muted); pointer-events: none; }
         .place-info { padding: 20px; display: flex; flex-direction: column; flex-grow: 1; pointer-events: none; }
         .distance-badge { position: absolute; top: 15px; right: 15px; background: rgba(26, 28, 32, 0.9); color: var(--primary-light); padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; backdrop-filter: blur(5px); border: 1px solid rgba(197, 160, 89, 0.3); box-shadow: 0 3px 10px rgba(0,0,0,0.2); z-index: 10; }
-        
         .action-buttons { display: flex; gap: 8px; margin-top: auto; padding-top: 15px; flex-wrap: wrap; pointer-events: auto; }
         .btn-action { flex: 1; text-align: center; color: white; text-decoration: none; padding: 10px 5px; border-radius: 10px; font-weight: 500; font-size: 12px; transition: 0.3s; border: none; cursor: pointer; font-family: 'Kanit'; min-width: 30%; }
         .btn-nav { background: #4285F4 !important; color: #FFF !important; border: none !important; font-weight: 600; box-shadow: 0 4px 10px rgba(66, 133, 244, 0.3); }
         .btn-call { background: var(--primary); color: white; }
         .btn-share { background: transparent; color: var(--text-gold); border: 1px solid var(--border); }
         .status-tag { display: inline-flex; align-items: center; justify-content: center; padding: 4px 8px; border-radius: 20px; font-size: 11px; font-weight: 500; white-space: nowrap; box-shadow: 0 2px 5px rgba(0,0,0,0.2); line-height: 1.2; }
-
-        /* 👑 VIP Aura */
         .card-vip { border: 2px solid #FFD700 !important; box-shadow: 0 0 20px rgba(255, 215, 0, 0.25) !important; transform: translateY(-2px); }
         .card-vip:hover { box-shadow: 0 15px 40px rgba(255, 215, 0, 0.4) !important; border-color: #FFF !important; }
         .vip-crown-badge { position: absolute; top: -10px; left: -10px; background: linear-gradient(135deg, #FFD700, #C5A059, #FFD700); color: #000; padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: 800; z-index: 15; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border: 2px solid #FFF; animation: pulseGlow 2s infinite; }
         @keyframes pulseGlow { 0% { box-shadow: 0 0 10px rgba(255,215,0,0.4); } 50% { box-shadow: 0 0 20px rgba(255,215,0,0.8); } 100% { box-shadow: 0 0 10px rgba(255,215,0,0.4); } }
         .btn-line { background: #06C755 !important; color: #FFF !important; border: none !important; font-weight: 600;}
         .btn-fb { background: #1877F2 !important; color: #FFF !important; border: none !important; font-weight: 600;}
-
-        /* 🚀 เอฟเฟกต์แสงสะท้อน */
         @keyframes shine { 100% { left: 125%; } }
         .shine-effect::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%); transform: skewX(-25deg); animation: shine 3s infinite; pointer-events: none; }
         .promo-btn-hover:hover { filter: brightness(1.1); transform: translateY(-2px); }
-
-        .highlight-banner { background: linear-gradient(135deg, var(--dark), var(--dark-light)); color: white; padding: 25px; border-radius: 16px; margin-top: 24px; box-shadow: 0 15px 35px rgba(26, 28, 32, 0.4); position: relative; overflow: hidden; border: 1px solid var(--border); }
+        .highlight-banner { background: linear-gradient(135deg, var(--dark), var(--dark-light)); color: white; padding: 25px; border-radius: 16px; margin-top: 24px; box-shadow: 0 15px 35px rgba(26, 28, 32, 0.4); display: none; position: relative; overflow: hidden; border: 1px solid var(--border); }
         .highlight-banner::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(197,160,89,0.15) 0%, transparent 60%); pointer-events: none; }
         .highlight-banner h3 { margin: 0 0 5px 0; font-size: 20px; color: var(--primary); font-weight: 500; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
-
         .dashboard-card { background: var(--surface); padding: 25px; border-radius: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); margin-bottom: 24px; border: 1px solid var(--border); }
         .dashboard-card h3 { margin-top: 0; color: var(--primary-light); border-bottom: 2px solid var(--border); padding-bottom: 12px; font-weight: 500; }
-        
         .form-group { margin-bottom: 22px; }
         .form-group label { display: block; font-weight: 500; font-size: 15px; color: #FFF; margin-bottom: 4px; }
         .form-group .hint { font-size: 12.5px; color: var(--text-muted); margin-top: 0; margin-bottom: 10px; line-height: 1.4; }
-        
-        /* 🌟 เอฟเฟกต์หน้า Login ล้ำยุค */
         #loginOverlay { position: fixed; inset: 0; background: #0b0f19; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
         .bg-glow { position: absolute; width: 400px; height: 400px; background: radial-gradient(circle, rgba(6,199,85,0.15) 0%, transparent 70%); border-radius: 50%; top: -10%; left: -20%; animation: floatGlow 8s infinite alternate; }
         .bg-glow2 { position: absolute; width: 500px; height: 500px; background: radial-gradient(circle, rgba(197,160,89,0.1) 0%, transparent 70%); border-radius: 50%; bottom: -20%; right: -20%; animation: floatGlow2 10s infinite alternate; }
         @keyframes floatGlow { 0% { transform: translate(0, 0); } 100% { transform: translate(50px, 50px); } }
         @keyframes floatGlow2 { 0% { transform: translate(0, 0); } 100% { transform: translate(-50px, -50px); } }
-        
         .glass-card { background: rgba(20, 24, 32, 0.6); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); border-top: 1px solid rgba(197, 160, 89, 0.4); box-shadow: 0 25px 50px rgba(0,0,0,0.5); padding: 35px 25px; border-radius: 24px; text-align: center; width: 90%; max-width: 360px; z-index: 10; animation: slideUpFade 0.6s ease-out; }
         @keyframes slideUpFade { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        
         .logo-circle { width: 110px; height: 110px; border-radius: 50%; background: linear-gradient(135deg, #1A1D23, #0b0f19); border: 2px solid #C5A059; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 0 25px rgba(197,160,89,0.4), inset 0 0 15px rgba(197,160,89,0.2); }
         .logo-text { color: #FFD700; font-family: 'Kanit'; font-weight: 700; font-size: 26px; line-height: 1.1; text-shadow: 0 0 10px rgba(255,215,0,0.5); margin: 0; }
-        
         .btn-enter-glow { background: linear-gradient(135deg, #FFD700, #C5A059); color: #000; border: none; padding: 14px 20px; border-radius: 12px; font-family: 'Kanit'; font-weight: 600; font-size: 16px; width: 100%; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; position: relative; overflow: hidden; box-shadow: 0 8px 20px rgba(197, 160, 89, 0.4); animation: pulse-gold 2.5s infinite; box-sizing: border-box; }
         .btn-enter-glow:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(197, 160, 89, 0.6); }
         .btn-enter-glow::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, transparent, rgba(255,255,255,0.4), transparent); transform: skewX(-25deg); animation: shineBtn 3s infinite; }
-        
         .btn-line-glow { background: linear-gradient(90deg, #06C755, #05A044); color: white; border: none; padding: 14px 20px; border-radius: 12px; font-family: 'Kanit'; font-weight: 600; font-size: 16px; width: 100%; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; position: relative; overflow: hidden; box-shadow: 0 8px 20px rgba(6, 199, 85, 0.4); box-sizing: border-box; }
         .btn-line-glow:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(6, 199, 85, 0.6); }
-
+        #partner-friend-blocker { display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 50px 20px; background: var(--surface); border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        #partner-actual-content { display: none; }
+        .line-logo-vertical { width: 100px; height: auto; margin-bottom: 25px; }
+        .friend-note { color: #FFF; font-size: 16px; font-weight: 400; line-height: 1.6; max-width: 300px; margin-bottom: 30px; }
         .spinner { width: 50px; height: 50px; border: 5px solid rgba(197,160,89,0.2); border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
         #appContent { display: none; }
-
         .promo-carousel { display: flex; overflow-x: auto; gap: 16px; padding-bottom: 15px; scroll-snap-type: x mandatory; scrollbar-width: none; margin-top: 15px; }
         .promo-carousel::-webkit-scrollbar { display: none; }
         .promo-item { flex: 0 0 85%; max-width: 340px; scroll-snap-align: center; }
@@ -169,14 +128,6 @@
 
     <div id="page-home" class="page active">
         <header>
-            <div id="header-aff-section" style="display: none; margin-bottom: 15px;">
-                <div style="display: inline-flex; align-items: center; background: rgba(197, 160, 89, 0.15); border: 1px solid var(--primary); border-radius: 30px; padding: 6px 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
-                    <span style="font-size: 12px; color: var(--text-muted); margin-right: 8px;">รหัสแนะนำ:</span>
-                    <span id="header-aff-code" style="color: #FFD700; font-weight: 600; letter-spacing: 1px; font-size: 15px;">-</span>
-                    <button onclick="copyHeaderAffCode()" style="background: none; border: none; color: #FFF; margin-left: 8px; cursor: pointer; font-size: 14px; padding: 0;" title="คัดลอกรหัส">📋</button>
-                </div>
-            </div>
-
             <div style="margin: 0 auto 15px; display: flex; justify-content: center;">
                 <div id="header-profile" style="width:100px; height:100px; border-radius:50%; background:var(--surface); border: 2px solid var(--primary); display: flex; flex-direction: column; align-items:center; justify-content:center; overflow: hidden; box-shadow: 0 0 15px rgba(197,160,89,0.3);"></div>
             </div>
@@ -226,7 +177,6 @@
     </div>
 
     <div id="page-affiliate" class="page">
-        
         <div id="affiliate-guest-view" style="display: none; text-align: center; padding: 40px 20px; background: var(--surface); border-radius: 16px; border: 1px solid var(--border);">
             <div style="font-size: 60px; margin-bottom: 10px;">💸</div>
             <h2 style="color: var(--primary); margin-top: 0;">สร้างรายได้กับเรา</h2>
@@ -242,6 +192,13 @@
                 <p style="font-size: 13.5px; color: var(--text-muted); margin-top: -10px; margin-bottom: 20px;">
                     คัดลอกลิงก์ด้านล่าง ส่งให้เพื่อนมาลงทะเบียนร้านค้า<br>รับค่าคอมมิชชั่นทันทีที่ร้านค้าซื้อโปรโมชั่นสำเร็จ!
                 </p>
+                
+                <div style="padding: 15px; border: 1px solid rgba(23, 162, 184, 0.3); border-radius: 12px; background: rgba(0,0,0,0.3); margin-bottom: 20px;">
+                    <p style="margin: 0 0 5px 0; color: #FFF; font-size: 14px;">🎁 รหัสแนะนำเพื่อน (Affiliate)</p>
+                    <p style="margin: 0 0 10px 0; color: var(--text-muted); font-size: 12px;">ให้ร้านค้าใหม่กรอกรหัสนี้ตอนสมัคร เพื่อรับค่าคอมมิชชั่น!</p>
+                    <h3 id="myAffiliateCode" style="margin: 0 0 10px 0; color: var(--info); font-size: 26px; letter-spacing: 2px; font-weight: bold;">-</h3>
+                    <button class="btn-outline" style="padding: 6px 20px; font-size: 13px; border-color: var(--info); color: var(--info); width: auto; background: transparent;" onclick="copyHeaderAffCode()">📋 คัดลอกรหัส</button>
+                </div>
                 
                 <div style="background: rgba(0,0,0,0.4); border: 1px solid rgba(6, 199, 85, 0.3); border-radius: 16px; padding: 25px 20px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
                     <p style="margin: 0 0 5px 0; font-size: 14px; color: var(--text-muted);">ยอดเงินค่าคอมมิชชั่นสะสม</p>
@@ -259,7 +216,6 @@
     </div>
 
     <div id="page-partner" class="page">
-        
         <div id="partner-friend-blocker" style="display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 50px 20px; background: var(--surface); border-radius: 16px; border: 1px solid var(--border);">
             <img src="https://official-static.line-scdn.net/branding/logo-vertical.png" alt="LINE Official Account" style="width: 100px; margin-bottom: 25px;">
             <div style="color: #FFF; font-size: 16px; font-weight: 400; line-height: 1.6; max-width: 300px; margin-bottom: 30px;">
@@ -435,7 +391,6 @@
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbwojqh2ry1b_xkuVp28w5q8Cs0CX9xBcI-upICxz98NtRrwnJ99GwLneWXFGQJySN1T/exec";
     
-    // ข้อมูลเริ่มต้นสำหรับหมวดหมู่หลัก (แก้ไขได้ใน Admin)
     const defaultMainCats = [
         { id: 'food', label: '🍽️ หมวดอาหาร', keyword: 'ร้านอาหาร' },
         { id: 'beauty', label: '💆‍♀️ ความงาม/พักผ่อน', keyword: 'สปา' },
@@ -460,7 +415,7 @@
         registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], 
         mainCategories: [], categories: [], closedReports: [], blacklistedPlaces: [], services: [], pendingVipRequests: [], 
         vipSettings: { price: 500, bankAccount: 'กสิกรไทย 123-x-xxxxx-x ชื่อบัญชี' },
-        affiliateSettings: { commissionPercent: 10, minWithdrawal: 300 },
+        affiliateSettings: { firstTimeType: 'fixed', firstTimeValue: 100, recurringType: 'percent', recurringValue: 10, minWithdrawal: 300 },
         affiliateWallets: [], withdrawalRequests: []
     };
 
@@ -598,7 +553,6 @@
             const targetPage = urlParams.get('page');
             const refParam = urlParams.get('ref');
             
-            // ⚡ จำรหัสแนะนำเพื่อนไว้ในเครื่อง
             if (refParam) {
                 sessionStorage.setItem('savedRefCode', refParam);
             }
@@ -609,23 +563,21 @@
                 const profile = await liff.getProfile();
                 document.getElementById('header-profile').innerHTML = `<img src="${profile.pictureUrl}" style="width:100%; height:100%; object-fit:cover;">`;
                 
-                // ⚡ สร้างรหัสแนะนำ (Affiliate)
                 const myCode = "AFF" + profile.userId.substring(0, 5).toUpperCase();
                 window.myAffCode = myCode;
                 
-                document.getElementById('header-aff-section').style.display = 'block';
-                document.getElementById('header-aff-code').innerText = myCode;
-                document.getElementById('header-guest-login').style.display = 'none';
+                if(document.getElementById('myAffiliateCode')) {
+                    document.getElementById('myAffiliateCode').innerText = myCode;
+                }
+                
+                document.getElementById('affiliate-actual-content').style.display = 'block';
+                document.getElementById('affiliate-guest-view').style.display = 'none';
 
                 document.getElementById('loginOverlay').style.display = 'none';
                 document.getElementById('appContent').style.display = 'block';
                 
-                document.getElementById('affiliate-actual-content').style.display = 'block';
-                document.getElementById('affiliate-guest-view').style.display = 'none';
-                
                 updateWalletUI(); 
                 
-                // ⚡ ดึงรหัสที่จำไว้มากรอกให้อัตโนมัติ (แต่ต้องไม่ใช่รหัสตัวเอง)
                 const savedRef = sessionStorage.getItem('savedRefCode');
                 if (savedRef && document.getElementById('regRefCode')) {
                     if (savedRef.toUpperCase() !== myCode.toUpperCase()) {
@@ -638,10 +590,7 @@
 
             } else {
                 isAppReady = true;
-                // โหมด Guest (ยังไม่ล็อกอิน)
                 document.getElementById('header-profile').innerHTML = `<div style="font-size: 50px; line-height: 100px; text-align: center;">👤</div>`;
-                document.getElementById('header-aff-section').style.display = 'none';
-                document.getElementById('header-guest-login').style.display = 'block';
                 
                 document.getElementById('affiliate-actual-content').style.display = 'none';
                 document.getElementById('affiliate-guest-view').style.display = 'block';
@@ -662,7 +611,7 @@
         const myWallet = wallets.find(w => w.refCode === window.myAffCode);
         const balance = myWallet ? myWallet.balance : 0;
         
-        const settings = appData.affiliateSettings || { commissionPercent: 10, minWithdrawal: 300 };
+        const settings = appData.affiliateSettings || { minWithdrawal: 300 };
         const minW = settings.minWithdrawal || 300;
         
         if(document.getElementById('aff-page-balance')) {
@@ -1122,7 +1071,6 @@
 
         if(!n || !p1 || !p2 || !p3) return alert("กรุณากรอกข้อมูลและแนบรูปให้ครบครับ");
         
-        // ⚡ ดักจับการใส่รหัสแนะนำตัวเอง
         if (refCode && window.myAffCode && refCode.toUpperCase() === window.myAffCode.toUpperCase()) {
             return alert("⚠️ ไม่สามารถใช้รหัสแนะนำของตัวเองได้ครับ");
         }
