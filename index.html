@@ -741,7 +741,7 @@
         
         googlePlaces = []; document.getElementById('placeList').innerHTML = `<p style="text-align:center; grid-column:1/-1; padding:50px; color:var(--text-muted);">กำลังค้นหา <b>"${keywordToSearch}"</b>...</p>`;
         
-        service.nearbySearch({ location: currentCoords, radius: 5000, keyword: keywordToSearch }, (res, status, pag) => {
+        service.nearbySearch({ location: currentCoords, radius: 10000, keyword: keywordToSearch }, (res, status, pag) => {
             if(status === "OK") { const blacklisted = appData.blacklistedPlaces || []; googlePlaces = res.filter(p => !blacklisted.includes(p.place_id)); currentPagination = pag; renderCards(keywordToSearch);
             } else { document.getElementById('placeList').innerHTML = `<p style="text-align:center; grid-column:1/-1; padding:50px; color:var(--text-muted);">ไม่พบ <b>"${keywordToSearch}"</b> ในบริเวณนี้</p>`; }
         });
