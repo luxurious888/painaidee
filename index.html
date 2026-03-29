@@ -8,6 +8,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+    <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap');
@@ -47,10 +48,13 @@
         .btn-call { background: var(--primary); color: white; }
         .btn-share { background: transparent; color: var(--text-gold); border: 1px solid var(--border); }
         .status-tag { display: inline-flex; align-items: center; justify-content: center; padding: 4px 8px; border-radius: 20px; font-size: 11px; font-weight: 500; white-space: nowrap; box-shadow: 0 2px 5px rgba(0,0,0,0.2); line-height: 1.2; }
+        
+        /* 👑 VIP Aura */
         .card-vip { border: 2px solid #FFD700 !important; box-shadow: 0 0 20px rgba(255, 215, 0, 0.25) !important; transform: translateY(-2px); }
         .card-vip:hover { box-shadow: 0 15px 40px rgba(255, 215, 0, 0.4) !important; border-color: #FFF !important; }
         .vip-crown-badge { position: absolute; top: -10px; left: -10px; background: linear-gradient(135deg, #FFD700, #C5A059, #FFD700); color: #000; padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: 800; z-index: 15; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border: 2px solid #FFF; animation: pulseGlow 2s infinite; }
         @keyframes pulseGlow { 0% { box-shadow: 0 0 10px rgba(255,215,0,0.4); } 50% { box-shadow: 0 0 20px rgba(255,215,0,0.8); } 100% { box-shadow: 0 0 10px rgba(255,215,0,0.4); } }
+        
         .btn-line { background: #06C755 !important; color: #FFF !important; border: none !important; font-weight: 600;}
         .btn-fb { background: #1877F2 !important; color: #FFF !important; border: none !important; font-weight: 600;}
         @keyframes shine { 100% { left: 125%; } }
@@ -78,6 +82,10 @@
         .btn-enter-glow::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, transparent, rgba(255,255,255,0.4), transparent); transform: skewX(-25deg); animation: shineBtn 3s infinite; }
         .btn-line-glow { background: linear-gradient(90deg, #06C755, #05A044); color: white; border: none; padding: 14px 20px; border-radius: 12px; font-family: 'Kanit'; font-weight: 600; font-size: 16px; width: 100%; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; position: relative; overflow: hidden; box-shadow: 0 8px 20px rgba(6, 199, 85, 0.4); box-sizing: border-box; }
         .btn-line-glow:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(6, 199, 85, 0.6); }
+        #partner-friend-blocker { display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 50px 20px; background: var(--surface); border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        #partner-actual-content { display: none; }
+        .line-logo-vertical { width: 100px; height: auto; margin-bottom: 25px; }
+        .friend-note { color: #FFF; font-size: 16px; font-weight: 400; line-height: 1.6; max-width: 300px; margin-bottom: 30px; }
         .spinner { width: 50px; height: 50px; border: 5px solid rgba(197,160,89,0.2); border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         #appContent { display: none; }
@@ -152,8 +160,7 @@
                 </select>
             </div>
             
-            <div id="dynamic-category-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
-                </div>
+            <div id="dynamic-category-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;"></div>
 
             <div class="search-box-container">
                 <input type="text" id="searchBox" placeholder="พิมพ์ชื่อร้านที่ต้องการค้นหา..." onkeydown="if(event.key === 'Enter') executeSearch('text')">
@@ -223,7 +230,6 @@
                     <div id="affiliate-history-list" style="max-height: 200px; overflow-y: auto; font-size: 13px; color: var(--text-muted);">
                         </div>
                 </div>
-
             </div>
         </div>
     </div>
@@ -400,9 +406,8 @@
     </div>
 </div>
 
-<script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <script>
-    // ⚡ ตั้งค่าเชื่อมต่อ Google Apps Script (ยิง LINE / Telegram)
+    // ⚡ ตั้งค่า API สำหรับยิงแจ้งเตือน LINE & Telegram
     const API_URL = "https://script.google.com/macros/s/AKfycbwojqh2ry1b_xkuVp28w5q8Cs0CX9xBcI-upICxz98NtRrwnJ99GwLneWXFGQJySN1T/exec";
 
     // ⚡ ตั้งค่าเชื่อมต่อ Firebase
@@ -412,21 +417,16 @@
         projectId: "painaid-88c53",
         storageBucket: "painaid-88c53.firebasestorage.app",
         messagingSenderId: "229290700458",
-        appId: "1:229290700458:web:74a57d0be5df9326c5ead3",
-        measurementId: "G-BF74QEHLQ7"
+        appId: "1:229290700458:web:74a57d0be5df9326c5ead3"
     };
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const storage = firebase.storage();
-    
-    // โครงสร้างข้อมูลเริ่มต้นเผื่อ Firebase ว่างเปล่า
-    const defaultMainCats = [{ id: 'food', label: '🍽️ หมวดอาหาร', keyword: 'ร้านอาหาร' }, { id: 'beauty', label: '💆‍♀️ ความงาม/พักผ่อน', keyword: 'สปา' }, { id: 'activity', label: '🎯 กิจกรรม/เที่ยว', keyword: 'สถานที่ท่องเที่ยว' }, { id: 'sport', label: '🏋️ กีฬา/ออกกำลังกาย', keyword: 'ฟิตเนส' }];
-    const defaultCategories = [{ id: 1, group: 'food', label: 'หมูกระทะ / แจ่วฮ้อน', keyword: 'หมูกระทะ' }, { id: 2, group: 'food', label: 'ชาบู / สุกี้', keyword: 'ชาบู' }, { id: 3, group: 'food', label: 'ปิ้งย่าง / บาร์บีคิว', keyword: 'ปิ้งย่าง' }, { id: 4, group: 'food', label: 'บุฟเฟ่ต์สุดคุ้ม', keyword: 'บุฟเฟ่ต์' }];
 
-    let appData = { registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], mainCategories: [], categories: [], closedReports: [], blacklistedPlaces: [], services: [], pendingVipRequests: [], vipSettings: { price: 500, bankAccount: 'กสิกรไทย 123-x-xxxxx-x ชื่อบัญชี' }, affiliateSettings: { firstTimeType: 'fixed', firstTimeValue: 100, recurringType: 'percent', recurringValue: 10, minWithdrawal: 300 }, affiliateWallets: [], withdrawalRequests: [] };
+    let appData = { registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], mainCategories: [], categories: [], closedReports: [], blacklistedPlaces: [], services: [], pendingVipRequests: [], affiliateWallets: [], withdrawalRequests: [] };
 
-    // ⚡ ฟังก์ชันแปลงและบีบอัดรูป
+    // ฟังก์ชันบีบอัดรูปภาพ
     const resizeImg = (file) => new Promise((resolve) => {
         if(!file) return resolve('');
         const reader = new FileReader(); reader.readAsDataURL(file);
@@ -444,9 +444,9 @@
         reader.onerror = () => resolve('');
     });
 
-    // ⚡ อัปโหลดรูปขึ้น Firebase Storage
+    // อัปโหลดรูปขึ้น Storage
     async function uploadImageToStorage(dataUrl, folder) {
-        if (!dataUrl) return ""; if (dataUrl.startsWith('http')) return dataUrl; 
+        if (!dataUrl) return ""; if (dataUrl.startsWith('http')) return dataUrl;
         const ref = storage.ref(`${folder}/${Date.now()}_${Math.random().toString(36).substring(2,9)}.jpg`);
         await ref.putString(dataUrl, 'data_url');
         return await ref.getDownloadURL();
@@ -456,16 +456,15 @@
         try { await fetch(API_URL, { method: 'POST', body: JSON.stringify({ telegramMsg: msg }) }); } catch(e) {}
     }
 
-    // ⚡ โหลดข้อมูลจาก Firebase (Real-time)
+    // ⚡ ระบบดึงข้อมูล Firebase แบบ Real-time
     let unsubscribe = null;
     function loadFromCloud() {
         return new Promise((resolve) => {
             unsubscribe = db.collection('painaidee').doc('systemData').onSnapshot((doc) => {
-                if (doc.exists) { appData = { ...appData, ...doc.data() }; } else { saveToCloud(); }
-                if (!appData.mainCategories || appData.mainCategories.length === 0) appData.mainCategories = JSON.parse(JSON.stringify(defaultMainCats));
-                if (!appData.categories || appData.categories.length === 0) appData.categories = JSON.parse(JSON.stringify(defaultCategories));
+                if (doc.exists) { appData = { ...appData, ...doc.data() }; } 
+                else { saveToCloud(); }
                 
-                ['registeredStores', 'activePromotions', 'mainCategories', 'categories', 'services', 'affiliateWallets', 'withdrawalRequests'].forEach(k => { if(!appData[k]) appData[k] = []; });
+                ['registeredStores', 'activePromotions', 'mainCategories', 'categories', 'services', 'affiliateWallets', 'withdrawalRequests', 'registrationRequests', 'pendingPromotions', 'pendingVipRequests'].forEach(k => { if(!appData[k]) appData[k] = []; });
                 
                 renderUI(); updateWalletUI(); renderPromos();
                 if (googlePlaces.length > 0) renderCards(document.getElementById('searchBox').value || 'ร้านอาหาร');
@@ -474,7 +473,10 @@
         });
     }
 
-    async function saveToCloud() { try { await db.collection('painaidee').doc('systemData').set(appData); return true; } catch(e) { throw e; } }
+    async function saveToCloud() {
+        try { await db.collection('painaidee').doc('systemData').set(appData); return true; }
+        catch(e) { throw e; }
+    }
 
     const provinces = [
         {id:'bkk',name:'กรุงเทพมหานคร',lat:13.7563,lng:100.5018},{id:'krabi',name:'กระบี่',lat:8.0863,lng:98.9063},{id:'kanchanaburi',name:'กาญจนบุรี',lat:14.0159,lng:99.5336},
@@ -509,21 +511,14 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         initSystem();
-        setTimeout(() => { if (!isAppReady && document.getElementById('loginCard').style.display === 'none') showLoginCard(); }, 4000);
+        setTimeout(() => { if (!isAppReady && document.getElementById('loginCard').style.display === 'none') { showLoginCard(); } }, 4000);
     });
 
-    function showLoginCard() {
-        document.getElementById('loadingSpinner').style.display = 'none';
-        document.getElementById('loginCard').style.display = 'block';
-    }
-
-    function enterApp() {
-        document.getElementById('loginOverlay').style.display = 'none';
-        document.getElementById('appContent').style.display = 'block';
-    }
+    function showLoginCard() { document.getElementById('loadingSpinner').style.display = 'none'; document.getElementById('loginCard').style.display = 'block'; }
+    function enterApp() { document.getElementById('loginOverlay').style.display = 'none'; document.getElementById('appContent').style.display = 'block'; }
 
     function copyHeaderAffCode() {
-        if(window.myAffCode) { navigator.clipboard.writeText(window.myAffCode).then(() => { alert("คัดลอกรหัสแนะนำ " + window.myAffCode + " สำเร็จ!"); }); }
+        if(window.myAffCode) { navigator.clipboard.writeText(window.myAffCode).then(() => { alert("คัดลอกรหัสแนะนำ " + window.myAffCode + " สำเร็จ! นำไปแชร์ให้เพื่อนหรือร้านค้าเพื่อรับสิทธิพิเศษได้เลยครับ"); }); }
     }
 
     function copyAffLink() {
@@ -536,62 +531,47 @@
     async function initSystem() {
         try {
             await liff.init({ liffId: "2009598846-wiCUeV35" });
-            await loadFromCloud(); // โหลดครั้งแรกผ่าน Firebase Snapshot
+            await loadFromCloud(); // ⚡ เริ่มดึงข้อมูลจาก Firebase
             
             const urlParams = new URLSearchParams(window.location.search);
-            const targetPage = urlParams.get('page');
-            const refParam = urlParams.get('ref');
+            const targetPage = urlParams.get('page'); const refParam = urlParams.get('ref');
             
             if (refParam) { sessionStorage.setItem('savedRefCode', refParam); }
 
             if (liff.isLoggedIn()) {
-                isAppReady = true; 
-                document.getElementById('loadingText').innerText = "กำลังดึงข้อมูลแผนที่...";
+                isAppReady = true; document.getElementById('loadingText').innerText = "กำลังดึงข้อมูลแผนที่...";
                 const profile = await liff.getProfile();
                 document.getElementById('header-profile').innerHTML = `<img src="${profile.pictureUrl}" style="width:100%; height:100%; object-fit:cover;">`;
                 
-                const myCode = "AFF" + profile.userId.substring(0, 5).toUpperCase();
-                window.myAffCode = myCode;
+                const myCode = "AFF" + profile.userId.substring(0, 5).toUpperCase(); window.myAffCode = myCode;
                 
                 if(document.getElementById('myAffiliateCode')) { document.getElementById('myAffiliateCode').innerText = myCode; }
                 
-                document.getElementById('affiliate-actual-content').style.display = 'block';
-                document.getElementById('affiliate-guest-view').style.display = 'none';
-                document.getElementById('loginOverlay').style.display = 'none';
-                document.getElementById('appContent').style.display = 'block';
+                document.getElementById('affiliate-actual-content').style.display = 'block'; document.getElementById('affiliate-guest-view').style.display = 'none';
+                document.getElementById('loginOverlay').style.display = 'none'; document.getElementById('appContent').style.display = 'block';
                 
                 updateWalletUI(); 
                 
                 const savedRef = sessionStorage.getItem('savedRefCode');
-                if (savedRef && document.getElementById('regRefCode')) {
-                    if (savedRef.toUpperCase() !== myCode.toUpperCase()) { document.getElementById('regRefCode').value = savedRef; }
-                }
+                if (savedRef && document.getElementById('regRefCode')) { if (savedRef.toUpperCase() !== myCode.toUpperCase()) { document.getElementById('regRefCode').value = savedRef; } }
 
                 if (targetPage === 'partner') { setTimeout(() => { navigateToPartner(); }, 300); }
                 if (targetPage === 'affiliate') { setTimeout(() => { navigateToAffiliate(); }, 300); }
+
             } else {
-                isAppReady = true;
-                document.getElementById('header-profile').innerHTML = `<div style="font-size: 50px; line-height: 100px; text-align: center;">👤</div>`;
-                document.getElementById('affiliate-actual-content').style.display = 'none';
-                document.getElementById('affiliate-guest-view').style.display = 'block';
+                isAppReady = true; document.getElementById('header-profile').innerHTML = `<div style="font-size: 50px; line-height: 100px; text-align: center;">👤</div>`;
+                document.getElementById('affiliate-actual-content').style.display = 'none'; document.getElementById('affiliate-guest-view').style.display = 'block';
                 showLoginCard();
             }
         } catch (err) { 
-            console.error("LIFF Init Error:", err);
-            isAppReady = true;
-            document.getElementById('header-profile').innerHTML = `<div style="font-size: 50px; line-height: 100px; text-align: center;">👤</div>`;
-            showLoginCard();
+            console.error("LIFF Init Error:", err); isAppReady = true; document.getElementById('header-profile').innerHTML = `<div style="font-size: 50px; line-height: 100px; text-align: center;">👤</div>`; showLoginCard();
         }
     }
 
     function updateWalletUI() {
         if(!window.myAffCode) return;
-        const wallets = appData.affiliateWallets || [];
-        const myWallet = wallets.find(w => w.refCode === window.myAffCode);
-        const balance = myWallet ? myWallet.balance : 0;
-        
-        const settings = appData.affiliateSettings || { minWithdrawal: 300 };
-        const minW = settings.minWithdrawal || 300;
+        const wallets = appData.affiliateWallets || []; const myWallet = wallets.find(w => w.refCode === window.myAffCode); const balance = myWallet ? myWallet.balance : 0;
+        const settings = appData.affiliateSettings || { minWithdrawal: 300 }; const minW = settings.minWithdrawal || 300;
         
         if(document.getElementById('aff-page-balance')) { document.getElementById('aff-page-balance').innerText = balance.toLocaleString() + ' ฿'; }
         if(document.getElementById('aff-min-text')) { document.getElementById('aff-min-text').innerText = `*(ถอนขั้นต่ำ ${minW} บาท)*`; }
@@ -599,11 +579,8 @@
         const btn = document.getElementById('btn-page-withdraw');
         if(btn) {
             btn.innerText = `ถอนเงินเข้าบัญชี (ขั้นต่ำ ${minW})`;
-            if (balance >= minW) {
-                btn.style.background = 'linear-gradient(90deg, #06C755, #05A044)'; btn.style.color = '#FFF'; btn.style.borderColor = '#06C755'; btn.style.cursor = 'pointer'; btn.disabled = false;
-            } else {
-                btn.style.background = 'var(--dark-muted)'; btn.style.color = 'var(--text-muted)'; btn.style.borderColor = 'var(--border)'; btn.style.cursor = 'not-allowed'; btn.disabled = true;
-            }
+            if (balance >= minW) { btn.style.background = 'linear-gradient(90deg, #06C755, #05A044)'; btn.style.color = '#FFF'; btn.style.borderColor = '#06C755'; btn.style.cursor = 'pointer'; btn.disabled = false;
+            } else { btn.style.background = 'var(--dark-muted)'; btn.style.color = 'var(--text-muted)'; btn.style.borderColor = 'var(--border)'; btn.style.cursor = 'not-allowed'; btn.disabled = true; }
         }
 
         const historyList = document.getElementById('affiliate-history-list');
@@ -628,16 +605,13 @@
         if(!bankInfo || bankInfo.trim() === '') return;
         if(!appData.withdrawalRequests) appData.withdrawalRequests = [];
         
-        const reqAmount = myWallet.balance; myWallet.balance = 0; 
-        let uid = ""; try { if(liff.isLoggedIn()) uid = (await liff.getProfile()).userId; } catch(e){}
+        const reqAmount = myWallet.balance; myWallet.balance = 0; let uid = ""; try { if(liff.isLoggedIn()) uid = (await liff.getProfile()).userId; } catch(e){}
 
         appData.withdrawalRequests.push({ id: Date.now().toString(), refCode: window.myAffCode, userId: uid, amount: reqAmount, bankDetails: bankInfo, status: 'pending', requestDate: new Date().toLocaleString() });
         try {
             document.getElementById('btn-page-withdraw').innerText = 'กำลังส่งเรื่อง...'; document.getElementById('btn-page-withdraw').disabled = true;
-            await saveToCloud();
-            sendTelegramNotify(`💸 <b>มีคำร้องขอถอนเงินค่าคอม!</b>\n\nรหัสตัวแทน: ${window.myAffCode}\nยอดถอน: <b>${reqAmount.toLocaleString()} บาท</b>\nบัญชี: ${bankInfo}\n\n👉 กรุณาโอนเงินและกดอนุมัติในหน้าแอดมินครับ`);
-            alert("ส่งคำร้องขอถอนเงินเรียบร้อยแล้ว! แอดมินจะตรวจสอบและโอนเงินให้ท่านในเร็วๆ นี้ครับ");
-            updateWalletUI(); 
+            await saveToCloud(); sendTelegramNotify(`💸 <b>มีคำร้องขอถอนเงินค่าคอม!</b>\n\nรหัสตัวแทน: ${window.myAffCode}\nยอดถอน: <b>${reqAmount.toLocaleString()} บาท</b>\nบัญชี: ${bankInfo}\n\n👉 กรุณาโอนเงินและกดอนุมัติในหน้าแอดมินครับ`);
+            alert("ส่งคำร้องขอถอนเงินเรียบร้อยแล้ว! แอดมินจะตรวจสอบและโอนเงินให้ท่านในเร็วๆ นี้ครับ"); updateWalletUI(); 
         } catch(e) { alert("เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่"); myWallet.balance = reqAmount; updateWalletUI(); }
     }
 
@@ -646,8 +620,7 @@
 
     async function navigateToPartner() {
         if (!liff.isLoggedIn()) {
-            const blocker = document.getElementById('partner-friend-blocker'); const content = document.getElementById('partner-actual-content');
-            switchPage('partner'); blocker.style.display = 'flex'; content.style.display = 'none';
+            const blocker = document.getElementById('partner-friend-blocker'); const content = document.getElementById('partner-actual-content'); switchPage('partner'); blocker.style.display = 'flex'; content.style.display = 'none';
             blocker.innerHTML = `<img src="https://official-static.line-scdn.net/branding/logo-vertical.png" alt="LINE" style="width: 100px; margin-bottom: 25px;"><div style="color: #FFF; font-size: 16px; margin-bottom: 30px; text-align: center; line-height: 1.6;"><span style="color:var(--primary); font-weight:600; font-size: 18px;">⚠️ สำหรับร้านค้า</span><br>กรุณาเข้าใช้งานผ่านแอป LINE<br>เพื่อรับรหัส PIN ในการจัดการร้านครับ</div><button class="btn-line-glow" style="width: auto; padding: 14px 24px; border:none; border-radius:12px; font-family:'Kanit'; font-weight:600; font-size:16px; cursor:pointer;" onclick="window.location.href='https://liff.line.me/2009598846-wiCUeV35?page=partner'">📱 เปิดใช้งานผ่านแอป LINE</button>`;
             return;
         }
@@ -838,10 +811,7 @@
             provinces.forEach(p => { const destPoint = new google.maps.LatLng(p.lat, p.lng); const dist = google.maps.geometry.spherical.computeDistanceBetween(originPoint, destPoint); if (dist < minDist) { minDist = dist; curProv = p.id; } });
         } else if (curProv === 'current') { curProv = 'ubon'; }
         
-        // 🎲 สุ่มป้ายโปรโมท (Shuffle)
-        let promos = activePromos.filter(p => p.province === curProv);
-        promos = promos.sort(() => Math.random() - 0.5);
-
+        let promos = activePromos.filter(p => p.province === curProv); promos = promos.sort(() => Math.random() - 0.5);
         const banner = document.getElementById('promoBanner');
         
         if(promos.length > 0) {
@@ -1057,6 +1027,21 @@
             await saveToCloud(); sendTelegramNotify(`📝 <b>มีการขอแก้ไขแบนเนอร์!</b>\n\n🏬 ร้าน: <b>${store.name}</b>\n\n👉 กรุณาตรวจสอบในหน้าแอดมินครับ`);
             alert("ส่งข้อมูลขอแก้ไขเรียบร้อย! รอแอดมินตรวจสอบการเปลี่ยนแปลงครับ (วันหมดอายุจะคงเดิม)"); document.getElementById('editPromoImageInput').value = '';
         } catch (error) { alert("❌ ไม่สามารถส่งข้อมูลได้ กรุณาลองใหม่อีกครั้ง"); } finally { btn.innerText = "🔄 ส่งเรื่องขอแก้ไขข้อมูล"; btn.disabled = false; }
+    }
+
+    function callPlace(placeId, event) {
+        event.stopPropagation();
+        service.getDetails({ placeId: placeId, fields: ['formatted_phone_number'] }, (place, status) => {
+            if (status === google.maps.places.PlacesServiceStatus.OK && place.formatted_phone_number) {
+                window.location.href = 'tel:' + place.formatted_phone_number.replace(/[^0-9+]/g, '');
+            } else { alert("ขออภัยครับ ไม่พบเบอร์โทรศัพท์ของสถานที่นี้ในระบบแผนที่"); }
+        });
+    }
+
+    function sharePlace(name, lat, lng, event) {
+        event.stopPropagation(); const mapUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+        if (navigator.share) { navigator.share({ title: 'แอปไปไหนดี', text: `ลองดูร้าน "${name}" สิ! น่าสนใจมากเลย 📍 ดูพิกัดได้ที่นี่: `, url: mapUrl }).catch(err => console.log('Share failed:', err));
+        } else { navigator.clipboard.writeText(mapUrl).then(() => { alert('คัดลอกลิงก์พิกัดเรียบร้อยแล้ว! สามารถนำไปวาง (Paste) ส่งให้เพื่อนได้เลยครับ'); }); }
     }
 </script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD7Qqf1Z9KQBuvipDzgIc5laJLz9SiOBH8&libraries=places,geometry&callback=initMap" async defer></script>
