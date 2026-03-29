@@ -92,12 +92,11 @@
         .dashboard-card { background: var(--surface); padding: 25px; border-radius: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); margin-bottom: 24px; border: 1px solid var(--border); }
         .dashboard-card h3 { margin-top: 0; color: var(--primary-light); border-bottom: 2px solid var(--border); padding-bottom: 12px; font-weight: 500; }
         
-        /* 📝 จัดฟอร์มใหม่ให้อ่านง่าย */
         .form-group { margin-bottom: 22px; }
         .form-group label { display: block; font-weight: 500; font-size: 15px; color: #FFF; margin-bottom: 4px; }
         .form-group .hint { font-size: 12.5px; color: var(--text-muted); margin-top: 0; margin-bottom: 10px; line-height: 1.4; }
         
-        /* 🌟 เอฟเฟกต์หน้า Login ล้ำยุค */
+        /* 🌟 เอฟเฟกต์หน้า Login ล้ำยุค (แก้ไขปุ่มใหม่) */
         #loginOverlay { position: fixed; inset: 0; background: #0b0f19; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
         .bg-glow { position: absolute; width: 400px; height: 400px; background: radial-gradient(circle, rgba(6,199,85,0.15) 0%, transparent 70%); border-radius: 50%; top: -10%; left: -20%; animation: floatGlow 8s infinite alternate; }
         .bg-glow2 { position: absolute; width: 500px; height: 500px; background: radial-gradient(circle, rgba(197,160,89,0.1) 0%, transparent 70%); border-radius: 50%; bottom: -20%; right: -20%; animation: floatGlow2 10s infinite alternate; }
@@ -110,9 +109,16 @@
         .logo-circle { width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, #1A1D23, #0b0f19); border: 2px solid #C5A059; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 0 25px rgba(197,160,89,0.4), inset 0 0 15px rgba(197,160,89,0.2); }
         .logo-text { color: #FFD700; font-family: 'Kanit'; font-weight: 700; font-size: 26px; line-height: 1.1; text-shadow: 0 0 10px rgba(255,215,0,0.5); margin: 0; }
         
-        .btn-line-glow { background: linear-gradient(90deg, #06C755, #05A044); color: white; border: none; padding: 16px 20px; border-radius: 14px; font-family: 'Kanit'; font-weight: 600; font-size: 16px; width: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; position: relative; overflow: hidden; box-shadow: 0 8px 20px rgba(6, 199, 85, 0.4); transition: 0.3s; }
-        .btn-line-glow:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(6, 199, 85, 0.6); }
-        .btn-line-glow::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, transparent, rgba(255,255,255,0.3), transparent); transform: skewX(-25deg); animation: shineBtn 3s infinite; }
+        /* ปุ่มเข้าใช้งานแอป (ลูกค้าทั่วไป) */
+        .btn-enter-glow { 
+            background: linear-gradient(135deg, #FFD700, #C5A059); color: #000; border: none; padding: 16px 20px; border-radius: 14px; 
+            font-family: 'Kanit'; font-weight: 600; font-size: 18px; width: 100%; cursor: pointer; transition: 0.3s; 
+            display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; position: relative; overflow: hidden; 
+            box-shadow: 0 8px 20px rgba(197, 160, 89, 0.4); animation: pulse-gold 2.5s infinite; 
+        }
+        .btn-enter-glow:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(197, 160, 89, 0.6); }
+        .btn-enter-glow::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, transparent, rgba(255,255,255,0.4), transparent); transform: skewX(-25deg); animation: shineBtn 3s infinite; }
+        @keyframes pulse-gold { 0% { box-shadow: 0 0 10px rgba(197, 160, 89, 0.3); } 50% { box-shadow: 0 0 25px rgba(197, 160, 89, 0.6); } 100% { box-shadow: 0 0 10px rgba(197, 160, 89, 0.3); } }
         @keyframes shineBtn { 0% { left: -100%; } 20% { left: 200%; } 100% { left: 200%; } }
 
         /* 🛡️ แจ้งเตือนแอดเพื่อน */
@@ -149,8 +155,12 @@
             <p class="logo-text">ไป<br>ไหนดี</p>
         </div>
         <h2 style="color: #FFF; margin: 0 0 8px 0; font-size: 24px; font-weight: 600;">ยินดีต้อนรับ</h2>
-        <p style="color: rgba(255,255,255,0.6); font-size: 14px; margin-bottom: 30px; line-height: 1.5;">กรุณาเข้าสู่ระบบผ่าน LINE<br>เพื่อค้นหาและรับโปรโมชั่นพิเศษ</p>
-        <a href="https://liff.line.me/2009598846-wiCUeV35" class="btn-line-glow">📱 เข้าสู่ระบบด้วย LINE</a>
+        <p style="color: rgba(255,255,255,0.6); font-size: 14px; margin-bottom: 30px; line-height: 1.5;">ค้นหาร้านอาหารและสถานที่น่าสนใจ<br>พร้อมรับโปรโมชั่นพิเศษมากมาย</p>
+        
+        <button onclick="enterApp()" class="btn-enter-glow">
+            🚀 เข้าใช้งานแอป
+        </button>
+        <p style="font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 20px;">*สำหรับร้านค้า สามารถเลือกล็อกอินเพื่อจัดการร้านได้ในแอป</p>
     </div>
 </div>
 
@@ -210,7 +220,7 @@
                 <span style="color:var(--primary); font-weight:600;">⚠️ สำคัญมาก</span><br>
                 สำหรับร้านค้าจำเป็นต้องเพิ่มเพื่อนก่อน เพื่อรับรหัสผ่านในการใช้งานครับ
             </div>
-            <button class="btn-line-login btn-line-glow" style="width: auto; padding: 12px 24px;" onclick="window.open('https://lin.ee/5SBoptj', '_blank')">➕ เพิ่มเพื่อน LINE OA ของเรา</button>
+            <button class="btn-primary" style="background:var(--line-green); width: auto; padding: 12px 24px; display: flex; align-items: center; justify-content: center; gap: 10px;" onclick="window.open('https://lin.ee/5SBoptj', '_blank')">➕ เพิ่มเพื่อน LINE OA ของเรา</button>
             <button class="btn-outline" style="margin-top: 20px; font-size: 13px; border-color:var(--dark-muted); color:var(--text-muted);" onclick="checkFriendshipForPartner(true)">ฉันเพิ่มเพื่อนแล้ว ตรวจสอบอีกครั้ง</button>
         </div>
 
@@ -519,32 +529,49 @@
         document.getElementById('loginCard').style.display = 'block';
     }
 
+    // ⚡ ฟังก์ชันเข้าแอปแบบ Guest (สำหรับลูกค้าทั่วไป)
+    function enterApp() {
+        document.getElementById('loginOverlay').style.display = 'none';
+        document.getElementById('appContent').style.display = 'block';
+    }
+
     async function initSystem() {
         try {
             await liff.init({ liffId: "2009598846-wiCUeV35" });
-
+            await loadFromCloud();
+            
             if (liff.isLoggedIn()) {
                 isAppReady = true; 
                 document.getElementById('loadingText').innerText = "กำลังดึงข้อมูลแผนที่...";
                 const profile = await liff.getProfile();
                 document.getElementById('header-profile').innerHTML = `<img src="${profile.pictureUrl}" style="width:100%; height:100%; object-fit:cover;">`;
                 
-                await loadFromCloud();
-                
                 document.getElementById('loginOverlay').style.display = 'none';
                 document.getElementById('appContent').style.display = 'block';
             } else {
+                // ถ้ายังไม่ล็อกอิน ให้โชว์หน้า Welcome แบบ Guest
                 isAppReady = true;
+                document.getElementById('header-profile').innerHTML = `<div style="font-size: 50px; line-height: 100px; text-align: center;">👤</div>`;
                 showLoginCard();
             }
         } catch (err) { 
             console.error("LIFF Init Error:", err);
             isAppReady = true;
+            document.getElementById('header-profile').innerHTML = `<div style="font-size: 50px; line-height: 100px; text-align: center;">👤</div>`;
             showLoginCard();
         }
     }
 
     async function navigateToPartner() {
+        // ⚡ ถ้ายังไม่ล็อกอิน LINE บังคับล็อกอินก่อนเข้าหน้าร้านค้า
+        if (!liff.isLoggedIn()) {
+            const confirmLogin = confirm("⚠️ สำหรับร้านค้า\nคุณจำเป็นต้องเข้าสู่ระบบด้วย LINE เพื่อดำเนินการต่อ\n\nต้องการเข้าสู่ระบบตอนนี้เลยหรือไม่?");
+            if (confirmLogin) {
+                liff.login();
+            }
+            return;
+        }
+        
         switchPage('partner');
         checkFriendshipForPartner(false); 
     }
@@ -585,7 +612,7 @@
                 <span style="color:var(--primary); font-weight:600;">⚠️ สำคัญมาก</span><br>
                 สำหรับร้านค้าจำเป็นต้องเพิ่มเพื่อนก่อน เพื่อรับรหัสผ่านในการใช้งานครับ
             </div>
-            <button class="btn-line-login btn-line-glow" style="width: auto; padding: 12px 24px;" onclick="window.open('https://lin.ee/5SBoptj', '_blank')">➕ เพิ่มเพื่อน LINE OA ของเรา</button>
+            <button class="btn-primary" style="background:var(--line-green); width: auto; padding: 12px 24px; display: flex; align-items: center; justify-content: center; gap: 10px;" onclick="window.open('https://lin.ee/5SBoptj', '_blank')">➕ เพิ่มเพื่อน LINE OA ของเรา</button>
             <button class="btn-outline" style="margin-top: 20px; font-size: 13px; border-color:var(--dark-muted); color:var(--text-muted);" onclick="checkFriendshipForPartner(true)">ฉันเพิ่มเพื่อนแล้ว ตรวจสอบอีกครั้ง</button>
         `;
     }
@@ -890,10 +917,10 @@
         });
     }
 
-    // ⚡ ฟังก์ชันลงทะเบียน (ส่งรหัส Affiliate)
+    // ⚡ ฟังก์ชันลงทะเบียน
     async function submitStoreRegistration() {
         const btn = document.getElementById('btnSubmitReg'); const n = document.getElementById('regStoreName').value; const p1 = document.getElementById('regStorePhoto').files[0]; const p2 = document.getElementById('regIdCard').files[0]; const p3 = document.getElementById('regPhone').value; 
-        const refCode = document.getElementById('regRefCode').value; // รหัสผู้แนะนำ
+        const refCode = document.getElementById('regRefCode').value;
 
         if(!n || !p1 || !p2 || !p3) return alert("กรุณากรอกข้อมูลและแนบรูปให้ครบครับ");
         
@@ -953,7 +980,7 @@
         }
     }
 
-    // ⚡ อัปเดตเช็คร้านค้า (ตรวจสอบสิทธิ์ฟรี 7 วัน)
+    // ⚡ อัปเดตเช็คร้านค้า
     function verifyStore() {
         const stores = appData.registeredStores || [];
         const store = stores.find(s => s.pin === document.getElementById('storePinInput').value);
@@ -985,15 +1012,13 @@
             } else {
                 document.getElementById('editPromoSection').style.display = 'none'; document.getElementById('buyPromoSection').style.display = 'block';
                 
-                // ตรวจสอบสิทธิ์ฟรี
                 if(hasFreePromo) {
                     promoTitle.innerHTML = '🎁 สิทธิพิเศษ VIP: ฟรีพื้นที่โปรโมท 7 วัน!';
-                    slipArea.style.display = 'none'; // ซ่อนช่องแนบสลิป
+                    slipArea.style.display = 'none'; 
                     document.getElementById('promoServiceSelect').innerHTML = `<option value="ฟรี 7 วัน (สิทธิ์ VIP)">ใช้สิทธิ์โปรโมทฟรี 7 วัน</option>`;
                 } else {
                     promoTitle.innerHTML = '🚀 ดันยอดขายพุ่ง! พื้นที่โปรโมทหน้าแรก';
-                    slipArea.style.display = 'block'; // โชว์ช่องแนบสลิป
-                    // คืนค่า Dropdown เดิม
+                    slipArea.style.display = 'block'; 
                     const sData = (appData.services && appData.services.length > 0) ? appData.services : defaultServices;
                     document.getElementById('promoServiceSelect').innerHTML = sData.map(s => `<option value="${s.name} - ${s.price}฿">${s.name} - ${s.price}฿</option>`).join('');
                 }
@@ -1047,7 +1072,7 @@
         if(store) { store.lineUrl = document.getElementById('vipLineInput').value; store.fbUrl = document.getElementById('vipFbInput').value; await saveToCloud(); alert("บันทึกข้อมูลติดต่อแล้ว ลูกค้าสามารถกดเข้า LINE/FB ได้ทันที"); }
     }
 
-    // ⚡ อัปเดตฟังก์ชันลงโปรโมท (รองรับสิทธิ์ฟรี 7 วัน)
+    // ⚡ อัปเดตฟังก์ชันลงโปรโมท 
     async function submitPromoWithPIN() {
         const btn = document.getElementById('btnSubmitPromo'); const stores = appData.registeredStores || [];
         const store = stores.find(s => s.pin === document.getElementById('storePinInput').value);
