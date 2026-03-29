@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painaidee Admin - ระบบจัดการหลังบ้าน</title>
+    <title>Super Admin - Painaidee</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap');
         body { font-family: 'Kanit', sans-serif; background-color: #121418; color: #fff; }
         .gold-text { color: #C5A059; }
         .card { background: #1A1D23; border: 1px solid rgba(197, 160, 89, 0.2); border-radius: 16px; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        .input-dark { background-color: #2A2E36; border: 1px solid #4A5568; color: white; border-radius: 8px; padding: 8px 12px; outline: none; transition: 0.3s; width: 100%; font-size: 14px;}
-        .input-dark:focus { border-color: #C5A059; box-shadow: 0 0 0 2px rgba(197, 160, 89, 0.2); }
+        .input-dark { background-color: #2A2E36; border: 1px solid #4A5568; color: white; border-radius: 8px; padding: 10px 14px; outline: none; transition: 0.3s; width: 100%; font-size: 14px;}
+        .input-dark:focus { border-color: #C5A059; }
         .btn-primary { background: linear-gradient(135deg, #FFD700, #C5A059); color: #000; font-weight: 600; padding: 8px 16px; border-radius: 8px; transition: 0.2s; cursor: pointer; }
         .btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); }
         .btn-success { background: #06C755; color: white; font-weight: 500; padding: 8px 16px; border-radius: 8px; transition: 0.2s; cursor: pointer; }
-        .btn-success:hover { background: #05A044; transform: translateY(-1px); }
+        .btn-success:hover { background: #05A044; }
         .btn-danger { background: #D9534F; color: white; font-weight: 500; padding: 8px 16px; border-radius: 8px; transition: 0.2s; cursor: pointer; }
-        .btn-danger:hover { background: #C9302C; transform: translateY(-1px); }
+        .btn-danger:hover { background: #C9302C; }
         .btn-info { background: #17a2b8; color: white; font-weight: 500; padding: 8px 16px; border-radius: 8px; transition: 0.2s; cursor: pointer; }
         .btn-info:hover { background: #138496; }
         
@@ -28,6 +28,10 @@
         details summary { cursor: pointer; background: #2A2E36; padding: 12px 15px; border-radius: 8px; font-weight: 600; color: #C5A059; list-style: none; transition: 0.3s; }
         details summary::-webkit-details-marker { display: none; }
         details[open] summary { border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-bottom: 1px solid #4A5568; }
+
+        /* Toggle Switch Custom */
+        .toggle-checkbox:checked { right: 0; border-color: #06C755; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #06C755; }
     </style>
 </head>
 <body class="p-4 md:p-8 text-sm md:text-base">
@@ -51,44 +55,69 @@
 </div>
 
 <div class="max-w-6xl mx-auto pb-24">
-    <h1 class="text-3xl md:text-4xl font-bold gold-text mb-8 text-center bg-[#1A1D23] py-6 rounded-2xl border border-gray-700 shadow-lg">👑 แผงควบคุมแอดมิน (Painaidee)</h1>
+    <h1 class="text-3xl md:text-4xl font-bold gold-text mb-8 text-center bg-[#1A1D23] py-6 rounded-2xl border border-gray-700 shadow-lg">👑 Super Admin Dashboard</h1>
 
     <div class="card border-l-4 border-yellow-500">
-        <h2 class="text-xl font-bold mb-4">👑 1. ตั้งค่าระบบ VIP (ราคา & บัญชี)</h2>
+        <h2 class="text-xl font-bold mb-4">⚙️ 1. ตั้งค่าระบบ (ราคา, บัญชี, โลโก้)</h2>
         <div class="bg-[#2A2E36] p-4 rounded-xl border border-yellow-600/30 flex flex-col md:flex-row gap-4 items-end mb-6">
             <div class="w-full md:w-1/4">
                 <label class="block text-gray-400 text-xs mb-1">ราคา VIP (บาท/เดือน)</label>
-                <input type="number" id="vipPriceSetting" class="input-dark">
+                <input type="number" id="vPrice" class="input-dark">
             </div>
             <div class="w-full md:w-2/4">
                 <label class="block text-gray-400 text-xs mb-1">ข้อมูลบัญชีโอนเงิน</label>
-                <input type="text" id="vipBankSetting" class="input-dark" placeholder="เช่น กสิกรไทย 123-x-xxxxx-x">
+                <input type="text" id="vBank" class="input-dark" placeholder="เช่น กสิกรไทย 123-x-xxxxx-x">
             </div>
             <div class="w-full md:w-1/4">
-                <button class="btn-primary w-full py-2.5" onclick="saveVipSettings()">💾 บันทึกตั้งค่า VIP</button>
+                <label class="block text-gray-400 text-xs mb-1">ลิงก์รูปโลโก้หน้า Login</label>
+                <input type="text" id="appLogo" class="input-dark" placeholder="https://...">
+            </div>
+            <div class="w-full md:w-1/4">
+                <button class="btn-primary w-full py-2.5" onclick="saveSettings()">💾 บันทึกตั้งค่า</button>
             </div>
         </div>
-        
-        <h3 class="text-lg font-bold mb-3 border-b border-gray-700 pb-2">คำขอสมัคร / ต่ออายุ VIP <span id="vip-req-count" class="bg-red-500 text-white text-xs px-2 py-1 rounded-full">0</span></h3>
+    </div>
+
+    <div class="card border-l-4 border-blue-500">
+        <h2 class="text-xl font-bold mb-4">🆕 2. คำร้องลงทะเบียนร้านค้าใหม่ <span id="reg-count" class="bg-red-500 text-white text-xs px-2 py-1 rounded-full">0</span></h2>
+        <div id="registration-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+    </div>
+
+    <div class="card border-l-4 border-yellow-300">
+        <h2 class="text-xl font-bold mb-4">👑 3. ตรวจสอบสลิป VIP <span id="vip-req-count" class="bg-red-500 text-white text-xs px-2 py-1 rounded-full">0</span></h2>
         <div id="vip-request-list" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
     </div>
 
-    <div class="card border-l-4 border-orange-500">
-        <h2 class="text-xl font-bold mb-4">💰 2. จัดการแพ็กเกจโปรโมท (แบนเนอร์)</h2>
-        <div class="bg-[#2A2E36] p-4 rounded-xl mb-4 grid grid-cols-1 md:grid-cols-5 gap-3">
-            <input type="text" id="sName" class="input-dark" placeholder="ชื่อแพ็กเกจ">
-            <input type="number" id="sPrice" class="input-dark" placeholder="ราคา (บาท)">
-            <input type="number" id="sDays" class="input-dark" placeholder="อายุ (วัน)">
-            <input type="text" id="sDetail" class="input-dark" placeholder="รายละเอียด">
-            <button class="btn-success" onclick="addService()">➕ เพิ่มแพ็กเกจ</button>
-        </div>
-        <div id="sTable" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+    <div class="card border-l-4 border-cyan-500">
+        <h2 class="text-xl font-bold mb-4">🚀 4. ตรวจสอบสลิป แบนเนอร์โปรโมท <span id="promo-count" class="bg-red-500 text-white text-xs px-2 py-1 rounded-full">0</span></h2>
+        <div id="pending-promo-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+    </div>
+
+    <div class="card border-l-4 border-green-500">
+        <h2 class="text-xl font-bold mb-4">✨ 5. แบนเนอร์ที่กำลังแสดงผล (แก้ไข/ต่ออายุได้)</h2>
+        <div id="active-promo-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+    </div>
+
+    <div class="card border-l-4 border-gray-400">
+        <h2 class="text-xl font-bold mb-4">🏬 6. ฐานข้อมูลร้านค้าทั้งหมด (จัดการสิทธิ์ VIP)</h2>
+        <div id="store-management-list" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
     </div>
 
     <div class="card border-l-4 border-purple-500 p-0 overflow-hidden">
         <details>
-            <summary>🔽 3. จัดการหมวดหมู่ค้นหา (คลิกเพื่อเปิด/ปิด)</summary>
+            <summary>🔽 7. จัดการแพ็กเกจโปรโมท & หมวดหมู่ค้นหา (คลิกเพื่อเปิด/ปิด)</summary>
             <div class="p-5 bg-[#1A1D23]">
+                <h3 class="font-bold gold-text mb-2 border-b border-gray-700 pb-2">📦 แพ็กเกจพื้นที่โปรโมท</h3>
+                <div class="bg-[#2A2E36] p-4 rounded-xl mb-4 grid grid-cols-1 md:grid-cols-5 gap-3">
+                    <input type="text" id="sName" class="input-dark" placeholder="ชื่อแพ็กเกจ">
+                    <input type="number" id="sPrice" class="input-dark" placeholder="ราคา (บาท)">
+                    <input type="number" id="sDays" class="input-dark" placeholder="อายุ (วัน)">
+                    <input type="text" id="sDetail" class="input-dark" placeholder="รายละเอียด">
+                    <button class="btn-success" onclick="addService()">➕ เพิ่มแพ็กเกจ</button>
+                </div>
+                <div id="sTable" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8"></div>
+
+                <h3 class="font-bold gold-text mb-2 border-b border-gray-700 pb-2">📌 หมวดหมู่การค้นหา</h3>
                 <div class="bg-[#2A2E36] p-4 rounded-xl mb-4 grid grid-cols-1 md:grid-cols-4 gap-3">
                     <select id="cGroup" class="input-dark">
                         <option value="food">🍽️ อาหาร/เครื่องดื่ม</option>
@@ -109,26 +138,6 @@
         </details>
     </div>
 
-    <div class="card border-l-4 border-cyan-500">
-        <h2 class="text-xl font-bold mb-4">📌 4. คำขอขึ้นแบนเนอร์โปรโมท (รออนุมัติ) <span id="promo-count" class="bg-red-500 text-white text-xs px-2 py-1 rounded-full">0</span></h2>
-        <div id="pending-promo-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-    </div>
-
-    <div class="card border-l-4 border-green-500">
-        <h2 class="text-xl font-bold mb-4">✨ 5. แบนเนอร์ที่กำลังแสดงผล (แก้ไข/ต่ออายุได้)</h2>
-        <div id="active-promo-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-    </div>
-
-    <div class="card border-l-4 border-blue-500">
-        <h2 class="text-xl font-bold mb-4">🆕 6. คำร้องลงทะเบียนร้านค้าใหม่ <span id="reg-count" class="bg-red-500 text-white text-xs px-2 py-1 rounded-full">0</span></h2>
-        <div id="registration-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-    </div>
-
-    <div class="card border-l-4 border-gray-400">
-        <h2 class="text-xl font-bold mb-4">🏬 7. ฐานข้อมูลร้านค้าทั้งหมด (จัดการสิทธิ์)</h2>
-        <div id="store-management-list" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
-    </div>
-
     <div class="card border-l-4 border-red-500">
         <h2 class="text-xl font-bold mb-4">🚩 8. รายงานร้านปิดถาวร (จากลูกค้า)</h2>
         <div id="closedTable" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
@@ -141,70 +150,27 @@
 
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbwojqh2ry1b_xkuVp28w5q8Cs0CX9xBcI-upICxz98NtRrwnJ99GwLneWXFGQJySN1T/exec";
-    
-    // ⚡ 1. ตั้งค่ารหัสผ่านเข้า Admin (เปลี่ยนได้ที่นี่)
     const ADMIN_PASSWORD = "250899"; 
     
+    let appData = { registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], categories: [], closedReports: [], blacklistedPlaces: [], services: [], pendingVipRequests: [], vipSettings: { price: 500, bankAccount: '-' }, appSettings: { logoUrl: '' } };
+
     function checkAdminLogin() {
         const pwd = document.getElementById('adminPasswordInput').value;
         if (pwd === ADMIN_PASSWORD) {
             sessionStorage.setItem('adminLoggedIn', 'true');
             document.getElementById('adminLoginOverlay').style.display = 'none';
-            load(); // โหลดข้อมูลเมื่อรหัสผ่านถูกต้อง
+            load(); 
         } else {
             document.getElementById('loginErrorMsg').style.display = 'block';
         }
     }
 
-    // เช็คตอนเปิดหน้าเว็บว่าเคยล็อกอินหรือยัง
     document.addEventListener('DOMContentLoaded', () => {
         if (sessionStorage.getItem('adminLoggedIn') === 'true') {
             document.getElementById('adminLoginOverlay').style.display = 'none';
             load();
-        } else {
-            document.getElementById('adminLoginOverlay').style.display = 'flex';
-        }
+        } else { document.getElementById('adminLoginOverlay').style.display = 'flex'; }
     });
-
-    const defaultCategories = [
-        { id: 1, group: 'food', label: 'หมูกระทะ / แจ่วฮ้อน', keyword: 'หมูกระทะ' },
-        { id: 2, group: 'food', label: 'ชาบู / สุกี้', keyword: 'ชาบู' },
-        { id: 3, group: 'food', label: 'ปิ้งย่าง / บาร์บีคิว', keyword: 'ปิ้งย่าง' },
-        { id: 4, group: 'food', label: 'บุฟเฟ่ต์สุดคุ้ม', keyword: 'บุฟเฟ่ต์' },
-        { id: 5, group: 'food', label: 'คาเฟ่ / กาแฟ / ขนม', keyword: 'คาเฟ่' },
-        { id: 6, group: 'food', label: 'อาหารทะเล / ซีฟู้ด', keyword: 'อาหารทะเล' },
-        { id: 7, group: 'food', label: 'ร้านนั่งชิล / บาร์ / ดนตรีสด', keyword: 'ร้านเหล้า' },
-        { id: 8, group: 'food', label: 'ส้มตำ / อาหารอีสาน', keyword: 'ร้านส้มตำ' },
-        { id: 9, group: 'food', label: 'อาหารญี่ปุ่น / ซูชิ', keyword: 'อาหารญี่ปุ่น' },
-        { id: 10, group: 'food', label: 'อาหารตามสั่ง / จานด่วน', keyword: 'อาหารตามสั่ง' },
-        { id: 11, group: 'food', label: 'ก๋วยเตี๋ยว / บะหมี่', keyword: 'ก๋วยเตี๋ยว' },
-        { id: 12, group: 'food', label: 'ข้าวต้มโต้รุ่ง / รอบดึก', keyword: 'ร้านข้าวต้ม' },
-        { id: 13, group: 'beauty', label: 'ร้านนวดแผนไทย / นวดสปา', keyword: 'ร้านนวด' },
-        { id: 14, group: 'beauty', label: 'คลินิกเสริมความงาม', keyword: 'คลินิกความงาม' },
-        { id: 15, group: 'beauty', label: 'ทำผม / ซาลอน / บาร์เบอร์', keyword: 'ร้านทำผม' },
-        { id: 16, group: 'beauty', label: 'ทำเล็บ / ต่อขนตา', keyword: 'ร้านทำเล็บ' },
-        { id: 17, group: 'beauty', label: 'ทำฟัน / คลินิกทันตกรรม', keyword: 'คลินิกทำฟัน' },
-        { id: 18, group: 'beauty', label: 'ออนเซ็น / แช่น้ำร้อน', keyword: 'ออนเซ็น' },
-        { id: 19, group: 'activity', label: 'สถานที่ท่องเที่ยว / แลนด์มาร์ค', keyword: 'สถานที่ท่องเที่ยว' },
-        { id: 20, group: 'activity', label: 'วัด / ไหว้พระ / สายมู', keyword: 'วัด' },
-        { id: 21, group: 'activity', label: 'ตลาดนัด / ถนนคนเดิน', keyword: 'ตลาดนัด' },
-        { id: 22, group: 'activity', label: 'ห้างสรรพสินค้า / ช้อปปิ้ง', keyword: 'ห้างสรรพสินค้า' },
-        { id: 23, group: 'activity', label: 'แคมป์ปิ้ง / กางเต็นท์', keyword: 'แคมป์ปิ้ง' },
-        { id: 24, group: 'activity', label: 'โรงแรม / รีสอร์ท / ที่พัก', keyword: 'โรงแรม' },
-        { id: 25, group: 'activity', label: 'พูลวิลล่า / บ้านพักตากอากาศ', keyword: 'พูลวิลล่า' },
-        { id: 26, group: 'activity', label: 'สวนสนุก / สวนน้ำ', keyword: 'สวนน้ำ' },
-        { id: 27, group: 'activity', label: 'สวนสาธารณะ / พักผ่อน', keyword: 'สวนสาธารณะ' },
-        { id: 28, group: 'activity', label: 'พิพิธภัณฑ์ / หอศิลป์', keyword: 'พิพิธภัณฑ์' },
-        { id: 29, group: 'sport', label: 'ฟิตเนส / ยิม', keyword: 'ฟิตเนส' },
-        { id: 30, group: 'sport', label: 'สนามฟุตบอล / หญ้าเทียม', keyword: 'สนามฟุตบอล' },
-        { id: 31, group: 'sport', label: 'สนามแบดมินตัน', keyword: 'สนามแบดมินตัน' },
-        { id: 32, group: 'sport', label: 'สระว่ายน้ำ', keyword: 'สระว่ายน้ำ' },
-        { id: 33, group: 'sport', label: 'มวยไทย / ค่ายมวย', keyword: 'ค่ายมวย' },
-        { id: 34, group: 'sport', label: 'โยคะ / พิลาทิส', keyword: 'โยคะ' },
-        { id: 35, group: 'sport', label: 'สนามกอล์ฟ / ไดร์ฟกอล์ฟ', keyword: 'สนามกอล์ฟ' }
-    ];
-
-    let appData = { registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], categories: [], closedReports: [], blacklistedPlaces: [], services: [], pendingVipRequests: [], vipSettings: { price: 500, bankAccount: 'กสิกรไทย 123-x-xxxxx-x ชื่อบัญชี' } };
 
     function formatDateTime(ms) {
         if (!ms) return '';
@@ -234,68 +200,102 @@
     }
 
     async function load() {
-        showLoading(true);
+        document.getElementById('loading').style.display = 'flex';
         try {
             const res = await fetch(API_URL + "?t=" + new Date().getTime());
             const data = await res.json();
             if (data && Object.keys(data).length > 0) { appData = { ...appData, ...data }; }
-            if (!appData.categories || appData.categories.length === 0) { appData.categories = JSON.parse(JSON.stringify(defaultCategories)); }
-            if (!appData.vipSettings) { appData.vipSettings = { price: 500, bankAccount: 'กสิกรไทย 123-4-56789-0 (ไปไหนดี)' }; }
+            if (!appData.appSettings) appData.appSettings = { logoUrl: '' };
             
             ['registrationRequests','registeredStores','pendingPromotions','activePromotions','categories','closedReports','blacklistedPlaces','services','pendingVipRequests'].forEach(key => { if(!appData[key]) appData[key] = []; });
             checkAutoRenew(); 
         } catch (e) { console.error(e); render(); }
-        showLoading(false);
+        document.getElementById('loading').style.display = 'none';
     }
 
     async function save() { 
-        showLoading(true);
+        document.getElementById('loading').style.display = 'flex';
         try { await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(appData) }); render(); } catch(e) { alert("⚠️ เกิดข้อผิดพลาดในการบันทึกข้อมูล"); } 
-        showLoading(false);
+        document.getElementById('loading').style.display = 'none';
+    }
+
+    function saveSettings() {
+        appData.vipSettings.price = parseInt(document.getElementById('vPrice').value) || 500;
+        appData.vipSettings.bankAccount = document.getElementById('vBank').value;
+        if(!appData.appSettings) appData.appSettings = {};
+        appData.appSettings.logoUrl = document.getElementById('appLogo').value;
+        save(); alert("💾 บันทึกการตั้งค่าสำเร็จ!");
     }
 
     function render() {
-        document.getElementById('vipPriceSetting').value = appData.vipSettings.price;
-        document.getElementById('vipBankSetting').value = appData.vipSettings.bankAccount;
+        document.getElementById('vPrice').value = appData.vipSettings.price || 500;
+        document.getElementById('vBank').value = appData.vipSettings.bankAccount || '';
+        document.getElementById('appLogo').value = (appData.appSettings && appData.appSettings.logoUrl) ? appData.appSettings.logoUrl : '';
 
+        // 1. ลงทะเบียนร้านค้า (Registration)
+        const regList = document.getElementById('registration-list'); document.getElementById('reg-count').innerText = appData.registrationRequests.length;
+        if(appData.registrationRequests.length === 0) { regList.innerHTML = '<p class="text-gray-500 italic">ไม่มีคำร้องใหม่</p>'; }
+        else {
+            regList.innerHTML = appData.registrationRequests.map((r,i) => `
+                <div class="bg-[#2A2E36] p-4 rounded-xl border border-blue-500 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-xl font-bold text-white">${r.storeName}</h3>
+                        <p class="text-sm text-gray-400 mt-1">📞 โทร: <span class="text-[#C5A059]">${r.phone || 'ไม่ระบุ'}</span></p>
+                        ${r.refCode ? `<p class="text-sm font-bold mt-1" style="color:var(--info);">🤝 ผู้แนะนำ (Affiliate): ${r.refCode}</p>` : ''}
+                        
+                        <div class="flex flex-wrap gap-2 mt-3 mb-4">
+                            ${r.storePhoto ? `<button class="bg-gray-700 px-3 py-1 rounded text-xs" onclick="openImageTab('${r.storePhoto}')">🖼️ รูปร้าน</button>` : ''}
+                            ${r.idCard ? `<button class="bg-gray-700 px-3 py-1 rounded text-xs" onclick="openImageTab('${r.idCard}')">🆔 ปชช.</button>` : ''}
+                            ${r.commercial ? `<button class="bg-gray-700 px-3 py-1 rounded text-xs" onclick="openImageTab('${r.commercial}')">📄 พาณิชย์</button>` : ''}
+                        </div>
+                    </div>
+                    <div class="flex gap-2 mt-auto">
+                        <button class="btn-success flex-1 text-sm" onclick="approveStore(${i})">✅ อนุมัติ & แจ้ง PIN</button>
+                        <button class="btn-danger flex-1 text-sm" onclick="deleteItem('registrationRequests', ${i})">❌ ลบ</button>
+                    </div>
+                </div>`).join('');
+        }
+
+        // 2. VIP Requests
         const vipReqList = document.getElementById('vip-request-list'); document.getElementById('vip-req-count').innerText = appData.pendingVipRequests.length;
         if(appData.pendingVipRequests.length === 0) { vipReqList.innerHTML = '<p class="text-gray-500 italic">ไม่มีสลิปรอตรวจสอบ</p>'; }
         else {
             vipReqList.innerHTML = appData.pendingVipRequests.map((r,i) => `
-                <div class="bg-[#2A2E36] p-4 rounded-xl border border-yellow-600 shadow-md">
+                <div class="bg-[#2A2E36] p-4 rounded-xl border border-yellow-500 shadow-md">
                     <h3 class="text-lg font-bold gold-text mb-1">👑 ${r.storeName}</h3>
                     <p class="text-xs text-gray-400 mb-3">เวลาส่ง: ${r.requestDate}</p>
-                    <img src="${r.slipImage}" class="w-full h-32 object-cover rounded-lg mb-3 cursor-pointer border border-gray-600" onclick="openImageTab('${r.slipImage}')">
+                    <img src="${r.slipImage}" class="w-full h-40 object-cover rounded-lg mb-3 cursor-pointer border border-gray-600" onclick="openImageTab('${r.slipImage}')">
                     <div class="flex gap-2"><button class="btn-success flex-1 py-1" onclick="approveVipRequest(${i})">✅ อนุมัติ</button><button class="btn-danger flex-1 py-1" onclick="deleteItem('pendingVipRequests', ${i})">❌ ลบ</button></div>
                 </div>`).join('');
         }
 
-        document.getElementById('sTable').innerHTML = appData.services.map((s,i) => `
-            <div class="bg-[#2A2E36] p-4 rounded-xl border border-gray-600 flex flex-col justify-between">
-                <div><h3 class="font-bold text-lg text-white">${s.name}</h3><p class="text-gray-400 text-sm mb-2">${s.detail || '-'}</p><p class="gold-text font-bold text-xl">${s.price} ฿ <span class="text-sm text-gray-400 font-normal">/ ${s.days || 30} วัน</span></p></div>
-                <button class="bg-red-500/20 text-red-400 hover:bg-red-500/40 py-1 px-3 rounded text-sm mt-3 self-end transition" onclick="deleteItem('services', ${i})">🗑️ ลบแพ็กเกจ</button>
-            </div>`).join('');
-
-        document.getElementById('cTable').innerHTML = appData.categories.map((c,i) => `
-            <div class="bg-[#2A2E36] p-3 rounded-lg flex flex-col md:flex-row gap-3 items-center border border-gray-700">
-                <input type="checkbox" class="cat-checkbox w-5 h-5 accent-[#C5A059] cursor-pointer shrink-0" value="${i}">
-                <select id="editCGroup_${i}" class="input-dark py-1.5 md:w-1/4"><option value="food" ${c.group==='food'?'selected':''}>อาหาร/เครื่องดื่ม</option><option value="beauty" ${c.group==='beauty'?'selected':''}>ความงาม/พักผ่อน</option><option value="activity" ${c.group==='activity'?'selected':''}>กิจกรรม/เที่ยว</option><option value="sport" ${c.group==='sport'?'selected':''}>กีฬา/ฟิตเนส</option></select>
-                <input type="text" id="editCLabel_${i}" class="input-dark py-1.5 md:w-1/3" value="${c.label}" placeholder="ชื่อที่ลูกค้าเห็น"><input type="text" id="editCKey_${i}" class="input-dark py-1.5 md:w-1/3" value="${c.keyword}" placeholder="คำค้นหา Map">
-            </div>`).join('');
-
+        // 3. Pending Promos
         const pendingPList = document.getElementById('pending-promo-list'); document.getElementById('promo-count').innerText = appData.pendingPromotions.length;
         if(appData.pendingPromotions.length === 0) { pendingPList.innerHTML = '<p class="text-gray-500 italic">ไม่มีรายการรออนุมัติ</p>'; }
         else {
             pendingPList.innerHTML = appData.pendingPromotions.map((p,i) => `
                 <div class="bg-[#2A2E36] p-4 rounded-xl border ${p.isUpdateOnly ? 'border-yellow-500' : 'border-cyan-500'} flex flex-col gap-3">
                     <div class="flex justify-between items-start">${p.isUpdateOnly ? '<span class="bg-yellow-500 text-black px-2 py-1 rounded text-xs font-bold">📝 ขอแก้ไขข้อมูล (ไม่เพิ่มวัน)</span>' : '<span class="bg-cyan-500 text-white px-2 py-1 rounded text-xs font-bold">🆕 ซื้อแพ็กเกจใหม่/ต่ออายุ</span>'}</div>
-                    <img src="${p.image}" class="w-full h-40 object-cover rounded-lg cursor-pointer border border-gray-600" onclick="openImageTab('${p.image}')">
+                    
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <p class="text-xs text-gray-400 mb-1">รูปแบนเนอร์:</p>
+                            <img src="${p.image}" class="w-full h-24 object-cover rounded-lg cursor-pointer border border-gray-600" onclick="openImageTab('${p.image}')">
+                        </div>
+                        ${p.slipImage ? `
+                        <div>
+                            <p class="text-xs text-gray-400 mb-1">สลิปชำระเงิน:</p>
+                            <img src="${p.slipImage}" class="w-full h-24 object-cover rounded-lg cursor-pointer border border-green-500" onclick="openImageTab('${p.slipImage}')">
+                        </div>` : '<div></div>'}
+                    </div>
+
                     <div class="grid grid-cols-2 gap-2"><input type="text" id="editPStore_${i}" class="input-dark text-sm" value="${p.storeName}"><input type="text" id="editPProv_${i}" class="input-dark text-sm" value="${p.province}"><input type="text" id="editPCat_${i}" class="input-dark text-sm" value="${p.category || ''}"><input type="text" id="editPServ_${i}" class="input-dark text-sm" value="${p.service || ''}" ${p.isUpdateOnly ? 'readonly style="opacity:0.5;"' : ''}></div>
                     <textarea id="editPDetail_${i}" class="input-dark text-sm" rows="2">${p.detail || ''}</textarea>
                     <div class="flex gap-2 mt-2"><button class="btn-success flex-1" onclick="approvePromotion(${i})">✅ อนุมัติ</button><button class="btn-danger flex-1" onclick="deleteItem('pendingPromotions', ${i})">❌ ลบ</button></div>
                 </div>`).join('');
         }
 
+        // 4. Active Promos
         const activePList = document.getElementById('active-promo-list'); const now = Date.now();
         if(appData.activePromotions.length === 0) { activePList.innerHTML = '<p class="text-gray-500 italic">ยังไม่มีแบนเนอร์ที่แสดงผล</p>'; }
         else {
@@ -307,23 +307,25 @@
                     <img src="${p.image}" class="w-full h-32 object-cover rounded-lg border border-gray-600 mt-4 cursor-pointer" onclick="openImageTab('${p.image}')">
                     <div class="grid grid-cols-2 gap-2"><input type="text" id="editAStore_${i}" class="input-dark font-bold text-[#C5A059]" value="${p.storeName}"><input type="text" id="editAProv_${i}" class="input-dark" value="${p.province}"><input type="text" id="editACat_${i}" class="input-dark text-sm" value="${p.category || ''}"><input type="datetime-local" id="editAExpire_${i}" class="input-dark text-sm" value="${formatDateTime(p.expireTimestamp)}"></div>
                     <textarea id="editADetail_${i}" class="input-dark text-sm" rows="2">${p.detail}</textarea>
-                    <div class="flex flex-wrap gap-2 mt-2"><button class="${p.autoRenew ? 'btn-success' : 'bg-gray-600 text-white'} px-3 py-1 rounded text-sm transition flex-1" onclick="togglePromoAutoRenew(${i})">🔄 ต่ออายุ: ${p.autoRenew ? 'ON' : 'OFF'}</button><button class="btn-info px-3 py-1 rounded text-sm flex-1" onclick="saveActivePromo(${i})">💾 เซฟแก้ไข</button><button class="btn-danger px-3 py-1 rounded text-sm" onclick="deleteItem('activePromotions', ${i})">🗑️ ลบ</button></div>
+                    
+                    <div class="flex flex-col gap-2 mt-2">
+                        <div class="bg-[#1A1D23] p-2 rounded flex justify-between items-center border border-gray-700">
+                            <span class="text-sm ${p.autoRenew ? 'text-[#06C755]' : 'text-gray-400'}">ออโต้ต่ออายุ (หักวันตามแพ็กเกจ)</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                              <input type="checkbox" class="sr-only peer" ${p.autoRenew ? 'checked' : ''} onchange="togglePromoAutoRenew(${i})">
+                              <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#06C755]"></div>
+                            </label>
+                        </div>
+                        <div class="flex gap-2">
+                            <button class="btn-info flex-1 py-2 text-sm" onclick="saveActivePromo(${i})">💾 บันทึกแก้ไข</button>
+                            <button class="btn-danger flex-1 py-2 text-sm" onclick="deleteItem('activePromotions', ${i})">🗑️ ลบแบนเนอร์</button>
+                        </div>
+                    </div>
                 </div>`;
             }).join('');
         }
 
-        const regList = document.getElementById('registration-list'); document.getElementById('reg-count').innerText = appData.registrationRequests.length;
-        if(appData.registrationRequests.length === 0) { regList.innerHTML = '<p class="text-gray-500 italic">ไม่มีคำร้องใหม่</p>'; }
-        else {
-            regList.innerHTML = appData.registrationRequests.map((r,i) => `
-                <div class="bg-[#2A2E36] p-4 rounded-xl border border-blue-500 flex flex-col justify-between">
-                    <div><h3 class="text-xl font-bold text-white">${r.storeName}</h3><p class="text-sm text-gray-400 mt-1">📞 โทร: <span class="text-[#C5A059]">${r.phone || 'ไม่ระบุ'}</span></p>
-                        <div class="flex flex-wrap gap-2 mt-3 mb-4">${r.storePhoto ? `<button class="bg-gray-700 px-3 py-1 rounded text-xs" onclick="openImageTab('${r.storePhoto}')">🖼️ รูปร้าน</button>` : ''}${r.idCard ? `<button class="bg-gray-700 px-3 py-1 rounded text-xs" onclick="openImageTab('${r.idCard}')">🆔 ปชช.</button>` : ''}${r.commercial ? `<button class="bg-gray-700 px-3 py-1 rounded text-xs" onclick="openImageTab('${r.commercial}')">📄 พาณิชย์</button>` : ''}</div>
-                    </div><div class="flex gap-2 mt-auto"><button class="btn-success flex-1 text-sm" onclick="approveStore(${i})">✅ อนุมัติ & แจ้ง PIN</button><button class="btn-danger flex-1 text-sm" onclick="deleteItem('registrationRequests', ${i})">❌ ลบ</button></div>
-                </div>`).join('');
-        }
-
-        // ⚡ 2. อัปเดตการ์ดร้านค้า (ดีไซน์ใหม่ + Toggle สวิตช์ออโต้ + ปุ่มลบมุมขวาล่าง)
+        // 5. จัดการร้านค้าทั้งหมด (Store Management)
         document.getElementById('store-management-list').innerHTML = appData.registeredStores.map((s,i) => `
             <div class="bg-[#242730] p-5 rounded-xl border border-gray-700 ${s.isVIP ? '!border-[#FFD700] shadow-[0_0_15px_rgba(255,215,0,0.1)]' : ''} relative flex flex-col h-full transition-all">
                 ${s.isVIP ? '<div class="absolute top-4 right-4 bg-[#FFD700] text-black text-[11px] px-3 py-1 rounded font-bold shadow">VIP</div>' : ''}
@@ -336,20 +338,20 @@
                 </div>
                 
                 <p class="text-sm text-gray-400 mb-1">📞 ${s.phone || 'ไม่ระบุ'}</p>
-                <p class="text-sm text-gray-400 mb-5">หมดอายุ: ${(s.isVIP && s.vipExpireTimestamp) ? new Date(s.vipExpireTimestamp).toLocaleDateString('th-TH') : '-'}</p>
+                <p class="text-sm text-gray-400 mb-5">หมดอายุ VIP: ${(s.isVIP && s.vipExpireTimestamp) ? new Date(s.vipExpireTimestamp).toLocaleDateString('th-TH') : '-'}</p>
                 
                 <div class="flex flex-col gap-3 mt-auto">
                     ${!s.isVIP ? `
-                        <button class="w-full bg-[#453715] hover:bg-[#5A461A] text-[#FFD700] py-2.5 rounded-lg text-sm font-bold transition flex justify-center items-center gap-2" onclick="toggleVIP(${i})">
+                        <button class="w-full bg-[#453715] hover:bg-[#5A461A] text-[#FFD700] py-2.5 rounded-lg text-sm font-bold transition" onclick="toggleVIP(${i})">
                             👑 เปิดสิทธิ์ VIP 30 วัน
                         </button>
                     ` : `
-                        <button class="w-full bg-[#4B1E25] hover:bg-[#632731] text-[#FF5A5A] py-2.5 rounded-lg text-sm font-bold transition flex justify-center items-center gap-2" onclick="toggleVIP(${i})">
+                        <button class="w-full bg-[#4B1E25] hover:bg-[#632731] text-[#FF5A5A] py-2.5 rounded-lg text-sm font-bold transition" onclick="toggleVIP(${i})">
                             ❌ ยกเลิก VIP
                         </button>
                         
                         <div class="bg-[#1A1D23] p-3 rounded-lg flex justify-between items-center border border-gray-700 mt-1">
-                            <span class="text-sm font-medium ${s.vipAutoRenew ? 'text-[#06C755]' : 'text-gray-400'}">ออโต้ต่ออายุ</span>
+                            <span class="text-sm font-medium ${s.vipAutoRenew ? 'text-[#06C755]' : 'text-gray-400'}">ออโต้ต่ออายุ VIP</span>
                             <label class="relative inline-flex items-center cursor-pointer">
                               <input type="checkbox" class="sr-only peer" ${s.vipAutoRenew ? 'checked' : ''} onchange="toggleVipAutoRenew(${i})">
                               <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#06C755]"></div>
@@ -358,14 +360,28 @@
                     `}
                     
                     <div class="text-right mt-1">
-                        <button class="text-[#FF5A5A] hover:text-red-400 text-xs underline transition" onclick="deleteStore(${i}, '${s.name}')">
-                            ลบร้านนี้ถาวร
-                        </button>
+                        <button class="text-[#FF5A5A] hover:text-red-400 text-xs underline transition" onclick="deleteStore(${i}, '${s.name}')">ลบร้านนี้ถาวร</button>
                     </div>
                 </div>
             </div>
         `).join('');
 
+        // Services Table
+        document.getElementById('sTable').innerHTML = appData.services.map((s,i) => `
+            <div class="bg-[#2A2E36] p-4 rounded-xl border border-gray-600 flex flex-col justify-between">
+                <div><h3 class="font-bold text-lg text-white">${s.name}</h3><p class="text-gray-400 text-sm mb-2">${s.detail || '-'}</p><p class="gold-text font-bold text-xl">${s.price} ฿ <span class="text-sm text-gray-400 font-normal">/ ${s.days || 30} วัน</span></p></div>
+                <button class="bg-red-500/20 text-red-400 hover:bg-red-500/40 py-1 px-3 rounded text-sm mt-3 self-end transition" onclick="deleteItem('services', ${i})">🗑️ ลบแพ็กเกจ</button>
+            </div>`).join('');
+
+        // Categories Table
+        document.getElementById('cTable').innerHTML = appData.categories.map((c,i) => `
+            <div class="bg-[#2A2E36] p-3 rounded-lg flex flex-col md:flex-row gap-3 items-center border border-gray-700">
+                <input type="checkbox" class="cat-checkbox w-5 h-5 accent-[#C5A059] cursor-pointer shrink-0" value="${i}">
+                <select id="editCGroup_${i}" class="input-dark py-1.5 md:w-1/4"><option value="food" ${c.group==='food'?'selected':''}>อาหาร/เครื่องดื่ม</option><option value="beauty" ${c.group==='beauty'?'selected':''}>ความงาม/พักผ่อน</option><option value="activity" ${c.group==='activity'?'selected':''}>กิจกรรม/เที่ยว</option><option value="sport" ${c.group==='sport'?'selected':''}>กีฬา/ฟิตเนส</option></select>
+                <input type="text" id="editCLabel_${i}" class="input-dark py-1.5 md:w-1/3" value="${c.label}" placeholder="ชื่อที่ลูกค้าเห็น"><input type="text" id="editCKey_${i}" class="input-dark py-1.5 md:w-1/3" value="${c.keyword}" placeholder="คำค้นหา Map">
+            </div>`).join('');
+
+        // Closed Reports
         const closedList = document.getElementById('closedTable');
         if(appData.closedReports.length === 0) { closedList.innerHTML = '<p class="text-gray-500 italic">ไม่มีรายงาน</p>'; }
         else {
@@ -374,30 +390,34 @@
         }
     }
 
-    function saveVipSettings() { appData.vipSettings.price = parseInt(document.getElementById('vipPriceSetting').value) || 500; appData.vipSettings.bankAccount = document.getElementById('vipBankSetting').value; save(); alert("💾 บันทึกการตั้งค่า VIP สำเร็จ!"); }
+    // --- Action Functions ---
+    async function approveStore(index) {
+        let r = appData.registrationRequests[index]; let pin = Math.floor(1000 + Math.random() * 9000).toString();
+        const newStore = { name: r.storeName, pin: pin, userId: r.userId, phone: r.phone || 'ไม่ระบุ', refCode: r.refCode || '', isVIP: false };
+        appData.registeredStores.unshift(newStore); appData.registrationRequests.splice(index, 1);
+        showLoading(true); await fetch(API_URL, { method: 'POST', body: JSON.stringify(appData) });
+        if (newStore.userId) {
+            const lineMsg = `✅ อนุมัติร้านค้า ${newStore.name} เรียบร้อยแล้วครับ!\n\n🔑 รหัส PIN ของคุณคือ: ${newStore.pin}\n\n🌐 เข้าใช้งานแอปได้เลยที่: https://painaidee.online`;
+            try {
+                const response = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "SEND_LINE_PIN", targetUserId: newStore.userId, message: lineMsg }) });
+                const resData = await response.json();
+                if(resData.result === "error") { prompt(`⚠️ อนุมัติสำเร็จ! แต่ระบบส่ง LINE ล้มเหลว\nรบกวนแอดมินก๊อปปี้ PIN ด้านล่างนี้ไปส่งให้ลูกค้าด้วยตัวเองนะครับ:`, pin); }
+                else { alert("✅ อนุมัติ และส่งรหัส PIN เข้า LINE OA ลูกค้าสำเร็จ!"); }
+            } catch(e) { prompt(`⚠️ อนุมัติสำเร็จ! แต่ระบบส่ง LINE ขัดข้อง\nPIN:`, pin); }
+        } else { prompt(`✅ อนุมัติร้าน ${newStore.name} สำเร็จ!\n(ลูกค้าไม่ได้ผูก LINE ID ให้ก๊อปปี้รหัสด้านล่างส่งให้ลูกค้าเอง)`, pin); }
+        load();
+    }
 
     function approveVipRequest(index) {
         const req = appData.pendingVipRequests[index]; const store = appData.registeredStores.find(s => s.name === req.storeName);
         if(store) { store.isVIP = true; store.vipExpireTimestamp = Date.now() + (30 * 24 * 60 * 60 * 1000); store.vipAutoRenew = false; appData.pendingVipRequests.splice(index, 1); save(); alert("👑 อนุมัติสถานะ VIP ให้ร้าน " + store.name + " สำเร็จ!"); } else { alert("⚠️ ไม่พบข้อมูลร้านค้านี้ในระบบ"); }
     }
 
-    async function approveStore(index) {
-        let r = appData.registrationRequests[index]; let pin = Math.floor(1000 + Math.random() * 9000).toString();
-        const newStore = { name: r.storeName, pin: pin, userId: r.userId, phone: r.phone || 'ไม่ระบุ', isVIP: false };
-        appData.registeredStores.unshift(newStore); appData.registrationRequests.splice(index, 1);
-        showLoading(true); await fetch(API_URL, { method: 'POST', body: JSON.stringify(appData) });
-        if (newStore.userId) {
-            const lineMsg = `✅ อนุมัติร้านค้า ${newStore.name} เรียบร้อยแล้วครับ!\n\n🔑 รหัส PIN ของคุณคือ: ${newStore.pin}\n\n🌐 เข้าใช้งานแอปเพื่อใส่โปรโมชั่นได้เลยที่: https://painaidee.online`;
-            await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "SEND_LINE_PIN", targetUserId: newStore.userId, message: lineMsg }) }); alert("✅ อนุมัติ และส่งรหัส PIN เข้า LINE OA ลูกค้าสำเร็จ!");
-        } else { prompt(`✅ อนุมัติร้าน ${newStore.name} สำเร็จ!\n(ลูกค้าไม่ได้ผูก LINE ID ให้ก๊อปปี้รหัสด้านล่างส่งให้ลูกค้าเอง)`, pin); }
-        load();
-    }
-
     function approvePromotion(i) {
         let p = appData.pendingPromotions[i]; p.storeName = document.getElementById(`editPStore_${i}`).value; p.province = document.getElementById(`editPProv_${i}`).value; p.category = document.getElementById(`editPCat_${i}`).value; p.detail = document.getElementById(`editPDetail_${i}`).value;
         const existingIndex = appData.activePromotions.findIndex(act => act.storeName === p.storeName);
         if (p.isUpdateOnly && existingIndex !== -1) {
-            appData.activePromotions[existingIndex].detail = p.detail; appData.activePromotions[existingIndex].image = p.image; appData.activePromotions[existingIndex].category = p.category; appData.activePromotions[existingIndex].province = p.province; alert("✅ อนุมัติอัปเดตรูปและข้อความเรียบร้อย! (วันหมดอายุเท่าเดิม)");
+            appData.activePromotions[existingIndex].detail = p.detail; appData.activePromotions[existingIndex].image = p.image; appData.activePromotions[existingIndex].category = p.category; appData.activePromotions[existingIndex].province = p.province; alert("✅ อนุมัติอัปเดตรูปและข้อความเรียบร้อย!");
         } else {
             p.service = document.getElementById(`editPServ_${i}`).value; const svc = (appData.services || []).find(s => s.name === p.service); const addDays = (svc && svc.days) ? parseInt(svc.days) : 30; const addMs = addDays * 24 * 60 * 60 * 1000;
             if(existingIndex !== -1) { let existingPromo = appData.activePromotions[existingIndex]; let baseTime = (existingPromo.expireTimestamp && existingPromo.expireTimestamp > Date.now()) ? existingPromo.expireTimestamp : Date.now(); p.expireTimestamp = baseTime + addMs; appData.activePromotions[existingIndex] = p; 
@@ -421,10 +441,9 @@
     function openImageTab(base64Str) { const newWindow = window.open(); if (newWindow) { newWindow.document.write(`<html><body style="margin:0; background:#121418; display:flex; align-items:center; justify-content:center; height:100vh;"><img src="${base64Str}" style="max-width:95%; max-height:95vh; border-radius:12px;"></body></html>`); } }
     function showLoading(show) { document.getElementById('loading').style.display = show ? 'flex' : 'none'; }
 
-    // ⚡ ระบบ Auto-Refresh อัจฉริยะ ทำงานเมื่อล็อกอินแล้วเท่านั้น
+    // Auto Refresh
     setInterval(async () => {
-        if (sessionStorage.getItem('adminLoggedIn') !== 'true') return; // หยุดถ้ายังไม่ล็อกอิน
-
+        if (sessionStorage.getItem('adminLoggedIn') !== 'true') return; 
         const isTyping = document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA';
         if (!isTyping && document.getElementById('loading').style.display === 'none') {
             try {
@@ -437,7 +456,7 @@
                 }
             } catch (e) { console.log("Auto-refresh failed", e); }
         }
-    }, 10000);
+    }, 15000);
 </script>
 </body>
 </html>
