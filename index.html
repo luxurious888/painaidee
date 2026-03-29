@@ -28,7 +28,6 @@
 
         body { font-family: 'Kanit', sans-serif; margin: 0; background-color: var(--bg-light); padding-bottom: 50px; color: var(--text-gold); overflow-x: hidden; scroll-behavior: smooth; }
         
-        /* ปรับ nav ให้รองรับ 3 แท็บ */
         nav { display: flex; justify-content: space-around; background: var(--surface); padding: 10px 0; position: sticky; top: 0; z-index: 2000; box-shadow: 0 4px 20px rgba(0,0,0,0.1); border-bottom: 1px solid var(--border); }
         nav div { cursor: pointer; font-weight: 500; color: var(--text-muted); padding: 12px 10px; font-size: 14px; transition: 0.3s; position: relative; letter-spacing: 0.5px; text-align: center; flex: 1; }
         nav div.active { color: var(--primary); font-weight: 600; }
@@ -110,18 +109,38 @@
         .logo-circle { width: 110px; height: 110px; border-radius: 50%; background: linear-gradient(135deg, #1A1D23, #0b0f19); border: 2px solid #C5A059; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 0 25px rgba(197,160,89,0.4), inset 0 0 15px rgba(197,160,89,0.2); }
         .logo-text { color: #FFD700; font-family: 'Kanit'; font-weight: 700; font-size: 26px; line-height: 1.1; text-shadow: 0 0 10px rgba(255,215,0,0.5); margin: 0; }
         
-        .btn-enter-glow { background: linear-gradient(135deg, #FFD700, #C5A059); color: #000; border: none; padding: 14px 20px; border-radius: 12px; font-family: 'Kanit'; font-weight: 600; font-size: 16px; width: 100%; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; position: relative; overflow: hidden; box-shadow: 0 8px 20px rgba(197, 160, 89, 0.4); animation: pulse-gold 2.5s infinite; box-sizing: border-box; }
+        /* ปุ่มเข้าใช้งานแอป */
+        .btn-enter-glow { 
+            background: linear-gradient(135deg, #FFD700, #C5A059); color: #000; border: none; padding: 14px 20px; border-radius: 12px; 
+            font-family: 'Kanit'; font-weight: 600; font-size: 16px; width: 100%; cursor: pointer; transition: 0.3s; 
+            display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; position: relative; overflow: hidden; 
+            box-shadow: 0 8px 20px rgba(197, 160, 89, 0.4); animation: pulse-gold 2.5s infinite; box-sizing: border-box;
+        }
         .btn-enter-glow:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(197, 160, 89, 0.6); }
         .btn-enter-glow::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, transparent, rgba(255,255,255,0.4), transparent); transform: skewX(-25deg); animation: shineBtn 3s infinite; }
-        
-        .btn-line-glow { background: linear-gradient(90deg, #06C755, #05A044); color: white; border: none; padding: 14px 20px; border-radius: 12px; font-family: 'Kanit'; font-weight: 600; font-size: 16px; width: 100%; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; position: relative; overflow: hidden; box-shadow: 0 8px 20px rgba(6, 199, 85, 0.4); box-sizing: border-box; }
+        @keyframes pulse-gold { 0% { box-shadow: 0 0 10px rgba(197, 160, 89, 0.3); } 50% { box-shadow: 0 0 20px rgba(197, 160, 89, 0.6); } 100% { box-shadow: 0 0 10px rgba(197, 160, 89, 0.3); } }
+        @keyframes shineBtn { 0% { left: -100%; } 20% { left: 200%; } 100% { left: 200%; } }
+
+        .btn-line-glow { 
+            background: linear-gradient(90deg, #06C755, #05A044); color: white; border: none; padding: 14px 20px; border-radius: 12px; 
+            font-family: 'Kanit'; font-weight: 600; font-size: 16px; width: 100%; cursor: pointer; transition: 0.3s; 
+            display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; position: relative; overflow: hidden; 
+            box-shadow: 0 8px 20px rgba(6, 199, 85, 0.4); box-sizing: border-box;
+        }
         .btn-line-glow:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(6, 199, 85, 0.6); }
+
+        /* 🛡️ แจ้งเตือนแอดเพื่อน / เข้าสู่ระบบร้านค้า */
+        #partner-friend-blocker { display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 50px 20px; background: var(--surface); border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        #partner-actual-content { display: none; }
+        .line-logo-vertical { width: 100px; height: auto; margin-bottom: 25px; }
+        .friend-note { color: #FFF; font-size: 16px; font-weight: 400; line-height: 1.6; max-width: 300px; margin-bottom: 30px; }
 
         .spinner { width: 50px; height: 50px; border: 5px solid rgba(197,160,89,0.2); border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
         #appContent { display: none; }
 
+        /* 🚀 CSS สไลด์โปรโมทแนวนอน */
         .promo-carousel { display: flex; overflow-x: auto; gap: 16px; padding-bottom: 15px; scroll-snap-type: x mandatory; scrollbar-width: none; margin-top: 15px; }
         .promo-carousel::-webkit-scrollbar { display: none; }
         .promo-item { flex: 0 0 85%; max-width: 340px; scroll-snap-align: center; }
@@ -175,6 +194,13 @@
             </div>
             <h1 id="header-name">ไปไหนดี</h1>
             <p>ค้นหาร้านอาหารและสถานที่น่าสนใจทั่วไทย</p>
+            
+            <div id="header-guest-login" style="display: none; margin-top: 20px;">
+                <button class="btn-line-glow" style="width: auto; margin: 0 auto; padding: 10px 24px; border-radius: 20px; font-size: 14px; box-shadow: 0 4px 15px rgba(6, 199, 85, 0.3);" onclick="window.location.href='https://liff.line.me/2009598846-wiCUeV35'">
+                    📱 ล็อคอินด้วย LINE
+                </button>
+                <p style="font-size: 12px; color: var(--text-muted); margin-top: 10px; line-height: 1.4;">ล็อคอินไลน์เพื่อรับรหัสแนะนำเพื่อน<br>เพื่อสร้างรายได้กับเรา!</p>
+            </div>
         </header>
         
         <div id="map"></div>
@@ -231,6 +257,13 @@
                 <p style="font-size: 13.5px; color: var(--text-muted); margin-top: -10px; margin-bottom: 20px;">
                     คัดลอกลิงก์ด้านล่าง ส่งให้เพื่อนมาลงทะเบียนร้านค้า<br>รับค่าคอมมิชชั่นทันทีที่ร้านค้าซื้อโปรโมชั่นสำเร็จ!
                 </p>
+                
+                <div style="padding: 15px; border: 1px solid rgba(23, 162, 184, 0.3); border-radius: 12px; background: rgba(0,0,0,0.3); margin-bottom: 20px;">
+                    <p style="margin: 0 0 5px 0; color: #FFF; font-size: 14px;">🎁 รหัสแนะนำเพื่อน (Affiliate)</p>
+                    <p style="margin: 0 0 10px 0; color: var(--text-muted); font-size: 12px;">ให้ร้านค้าใหม่กรอกรหัสนี้ตอนสมัคร เพื่อรับค่าคอมมิชชั่น!</p>
+                    <h3 id="myAffiliateCode" style="margin: 0 0 10px 0; color: var(--info); font-size: 26px; letter-spacing: 2px; font-weight: bold;">-</h3>
+                    <button class="btn-outline" style="padding: 6px 20px; font-size: 13px; border-color: var(--info); color: var(--info); width: auto; background: transparent;" onclick="copyHeaderAffCode()">📋 คัดลอกรหัส</button>
+                </div>
                 
                 <div style="background: rgba(0,0,0,0.4); border: 1px solid rgba(6, 199, 85, 0.3); border-radius: 16px; padding: 25px 20px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
                     <p style="margin: 0 0 5px 0; font-size: 14px; color: var(--text-muted);">ยอดเงินค่าคอมมิชชั่นสะสม</p>
@@ -553,7 +586,14 @@
         document.getElementById('appContent').style.display = 'block';
     }
 
-    // ⚡ ฟังก์ชันคัดลอกลิงก์ Affiliate (ซ่อนลิงก์ตัวเต็มไว้ในระบบ)
+    function copyHeaderAffCode() {
+        if(window.myAffCode) {
+            navigator.clipboard.writeText(window.myAffCode).then(() => {
+                alert("คัดลอกรหัสแนะนำ " + window.myAffCode + " สำเร็จ! นำไปแชร์ให้เพื่อนหรือร้านค้าเพื่อรับสิทธิพิเศษได้เลยครับ");
+            });
+        }
+    }
+
     function copyAffLink() {
         if(window.myAffCode) {
             const link = "https://liff.line.me/2009598846-wiCUeV35?ref=" + window.myAffCode;
@@ -572,7 +612,6 @@
             const targetPage = urlParams.get('page');
             const refParam = urlParams.get('ref');
             
-            // ⚡ ถ้ากดมาจากลิงก์เพื่อน ให้จำรหัสเพื่อนไว้ในเครื่องเลย
             if (refParam) {
                 sessionStorage.setItem('savedRefCode', refParam);
             }
@@ -586,7 +625,10 @@
                 const myCode = "AFF" + profile.userId.substring(0, 5).toUpperCase();
                 window.myAffCode = myCode;
                 
-                // สลับโชว์หน้า Affiliate (คนล็อกอิน)
+                if(document.getElementById('myAffiliateCode')) {
+                    document.getElementById('myAffiliateCode').innerText = myCode;
+                }
+                
                 document.getElementById('affiliate-actual-content').style.display = 'block';
                 document.getElementById('affiliate-guest-view').style.display = 'none';
 
@@ -595,7 +637,6 @@
                 
                 updateWalletUI(); 
                 
-                // ⚡ ถ้าระบบจำได้ว่ามาจากลิงก์เพื่อน ให้ยัดรหัสลงช่องให้อัตโนมัติ (แต่ต้องไม่ใช่รหัสตัวเอง)
                 const savedRef = sessionStorage.getItem('savedRefCode');
                 if (savedRef && document.getElementById('regRefCode')) {
                     if (savedRef.toUpperCase() !== myCode.toUpperCase()) {
@@ -610,7 +651,6 @@
                 isAppReady = true;
                 document.getElementById('header-profile').innerHTML = `<div style="font-size: 50px; line-height: 100px; text-align: center;">👤</div>`;
                 
-                // สลับโชว์หน้า Affiliate (Guest)
                 document.getElementById('affiliate-actual-content').style.display = 'none';
                 document.getElementById('affiliate-guest-view').style.display = 'block';
                 
@@ -701,7 +741,6 @@
         }
     }
 
-    // ⚡ ฟังก์ชันเปลี่ยนหน้าใหม่ (รองรับ 3 แท็บ)
     function switchPage(p) { 
         document.querySelectorAll('.page').forEach(el => el.classList.remove('active')); 
         document.querySelectorAll('nav div').forEach(el => el.classList.remove('active')); 
@@ -709,7 +748,6 @@
         document.getElementById('tab-'+p).classList.add('active'); 
     }
 
-    // ⚡ ฟังก์ชันกดแท็บ Affiliate
     async function navigateToAffiliate() {
         switchPage('affiliate');
     }
@@ -1073,14 +1111,12 @@
         });
     }
 
-    // ⚡ ฟังก์ชันลงทะเบียน (ดักจับห้ามใช้รหัสตัวเอง)
     async function submitStoreRegistration() {
         const btn = document.getElementById('btnSubmitReg'); const n = document.getElementById('regStoreName').value; const p1 = document.getElementById('regStorePhoto').files[0]; const p2 = document.getElementById('regIdCard').files[0]; const p3 = document.getElementById('regPhone').value; 
         const refCode = document.getElementById('regRefCode').value;
 
         if(!n || !p1 || !p2 || !p3) return alert("กรุณากรอกข้อมูลและแนบรูปให้ครบครับ");
         
-        // ⚡ ป้องกันการใส่รหัสตัวเอง
         if (refCode && window.myAffCode && refCode.toUpperCase() === window.myAffCode.toUpperCase()) {
             return alert("⚠️ ไม่สามารถใช้รหัสแนะนำของตัวเองได้ครับ");
         }
@@ -1291,6 +1327,33 @@
             alert("❌ ไม่สามารถส่งข้อมูลได้ กรุณาลองใหม่อีกครั้ง");
         } finally {
             btn.innerText = "🔄 ส่งเรื่องขอแก้ไขข้อมูล"; btn.disabled = false; 
+        }
+    }
+
+    function callPlace(placeId, event) {
+        event.stopPropagation();
+        service.getDetails({ placeId: placeId, fields: ['formatted_phone_number'] }, (place, status) => {
+            if (status === google.maps.places.PlacesServiceStatus.OK && place.formatted_phone_number) {
+                window.location.href = 'tel:' + place.formatted_phone_number.replace(/[^0-9+]/g, '');
+            } else {
+                alert("ขออภัยครับ ไม่พบเบอร์โทรศัพท์ของสถานที่นี้ในระบบแผนที่");
+            }
+        });
+    }
+
+    function sharePlace(name, lat, lng, event) {
+        event.stopPropagation(); 
+        const mapUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+        if (navigator.share) {
+            navigator.share({
+                title: 'แอปไปไหนดี',
+                text: `ลองดูร้าน "${name}" สิ! น่าสนใจมากเลย 📍 ดูพิกัดได้ที่นี่: `,
+                url: mapUrl
+            }).catch(err => console.log('Share failed:', err));
+        } else {
+            navigator.clipboard.writeText(mapUrl).then(() => {
+                alert('คัดลอกลิงก์พิกัดเรียบร้อยแล้ว! สามารถนำไปวาง (Paste) ส่งให้เพื่อนได้เลยครับ');
+            });
         }
     }
 </script>
