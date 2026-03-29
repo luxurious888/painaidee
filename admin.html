@@ -195,20 +195,36 @@
             <h2 class="text-xl font-bold mb-2">🤝 ระบบจัดการ Affiliate (นายหน้าผู้แนะนำ)</h2>
             <p class="text-sm text-gray-400 mb-6">ตั้งค่าเรทค่าคอมมิชชั่น อนุมัติการถอนเงิน และตรวจสอบยอดที่ต้องจ่ายให้นายหน้า</p>
             
-            <div class="bg-[#2A2E36] p-5 rounded-xl border border-cyan-600/50 shadow-lg flex flex-col md:flex-row gap-4 items-end mb-8 relative overflow-hidden">
+            <div class="bg-[#2A2E36] p-5 rounded-xl border border-cyan-600/50 shadow-lg mb-8 relative overflow-hidden">
                 <div class="absolute top-0 right-0 bg-cyan-600 text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg">SETTING</div>
-                <div class="w-full md:w-1/3">
-                    <label class="block text-gray-300 text-sm mb-2 font-medium">💰 % ค่าคอมมิชชั่น (ส่วนแบ่ง)</label>
-                    <input type="number" id="affCommPercent" class="input-dark text-xl font-bold text-cyan-400 py-3" placeholder="เช่น 10 (หมายถึง 10%)">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                    <div class="bg-[#1A1D23] p-4 rounded-lg border border-gray-600">
+                        <label class="block text-[#FFD700] text-sm mb-2 font-bold">🎯 แนะนำครั้งแรก (ร้านใหม่จ่ายเงินครั้งแรก)</label>
+                        <div class="flex gap-2">
+                            <select id="affFirstType" class="input-dark w-1/3 text-center font-bold"><option value="fixed">บาท (฿)</option><option value="percent">เปอร์เซ็น (%)</option></select>
+                            <input type="number" id="affFirstVal" class="input-dark w-2/3 text-xl font-bold text-white py-2" placeholder="จำนวน">
+                        </div>
+                    </div>
+                    <div class="bg-[#1A1D23] p-4 rounded-lg border border-gray-600">
+                        <label class="block text-cyan-400 text-sm mb-2 font-bold">🔄 ผลตอบแทนต่อเนื่อง (ร้านเดิมต่ออายุแพ็กเกจ)</label>
+                        <div class="flex gap-2">
+                            <select id="affRecurType" class="input-dark w-1/3 text-center font-bold"><option value="percent">เปอร์เซ็น (%)</option><option value="fixed">บาท (฿)</option></select>
+                            <input type="number" id="affRecurVal" class="input-dark w-2/3 text-xl font-bold text-white py-2" placeholder="จำนวน">
+                        </div>
+                    </div>
                 </div>
-                <div class="w-full md:w-1/3">
-                    <label class="block text-gray-300 text-sm mb-2 font-medium">🏧 ยอดถอนเงินขั้นต่ำ (บาท)</label>
-                    <input type="number" id="affMinWithdraw" class="input-dark text-xl font-bold text-green-400 py-3" placeholder="เช่น 300">
-                </div>
-                <div class="w-full md:w-1/3">
-                    <button class="w-full py-3 rounded-lg font-bold text-white shadow-lg transition hover:scale-[1.02]" style="background: linear-gradient(135deg, #00d2ff, #3a7bd5);" onclick="saveAffiliateSettings()">
-                        💾 บันทึกตั้งค่า Affiliate
-                    </button>
+
+                <div class="flex flex-col md:flex-row gap-4 items-end">
+                    <div class="w-full md:w-1/2">
+                        <label class="block text-green-400 text-sm mb-2 font-bold">🏧 ยอดถอนเงินขั้นต่ำ (บาท)</label>
+                        <input type="number" id="affMinWithdraw" class="input-dark text-xl font-bold text-green-400 py-2" placeholder="เช่น 300">
+                    </div>
+                    <div class="w-full md:w-1/2">
+                        <button class="w-full py-3 rounded-lg font-bold text-white shadow-lg transition hover:scale-[1.02]" style="background: linear-gradient(135deg, #00d2ff, #3a7bd5);" onclick="saveAffiliateSettings()">
+                            💾 บันทึกตั้งค่า Affiliate
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -294,7 +310,7 @@
         registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], 
         mainCategories: [], categories: [], closedReports: [], blacklistedPlaces: [], services: [], pendingVipRequests: [], 
         vipSettings: { price: 500, bankAccount: 'กสิกรไทย 123-x-xxxxx-x ชื่อบัญชี' },
-        affiliateSettings: { commissionPercent: 10, minWithdrawal: 300 },
+        affiliateSettings: { firstTimeType: 'fixed', firstTimeValue: 100, recurringType: 'percent', recurringValue: 10, minWithdrawal: 300 },
         affiliateWallets: [], withdrawalRequests: []
     };
 
@@ -332,11 +348,10 @@
             const data = await res.json();
             if (data && Object.keys(data).length > 0) { appData = { ...appData, ...data }; }
             
-            // ⚡ จัดการข้อมูลเริ่มต้น
             if (!appData.mainCategories || appData.mainCategories.length === 0) { appData.mainCategories = JSON.parse(JSON.stringify(defaultMainCats)); }
             if (!appData.categories || appData.categories.length === 0) { appData.categories = JSON.parse(JSON.stringify(defaultCategories)); }
             if (!appData.vipSettings) { appData.vipSettings = { price: 500, bankAccount: 'กสิกรไทย 123-4-56789-0 (ไปไหนดี)' }; }
-            if (!appData.affiliateSettings) { appData.affiliateSettings = { commissionPercent: 10, minWithdrawal: 300 }; }
+            if (!appData.affiliateSettings) { appData.affiliateSettings = { firstTimeType: 'fixed', firstTimeValue: 100, recurringType: 'percent', recurringValue: 10, minWithdrawal: 300 }; }
             
             ['registrationRequests','registeredStores','pendingPromotions','activePromotions','mainCategories','categories','closedReports','blacklistedPlaces','services','pendingVipRequests','affiliateWallets','withdrawalRequests'].forEach(key => { if(!appData[key]) appData[key] = []; });
             checkAutoRenew(); 
@@ -374,7 +389,7 @@
                 <button class="bg-red-500/20 text-red-400 hover:bg-red-500/40 py-1 px-3 rounded text-sm mt-3 self-end transition" onclick="deleteItem('services', ${i})">🗑️ ลบแพ็กเกจ</button>
             </div>`).join('');
 
-        // 🚀 3. เรนเดอร์หมวดหมู่หลัก (Main Categories)
+        // 3. เรนเดอร์หมวดหมู่หลัก (Main Categories)
         document.getElementById('mTable').innerHTML = appData.mainCategories.map((m, i) => `
             <div class="bg-[#1A1D23] p-3 rounded-lg border border-purple-600/30 flex justify-between items-center shadow-sm">
                 <div>
@@ -385,10 +400,9 @@
             </div>
         `).join('');
 
-        // ยัดข้อมูลหมวดหมู่หลักลงใน select ของการเพิ่มหมวดหมู่ย่อย
         document.getElementById('cGroup').innerHTML = appData.mainCategories.map(m => `<option value="${m.id}">${m.label}</option>`).join('');
 
-        // 📌 4. เรนเดอร์หมวดหมู่ย่อย (Sub Categories)
+        // 4. เรนเดอร์หมวดหมู่ย่อย (Sub Categories)
         document.getElementById('cTable').innerHTML = appData.categories.map((c,i) => `
             <div class="bg-[#2A2E36] p-3 rounded-lg flex flex-col md:flex-row gap-3 items-center border border-gray-700">
                 <input type="checkbox" class="cat-checkbox w-5 h-5 accent-[#C5A059] cursor-pointer shrink-0" value="${i}">
@@ -494,12 +508,10 @@
                 <div class="bg-[#2A2E36] p-4 rounded-xl border border-red-500 flex flex-col justify-between"><div><h3 class="font-bold text-white text-lg">${c.storeName}</h3><p class="text-xs text-gray-500 mt-1 mb-2 font-mono break-all">${c.placeId}</p><p class="text-sm text-gray-400 mb-4">แจ้งเมื่อ: ${c.date}</p></div><div class="flex gap-2"><button class="btn-danger flex-1 text-xs" onclick="blacklistPlace('${c.placeId}', ${i})">🚩 แบนถาวร</button><button class="bg-gray-600 text-white rounded px-3 py-1 flex-1 text-xs transition" onclick="deleteItem('closedReports', ${i})">❌ ลบรายงาน</button></div></div>`).join('');
         }
 
-        // ================= อัปเดตแท็บหน้าอื่นๆ ให้ตรงกัน =================
         if (document.getElementById('page-affiliate').classList.contains('active')) renderAffiliate();
         if (document.getElementById('page-storeinfo').classList.contains('active')) renderStoreInfo();
     }
 
-    // ⚡ ฟังก์ชันเพิ่ม/ลบ หมวดหมู่หลัก (Main Categories)
     function addMainCategory() {
         const id = document.getElementById('mId').value.trim().toLowerCase().replace(/[^a-z0-9_]/g, '');
         const label = document.getElementById('mLabel').value.trim();
@@ -509,29 +521,31 @@
         if(appData.mainCategories.find(m => m.id === id)) return alert("ID นี้มีอยู่แล้วครับ กรุณาเปลี่ยนชื่อ ID ใหม่");
         
         appData.mainCategories.push({ id, label, keyword });
-        
-        document.getElementById('mId').value = '';
-        document.getElementById('mLabel').value = '';
-        document.getElementById('mKey').value = '';
-        
-        save();
-        alert('✅ เพิ่มหมวดหมู่หลักเรียบร้อยแล้ว!\nระบบจะสร้างปุ่มค้นหาใหม่ในหน้าแอปลูกค้าให้อัตโนมัติครับ');
+        document.getElementById('mId').value = ''; document.getElementById('mLabel').value = ''; document.getElementById('mKey').value = '';
+        save(); alert('✅ เพิ่มหมวดหมู่หลักเรียบร้อยแล้ว!\nระบบจะสร้างปุ่มค้นหาใหม่ในหน้าแอปลูกค้าให้อัตโนมัติครับ');
     }
 
     function deleteMainCategory(index) {
         if(confirm('🗑️ ยืนยันการลบหมวดหมู่หลัก?\n(หมวดหมู่ย่อยที่อยู่ในหมวดนี้ จะไม่แสดงผลที่หน้าแอปจนกว่าจะถูกย้ายไปหมวดอื่น)')) {
-            appData.mainCategories.splice(index, 1);
-            save();
+            appData.mainCategories.splice(index, 1); save();
         }
     }
 
-    // ⚡ ฟังก์ชันเพิ่มเงินให้นายหน้าอัตโนมัติเมื่ออนุมัติยอด
-    function addCommissionToWallet(refCode, packageAmount) {
-        if (!refCode || refCode.trim() === '') return;
+    // ⚡ ฟังก์ชันคำนวณและเพิ่มเงินให้นายหน้า (อัปเดตใหม่)
+    function addCommissionToWallet(store, packageAmount) {
+        if (!store || !store.refCode || store.refCode.trim() === '') return;
         
-        const settings = appData.affiliateSettings || { commissionPercent: 10 };
-        const percent = settings.commissionPercent || 10;
-        const commAmount = (packageAmount * percent) / 100;
+        const refCode = store.refCode;
+        const set = appData.affiliateSettings || { firstTimeType: 'fixed', firstTimeValue: 100, recurringType: 'percent', recurringValue: 10 };
+        
+        let commAmount = 0;
+
+        if (!store.hasPaidFirstComm) {
+            commAmount = set.firstTimeType === 'percent' ? (packageAmount * set.firstTimeValue / 100) : set.firstTimeValue;
+            store.hasPaidFirstComm = true; 
+        } else {
+            commAmount = set.recurringType === 'percent' ? (packageAmount * set.recurringValue / 100) : set.recurringValue;
+        }
         
         if (commAmount <= 0) return;
 
@@ -549,11 +563,13 @@
 
     // ⚡ ฟังก์ชันเรนเดอร์หน้า Affiliate 
     function renderAffiliate() {
-        const currentComm = (appData.affiliateSettings && appData.affiliateSettings.commissionPercent) ? appData.affiliateSettings.commissionPercent : 10;
-        const currentMinW = (appData.affiliateSettings && appData.affiliateSettings.minWithdrawal) ? appData.affiliateSettings.minWithdrawal : 300;
+        const affSet = appData.affiliateSettings || { firstTimeType: 'fixed', firstTimeValue: 100, recurringType: 'percent', recurringValue: 10, minWithdrawal: 300 };
         
-        document.getElementById('affCommPercent').value = currentComm;
-        document.getElementById('affMinWithdraw').value = currentMinW;
+        document.getElementById('affFirstType').value = affSet.firstTimeType || 'fixed';
+        document.getElementById('affFirstVal').value = affSet.firstTimeValue !== undefined ? affSet.firstTimeValue : 100;
+        document.getElementById('affRecurType').value = affSet.recurringType || 'percent';
+        document.getElementById('affRecurVal').value = affSet.recurringValue !== undefined ? affSet.recurringValue : 10;
+        document.getElementById('affMinWithdraw').value = affSet.minWithdrawal || 300;
         
         const withdrawList = document.getElementById('withdrawalList');
         const pendingW = (appData.withdrawalRequests || []).filter(w => w.status === 'pending');
@@ -636,9 +652,13 @@
     }
 
     function saveAffiliateSettings() {
-        if(!appData.affiliateSettings) appData.affiliateSettings = {};
-        appData.affiliateSettings.commissionPercent = parseInt(document.getElementById('affCommPercent').value) || 10;
-        appData.affiliateSettings.minWithdrawal = parseInt(document.getElementById('affMinWithdraw').value) || 300;
+        appData.affiliateSettings = {
+            firstTimeType: document.getElementById('affFirstType').value,
+            firstTimeValue: parseFloat(document.getElementById('affFirstVal').value) || 0,
+            recurringType: document.getElementById('affRecurType').value,
+            recurringValue: parseFloat(document.getElementById('affRecurVal').value) || 0,
+            minWithdrawal: parseInt(document.getElementById('affMinWithdraw').value) || 300
+        };
         save();
         alert("💾 บันทึกการตั้งค่าเรทค่าคอมมิชชั่นเรียบร้อยแล้ว!");
     }
@@ -733,6 +753,7 @@
             refCode: r.refCode || '', 
             isVIP: false, 
             freePromoDays: 0,
+            hasPaidFirstComm: false, // ⚡ เพิ่ม Flag นี้
             storePhoto: r.storePhoto || '',
             idCard: r.idCard || '',
             commercial: r.commercial || ''
@@ -778,7 +799,7 @@
             store.freePromoDays = 7; 
 
             const vipPrice = appData.vipSettings.price || 500;
-            addCommissionToWallet(store.refCode, vipPrice);
+            addCommissionToWallet(store, vipPrice);
 
             appData.pendingVipRequests.splice(index, 1); 
             showLoading(true);
@@ -817,7 +838,7 @@
             } else { p.expireTimestamp = Date.now() + addMs; appData.activePromotions.unshift(p); }
             
             if(!p.isFreeRedeem && svc) {
-                addCommissionToWallet(store ? store.refCode : '', svc.price);
+                addCommissionToWallet(store, svc.price);
             }
 
             lineMsg = `🚀 แจ้งเตือนจาก แอดมินไปไหนดี\n\nแบนเนอร์โปรโมชั่นของร้าน ${p.storeName} ได้รับการอนุมัติและกำลังแสดงผลบนหน้าแอปแล้วครับ!\n(อายุการแสดงผลเพิ่มขึ้น ${addDays} วัน)`;
