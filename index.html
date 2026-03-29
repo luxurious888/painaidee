@@ -109,7 +109,6 @@
         .logo-circle { width: 110px; height: 110px; border-radius: 50%; background: linear-gradient(135deg, #1A1D23, #0b0f19); border: 2px solid #C5A059; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 0 25px rgba(197,160,89,0.4), inset 0 0 15px rgba(197,160,89,0.2); }
         .logo-text { color: #FFD700; font-family: 'Kanit'; font-weight: 700; font-size: 26px; line-height: 1.1; text-shadow: 0 0 10px rgba(255,215,0,0.5); margin: 0; }
         
-        /* ปุ่มเข้าใช้งานแอป */
         .btn-enter-glow { 
             background: linear-gradient(135deg, #FFD700, #C5A059); color: #000; border: none; padding: 14px 20px; border-radius: 12px; 
             font-family: 'Kanit'; font-weight: 600; font-size: 16px; width: 100%; cursor: pointer; transition: 0.3s; 
@@ -118,9 +117,7 @@
         }
         .btn-enter-glow:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(197, 160, 89, 0.6); }
         .btn-enter-glow::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, transparent, rgba(255,255,255,0.4), transparent); transform: skewX(-25deg); animation: shineBtn 3s infinite; }
-        @keyframes pulse-gold { 0% { box-shadow: 0 0 10px rgba(197, 160, 89, 0.3); } 50% { box-shadow: 0 0 20px rgba(197, 160, 89, 0.6); } 100% { box-shadow: 0 0 10px rgba(197, 160, 89, 0.3); } }
-        @keyframes shineBtn { 0% { left: -100%; } 20% { left: 200%; } 100% { left: 200%; } }
-
+        
         .btn-line-glow { 
             background: linear-gradient(90deg, #06C755, #05A044); color: white; border: none; padding: 14px 20px; border-radius: 12px; 
             font-family: 'Kanit'; font-weight: 600; font-size: 16px; width: 100%; cursor: pointer; transition: 0.3s; 
@@ -129,7 +126,6 @@
         }
         .btn-line-glow:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(6, 199, 85, 0.6); }
 
-        /* 🛡️ แจ้งเตือนแอดเพื่อน / เข้าสู่ระบบร้านค้า */
         #partner-friend-blocker { display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 50px 20px; background: var(--surface); border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         #partner-actual-content { display: none; }
         .line-logo-vertical { width: 100px; height: auto; margin-bottom: 25px; }
@@ -140,7 +136,6 @@
         
         #appContent { display: none; }
 
-        /* 🚀 CSS สไลด์โปรโมทแนวนอน */
         .promo-carousel { display: flex; overflow-x: auto; gap: 16px; padding-bottom: 15px; scroll-snap-type: x mandatory; scrollbar-width: none; margin-top: 15px; }
         .promo-carousel::-webkit-scrollbar { display: none; }
         .promo-item { flex: 0 0 85%; max-width: 340px; scroll-snap-align: center; }
@@ -159,18 +154,12 @@
     </div>
 
     <div class="glass-card" id="loginCard" style="display: none;">
-        <div class="logo-circle">
-            <p class="logo-text">ไป<br>ไหนดี</p>
-        </div>
+        <div class="logo-circle"><p class="logo-text">ไป<br>ไหนดี</p></div>
         <h2 style="color: #FFF; margin: 0 0 20px 0; font-size: 22px; font-weight: 600;">เลือกรูปแบบการใช้งาน</h2>
         
         <div style="margin-bottom: 20px;">
-            <button onclick="enterApp()" class="btn-enter-glow" style="margin-bottom: 8px;">
-                🚀 เข้าใช้งานทั่วไป
-            </button>
-            <p style="font-size: 12.5px; color: rgba(255,255,255,0.7); margin: 0; line-height: 1.4;">
-                * สำหรับผู้ใช้งานทั่วไป ค้นหาร้านและดูโปรโมชั่น <br><span style="color: var(--primary-light);">(ไม่ต้องล็อกอิน)</span>
-            </p>
+            <button onclick="enterApp()" class="btn-enter-glow" style="margin-bottom: 8px;">🚀 เข้าใช้งานทั่วไป</button>
+            <p style="font-size: 12.5px; color: rgba(255,255,255,0.7); margin: 0; line-height: 1.4;">* สำหรับผู้ใช้งานทั่วไป ค้นหาร้านและดูโปรโมชั่น <br><span style="color: var(--primary-light);">(ไม่ต้องล็อกอิน)</span></p>
         </div>
 
         <div style="display: flex; align-items: center; margin-bottom: 20px;">
@@ -180,12 +169,8 @@
         </div>
 
         <div>
-            <button onclick="window.location.href='https://liff.line.me/2009598846-wiCUeV35?page=partner'" class="btn-line-glow" style="margin-bottom: 8px;">
-                📱 เข้าสู่ระบบด้วย LINE
-            </button>
-            <p style="font-size: 12.5px; color: rgba(255,255,255,0.7); margin: 0; line-height: 1.4;">
-                * เหมาะสำหรับร้านค้า เพื่อลงทะเบียนและจัดการ<br>โปรโมชั่นหน้าร้านของคุณ
-            </p>
+            <button onclick="window.location.href='https://liff.line.me/2009598846-wiCUeV35?page=partner'" class="btn-line-glow" style="margin-bottom: 8px;">📱 เข้าสู่ระบบด้วย LINE</button>
+            <p style="font-size: 12.5px; color: rgba(255,255,255,0.7); margin: 0; line-height: 1.4;">* เหมาะสำหรับร้านค้า เพื่อลงทะเบียนและจัดการ<br>โปรโมชั่นหน้าร้านของคุณ</p>
         </div>
     </div>
 </div>
@@ -198,11 +183,21 @@
 
     <div id="page-home" class="page active">
         <header>
-            <div id="header-aff-section" style="display: none; margin-bottom: 15px;">
+            <div id="header-aff-section" style="display: none; margin-bottom: 20px; flex-direction: column; align-items: center; gap: 12px;">
                 <div style="display: inline-flex; align-items: center; background: rgba(197, 160, 89, 0.15); border: 1px solid var(--primary); border-radius: 30px; padding: 6px 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
                     <span style="font-size: 12px; color: var(--text-muted); margin-right: 8px;">รหัสแนะนำ:</span>
                     <span id="header-aff-code" style="color: #FFD700; font-weight: 600; letter-spacing: 1px; font-size: 15px;">-</span>
                     <button onclick="copyHeaderAffCode()" style="background: none; border: none; color: #FFF; margin-left: 8px; cursor: pointer; font-size: 14px; padding: 0;" title="คัดลอกรหัส">📋</button>
+                </div>
+                
+                <div style="background: rgba(0,0,0,0.4); border: 1px solid rgba(6, 199, 85, 0.3); border-radius: 16px; padding: 12px 20px; width: 100%; max-width: 320px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+                    <div style="text-align: left;">
+                        <p style="margin: 0; font-size: 11px; color: var(--text-muted);">ยอดเงินค่าคอมที่ถอนได้</p>
+                        <p style="margin: 0; font-size: 18px; color: var(--line-green); font-weight: bold;" id="aff-balance">0.00 ฿</p>
+                    </div>
+                    <button id="btn-withdraw" onclick="requestWithdraw()" style="background: var(--dark-muted); color: var(--text-muted); border: 1px solid var(--border); padding: 8px 15px; border-radius: 10px; font-size: 12px; font-family: 'Kanit'; font-weight: 600; cursor: not-allowed; transition: 0.3s;" disabled>
+                        ถอนเงิน
+                    </button>
                 </div>
             </div>
 
@@ -259,7 +254,6 @@
     </div>
 
     <div id="page-partner" class="page">
-        
         <div id="partner-friend-blocker">
             <img src="https://official-static.line-scdn.net/branding/logo-vertical.png" alt="LINE Official Account" class="line-logo-vertical">
             <div class="friend-note">
@@ -273,7 +267,6 @@
         </div>
 
         <div id="partner-actual-content">
-
             <div class="dashboard-card" style="padding: 15px 20px; border: 2px dashed var(--info); text-align: center; background: rgba(23, 162, 184, 0.05);">
                 <p style="margin: 0 0 5px 0; color: var(--text-main); font-size: 14px;">🎁 รหัสแนะนำเพื่อน (Affiliate)</p>
                 <p style="margin: 0 0 10px 0; color: var(--text-muted); font-size: 12px;">ให้ร้านค้าใหม่กรอกรหัสนี้ตอนสมัคร เพื่อรับค่าคอมมิชชั่น!</p>
@@ -456,7 +449,14 @@
         { id: 10, group: 'food', label: 'อาหารตามสั่ง / จานด่วน', keyword: 'อาหารตามสั่ง' }
     ];
 
-    let appData = { registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], categories: [], closedReports: [], blacklistedPlaces: [], services: [], pendingVipRequests: [], vipSettings: { price: 500, bankAccount: 'กสิกรไทย 123-x-xxxxx-x ชื่อบัญชี' } };
+    // เพิ่ม affiliateWallets เพื่อเก็บกระเป๋าเงิน
+    let appData = { 
+        registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], 
+        categories: [], closedReports: [], blacklistedPlaces: [], services: [], pendingVipRequests: [], 
+        vipSettings: { price: 500, bankAccount: 'กสิกรไทย 123-x-xxxxx-x ชื่อบัญชี' },
+        affiliateSettings: { commissionPercent: 10, minWithdrawal: 300 },
+        affiliateWallets: [], withdrawalRequests: []
+    };
 
     const provinces = [
         {id:'bkk',name:'กรุงเทพมหานคร',lat:13.7563,lng:100.5018},{id:'krabi',name:'กระบี่',lat:8.0863,lng:98.9063},{id:'kanchanaburi',name:'กาญจนบุรี',lat:14.0159,lng:99.5336},
@@ -496,6 +496,7 @@
             if (!appData.activePromotions) appData.activePromotions = [];
         } catch(e) {}
         renderUI(); 
+        updateWalletUI(); // ⚡ อัปเดตกระเป๋าเงินตอนโหลดเสร็จ
     }
 
     async function saveToCloud() { 
@@ -514,6 +515,7 @@
             if (data && Object.keys(data).length > 0) {
                 appData = { ...appData, ...data };
                 renderPromos();
+                updateWalletUI(); // ⚡ อัปเดตกระเป๋าเงินเรื่อยๆ
                 if (googlePlaces.length > 0) renderCards(document.getElementById('searchBox').value || 'ร้านอาหาร');
             }
         } catch(e) {}
@@ -559,13 +561,11 @@
         document.getElementById('loginCard').style.display = 'block';
     }
 
-    // ⚡ ฟังก์ชันเข้าแอปแบบ Guest (สำหรับลูกค้าทั่วไป)
     function enterApp() {
         document.getElementById('loginOverlay').style.display = 'none';
         document.getElementById('appContent').style.display = 'block';
     }
 
-    // ⚡ ก๊อปปี้รหัส Affiliate
     function copyHeaderAffCode() {
         if(window.myAffCode) {
             navigator.clipboard.writeText(window.myAffCode).then(() => {
@@ -588,22 +588,19 @@
                 const profile = await liff.getProfile();
                 document.getElementById('header-profile').innerHTML = `<img src="${profile.pictureUrl}" style="width:100%; height:100%; object-fit:cover;">`;
                 
-                // ⚡ สร้างรหัส Affiliate อัตโนมัติ (เช่น AFF12345)
                 const myCode = "AFF" + profile.userId.substring(0, 5).toUpperCase();
                 window.myAffCode = myCode;
                 
-                // โชว์รหัสในหน้าหน้าร้านค้า
-                if(document.getElementById('myAffiliateCode')) {
-                    document.getElementById('myAffiliateCode').innerText = myCode;
-                }
+                if(document.getElementById('myAffiliateCode')) { document.getElementById('myAffiliateCode').innerText = myCode; }
                 
-                // โชว์รหัสในหน้า Header ของหน้าแรก (และซ่อนปุ่มล็อกอินของ Guest)
-                document.getElementById('header-aff-section').style.display = 'block';
+                document.getElementById('header-aff-section').style.display = 'flex';
                 document.getElementById('header-aff-code').innerText = myCode;
                 document.getElementById('header-guest-login').style.display = 'none';
 
                 document.getElementById('loginOverlay').style.display = 'none';
                 document.getElementById('appContent').style.display = 'block';
+                
+                updateWalletUI(); // ⚡ โหลด UI กระเป๋าเงิน
 
                 if (targetPage === 'partner') {
                     setTimeout(() => { navigateToPartner(); }, 300);
@@ -611,13 +608,9 @@
 
             } else {
                 isAppReady = true;
-                // ถ้ายังไม่ล็อกอิน ให้โชว์หน้า Profile สีเทา
                 document.getElementById('header-profile').innerHTML = `<div style="font-size: 50px; line-height: 100px; text-align: center;">👤</div>`;
-                
-                // ซ่อนรหัส AFF และโชว์ปุ่ม Login ตรงหน้า Header
                 document.getElementById('header-aff-section').style.display = 'none';
                 document.getElementById('header-guest-login').style.display = 'block';
-                
                 showLoginCard();
             }
         } catch (err) { 
@@ -628,8 +621,83 @@
         }
     }
 
+    // ⚡ 1. ฟังก์ชันอัปเดต UI กระเป๋าเงิน
+    function updateWalletUI() {
+        if(!window.myAffCode) return;
+        const wallets = appData.affiliateWallets || [];
+        const myWallet = wallets.find(w => w.refCode === window.myAffCode);
+        const balance = myWallet ? myWallet.balance : 0;
+        
+        const settings = appData.affiliateSettings || { commissionPercent: 10, minWithdrawal: 300 };
+        const minW = settings.minWithdrawal || 300;
+        
+        document.getElementById('aff-balance').innerText = balance.toLocaleString() + ' ฿';
+        
+        const btn = document.getElementById('btn-withdraw');
+        btn.innerText = `ถอนเงิน (ขั้นต่ำ ${minW})`;
+        
+        if (balance >= minW) {
+            btn.style.background = 'linear-gradient(90deg, #06C755, #05A044)';
+            btn.style.color = '#FFF';
+            btn.style.borderColor = '#06C755';
+            btn.style.cursor = 'pointer';
+            btn.disabled = false;
+        } else {
+            btn.style.background = 'var(--dark-muted)';
+            btn.style.color = 'var(--text-muted)';
+            btn.style.borderColor = 'var(--border)';
+            btn.style.cursor = 'not-allowed';
+            btn.disabled = true;
+        }
+    }
+
+    // ⚡ 2. ฟังก์ชันกดขอถอนเงิน
+    async function requestWithdraw() {
+        const wallets = appData.affiliateWallets || [];
+        const myWallet = wallets.find(w => w.refCode === window.myAffCode);
+        if(!myWallet) return;
+        
+        const settings = appData.affiliateSettings || { minWithdrawal: 300 };
+        if(myWallet.balance < settings.minWithdrawal) return;
+        
+        const bankInfo = prompt(`ยอดเงินที่สามารถถอนได้คือ ${myWallet.balance.toLocaleString()} บาท\n\nกรุณากรอกข้อมูลบัญชีรับเงิน\n(รูปแบบ: ชื่อธนาคาร / เลขบัญชี / ชื่อ-สกุล):`);
+        if(!bankInfo || bankInfo.trim() === '') return;
+        
+        if(!appData.withdrawalRequests) appData.withdrawalRequests = [];
+        
+        const reqAmount = myWallet.balance;
+        myWallet.balance = 0; // ⚡ หักยอดในกระเป๋าทันที
+        
+        let uid = "";
+        try { if(liff.isLoggedIn()) uid = (await liff.getProfile()).userId; } catch(e){}
+
+        appData.withdrawalRequests.push({
+            id: Date.now().toString(),
+            refCode: window.myAffCode,
+            userId: uid,
+            amount: reqAmount,
+            bankDetails: bankInfo,
+            status: 'pending',
+            requestDate: new Date().toLocaleString()
+        });
+        
+        appData.telegramMsg = `💸 <b>มีคำร้องขอถอนเงินค่าคอม!</b>\n\nรหัสตัวแทน: ${window.myAffCode}\nยอดถอน: <b>${reqAmount.toLocaleString()} บาท</b>\nบัญชี: ${bankInfo}\n\n👉 กรุณาโอนเงินและกดอนุมัติในหน้าแอดมินครับ`;
+        
+        try {
+            document.getElementById('btn-withdraw').innerText = 'กำลังส่งเรื่อง...';
+            document.getElementById('btn-withdraw').disabled = true;
+            await saveToCloud();
+            delete appData.telegramMsg;
+            alert("ส่งคำร้องขอถอนเงินเรียบร้อยแล้ว! แอดมินจะตรวจสอบและโอนเงินให้ท่านในเร็วๆ นี้ครับ");
+            updateWalletUI(); // อัปเดตยอดให้เป็น 0
+        } catch(e) {
+            alert("เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่");
+            myWallet.balance = reqAmount; // ถ้าเซฟไม่ผ่าน คืนยอดให้
+            updateWalletUI();
+        }
+    }
+
     async function navigateToPartner() {
-        // ⚡ ถ้ายังไม่ล็อกอิน LINE บังคับเตะให้ไปเข้าผ่านลิงก์ LIFF เพื่อเปิด LINE อัตโนมัติ
         if (!liff.isLoggedIn()) {
             const blocker = document.getElementById('partner-friend-blocker');
             const content = document.getElementById('partner-actual-content');
@@ -690,7 +758,7 @@
                 <span style="color:var(--primary); font-weight:600;">⚠️ สำคัญมาก</span><br>
                 สำหรับร้านค้าจำเป็นต้องเพิ่มเพื่อนก่อน เพื่อรับรหัสผ่านในการใช้งานครับ
             </div>
-            <button class="btn-line-glow" style="width: auto; padding: 14px 24px; border:none; border-radius:12px; font-family:'Kanit'; font-weight:600; font-size:16px; cursor:pointer; animation: none;" onclick="window.location.href='https://liff.line.me/2009598846-wiCUeV35'">➕ เพิ่มเพื่อน LINE OA ของเรา</button>
+            <button class="btn-line-glow" style="width: auto; padding: 14px 24px; border:none; border-radius:12px; font-family:'Kanit'; font-weight:600; font-size:16px; cursor:pointer; animation: none;" onclick="window.location.href='https://lin.ee/5SBoptj'">➕ เพิ่มเพื่อน LINE OA ของเรา</button>
             <button class="btn-outline" style="margin-top: 20px; font-size: 13px; border-color:var(--dark-muted); color:var(--text-muted);" onclick="checkFriendshipForPartner(true)">ฉันเพิ่มเพื่อนแล้ว ตรวจสอบอีกครั้ง</button>
         `;
     }
@@ -1171,7 +1239,7 @@
             appData.pendingPromotions = appData.pendingPromotions.filter(p => p.storeName !== store.name);
             appData.pendingPromotions.push({ id: Date.now().toString(), storeName: store.name, province: document.getElementById('promoProvinceSelect').value, detail: document.getElementById('promoDetail').value, image: img, slipImage: slip, service: document.getElementById('promoServiceSelect').value, category: document.getElementById('promoStoreCategory').value, lineUrl: store.lineUrl || '', fbUrl: store.fbUrl || '', isUpdateOnly: false, isFreeRedeem: isFree });
             
-            if(isFree) { store.freePromoDays = 0; } // ตัดสิทธิ์ฟรีทันที
+            if(isFree) { store.freePromoDays = 0; } 
             
             appData.telegramMsg = `🔥 <b>มีการสั่งซื้อ/ต่ออายุแบนเนอร์!</b>\n\n🏬 ร้าน: <b>${store.name}</b>\n📌 หมวด: ${document.getElementById('promoStoreCategory').value}\n\n👉 กรุณาตรวจสอบและอนุมัติในหน้าแอดมินครับ`;
             
@@ -1213,7 +1281,6 @@
         }
     }
 
-    // ⚡ ฟังก์ชันสำหรับปุ่ม "โทร"
     function callPlace(placeId, event) {
         event.stopPropagation();
         service.getDetails({ placeId: placeId, fields: ['formatted_phone_number'] }, (place, status) => {
@@ -1225,7 +1292,6 @@
         });
     }
 
-    // ⚡ ฟังก์ชันสำหรับปุ่ม "แชร์"
     function sharePlace(name, lat, lng, event) {
         event.stopPropagation(); 
         const mapUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
