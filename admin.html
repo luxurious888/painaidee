@@ -30,10 +30,6 @@
         details summary::after { content: "▼"; font-size: 14px; color: #999; }
         details[open] summary::after { content: "▲"; color: #C5A059; }
         details[open] summary { border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-bottom: 1px solid #4A5568; }
-
-        /* Toggle Switch Custom */
-        .toggle-checkbox:checked { right: 0; border-color: #06C755; }
-        .toggle-checkbox:checked + .toggle-label { background-color: #06C755; }
     </style>
 </head>
 <body class="p-4 md:p-8 text-sm md:text-base">
@@ -176,7 +172,6 @@
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbwojqh2ry1b_xkuVp28w5q8Cs0CX9xBcI-upICxz98NtRrwnJ99GwLneWXFGQJySN1T/exec";
     
-    // ⚡ ตั้งค่ารหัสผ่านเข้า Admin (เปลี่ยนได้ที่นี่)
     const ADMIN_PASSWORD = "250899"; 
     
     function checkAdminLogin() {
@@ -363,7 +358,7 @@
                 </div>`).join('');
         }
 
-        // 7. Store Management (อัปเดตปุ่มส่ง PIN และข้อมูลสิทธิ์ฟรี)
+        // 7. Store Management (มีเช็คสถานะ LINE ยุคเก่า)
         document.getElementById('store-management-list').innerHTML = appData.registeredStores.map((s,i) => `
             <div class="bg-[#242730] p-5 rounded-xl border border-gray-700 ${s.isVIP ? '!border-[#FFD700] shadow-[0_0_15px_rgba(255,215,0,0.1)]' : ''} relative flex flex-col h-full transition-all">
                 ${s.isVIP ? '<div class="absolute top-4 right-4 bg-[#FFD700] text-black text-[11px] px-3 py-1 rounded font-bold shadow">VIP</div>' : ''}
@@ -375,13 +370,19 @@
                     <span class="text-[#FFD700] font-bold text-xl tracking-wider">${s.pin}</span>
                 </div>
                 
-                <p class="text-sm text-gray-400 mb-1">📞 ${s.phone || 'ไม่ระบุ'}</p>
+                <div class="flex justify-between items-center mb-1">
+                    <p class="text-sm text-gray-400">📞 ${s.phone || 'ไม่ระบุ'}</p>
+                    <span class="text-xs px-2 py-1 rounded-full font-bold ${s.userId ? 'bg-[#06C755]/20 text-[#06C755]' : 'bg-red-500/20 text-red-400'}">
+                        ${s.userId ? '✅ ผูก LINE แล้ว' : '❌ ร้านยุคเก่า'}
+                    </span>
+                </div>
+
                 <p class="text-sm text-gray-400 mb-1">หมดอายุ VIP: ${(s.isVIP && s.vipExpireTimestamp) ? new Date(s.vipExpireTimestamp).toLocaleDateString('th-TH') : '-'}</p>
                 <p class="text-sm text-[#06C755] mb-5 font-bold">สิทธิ์ฟรีโปรโมท: ${s.freePromoDays || 0} วัน</p>
                 
                 <div class="flex flex-col gap-3 mt-auto">
-                    <button class="w-full btn-info py-2 rounded-lg text-sm font-bold transition flex justify-center items-center gap-2" onclick="resendPinToStore(${i})">
-                        📨 ส่ง PIN ทาง LINE อีกครั้ง
+                    <button class="w-full ${s.userId ? 'btn-info' : 'bg-gray-600 text-gray-300'} py-2 rounded-lg text-sm font-bold transition flex justify-center items-center gap-2" onclick="resendPinToStore(${i})">
+                        ${s.userId ? '📨 ส่ง PIN ทาง LINE อีกครั้ง' : '⚠️ ก๊อปปี้รหัส PIN (ข้อมูลเก่า)'}
                     </button>
 
                     ${!s.isVIP ? `
@@ -424,11 +425,11 @@
 
     function saveVipSettings() { appData.vipSettings.price = parseInt(document.getElementById('vipPriceSetting').value) || 500; appData.vipSettings.bankAccount = document.getElementById('vipBankSetting').value; save(); alert("💾 บันทึกการตั้งค่า VIP สำเร็จ!"); }
 
-    // ⚡ ฟังก์ชันอนุมัติร้านค้า (มีตั้ง PIN เอง / สุ่ม)
+    // ⚡ ตั้งค่ารหัส PIN เองได้
     async function approveStore(index) {
         let r = appData.registrationRequests[index]; 
-        let defaultPin = Math.floor(100000 + Math.random() * 900000).toString(); // รหัส 6 หลักปลอดภัยกว่า
-        let customPin = prompt(`ตั้งรหัส PIN 6 หลัก สำหรับร้าน: ${r.storeName}\n\n(คุณสามารถพิมพ์รหัสที่ต้องการ หรือกดยืนยันเพื่อใช้รหัสสุ่มด้านล่างนี้ได้เลย)`, defaultPin);
+        let defaultPin = Math.floor(100000 + Math.random() * 900000).toString();
+        let customPin = prompt(`ตั้งรหัส PIN 6 หลัก สำหรับร้าน: ${r.storeName}\n\n(พิมพ์รหัสที่ต้องการ หรือกดยืนยันเพื่อใช้รหัสสุ่มด้านล่างนี้ได้เลย)`, defaultPin);
         
         if (customPin === null || customPin.trim() === "") return; 
 
@@ -443,30 +444,35 @@
         load();
     }
 
-    // ⚡ ฟังก์ชันส่ง PIN ทาง LINE ซ้ำ
+    // ⚡ ส่ง PIN ทาง LINE ซ้ำ 
     async function resendPinToStore(index) {
         const store = appData.registeredStores[index];
         if (store && store.userId) {
             const lineMsg = `🔑 แจ้งเตือนจากแอดมิน (Painaidee)\n\nรหัส PIN ของร้าน ${store.name} คือ: ${store.pin}`;
             try {
                 showLoading(true);
-                await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "SEND_LINE_PIN", targetUserId: store.userId, message: lineMsg }) });
-                alert("✅ ส่งรหัส PIN กลับไปที่ LINE ลูกค้าเรียบร้อยแล้วครับ!");
-            } catch(e) { alert("❌ เกิดข้อผิดพลาดในการส่ง LINE"); }
+                const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "SEND_LINE_PIN", targetUserId: store.userId, message: lineMsg }) });
+                const result = await res.json();
+                if(result.result === "error") {
+                    alert("❌ ลูกค้าบล็อก LINE OA หรือเกิดข้อผิดพลาดในการส่ง");
+                } else {
+                    alert("✅ ส่งรหัส PIN กลับไปที่ LINE ลูกค้าเรียบร้อยแล้วครับ!");
+                }
+            } catch(e) { alert("❌ เกิดข้อผิดพลาดในการเชื่อมต่อ"); }
             showLoading(false);
         } else {
-            prompt(`⚠️ ร้านนี้ไม่ได้ผูกบัญชี LINE กับระบบไว้\nกรุณาก๊อปปี้รหัส PIN นี้เพื่อส่งให้ลูกค้าด้วยตัวเอง:`, store.pin);
+            prompt(`⚠️ ร้านนี้เป็นข้อมูลเก่า (ไม่ได้ผูกบัญชี LINE ไว้)\nกรุณาก๊อปปี้รหัส PIN นี้เพื่อส่งให้ลูกค้าด้วยตัวเอง:`, store.pin);
         }
     }
 
-    // ⚡ ฟังก์ชันอนุมัติ VIP (บวกโปรโมทฟรี 7 วัน)
+    // ⚡ อนุมัติ VIP + แจกฟรี 7 วัน
     function approveVipRequest(index) {
         const req = appData.pendingVipRequests[index]; const store = appData.registeredStores.find(s => s.name === req.storeName);
         if(store) { 
             store.isVIP = true; 
             store.vipExpireTimestamp = Date.now() + (30 * 24 * 60 * 60 * 1000); 
             store.vipAutoRenew = false;
-            store.freePromoDays = 7; // 🎁 มอบสิทธิ์โปรโมทฟรี 7 วันให้ร้านนี้
+            store.freePromoDays = 7; 
 
             appData.pendingVipRequests.splice(index, 1); save(); 
             alert(`👑 อนุมัติสถานะ VIP ให้ร้าน ${store.name} สำเร็จ!\n🎁 มอบสิทธิ์พื้นที่โปรโมทฟรี 7 วัน เรียบร้อยแล้ว`); 
