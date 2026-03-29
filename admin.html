@@ -34,7 +34,6 @@
         .toggle-checkbox:checked { right: 0; border-color: #06C755; }
         .toggle-checkbox:checked + .toggle-label { background-color: #06C755; }
 
-        /* 🚀 สไตล์แท็บแยกหน้า */
         .tab-nav { display: flex; gap: 10px; margin-bottom: 25px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
         .tab-nav::-webkit-scrollbar { display: none; }
         .tab-btn { background: #2A2E36; color: #aaa; padding: 12px 24px; border-radius: 12px; cursor: pointer; white-space: nowrap; font-weight: bold; transition: 0.3s; border: 1px solid #4A5568; }
@@ -187,22 +186,29 @@
     <div id="page-affiliate" class="admin-page">
         <div class="card border-l-4 border-cyan-500">
             <h2 class="text-xl font-bold mb-2">🤝 ระบบจัดการ Affiliate (นายหน้าผู้แนะนำ)</h2>
-            <p class="text-sm text-gray-400 mb-6">ตั้งค่าเรทค่าคอมมิชชั่น และตรวจสอบยอดเงินที่ต้องจ่ายให้กับนายหน้าแต่ละคน</p>
+            <p class="text-sm text-gray-400 mb-6">ตั้งค่าเรทค่าคอมมิชชั่น อนุมัติการถอนเงิน และตรวจสอบยอดที่ต้องจ่ายให้นายหน้า</p>
             
             <div class="bg-[#2A2E36] p-5 rounded-xl border border-cyan-600/50 shadow-lg flex flex-col md:flex-row gap-4 items-end mb-8 relative overflow-hidden">
                 <div class="absolute top-0 right-0 bg-cyan-600 text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg">SETTING</div>
-                <div class="w-full md:w-3/4">
-                    <label class="block text-gray-300 text-sm mb-2 font-medium">💰 เรทค่าคอมมิชชั่น (บาท / 1 ร้านค้าที่แนะนำสำเร็จ)</label>
-                    <input type="number" id="affCommSetting" class="input-dark text-xl font-bold text-cyan-400 py-3" placeholder="ตัวอย่าง: 100">
+                <div class="w-full md:w-1/3">
+                    <label class="block text-gray-300 text-sm mb-2 font-medium">💰 % ค่าคอมมิชชั่น (ส่วนแบ่ง)</label>
+                    <input type="number" id="affCommPercent" class="input-dark text-xl font-bold text-cyan-400 py-3" placeholder="เช่น 10 (หมายถึง 10%)">
                 </div>
-                <div class="w-full md:w-1/4">
+                <div class="w-full md:w-1/3">
+                    <label class="block text-gray-300 text-sm mb-2 font-medium">🏧 ยอดถอนเงินขั้นต่ำ (บาท)</label>
+                    <input type="number" id="affMinWithdraw" class="input-dark text-xl font-bold text-green-400 py-3" placeholder="เช่น 300">
+                </div>
+                <div class="w-full md:w-1/3">
                     <button class="w-full py-3 rounded-lg font-bold text-white shadow-lg transition hover:scale-[1.02]" style="background: linear-gradient(135deg, #00d2ff, #3a7bd5);" onclick="saveAffiliateSettings()">
-                        💾 บันทึกเรทค่าคอม
+                        💾 บันทึกตั้งค่า Affiliate
                     </button>
                 </div>
             </div>
 
-            <h3 class="text-lg font-bold mb-4 border-b border-gray-700 pb-2 text-white">ตารางสรุปยอดค่าคอมมิชชั่นของนายหน้า</h3>
+            <h3 class="text-lg font-bold mb-4 border-b border-gray-700 pb-2 text-[#FFD700]">💸 คำร้องขอถอนเงิน (รอดำเนินการ) <span id="withdraw-count" class="bg-red-500 text-white text-xs px-2 py-1 rounded-full ml-2">0</span></h3>
+            <div id="withdrawalList" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8"></div>
+
+            <h3 class="text-lg font-bold mb-4 border-b border-gray-700 pb-2 text-white">ตารางสรุปข้อมูลกระเป๋าเงินนายหน้า (Wallets)</h3>
             <div id="affiliateList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
         </div>
     </div>
@@ -227,14 +233,12 @@
     const API_URL = "https://script.google.com/macros/s/AKfycbwojqh2ry1b_xkuVp28w5q8Cs0CX9xBcI-upICxz98NtRrwnJ99GwLneWXFGQJySN1T/exec";
     const ADMIN_PASSWORD = "250899"; 
     
-    // ⚡ ฟังก์ชันเปลี่ยนหน้า Admin
     function switchAdminPage(pageId, btnElement) {
         document.querySelectorAll('.admin-page').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
         document.getElementById('page-' + pageId).classList.add('active');
         btnElement.classList.add('active');
         
-        // เรนเดอร์ข้อมูลของหน้านั้นๆ ทันทีที่กดแท็บ
         if(pageId === 'affiliate') renderAffiliate();
         if(pageId === 'storeinfo') renderStoreInfo();
     }
@@ -272,12 +276,12 @@
         { id: 10, group: 'food', label: 'อาหารตามสั่ง / จานด่วน', keyword: 'อาหารตามสั่ง' }
     ];
 
-    // เพิ่ม affiliateSettings ไว้ใน appData เผื่อดึงจากฐานข้อมูล
     let appData = { 
         registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], 
         categories: [], closedReports: [], blacklistedPlaces: [], services: [], pendingVipRequests: [], 
         vipSettings: { price: 500, bankAccount: 'กสิกรไทย 123-x-xxxxx-x ชื่อบัญชี' },
-        affiliateSettings: { commissionReward: 100 } // ค่าเริ่มต้น 100 บาท/ร้าน
+        affiliateSettings: { commissionPercent: 10, minWithdrawal: 300 },
+        affiliateWallets: [], withdrawalRequests: []
     };
 
     function formatDateTime(ms) {
@@ -315,9 +319,9 @@
             if (data && Object.keys(data).length > 0) { appData = { ...appData, ...data }; }
             if (!appData.categories || appData.categories.length === 0) { appData.categories = JSON.parse(JSON.stringify(defaultCategories)); }
             if (!appData.vipSettings) { appData.vipSettings = { price: 500, bankAccount: 'กสิกรไทย 123-4-56789-0 (ไปไหนดี)' }; }
-            if (!appData.affiliateSettings) { appData.affiliateSettings = { commissionReward: 100 }; } // เช็คค่าคอมมิชชั่น
+            if (!appData.affiliateSettings) { appData.affiliateSettings = { commissionPercent: 10, minWithdrawal: 300 }; }
             
-            ['registrationRequests','registeredStores','pendingPromotions','activePromotions','categories','closedReports','blacklistedPlaces','services','pendingVipRequests'].forEach(key => { if(!appData[key]) appData[key] = []; });
+            ['registrationRequests','registeredStores','pendingPromotions','activePromotions','categories','closedReports','blacklistedPlaces','services','pendingVipRequests','affiliateWallets','withdrawalRequests'].forEach(key => { if(!appData[key]) appData[key] = []; });
             checkAutoRenew(); 
         } catch (e) { console.error(e); render(); }
         showLoading(false);
@@ -461,64 +465,147 @@
         if (document.getElementById('page-storeinfo').classList.contains('active')) renderStoreInfo();
     }
 
-    // ⚡ ฟังก์ชันเรนเดอร์หน้า Affiliate (พร้อมคำนวณยอดเงิน)
-    function renderAffiliate() {
-        // ดึงค่าคอมตั้งต้นมาโชว์ในช่อง input
-        const currentComm = (appData.affiliateSettings && appData.affiliateSettings.commissionReward) ? appData.affiliateSettings.commissionReward : 0;
-        document.getElementById('affCommSetting').value = currentComm;
+    // ⚡ ฟังก์ชันเพิ่มเงินให้นายหน้าอัตโนมัติเมื่ออนุมัติยอด (Core Logic)
+    function addCommissionToWallet(refCode, packageAmount) {
+        if (!refCode || refCode.trim() === '') return;
         
-        const commRate = parseInt(currentComm) || 0;
+        const settings = appData.affiliateSettings || { commissionPercent: 10 };
+        const percent = settings.commissionPercent || 10;
+        const commAmount = (packageAmount * percent) / 100;
+        
+        if (commAmount <= 0) return;
 
+        if (!appData.affiliateWallets) appData.affiliateWallets = [];
+        let wallet = appData.affiliateWallets.find(w => w.refCode === refCode);
+        
+        if (!wallet) {
+            wallet = { refCode: refCode, balance: 0, totalEarned: 0 };
+            appData.affiliateWallets.push(wallet);
+        }
+        
+        wallet.balance += commAmount;
+        wallet.totalEarned += commAmount;
+    }
+
+    // ⚡ ฟังก์ชันเรนเดอร์หน้า Affiliate (พร้อมระบบอนุมัติการถอน)
+    function renderAffiliate() {
+        const currentComm = (appData.affiliateSettings && appData.affiliateSettings.commissionPercent) ? appData.affiliateSettings.commissionPercent : 10;
+        const currentMinW = (appData.affiliateSettings && appData.affiliateSettings.minWithdrawal) ? appData.affiliateSettings.minWithdrawal : 300;
+        
+        document.getElementById('affCommPercent').value = currentComm;
+        document.getElementById('affMinWithdraw').value = currentMinW;
+        
+        // ⚡ ส่วนของรายการถอนเงิน
+        const withdrawList = document.getElementById('withdrawalList');
+        const pendingW = (appData.withdrawalRequests || []).filter(w => w.status === 'pending');
+        document.getElementById('withdraw-count').innerText = pendingW.length;
+
+        if(pendingW.length === 0) {
+            withdrawList.innerHTML = '<p class="text-gray-500 italic col-span-full">ไม่มีคำร้องขอถอนเงิน</p>';
+        } else {
+            withdrawList.innerHTML = pendingW.map((w) => {
+                const originalIndex = appData.withdrawalRequests.findIndex(orig => orig.id === w.id);
+                return `
+                <div class="bg-[#2A2E36] p-4 rounded-xl border border-[#FFD700] flex flex-col justify-between shadow-lg relative">
+                    <div class="absolute top-0 right-0 bg-[#FFD700] text-black text-[10px] font-bold px-3 py-1 rounded-bl-lg">WAITING</div>
+                    <div>
+                        <p class="text-xs text-gray-400">รหัสนายหน้า: <span class="text-white font-bold text-sm">${w.refCode}</span></p>
+                        <p class="text-xs text-gray-400 mb-2">เวลาที่ขอ: ${w.requestDate}</p>
+                        <h3 class="text-2xl font-bold text-[#06C755] mb-3">${w.amount.toLocaleString()} ฿</h3>
+                        <div class="bg-[#1A1D23] p-3 rounded border border-gray-700 mb-4">
+                            <p class="text-xs text-gray-500 mb-1">ข้อมูลบัญชีรับเงิน:</p>
+                            <p class="text-sm text-white font-mono break-words">${w.bankDetails}</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button class="btn-success flex-1" onclick="approveWithdrawal(${originalIndex})">✅ โอนเงินเรียบร้อย</button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // ⚡ ส่วนของตารางกระเป๋าเงิน (Wallets)
         const affMap = {};
         appData.registeredStores.forEach(s => {
             if(s.refCode && s.refCode.trim() !== '') {
-                if(!affMap[s.refCode]) affMap[s.refCode] = [];
-                affMap[s.refCode].push(s);
+                if(!affMap[s.refCode]) affMap[s.refCode] = { stores: [], wallet: null };
+                affMap[s.refCode].stores.push(s);
             }
+        });
+
+        (appData.affiliateWallets || []).forEach(w => {
+            if(!affMap[w.refCode]) affMap[w.refCode] = { stores: [], wallet: w };
+            else affMap[w.refCode].wallet = w;
         });
         
         const list = document.getElementById('affiliateList');
         if(Object.keys(affMap).length === 0) {
-            list.innerHTML = '<p class="text-gray-500 italic">ยังไม่มีข้อมูลการแนะนำร้านค้าในระบบ</p>';
+            list.innerHTML = '<p class="text-gray-500 italic col-span-full">ยังไม่มีข้อมูลกระเป๋าเงินหรือการแนะนำในระบบ</p>';
             return;
         }
         
         let html = '';
         for(let code in affMap) {
-            const stores = affMap[code];
-            const totalComm = stores.length * commRate; // คำนวณยอดเงินค่าคอม
+            const data = affMap[code];
+            const stores = data.stores;
+            const wallet = data.wallet || { balance: 0, totalEarned: 0 };
 
             html += `
-            <div class="bg-[#2A2E36] p-5 rounded-xl border border-cyan-500 shadow-lg">
+            <div class="bg-[#2A2E36] p-5 rounded-xl border border-gray-600 shadow-lg">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 pb-4 border-b border-gray-700 gap-3">
                     <div>
                         <p class="text-xs text-gray-400 mb-1">รหัสผู้แนะนำ / เบอร์โทร</p>
-                        <h3 class="text-2xl font-bold text-cyan-400">${code}</h3>
+                        <h3 class="text-xl font-bold text-cyan-400">${code}</h3>
                     </div>
                     <div class="flex gap-2 w-full md:w-auto">
-                        <div class="flex-1 md:flex-none bg-cyan-500/20 border border-cyan-500 text-cyan-400 px-4 py-2 rounded-lg text-sm font-bold text-center">
-                            แนะนำแล้ว<br><span class="text-xl">${stores.length}</span> ร้าน
+                        <div class="flex-1 md:flex-none bg-cyan-500/20 border border-cyan-500 text-cyan-400 px-3 py-1.5 rounded-lg text-center">
+                            <p class="text-[10px] m-0">ยอดเงินที่ถอนได้</p>
+                            <span class="text-lg font-bold">${wallet.balance.toLocaleString()} ฿</span>
                         </div>
-                        <div class="flex-1 md:flex-none bg-green-500/20 border border-green-500 text-green-400 px-4 py-2 rounded-lg text-sm font-bold text-center">
-                            ยอดค่าคอมฯ<br><span class="text-xl">${totalComm.toLocaleString()}</span> ฿
+                        <div class="flex-1 md:flex-none bg-green-500/20 border border-green-500 text-green-400 px-3 py-1.5 rounded-lg text-center">
+                            <p class="text-[10px] m-0">รับรายได้ไปแล้วรวม</p>
+                            <span class="text-lg font-bold">${wallet.totalEarned.toLocaleString()} ฿</span>
                         </div>
                     </div>
                 </div>
-                <p class="text-sm text-gray-400 mb-2">📋 รายชื่อร้านค้าที่แนะนำมา:</p>
-                <ul class="text-sm text-gray-300 list-disc list-inside bg-[#1A1D23] p-3 rounded-lg border border-gray-700 h-32 overflow-y-auto">
-                    ${stores.map(s => `<li class="mb-1">${s.name} ${s.isVIP ? '<span class="bg-[#FFD700] text-black px-1.5 py-0.5 rounded text-[10px] font-bold ml-1">VIP</span>' : ''}</li>`).join('')}
+                <p class="text-sm text-gray-400 mb-2">📋 รายชื่อร้านค้าที่แนะนำมา (${stores.length} ร้าน):</p>
+                <ul class="text-sm text-gray-300 list-disc list-inside bg-[#1A1D23] p-3 rounded-lg border border-gray-700 h-24 overflow-y-auto">
+                    ${stores.length > 0 ? stores.map(s => `<li class="mb-1">${s.name} ${s.isVIP ? '<span class="bg-[#FFD700] text-black px-1.5 py-0.5 rounded text-[10px] font-bold ml-1">VIP</span>' : ''}</li>`).join('') : '<li class="text-gray-500 italic list-none">ยังไม่มีร้านค้าสมัครผ่านรหัสนี้</li>'}
                 </ul>
             </div>`;
         }
         list.innerHTML = html;
     }
 
-    // ⚡ ฟังก์ชันเซฟค่าคอมมิชชั่น
+    // ⚡ ฟังก์ชันเซฟตั้งค่า Affiliate
     function saveAffiliateSettings() {
         if(!appData.affiliateSettings) appData.affiliateSettings = {};
-        appData.affiliateSettings.commissionReward = parseInt(document.getElementById('affCommSetting').value) || 0;
+        appData.affiliateSettings.commissionPercent = parseInt(document.getElementById('affCommPercent').value) || 10;
+        appData.affiliateSettings.minWithdrawal = parseInt(document.getElementById('affMinWithdraw').value) || 300;
         save();
         alert("💾 บันทึกการตั้งค่าเรทค่าคอมมิชชั่นเรียบร้อยแล้ว!");
+    }
+
+    // ⚡ ฟังก์ชันอนุมัติการถอนเงิน
+    async function approveWithdrawal(index) {
+        if(!confirm('ยืนยันว่าคุณได้โอนเงินเข้าบัญชีของนายหน้าเรียบร้อยแล้วใช่หรือไม่?')) return;
+        
+        const req = appData.withdrawalRequests[index];
+        req.status = 'completed';
+        req.approveDate = new Date().toLocaleString();
+
+        showLoading(true);
+        await fetch(API_URL, { method: 'POST', body: JSON.stringify(appData) });
+        
+        // ⚡ ยิงแจ้งเตือนกลับไปหานายหน้าว่าโอนเงินแล้ว
+        if(req.userId && req.userId.trim() !== '') {
+            const lineMsg = `💸 แจ้งเตือนจาก แอดมินไปไหนดี\n\nระบบได้ดำเนินการโอนเงินค่าคอมมิชชั่น จำนวน ${req.amount.toLocaleString()} บาท เข้าบัญชีของท่านเรียบร้อยแล้วครับ!\n\nขอบคุณที่แนะนำร้านค้าดีๆ เข้ามาในระบบครับ 😊`;
+            try { await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "SEND_LINE_PIN", targetUserId: req.userId, message: lineMsg }) }); } catch(e){}
+        }
+
+        showLoading(false);
+        alert(`✅ อนุมัติการถอนเงิน ${req.amount} บาท เรียบร้อยแล้ว!`);
+        load();
     }
 
     // ⚡ ฟังก์ชันเรนเดอร์หน้า Store Info & LINE ID
@@ -576,7 +663,7 @@
 
     // --- Action Functions ---
 
-    // ⚡ ฟังก์ชันอนุมัติร้านค้า (แก้ไขให้เก็บรูปภาพไว้ในฐานข้อมูลด้วย)
+    // ⚡ ฟังก์ชันอนุมัติร้านค้า 
     async function approveStore(index) {
         let r = appData.registrationRequests[index]; 
         let defaultPin = Math.floor(100000 + Math.random() * 900000).toString();
@@ -584,7 +671,6 @@
         
         if (customPin === null || customPin.trim() === "") return; 
 
-        // ⚡ เพิ่มการเก็บรูปภาพลงใน newStore เพื่อให้ไปโชว์ในแท็บ ข้อมูลเชิงลึก
         const newStore = { 
             name: r.storeName, 
             pin: customPin.trim(), 
@@ -630,7 +716,7 @@
         }
     }
 
-    // ⚡ อนุมัติ VIP + แจกฟรี 7 วัน + ส่ง LINE แจ้งลูกค้า
+    // ⚡ อนุมัติ VIP + แจกฟรี 7 วัน + คำนวณค่าคอม
     async function approveVipRequest(index) {
         const req = appData.pendingVipRequests[index]; const store = appData.registeredStores.find(s => s.name === req.storeName);
         if(store) { 
@@ -638,6 +724,10 @@
             store.vipExpireTimestamp = Date.now() + (30 * 24 * 60 * 60 * 1000); 
             store.vipAutoRenew = false;
             store.freePromoDays = 7; 
+
+            // 💰 ให้ค่าคอมมิชชั่นกับนายหน้า
+            const vipPrice = appData.vipSettings.price || 500;
+            addCommissionToWallet(store.refCode, vipPrice);
 
             appData.pendingVipRequests.splice(index, 1); 
             showLoading(true);
@@ -648,12 +738,12 @@
                 try { await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "SEND_LINE_PIN", targetUserId: store.userId, message: lineMsg }) }); } catch(e) {}
             }
             showLoading(false);
-            alert(`👑 อนุมัติสถานะ VIP ให้ร้าน ${store.name} สำเร็จ!\n🎁 มอบสิทธิ์พื้นที่โปรโมทฟรี 7 วัน เรียบร้อยแล้ว`); 
+            alert(`👑 อนุมัติสถานะ VIP ให้ร้าน ${store.name} สำเร็จ!\nระบบได้แบ่งค่าคอมให้นายหน้าแล้ว (ถ้ามี)`); 
             load();
         } else { alert("⚠️ ไม่พบข้อมูลร้านค้านี้ในระบบ"); }
     }
 
-    // ⚡ อนุมัติโปรโมชั่น + ส่ง LINE แจ้งลูกค้า
+    // ⚡ อนุมัติโปรโมชั่น + คำนวณค่าคอม
     async function approvePromotion(i) {
         let p = appData.pendingPromotions[i]; p.storeName = document.getElementById(`editPStore_${i}`).value; p.province = document.getElementById(`editPProv_${i}`).value; p.category = document.getElementById(`editPCat_${i}`).value; p.detail = document.getElementById(`editPDetail_${i}`).value;
         const existingIndex = appData.activePromotions.findIndex(act => act.storeName === p.storeName);
@@ -666,7 +756,9 @@
             isUpdateAlert = true;
             lineMsg = `📝 แจ้งเตือนจาก แอดมินไปไหนดี\n\nข้อมูลโปรโมชั่นแบนเนอร์ของร้าน ${p.storeName} ได้รับการอัปเดตใหม่เรียบร้อยแล้วครับ!`;
         } else {
-            p.service = document.getElementById(`editPServ_${i}`).value; const svc = (appData.services || []).find(s => s.name === p.service); 
+            const svcName = document.getElementById(`editPServ_${i}`).value.split(' - ')[0]; // ตัดสตริงเอาเฉพาะชื่อแพ็กเกจ
+            p.service = svcName; 
+            const svc = (appData.services || []).find(s => s.name === p.service); 
             const addDays = p.isFreeRedeem ? 7 : (svc && svc.days ? parseInt(svc.days) : 30); 
             const addMs = addDays * 24 * 60 * 60 * 1000;
             
@@ -674,6 +766,11 @@
                 let existingPromo = appData.activePromotions[existingIndex]; let baseTime = (existingPromo.expireTimestamp && existingPromo.expireTimestamp > Date.now()) ? existingPromo.expireTimestamp : Date.now(); p.expireTimestamp = baseTime + addMs; appData.activePromotions[existingIndex] = p; 
             } else { p.expireTimestamp = Date.now() + addMs; appData.activePromotions.unshift(p); }
             
+            // 💰 ให้ค่าคอมมิชชั่นกับนายหน้า (กรณีไม่ใช่สิทธิ์ฟรี)
+            if(!p.isFreeRedeem && svc) {
+                addCommissionToWallet(store ? store.refCode : '', svc.price);
+            }
+
             lineMsg = `🚀 แจ้งเตือนจาก แอดมินไปไหนดี\n\nแบนเนอร์โปรโมชั่นของร้าน ${p.storeName} ได้รับการอนุมัติและกำลังแสดงผลบนหน้าแอปแล้วครับ!\n(อายุการแสดงผลเพิ่มขึ้น ${addDays} วัน)`;
         }
 
@@ -686,7 +783,7 @@
         }
         
         showLoading(false);
-        alert(isUpdateAlert ? "✅ อนุมัติอัปเดตรูปและข้อความเรียบร้อย! (ส่งการแจ้งเตือนแล้ว)" : "✅ อนุมัติแพ็กเกจและขึ้นแบนเนอร์เรียบร้อย! (ส่งการแจ้งเตือนแล้ว)");
+        alert(isUpdateAlert ? "✅ อนุมัติอัปเดตรูปและข้อความเรียบร้อย!" : "✅ อนุมัติแพ็กเกจและขึ้นแบนเนอร์เรียบร้อย!\nระบบได้แบ่งค่าคอมให้นายหน้าแล้ว (ถ้ามี)");
         load();
     }
 
@@ -704,7 +801,6 @@
     function openImageTab(base64Str) { const newWindow = window.open(); if (newWindow) { newWindow.document.write(`<html><body style="margin:0; background:#121418; display:flex; align-items:center; justify-content:center; height:100vh;"><img src="${base64Str}" style="max-width:95%; max-height:95vh; border-radius:12px;"></body></html>`); } }
     function showLoading(show) { document.getElementById('loading').style.display = show ? 'flex' : 'none'; }
 
-    // Auto-Refresh
     setInterval(async () => {
         if (sessionStorage.getItem('adminLoggedIn') !== 'true') return;
 
@@ -715,7 +811,7 @@
                 const data = await res.json();
                 if (data && Object.keys(data).length > 0) { 
                     appData = { ...appData, ...data }; 
-                    ['registrationRequests','registeredStores','pendingPromotions','activePromotions','categories','closedReports','blacklistedPlaces','services','pendingVipRequests'].forEach(key => { if(!appData[key]) appData[key] = []; });
+                    ['registrationRequests','registeredStores','pendingPromotions','activePromotions','categories','closedReports','blacklistedPlaces','services','pendingVipRequests','affiliateWallets','withdrawalRequests'].forEach(key => { if(!appData[key]) appData[key] = []; });
                     render(); 
                 }
             } catch (e) { console.log("Auto-refresh failed", e); }
