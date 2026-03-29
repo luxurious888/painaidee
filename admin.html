@@ -154,7 +154,6 @@
             <details>
                 <summary>🔽 7. จัดการหมวดหมู่ค้นหา (หลัก & ย่อย)</summary>
                 <div class="p-5 bg-[#1A1D23]">
-                    
                     <h3 class="text-lg font-bold text-white mb-2 border-b border-gray-700 pb-2">📂 หมวดหมู่หลัก (ปุ่มค้นหาหน้าแอป)</h3>
                     <div class="bg-[#2A2E36] p-4 rounded-xl mb-4 grid grid-cols-1 md:grid-cols-4 gap-3 border border-purple-600/30">
                         <input type="text" id="mId" class="input-dark" placeholder="ID (ภาษาอังกฤษ เช่น hotel)">
@@ -176,7 +175,6 @@
                         <button class="btn-danger text-sm" onclick="deleteSelectedCategories()">🗑️ ลบที่ติ๊กถูก</button>
                     </div>
                     <div id="cTable" class="flex flex-col gap-2"></div>
-
                 </div>
             </details>
         </div>
@@ -266,7 +264,7 @@
 </div>
 
 <script>
-    // ⚡ ตั้งค่าเชื่อมต่อ Google Apps Script (ไว้สำหรับยิงแจ้งเตือน LINE)
+    // ⚡ ตั้งค่าเชื่อมต่อ Google Apps Script (ยิง LINE)
     const API_URL = "https://script.google.com/macros/s/AKfycbwojqh2ry1b_xkuVp28w5q8Cs0CX9xBcI-upICxz98NtRrwnJ99GwLneWXFGQJySN1T/exec";
     const ADMIN_PASSWORD = "250899"; 
     
@@ -277,8 +275,7 @@
         projectId: "painaid-88c53",
         storageBucket: "painaid-88c53.firebasestorage.app",
         messagingSenderId: "229290700458",
-        appId: "1:229290700458:web:74a57d0be5df9326c5ead3",
-        measurementId: "G-BF74QEHLQ7"
+        appId: "1:229290700458:web:74a57d0be5df9326c5ead3"
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
@@ -288,7 +285,6 @@
         document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
         document.getElementById('page-' + pageId).classList.add('active');
         btnElement.classList.add('active');
-        
         if(pageId === 'affiliate') renderAffiliate();
         if(pageId === 'storeinfo') renderStoreInfo();
     }
@@ -298,7 +294,7 @@
         if (pwd === ADMIN_PASSWORD) {
             sessionStorage.setItem('adminLoggedIn', 'true');
             document.getElementById('adminLoginOverlay').style.display = 'none';
-            load(); 
+            loadDataRealtime(); 
         } else {
             document.getElementById('loginErrorMsg').style.display = 'block';
         }
@@ -307,86 +303,59 @@
     document.addEventListener('DOMContentLoaded', () => {
         if (sessionStorage.getItem('adminLoggedIn') === 'true') {
             document.getElementById('adminLoginOverlay').style.display = 'none';
-            load();
+            loadDataRealtime();
         } else {
             document.getElementById('adminLoginOverlay').style.display = 'flex';
         }
     });
 
-    const defaultMainCats = [
-        { id: 'food', label: '🍽️ หมวดอาหาร', keyword: 'ร้านอาหาร' },
-        { id: 'beauty', label: '💆‍♀️ ความงาม/พักผ่อน', keyword: 'สปา' },
-        { id: 'activity', label: '🎯 กิจกรรม/เที่ยว', keyword: 'สถานที่ท่องเที่ยว' },
-        { id: 'sport', label: '🏋️ กีฬา/ออกกำลังกาย', keyword: 'ฟิตเนส' }
-    ];
+    const defaultMainCats = [{ id: 'food', label: '🍽️ หมวดอาหาร', keyword: 'ร้านอาหาร' }, { id: 'beauty', label: '💆‍♀️ ความงาม/พักผ่อน', keyword: 'สปา' }, { id: 'activity', label: '🎯 กิจกรรม/เที่ยว', keyword: 'สถานที่ท่องเที่ยว' }, { id: 'sport', label: '🏋️ กีฬา/ออกกำลังกาย', keyword: 'ฟิตเนส' }];
+    const defaultCategories = [{ id: 1, group: 'food', label: 'หมูกระทะ / แจ่วฮ้อน', keyword: 'หมูกระทะ' }, { id: 2, group: 'food', label: 'ชาบู / สุกี้', keyword: 'ชาบู' }, { id: 3, group: 'food', label: 'ปิ้งย่าง / บาร์บีคิว', keyword: 'ปิ้งย่าง' }, { id: 4, group: 'food', label: 'บุฟเฟ่ต์สุดคุ้ม', keyword: 'บุฟเฟ่ต์' }, { id: 5, group: 'food', label: 'คาเฟ่ / กาแฟ / ขนม', keyword: 'คาเฟ่' }];
 
-    const defaultCategories = [
-        { id: 1, group: 'food', label: 'หมูกระทะ / แจ่วฮ้อน', keyword: 'หมูกระทะ' },
-        { id: 2, group: 'food', label: 'ชาบู / สุกี้', keyword: 'ชาบู' },
-        { id: 3, group: 'food', label: 'ปิ้งย่าง / บาร์บีคิว', keyword: 'ปิ้งย่าง' },
-        { id: 4, group: 'food', label: 'บุฟเฟ่ต์สุดคุ้ม', keyword: 'บุฟเฟ่ต์' },
-        { id: 5, group: 'food', label: 'คาเฟ่ / กาแฟ / ขนม', keyword: 'คาเฟ่' }
-    ];
-
-    let appData = { 
-        registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], 
-        mainCategories: [], categories: [], closedReports: [], blacklistedPlaces: [], services: [], pendingVipRequests: [], 
-        vipSettings: { price: 500, bankAccount: 'กสิกรไทย 123-x-xxxxx-x ชื่อบัญชี' },
-        affiliateSettings: { firstTimeType: 'fixed', firstTimeValue: 100, recurringType: 'percent', recurringValue: 10, minWithdrawal: 300 },
-        affiliateWallets: [], withdrawalRequests: []
-    };
+    let appData = { registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], mainCategories: [], categories: [], closedReports: [], blacklistedPlaces: [], services: [], pendingVipRequests: [], vipSettings: { price: 500, bankAccount: 'กสิกรไทย 123-x-xxxxx-x ชื่อบัญชี' }, affiliateSettings: { firstTimeType: 'fixed', firstTimeValue: 100, recurringType: 'percent', recurringValue: 10, minWithdrawal: 300 }, affiliateWallets: [], withdrawalRequests: [] };
 
     function formatDateTime(ms) {
         if (!ms) return '';
         const d = new Date(ms); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 16);
     }
 
-    function checkAutoRenew() {
-        let needSave = false; const now = Date.now();
-        if (appData.registeredStores) {
-            appData.registeredStores.forEach(s => {
-                if (s.isVIP && s.vipExpireTimestamp && now > s.vipExpireTimestamp) {
-                    if (s.vipAutoRenew) { s.vipExpireTimestamp += (30 * 24 * 60 * 60 * 1000); needSave = true; } 
-                    else { s.isVIP = false; needSave = true; }
-                }
-            });
-        }
-        if (appData.activePromotions) {
-            appData.activePromotions.forEach(p => {
-                if (p.expireTimestamp && now > p.expireTimestamp && p.autoRenew) {
-                    const svc = (appData.services || []).find(s => s.name === p.service);
-                    const addDays = (svc && svc.days) ? parseInt(svc.days) : 30;
-                    p.expireTimestamp += (addDays * 24 * 60 * 60 * 1000); needSave = true;
-                }
-            });
-        }
-        if (needSave) { save(); } else { render(); }
-    }
-
-    // ⚡ ดึงข้อมูลจาก Firebase
-    async function load() {
+    // ⚡ ระบบ Real-time แบบใหม่ โหลดปุ๊บ Sync กับเซิร์ฟเวอร์ทันที ไม่มีการเซฟทับมั่วซั่ว
+    let unsubscribe = null;
+    function loadDataRealtime() {
         showLoading(true);
-        try {
-            const doc = await db.collection('painaidee').doc('systemData').get();
-            if (doc.exists) { appData = { ...appData, ...doc.data() }; }
+        if (unsubscribe) unsubscribe(); // ป้องกันการดึงซ้ำซ้อน
+        
+        unsubscribe = db.collection('painaidee').doc('systemData').onSnapshot((doc) => {
+            if (doc.exists) { 
+                appData = { ...appData, ...doc.data() }; 
+            }
             
-            if (!appData.mainCategories || appData.mainCategories.length === 0) { appData.mainCategories = JSON.parse(JSON.stringify(defaultMainCats)); }
-            if (!appData.categories || appData.categories.length === 0) { appData.categories = JSON.parse(JSON.stringify(defaultCategories)); }
-            if (!appData.vipSettings) { appData.vipSettings = { price: 500, bankAccount: 'กสิกรไทย 123-4-56789-0 (ไปไหนดี)' }; }
-            if (!appData.affiliateSettings) { appData.affiliateSettings = { firstTimeType: 'fixed', firstTimeValue: 100, recurringType: 'percent', recurringValue: 10, minWithdrawal: 300 }; }
+            // เช็คค่าเริ่มต้นกรณีลบข้อมูลเกลี้ยง
+            if (!appData.mainCategories || appData.mainCategories.length === 0) appData.mainCategories = JSON.parse(JSON.stringify(defaultMainCats));
+            if (!appData.categories || appData.categories.length === 0) appData.categories = JSON.parse(JSON.stringify(defaultCategories));
+            if (!appData.vipSettings) appData.vipSettings = { price: 500, bankAccount: 'กสิกรไทย 123-4-56789-0 (ไปไหนดี)' };
+            if (!appData.affiliateSettings) appData.affiliateSettings = { firstTimeType: 'fixed', firstTimeValue: 100, recurringType: 'percent', recurringValue: 10, minWithdrawal: 300 };
             
             ['registrationRequests','registeredStores','pendingPromotions','activePromotions','mainCategories','categories','closedReports','blacklistedPlaces','services','pendingVipRequests','affiliateWallets','withdrawalRequests'].forEach(key => { if(!appData[key]) appData[key] = []; });
-            checkAutoRenew(); 
-        } catch (e) { console.error(e); render(); }
-        showLoading(false);
+            
+            // ถ้าแอดมินกำลังพิมพ์ข้อมูลอยู่ จะไม่เด้งหน้าจอหนี
+            const isTyping = document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA';
+            if (!isTyping) {
+                render();
+            }
+            showLoading(false);
+        }, (error) => { 
+            console.error("Firebase Sync Error:", error); 
+            showLoading(false); 
+        });
     }
 
-    // ⚡ บันทึกข้อมูลลง Firebase
+    // ⚡ ฟังก์ชันเซฟข้อมูล
     async function save() { 
         showLoading(true);
         try { 
             await db.collection('painaidee').doc('systemData').set(appData); 
-            render(); 
+            // ไม่ต้องเรียก render() ตรงนี้ เพราะ onSnapshot จะทำงานอัตโนมัติเมื่อเซฟเสร็จ
         } catch(e) { alert("⚠️ เกิดข้อผิดพลาดในการบันทึกข้อมูล"); } 
         showLoading(false);
     }
@@ -394,19 +363,9 @@
     // 🚀 ระบบ Factory Reset 
     async function factoryResetSystem() {
         const confirmWord = prompt('⚠️ เขตอันตราย! ⚠️\nการล้างระบบจะทำให้ข้อมูลร้านค้าและกระเป๋าเงินหายทั้งหมด ไม่สามารถกู้คืนได้\n\nพิมพ์คำว่า "RESET" (ตัวพิมพ์ใหญ่) เพื่อยืนยัน:');
-        
         if (confirmWord === "RESET") {
             showLoading(true);
-            
-            appData.registrationRequests = [];
-            appData.registeredStores = [];
-            appData.pendingPromotions = [];
-            appData.activePromotions = [];
-            appData.closedReports = [];
-            appData.pendingVipRequests = [];
-            appData.affiliateWallets = [];
-            appData.withdrawalRequests = [];
-            
+            appData.registrationRequests = []; appData.registeredStores = []; appData.pendingPromotions = []; appData.activePromotions = []; appData.closedReports = []; appData.pendingVipRequests = []; appData.affiliateWallets = []; appData.withdrawalRequests = [];
             await save();
             alert("🧨 ล้างข้อมูล User ในระบบเสร็จสิ้น! ระบบเริ่มต้นใหม่แล้วครับ");
             window.location.reload();
@@ -449,7 +408,6 @@
                 <button class="bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white p-2 rounded transition" onclick="deleteMainCategory(${i})" title="ลบหมวดหมู่นี้">🗑️</button>
             </div>
         `).join('');
-
         document.getElementById('cGroup').innerHTML = appData.mainCategories.map(m => `<option value="${m.id}">${m.label}</option>`).join('');
 
         // 4. เรนเดอร์หมวดหมู่ย่อย (Sub Categories)
@@ -532,7 +490,7 @@
                 </div>`).join('');
         }
 
-        // 7. Store Management
+        // 7. Store Management (Dashboard เดิม)
         document.getElementById('store-management-list').innerHTML = appData.registeredStores.map((s,i) => `
             <div class="bg-[#242730] p-5 rounded-xl border border-gray-700 ${s.isVIP ? '!border-[#FFD700] shadow-[0_0_15px_rgba(255,215,0,0.1)]' : ''} relative flex flex-col h-full transition-all">
                 ${s.isVIP ? '<div class="absolute top-4 right-4 bg-[#FFD700] text-black text-[11px] px-3 py-1 rounded font-bold shadow">VIP</div>' : ''}
@@ -562,18 +520,11 @@
         if (document.getElementById('page-storeinfo').classList.contains('active')) renderStoreInfo();
     }
 
-    function saveVipSettings() {
-        appData.vipSettings.price = parseInt(document.getElementById('vipPriceSetting').value) || 500;
-        appData.vipSettings.bankAccount = document.getElementById('vipBankSetting').value || '';
-        save(); alert("💾 บันทึกตั้งค่าระบบ VIP เรียบร้อยแล้ว!");
-    }
-
     function addMainCategory() {
         const id = document.getElementById('mId').value.trim().toLowerCase().replace(/[^a-z0-9_]/g, '');
         const label = document.getElementById('mLabel').value.trim();
         const keyword = document.getElementById('mKey').value.trim();
         if(!id || !label || !keyword) return alert("กรุณากรอกข้อมูลให้ครบถ้วนครับ (ID ต้องเป็นภาษาอังกฤษเท่านั้น)");
-        
         if(appData.mainCategories.find(m => m.id === id)) return alert("ID นี้มีอยู่แล้วครับ กรุณาเปลี่ยนชื่อ ID ใหม่");
         
         appData.mainCategories.push({ id, label, keyword });
@@ -590,12 +541,10 @@
     // ⚡ ฟังก์ชันคำนวณและเพิ่มเงินให้นายหน้า (แยกจ่ายครั้งแรก/ต่ออายุ)
     function addCommissionToWallet(store, packageAmount) {
         if (!store || !store.refCode || store.refCode.trim() === '') return;
-        
         const refCode = store.refCode;
         const set = appData.affiliateSettings || { firstTimeType: 'fixed', firstTimeValue: 100, recurringType: 'percent', recurringValue: 10 };
         
         let commAmount = 0;
-
         if (!store.hasPaidFirstComm) {
             commAmount = set.firstTimeType === 'percent' ? (packageAmount * set.firstTimeValue / 100) : set.firstTimeValue;
             store.hasPaidFirstComm = true; 
@@ -612,9 +561,7 @@
             wallet = { refCode: refCode, balance: 0, totalEarned: 0 };
             appData.affiliateWallets.push(wallet);
         }
-        
-        wallet.balance += commAmount;
-        wallet.totalEarned += commAmount;
+        wallet.balance += commAmount; wallet.totalEarned += commAmount;
     }
 
     // ⚡ ฟังก์ชันเรนเดอร์หน้า Affiliate 
@@ -631,9 +578,8 @@
         const pendingW = (appData.withdrawalRequests || []).filter(w => w.status === 'pending');
         document.getElementById('withdraw-count').innerText = pendingW.length;
 
-        if(pendingW.length === 0) {
-            withdrawList.innerHTML = '<p class="text-gray-500 italic col-span-full">ไม่มีคำร้องขอถอนเงิน</p>';
-        } else {
+        if(pendingW.length === 0) { withdrawList.innerHTML = '<p class="text-gray-500 italic col-span-full">ไม่มีคำร้องขอถอนเงิน</p>'; } 
+        else {
             withdrawList.innerHTML = pendingW.map((w) => {
                 const originalIndex = appData.withdrawalRequests.findIndex(orig => orig.id === w.id);
                 return `
@@ -648,9 +594,7 @@
                             <p class="text-sm text-white font-mono break-words">${w.bankDetails}</p>
                         </div>
                     </div>
-                    <div class="flex gap-2">
-                        <button class="btn-success flex-1" onclick="approveWithdrawal(${originalIndex})">✅ โอนเงินเรียบร้อย</button>
-                    </div>
+                    <div class="flex gap-2"><button class="btn-success flex-1" onclick="approveWithdrawal(${originalIndex})">✅ โอนเงินเรียบร้อย</button></div>
                 </div>`;
             }).join('');
         }
@@ -669,33 +613,18 @@
         });
         
         const list = document.getElementById('affiliateList');
-        if(Object.keys(affMap).length === 0) {
-            list.innerHTML = '<p class="text-gray-500 italic col-span-full">ยังไม่มีข้อมูลกระเป๋าเงินหรือการแนะนำในระบบ</p>';
-            return;
-        }
+        if(Object.keys(affMap).length === 0) { list.innerHTML = '<p class="text-gray-500 italic col-span-full">ยังไม่มีข้อมูลกระเป๋าเงินหรือการแนะนำในระบบ</p>'; return; }
         
         let html = '';
         for(let code in affMap) {
-            const data = affMap[code];
-            const stores = data.stores;
-            const wallet = data.wallet || { balance: 0, totalEarned: 0 };
-
+            const data = affMap[code]; const stores = data.stores; const wallet = data.wallet || { balance: 0, totalEarned: 0 };
             html += `
             <div class="bg-[#2A2E36] p-5 rounded-xl border border-gray-600 shadow-lg">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 pb-4 border-b border-gray-700 gap-3">
-                    <div>
-                        <p class="text-xs text-gray-400 mb-1">รหัสผู้แนะนำ / เบอร์โทร</p>
-                        <h3 class="text-xl font-bold text-cyan-400">${code}</h3>
-                    </div>
+                    <div><p class="text-xs text-gray-400 mb-1">รหัสผู้แนะนำ / เบอร์โทร</p><h3 class="text-xl font-bold text-cyan-400">${code}</h3></div>
                     <div class="flex gap-2 w-full md:w-auto">
-                        <div class="flex-1 md:flex-none bg-cyan-500/20 border border-cyan-500 text-cyan-400 px-3 py-1.5 rounded-lg text-center">
-                            <p class="text-[10px] m-0">ยอดเงินที่ถอนได้</p>
-                            <span class="text-lg font-bold">${wallet.balance.toLocaleString()} ฿</span>
-                        </div>
-                        <div class="flex-1 md:flex-none bg-green-500/20 border border-green-500 text-green-400 px-3 py-1.5 rounded-lg text-center">
-                            <p class="text-[10px] m-0">รับรายได้ไปแล้วรวม</p>
-                            <span class="text-lg font-bold">${wallet.totalEarned.toLocaleString()} ฿</span>
-                        </div>
+                        <div class="flex-1 md:flex-none bg-cyan-500/20 border border-cyan-500 text-cyan-400 px-3 py-1.5 rounded-lg text-center"><p class="text-[10px] m-0">ยอดเงินที่ถอนได้</p><span class="text-lg font-bold">${wallet.balance.toLocaleString()} ฿</span></div>
+                        <div class="flex-1 md:flex-none bg-green-500/20 border border-green-500 text-green-400 px-3 py-1.5 rounded-lg text-center"><p class="text-[10px] m-0">รับรายได้ไปแล้วรวม</p><span class="text-lg font-bold">${wallet.totalEarned.toLocaleString()} ฿</span></div>
                     </div>
                 </div>
                 <p class="text-sm text-gray-400 mb-2">📋 รายชื่อร้านค้าที่แนะนำมา (${stores.length} ร้าน):</p>
@@ -709,30 +638,22 @@
 
     function saveAffiliateSettings() {
         appData.affiliateSettings = {
-            firstTimeType: document.getElementById('affFirstType').value,
-            firstTimeValue: parseFloat(document.getElementById('affFirstVal').value) || 0,
-            recurringType: document.getElementById('affRecurType').value,
-            recurringValue: parseFloat(document.getElementById('affRecurVal').value) || 0,
+            firstTimeType: document.getElementById('affFirstType').value, firstTimeValue: parseFloat(document.getElementById('affFirstVal').value) || 0,
+            recurringType: document.getElementById('affRecurType').value, recurringValue: parseFloat(document.getElementById('affRecurVal').value) || 0,
             minWithdrawal: parseInt(document.getElementById('affMinWithdraw').value) || 300
         };
-        save();
-        alert("💾 บันทึกการตั้งค่าเรทค่าคอมมิชชั่นเรียบร้อยแล้ว!");
+        save(); alert("💾 บันทึกการตั้งค่าเรทค่าคอมมิชชั่นเรียบร้อยแล้ว!");
     }
 
     async function approveWithdrawal(index) {
         if(!confirm('ยืนยันว่าคุณได้โอนเงินเข้าบัญชีของนายหน้าเรียบร้อยแล้วใช่หรือไม่?')) return;
-        
-        const req = appData.withdrawalRequests[index];
-        req.status = 'completed';
-        req.approveDate = new Date().toLocaleString();
-
+        const req = appData.withdrawalRequests[index]; req.status = 'completed'; req.approveDate = new Date().toLocaleString();
         await save();
         
         if(req.userId && req.userId.trim() !== '') {
             const lineMsg = `💸 แจ้งเตือนจาก แอดมินไปไหนดี\n\nระบบได้ดำเนินการโอนเงินค่าคอมมิชชั่น จำนวน ${req.amount.toLocaleString()} บาท เข้าบัญชีของท่านเรียบร้อยแล้วครับ!\n\nขอบคุณที่แนะนำร้านค้าดีๆ เข้ามาในระบบครับ 😊`;
             try { await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "SEND_LINE_PIN", targetUserId: req.userId, message: lineMsg }) }); } catch(e){}
         }
-
         alert(`✅ อนุมัติการถอนเงิน ${req.amount} บาท เรียบร้อยแล้ว!`);
     }
 
@@ -740,46 +661,21 @@
     function renderStoreInfo() {
         const q = document.getElementById('searchStoreInput').value.toLowerCase();
         const list = document.getElementById('storeInfoList');
+        const stores = appData.registeredStores.filter(s => s.name.toLowerCase().includes(q) || (s.phone && s.phone.includes(q)) || (s.refCode && s.refCode.toLowerCase().includes(q)) );
         
-        const stores = appData.registeredStores.filter(s => 
-            s.name.toLowerCase().includes(q) || 
-            (s.phone && s.phone.includes(q)) || 
-            (s.refCode && s.refCode.toLowerCase().includes(q))
-        );
-        
-        if(stores.length === 0) {
-            list.innerHTML = '<p class="text-gray-500 italic">ไม่พบข้อมูลร้านค้าที่ค้นหา</p>';
-            return;
-        }
+        if(stores.length === 0) { list.innerHTML = '<p class="text-gray-500 italic">ไม่พบข้อมูลร้านค้าที่ค้นหา</p>'; return; }
         
         list.innerHTML = stores.map((s,i) => `
         <div class="bg-[#2A2E36] p-5 rounded-xl border border-gray-600 flex flex-col gap-2 shadow-lg hover:border-purple-500 transition">
-            <div class="flex justify-between items-start mb-1">
-                <h3 class="text-lg font-bold text-white">${s.name}</h3>
-                ${s.isVIP ? '<span class="bg-[#FFD700] text-black px-2 py-0.5 rounded text-[10px] font-bold">VIP</span>' : ''}
-            </div>
-            
+            <div class="flex justify-between items-start mb-1"><h3 class="text-lg font-bold text-white">${s.name}</h3>${s.isVIP ? '<span class="bg-[#FFD700] text-black px-2 py-0.5 rounded text-[10px] font-bold">VIP</span>' : ''}</div>
             <div class="grid grid-cols-2 gap-2 text-sm">
-                <div class="bg-[#1A1D23] p-2 rounded border border-gray-700">
-                    <p class="text-xs text-gray-500">📞 เบอร์โทรศัพท์:</p>
-                    <p class="text-[#C5A059] font-bold">${s.phone || 'ไม่ระบุ'}</p>
-                </div>
-                <div class="bg-[#1A1D23] p-2 rounded border border-gray-700">
-                    <p class="text-xs text-gray-500">🤝 รหัสแนะนำ (AFF):</p>
-                    <p class="text-cyan-400 font-bold">${s.refCode || '-'}</p>
-                </div>
+                <div class="bg-[#1A1D23] p-2 rounded border border-gray-700"><p class="text-xs text-gray-500">📞 เบอร์โทรศัพท์:</p><p class="text-[#C5A059] font-bold">${s.phone || 'ไม่ระบุ'}</p></div>
+                <div class="bg-[#1A1D23] p-2 rounded border border-gray-700"><p class="text-xs text-gray-500">🤝 รหัสแนะนำ (AFF):</p><p class="text-cyan-400 font-bold">${s.refCode || '-'}</p></div>
             </div>
-
             <div class="bg-[#1A1D23] p-3 rounded border border-gray-700 mt-1">
-                <div class="flex justify-between items-center mb-1">
-                    <p class="text-xs text-gray-500">LINE User ID (สำหรับระบบยิงข้อความ):</p>
-                    <span class="text-[10px] px-2 py-0.5 rounded-full font-bold ${s.userId ? 'bg-[#06C755]/20 text-[#06C755]' : 'bg-red-500/20 text-red-400'}">
-                        ${s.userId ? '✅ เชื่อมต่อแล้ว' : '❌ ไม่มีข้อมูล'}
-                    </span>
-                </div>
+                <div class="flex justify-between items-center mb-1"><p class="text-xs text-gray-500">LINE User ID (สำหรับระบบยิงข้อความ):</p><span class="text-[10px] px-2 py-0.5 rounded-full font-bold ${s.userId ? 'bg-[#06C755]/20 text-[#06C755]' : 'bg-red-500/20 text-red-400'}">${s.userId ? '✅ เชื่อมต่อแล้ว' : '❌ ไม่มีข้อมูล'}</span></div>
                 <p class="text-xs text-[#06C755] font-mono break-all bg-black/30 p-2 rounded border border-[#06C755]/30 select-all">${s.userId || 'ไม่สามารถยิงข้อความหาลูกค้ารายนี้ได้ เนื่องจากเป็นข้อมูลเก่า'}</p>
             </div>
-            
             <p class="text-xs text-gray-400 mt-2 mb-1">เอกสารแนบตอนสมัคร:</p>
             <div class="flex flex-wrap gap-2">
                 ${s.storePhoto ? `<button class="bg-gray-700 hover:bg-gray-600 px-3 py-1.5 rounded-lg text-xs transition border border-gray-500" onclick="openImageTab('${s.storePhoto}')">🖼️ รูปร้าน</button>` : '<span class="text-xs text-gray-600 border border-gray-700 px-3 py-1.5 rounded-lg">❌ ไม่มีรูปร้าน</span>'}
@@ -790,30 +686,13 @@
     }
 
     // --- Action Functions ---
-
     async function approveStore(index) {
-        let r = appData.registrationRequests[index]; 
-        let defaultPin = Math.floor(100000 + Math.random() * 900000).toString();
+        let r = appData.registrationRequests[index]; let defaultPin = Math.floor(100000 + Math.random() * 900000).toString();
         let customPin = prompt(`ตั้งรหัส PIN 6 หลัก สำหรับร้าน: ${r.storeName}\n\n(พิมพ์รหัสที่ต้องการ หรือกดยืนยันเพื่อใช้รหัสสุ่มด้านล่างนี้ได้เลย)`, defaultPin);
-        
         if (customPin === null || customPin.trim() === "") return; 
 
-        const newStore = { 
-            name: r.storeName, 
-            pin: customPin.trim(), 
-            userId: r.userId, 
-            phone: r.phone || 'ไม่ระบุ', 
-            refCode: r.refCode || '', 
-            isVIP: false, 
-            freePromoDays: 0,
-            hasPaidFirstComm: false, // ⚡ เช็คว่าเคยจ่ายค่าคอมเปิดร้านให้คนแนะนำหรือยัง
-            storePhoto: r.storePhoto || '',
-            idCard: r.idCard || '',
-            commercial: r.commercial || ''
-        };
-
-        appData.registeredStores.unshift(newStore); 
-        appData.registrationRequests.splice(index, 1);
+        const newStore = { name: r.storeName, pin: customPin.trim(), userId: r.userId, phone: r.phone || 'ไม่ระบุ', refCode: r.refCode || '', isVIP: false, freePromoDays: 0, hasPaidFirstComm: false, storePhoto: r.storePhoto || '', idCard: r.idCard || '', commercial: r.commercial || '' };
+        appData.registeredStores.unshift(newStore); appData.registrationRequests.splice(index, 1);
         await save();
         
         if (newStore.userId) {
@@ -826,36 +705,17 @@
         const store = appData.registeredStores[index];
         if (store && store.userId) {
             const lineMsg = `🔑 แจ้งเตือนจาก แอดมินไปไหนดี\n\nรหัส PIN ของร้าน ${store.name} คือ: ${store.pin}\n\nเข้าใช้งานระบบได้ที่: https://liff.line.me/2009598846-wiCUeV35`;
-            try {
-                showLoading(true);
-                const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "SEND_LINE_PIN", targetUserId: store.userId, message: lineMsg }) });
-                const result = await res.json();
-                if(result.result === "error") {
-                    alert("❌ ลูกค้าบล็อก LINE OA หรือเกิดข้อผิดพลาดในการส่ง");
-                } else {
-                    alert("✅ ส่งรหัส PIN กลับไปที่ LINE ลูกค้าเรียบร้อยแล้วครับ!");
-                }
-            } catch(e) { alert("❌ เกิดข้อผิดพลาดในการเชื่อมต่อ"); }
-            showLoading(false);
-        } else {
-            prompt(`⚠️ ร้านนี้เป็นข้อมูลเก่า (ไม่ได้ผูกบัญชี LINE ไว้)\nกรุณาก๊อปปี้รหัส PIN นี้เพื่อส่งให้ลูกค้าด้วยตัวเอง:`, store.pin);
-        }
+            try { showLoading(true); const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "SEND_LINE_PIN", targetUserId: store.userId, message: lineMsg }) }); const result = await res.json(); if(result.result === "error") { alert("❌ ลูกค้าบล็อก LINE OA หรือเกิดข้อผิดพลาดในการส่ง"); } else { alert("✅ ส่งรหัส PIN กลับไปที่ LINE ลูกค้าเรียบร้อยแล้วครับ!"); } } catch(e) { alert("❌ เกิดข้อผิดพลาดในการเชื่อมต่อ"); } showLoading(false);
+        } else { prompt(`⚠️ ร้านนี้เป็นข้อมูลเก่า (ไม่ได้ผูกบัญชี LINE ไว้)\nกรุณาก๊อปปี้รหัส PIN นี้เพื่อส่งให้ลูกค้าด้วยตัวเอง:`, store.pin); }
     }
 
     async function approveVipRequest(index) {
         const req = appData.pendingVipRequests[index]; const store = appData.registeredStores.find(s => s.name === req.storeName);
         if(store) { 
-            store.isVIP = true; 
-            store.vipExpireTimestamp = Date.now() + (30 * 24 * 60 * 60 * 1000); 
-            store.vipAutoRenew = false;
-            store.freePromoDays = 7; 
-
-            const vipPrice = appData.vipSettings.price || 500;
-            addCommissionToWallet(store, vipPrice);
-
+            store.isVIP = true; store.vipExpireTimestamp = Date.now() + (30 * 24 * 60 * 60 * 1000); store.vipAutoRenew = false; store.freePromoDays = 7; 
+            const vipPrice = appData.vipSettings.price || 500; addCommissionToWallet(store, vipPrice);
             appData.pendingVipRequests.splice(index, 1); 
             await save();
-            
             if (store.userId) {
                 const lineMsg = `👑 แจ้งเตือนจาก แอดมินไปไหนดี\n\nร้าน ${store.name} ได้รับการอนุมัติสถานะ VIP เรียบร้อยแล้วครับ!\n\n🎁 พิเศษ! คุณได้รับสิทธิ์โปรโมทแบนเนอร์หน้าร้านฟรี 7 วัน เข้าไปอัปเดตโปรโมชั่นได้เลยครับที่: https://liff.line.me/2009598846-wiCUeV35`;
                 try { await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "SEND_LINE_PIN", targetUserId: store.userId, message: lineMsg }) }); } catch(e) {}
@@ -866,43 +726,27 @@
 
     async function approvePromotion(i) {
         let p = appData.pendingPromotions[i]; p.storeName = document.getElementById(`editPStore_${i}`).value; p.province = document.getElementById(`editPProv_${i}`).value; p.category = document.getElementById(`editPCat_${i}`).value; p.detail = document.getElementById(`editPDetail_${i}`).value;
-        const existingIndex = appData.activePromotions.findIndex(act => act.storeName === p.storeName);
-        const store = appData.registeredStores.find(s => s.name === p.storeName);
-        let lineMsg = "";
-        let isUpdateAlert = false;
+        const existingIndex = appData.activePromotions.findIndex(act => act.storeName === p.storeName); const store = appData.registeredStores.find(s => s.name === p.storeName); let lineMsg = ""; let isUpdateAlert = false;
         
         if (p.isUpdateOnly && existingIndex !== -1) {
             appData.activePromotions[existingIndex].detail = p.detail; appData.activePromotions[existingIndex].image = p.image; appData.activePromotions[existingIndex].category = p.category; appData.activePromotions[existingIndex].province = p.province;
-            isUpdateAlert = true;
-            lineMsg = `📝 แจ้งเตือนจาก แอดมินไปไหนดี\n\nข้อมูลโปรโมชั่นแบนเนอร์ของร้าน ${p.storeName} ได้รับการอัปเดตใหม่เรียบร้อยแล้วครับ!`;
+            isUpdateAlert = true; lineMsg = `📝 แจ้งเตือนจาก แอดมินไปไหนดี\n\nข้อมูลโปรโมชั่นแบนเนอร์ของร้าน ${p.storeName} ได้รับการอัปเดตใหม่เรียบร้อยแล้วครับ!`;
         } else {
-            const svcName = document.getElementById(`editPServ_${i}`).value.split(' - ')[0]; 
-            p.service = svcName; 
-            const svc = (appData.services || []).find(s => s.name === p.service); 
-            const addDays = p.isFreeRedeem ? 7 : (svc && svc.days ? parseInt(svc.days) : 30); 
-            const addMs = addDays * 24 * 60 * 60 * 1000;
-            
-            if(existingIndex !== -1) { 
-                let existingPromo = appData.activePromotions[existingIndex]; let baseTime = (existingPromo.expireTimestamp && existingPromo.expireTimestamp > Date.now()) ? existingPromo.expireTimestamp : Date.now(); p.expireTimestamp = baseTime + addMs; appData.activePromotions[existingIndex] = p; 
+            const svcName = document.getElementById(`editPServ_${i}`).value.split(' - ')[0]; p.service = svcName; const svc = (appData.services || []).find(s => s.name === p.service); const addDays = p.isFreeRedeem ? 7 : (svc && svc.days ? parseInt(svc.days) : 30); const addMs = addDays * 24 * 60 * 60 * 1000;
+            if(existingIndex !== -1) { let existingPromo = appData.activePromotions[existingIndex]; let baseTime = (existingPromo.expireTimestamp && existingPromo.expireTimestamp > Date.now()) ? existingPromo.expireTimestamp : Date.now(); p.expireTimestamp = baseTime + addMs; appData.activePromotions[existingIndex] = p; 
             } else { p.expireTimestamp = Date.now() + addMs; appData.activePromotions.unshift(p); }
-            
-            if(!p.isFreeRedeem && svc) {
-                addCommissionToWallet(store, svc.price);
-            }
-
+            if(!p.isFreeRedeem && svc) { addCommissionToWallet(store, svc.price); }
             lineMsg = `🚀 แจ้งเตือนจาก แอดมินไปไหนดี\n\nแบนเนอร์โปรโมชั่นของร้าน ${p.storeName} ได้รับการอนุมัติและกำลังแสดงผลบนหน้าแอปแล้วครับ!\n(อายุการแสดงผลเพิ่มขึ้น ${addDays} วัน)`;
         }
 
         appData.pendingPromotions.splice(i, 1);
         await save();
 
-        if (store && store.userId) {
-            try { await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "SEND_LINE_PIN", targetUserId: store.userId, message: lineMsg }) }); } catch(e) {}
-        }
-        
+        if (store && store.userId) { try { await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "SEND_LINE_PIN", targetUserId: store.userId, message: lineMsg }) }); } catch(e) {} }
         alert(isUpdateAlert ? "✅ อนุมัติอัปเดตรูปและข้อความเรียบร้อย!" : "✅ อนุมัติแพ็กเกจและขึ้นแบนเนอร์เรียบร้อย!\nระบบได้แบ่งค่าคอมให้นายหน้าแล้ว (ถ้ามี)");
     }
 
+    function saveVipSettings() { appData.vipSettings.price = parseInt(document.getElementById('vipPriceSetting').value) || 500; appData.vipSettings.bankAccount = document.getElementById('vipBankSetting').value || ''; save(); alert("💾 บันทึกตั้งค่าระบบ VIP เรียบร้อยแล้ว!"); }
     function saveActivePromo(i) { let p = appData.activePromotions[i]; p.storeName = document.getElementById(`editAStore_${i}`).value; p.province = document.getElementById(`editAProv_${i}`).value; p.category = document.getElementById(`editACat_${i}`).value; p.detail = document.getElementById(`editADetail_${i}`).value; const newExpStr = document.getElementById(`editAExpire_${i}`).value; if(newExpStr) { p.expireTimestamp = new Date(newExpStr).getTime(); } save(); alert("💾 บันทึกการแก้ไขข้อมูลและเวลาเรียบร้อยแล้ว!"); }
     function deleteSelectedCategories() { const checkboxes = document.querySelectorAll('.cat-checkbox:checked'); if(checkboxes.length === 0) return alert('กรุณาเลือกหมวดหมู่ที่ต้องการลบอย่างน้อย 1 รายการ'); if(confirm('ยืนยันลบหมวดหมู่ที่เลือกทั้งหมดใช่หรือไม่?')) { const indices = Array.from(checkboxes).map(cb => parseInt(cb.value)).sort((a,b) => b - a); indices.forEach(idx => { appData.categories.splice(idx, 1); }); save(); } }
     function saveCategories() { appData.categories.forEach((c, i) => { c.group = document.getElementById(`editCGroup_${i}`).value; c.label = document.getElementById(`editCLabel_${i}`).value; c.keyword = document.getElementById(`editCKey_${i}`).value; }); save(); alert('💾 บันทึกการแก้ไขหมวดหมู่เรียบร้อยแล้ว!'); }
@@ -916,22 +760,6 @@
     function deleteItem(targetArray, index) { if(confirm('🗑️ ยืนยันการลบข้อมูลนี้ใช่หรือไม่?')) { appData[targetArray].splice(index, 1); save(); } }
     function openImageTab(base64Str) { const newWindow = window.open(); if (newWindow) { newWindow.document.write(`<html><body style="margin:0; background:#121418; display:flex; align-items:center; justify-content:center; height:100vh;"><img src="${base64Str}" style="max-width:95%; max-height:95vh; border-radius:12px;"></body></html>`); } }
     function showLoading(show) { document.getElementById('loading').style.display = show ? 'flex' : 'none'; }
-
-    setInterval(async () => {
-        if (sessionStorage.getItem('adminLoggedIn') !== 'true') return;
-
-        const isTyping = document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA';
-        if (!isTyping && document.getElementById('loading').style.display === 'none') {
-            try {
-                const doc = await db.collection('painaidee').doc('systemData').get();
-                if (doc.exists) { 
-                    appData = { ...appData, ...doc.data() }; 
-                    ['registrationRequests','registeredStores','pendingPromotions','activePromotions','mainCategories','categories','closedReports','blacklistedPlaces','services','pendingVipRequests','affiliateWallets','withdrawalRequests'].forEach(key => { if(!appData[key]) appData[key] = []; });
-                    render(); 
-                }
-            } catch (e) { console.log("Auto-refresh failed", e); }
-        }
-    }, 10000);
 </script>
 </body>
 </html>
