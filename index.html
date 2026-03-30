@@ -543,11 +543,19 @@
                 document.getElementById('loginOverlay').style.display = 'none'; document.getElementById('appContent').style.display = 'block';
                 updateWalletUI(); 
                 
+               // --- ส่วนที่ต้องหาและวางทับในฟังก์ชัน initSystem() ---
                 const savedRef = sessionStorage.getItem('savedRefCode');
                 if (savedRef && document.getElementById('regRefCode')) { if (savedRef.toUpperCase() !== myCode.toUpperCase()) { document.getElementById('regRefCode').value = savedRef; } }
 
-                if (targetPage === 'partner') { setTimeout(() => { navigateToPartner(); }, 300); }
-                if (targetPage === 'affiliate') { setTimeout(() => { navigateToAffiliate(); }, 300); }
+                // ⚡ ล็อกเป้าหมายการเด้งหน้า (มาทางไหน ให้อยู่หน้านั้น 100%)
+                if (targetPage === 'partner') { 
+                    setTimeout(() => { navigateToPartner(); }, 300); 
+                } else if (targetPage === 'affiliate') { 
+                    setTimeout(() => { navigateToAffiliate(); }, 300); 
+                } else {
+                    // ถ้าล็อกอินจากหน้าแรก หรือไม่ระบุหน้า ให้บังคับกลับมาหน้าแรกเสมอ!
+                    setTimeout(() => { switchPage('home'); }, 300); 
+                }
 
             } else {
                 isAppReady = true; document.getElementById('header-profile').innerHTML = `<div style="font-size: 50px; line-height: 100px; text-align: center;">👤</div>`;
@@ -558,7 +566,7 @@
             console.error("LIFF Init Error:", err); isAppReady = true; document.getElementById('header-profile').innerHTML = `<div style="font-size: 50px; line-height: 100px; text-align: center;">👤</div>`; showLoginCard();
         }
     }
-
+            
     function updateWalletUI() {
         if(!window.myAffCode) return;
         const wallets = appData.affiliateWallets || []; const myWallet = wallets.find(w => w.refCode === window.myAffCode); const balance = myWallet ? myWallet.balance : 0;
