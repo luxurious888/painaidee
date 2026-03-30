@@ -212,29 +212,56 @@
             
             <div class="bg-[#2A2E36] p-5 rounded-xl border border-cyan-600/50 shadow-lg mb-8 relative overflow-hidden">
                 <div class="absolute top-0 right-0 bg-cyan-600 text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg">SETTING</div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                
+                <h3 class="text-white font-bold mb-3 border-b border-gray-700 pb-2">👑 ค่าคอมมิชชั่น: ระบบสมัคร VIP</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     <div class="bg-[#1A1D23] p-4 rounded-lg border border-gray-600">
-                        <label class="block text-[#FFD700] text-sm mb-2 font-bold">🎯 แนะนำครั้งแรก (ร้านใหม่จ่ายเงินครั้งแรก)</label>
+                        <label class="block text-[#FFD700] text-sm mb-2 font-bold">🎯 สมัคร VIP ครั้งแรก</label>
                         <div class="flex gap-2">
-                            <select id="affFirstType" class="input-dark w-1/3 text-center font-bold">
+                            <select id="vipFirstType" class="input-dark w-1/3 text-center font-bold">
                                 <option value="fixed">บาท (฿)</option>
                                 <option value="percent">เปอร์เซ็น (%)</option>
                             </select>
-                            <input type="number" id="affFirstVal" class="input-dark w-2/3 text-xl font-bold text-white py-2" placeholder="จำนวน">
+                            <input type="number" id="vipFirstVal" class="input-dark w-2/3 text-xl font-bold text-white py-2" placeholder="จำนวน">
                         </div>
                     </div>
                     <div class="bg-[#1A1D23] p-4 rounded-lg border border-gray-600">
-                        <label class="block text-cyan-400 text-sm mb-2 font-bold">🔄 ผลตอบแทนต่อเนื่อง (ร้านเดิมต่ออายุแพ็กเกจ)</label>
+                        <label class="block text-cyan-400 text-sm mb-2 font-bold">🔄 ต่ออายุ VIP เดือนถัดไป</label>
                         <div class="flex gap-2">
-                            <select id="affRecurType" class="input-dark w-1/3 text-center font-bold">
+                            <select id="vipRecurType" class="input-dark w-1/3 text-center font-bold">
                                 <option value="percent">เปอร์เซ็น (%)</option>
                                 <option value="fixed">บาท (฿)</option>
                             </select>
-                            <input type="number" id="affRecurVal" class="input-dark w-2/3 text-xl font-bold text-white py-2" placeholder="จำนวน">
+                            <input type="number" id="vipRecurVal" class="input-dark w-2/3 text-xl font-bold text-white py-2" placeholder="จำนวน">
                         </div>
                     </div>
                 </div>
-                <div class="flex flex-col md:flex-row gap-4 items-end">
+
+                <h3 class="text-white font-bold mb-3 border-b border-gray-700 pb-2">🚀 ค่าคอมมิชชั่น: ซื้อแพ็กเกจโปรโมทแบนเนอร์</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-[#1A1D23] p-4 rounded-lg border border-gray-600">
+                        <label class="block text-[#FFD700] text-sm mb-2 font-bold">🎯 ซื้อแพ็กเกจครั้งแรก</label>
+                        <div class="flex gap-2">
+                            <select id="promoFirstType" class="input-dark w-1/3 text-center font-bold">
+                                <option value="fixed">บาท (฿)</option>
+                                <option value="percent">เปอร์เซ็น (%)</option>
+                            </select>
+                            <input type="number" id="promoFirstVal" class="input-dark w-2/3 text-xl font-bold text-white py-2" placeholder="จำนวน">
+                        </div>
+                    </div>
+                    <div class="bg-[#1A1D23] p-4 rounded-lg border border-gray-600">
+                        <label class="block text-cyan-400 text-sm mb-2 font-bold">🔄 ซื้อแพ็กเกจครั้งถัดไป</label>
+                        <div class="flex gap-2">
+                            <select id="promoRecurType" class="input-dark w-1/3 text-center font-bold">
+                                <option value="percent">เปอร์เซ็น (%)</option>
+                                <option value="fixed">บาท (฿)</option>
+                            </select>
+                            <input type="number" id="promoRecurVal" class="input-dark w-2/3 text-xl font-bold text-white py-2" placeholder="จำนวน">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col md:flex-row gap-4 items-end mt-4 pt-4 border-t border-gray-700">
                     <div class="w-full md:w-1/2">
                         <label class="block text-green-400 text-sm mb-2 font-bold">🏧 ยอดถอนเงินขั้นต่ำ (บาท)</label>
                         <input type="number" id="affMinWithdraw" class="input-dark text-xl font-bold text-green-400 py-2" placeholder="เช่น 300">
@@ -358,7 +385,11 @@
         activePromotions: [], mainCategories: [], categories: [], closedReports: [], 
         blacklistedPlaces: [], services: [], pendingVipRequests: [], 
         vipSettings: { price: 500, bankAccount: 'กสิกรไทย 123-x-xxxxx-x ชื่อบัญชี' }, 
-        affiliateSettings: { firstTimeType: 'fixed', firstTimeValue: 100, recurringType: 'percent', recurringValue: 10, minWithdrawal: 300 }, 
+        affiliateSettings: { 
+            vipFirstType: 'fixed', vipFirstVal: 100, vipRecurType: 'percent', vipRecurVal: 10,
+            promoFirstType: 'fixed', promoFirstVal: 50, promoRecurType: 'percent', promoRecurVal: 5,
+            minWithdrawal: 300 
+        }, 
         affiliateWallets: [], withdrawalRequests: [] 
     };
 
@@ -411,7 +442,7 @@
             if (!appData.mainCategories || appData.mainCategories.length === 0) appData.mainCategories = JSON.parse(JSON.stringify(defaultMainCats));
             if (!appData.categories || appData.categories.length === 0) appData.categories = JSON.parse(JSON.stringify(defaultCategories));
             if (!appData.vipSettings) appData.vipSettings = { price: 500, bankAccount: 'กสิกรไทย 123-4-56789-0 (ไปไหนดี)' };
-            if (!appData.affiliateSettings) appData.affiliateSettings = { firstTimeType: 'fixed', firstTimeValue: 100, recurringType: 'percent', recurringValue: 10, minWithdrawal: 300 };
+            if (!appData.affiliateSettings) appData.affiliateSettings = { vipFirstType: 'fixed', vipFirstVal: 100, vipRecurType: 'percent', vipRecurVal: 10, promoFirstType: 'fixed', promoFirstVal: 50, promoRecurType: 'percent', promoRecurVal: 5, minWithdrawal: 300 };
             
             ['registrationRequests','registeredStores','pendingPromotions','activePromotions','mainCategories','categories','closedReports','blacklistedPlaces','services','pendingVipRequests','affiliateWallets','withdrawalRequests'].forEach(key => { if(!appData[key]) appData[key] = []; });
             
@@ -602,17 +633,48 @@
         } 
     }
 
-    function addCommissionToWallet(store, packageAmount) {
+    // ⚡ ระบบคำนวณเงินใหม่ (แยก VIP กับ Promo)
+    function addCommissionToWallet(store, packageAmount, type) {
         if (!store || !store.refCode || store.refCode.trim() === '') return;
-        const refCode = store.refCode; const set = appData.affiliateSettings || { firstTimeType: 'fixed', firstTimeValue: 100, recurringType: 'percent', recurringValue: 10 };
-        let commAmount = 0;
-        if (!store.hasPaidFirstComm) { 
-            commAmount = set.firstTimeType === 'percent' ? (packageAmount * set.firstTimeValue / 100) : set.firstTimeValue; 
-            store.hasPaidFirstComm = true; 
-        } else { 
-            commAmount = set.recurringType === 'percent' ? (packageAmount * set.recurringValue / 100) : set.recurringValue; 
+        const refCode = store.refCode; 
+        const set = appData.affiliateSettings || {};
+
+        // โค้ดรองรับข้อมูลเก่า
+        if (set.firstTimeType && !set.vipFirstType) {
+            set.vipFirstType = set.firstTimeType; set.vipFirstVal = set.firstTimeValue;
+            set.vipRecurType = set.recurringType; set.vipRecurVal = set.recurringValue;
+            set.promoFirstType = set.firstTimeType; set.promoFirstVal = set.firstTimeValue;
+            set.promoRecurType = set.recurringType; set.promoRecurVal = set.recurringValue;
         }
-        if (commAmount <= 0) return;
+
+        let commAmount = 0;
+        let isFirstTime = false;
+
+        if (type === 'vip') {
+            if (!store.hasPaidVipComm) {
+                commAmount = set.vipFirstType === 'percent' ? (packageAmount * set.vipFirstVal / 100) : set.vipFirstVal;
+                store.hasPaidVipComm = true; store.hasPaidFirstComm = true; isFirstTime = true;
+            } else {
+                commAmount = set.vipRecurType === 'percent' ? (packageAmount * set.vipRecurVal / 100) : set.vipRecurVal;
+            }
+        } else if (type === 'promo') {
+            if (!store.hasPaidPromoComm) {
+                commAmount = set.promoFirstType === 'percent' ? (packageAmount * set.promoFirstVal / 100) : set.promoFirstVal;
+                store.hasPaidPromoComm = true; store.hasPaidFirstComm = true; isFirstTime = true;
+            } else {
+                commAmount = set.promoRecurType === 'percent' ? (packageAmount * set.promoRecurVal / 100) : set.promoRecurVal;
+            }
+        }
+
+        // จัดการกรณีข้อมูลร้านค้าเก่าที่เคยจ่ายค่าแรกเข้าแบบรวมไปแล้ว ให้ถือว่าครั้งต่อไปเป็นการต่ออายุ
+        if (!isFirstTime && !store.hasPaidVipComm && !store.hasPaidPromoComm && store.hasPaidFirstComm) {
+            store.hasPaidVipComm = true; store.hasPaidPromoComm = true;
+            if (type === 'vip') commAmount = set.vipRecurType === 'percent' ? (packageAmount * set.vipRecurVal / 100) : set.vipRecurVal;
+            if (type === 'promo') commAmount = set.promoRecurType === 'percent' ? (packageAmount * set.promoRecurVal / 100) : set.promoRecurVal;
+        }
+
+        if (commAmount <= 0 || isNaN(commAmount)) return;
+
         if (!appData.affiliateWallets) appData.affiliateWallets = [];
         let wallet = appData.affiliateWallets.find(w => w.refCode === refCode);
         if (!wallet) { wallet = { refCode: refCode, balance: 0, totalEarned: 0 }; appData.affiliateWallets.push(wallet); }
@@ -620,11 +682,25 @@
     }
 
     function renderAffiliate() {
-        const affSet = appData.affiliateSettings || { firstTimeType: 'fixed', firstTimeValue: 100, recurringType: 'percent', recurringValue: 10, minWithdrawal: 300 };
-        document.getElementById('affFirstType').value = affSet.firstTimeType || 'fixed'; 
-        document.getElementById('affFirstVal').value = affSet.firstTimeValue !== undefined ? affSet.firstTimeValue : 100; 
-        document.getElementById('affRecurType').value = affSet.recurringType || 'percent'; 
-        document.getElementById('affRecurVal').value = affSet.recurringValue !== undefined ? affSet.recurringValue : 10; 
+        const affSet = appData.affiliateSettings || {};
+        
+        // รองรับข้อมูลเก่า
+        const vFT = affSet.vipFirstType || affSet.firstTimeType || 'fixed';
+        const vFV = affSet.vipFirstVal !== undefined ? affSet.vipFirstVal : (affSet.firstTimeValue !== undefined ? affSet.firstTimeValue : 100);
+        const vRT = affSet.vipRecurType || affSet.recurringType || 'percent';
+        const vRV = affSet.vipRecurVal !== undefined ? affSet.vipRecurVal : (affSet.recurringValue !== undefined ? affSet.recurringValue : 10);
+
+        const pFT = affSet.promoFirstType || affSet.firstTimeType || 'fixed';
+        const pFV = affSet.promoFirstVal !== undefined ? affSet.promoFirstVal : (affSet.firstTimeValue !== undefined ? affSet.firstTimeValue : 50);
+        const pRT = affSet.promoRecurType || affSet.recurringType || 'percent';
+        const pRV = affSet.promoRecurVal !== undefined ? affSet.promoRecurVal : (affSet.recurringValue !== undefined ? affSet.recurringValue : 5);
+
+        document.getElementById('vipFirstType').value = vFT; document.getElementById('vipFirstVal').value = vFV; 
+        document.getElementById('vipRecurType').value = vRT; document.getElementById('vipRecurVal').value = vRV; 
+
+        document.getElementById('promoFirstType').value = pFT; document.getElementById('promoFirstVal').value = pFV; 
+        document.getElementById('promoRecurType').value = pRT; document.getElementById('promoRecurVal').value = pRV; 
+
         document.getElementById('affMinWithdraw').value = affSet.minWithdrawal || 300;
         
         const withdrawList = document.getElementById('withdrawalList'); 
@@ -684,10 +760,14 @@
 
     function saveAffiliateSettings() { 
         appData.affiliateSettings = { 
-            firstTimeType: document.getElementById('affFirstType').value, 
-            firstTimeValue: parseFloat(document.getElementById('affFirstVal').value) || 0, 
-            recurringType: document.getElementById('affRecurType').value, 
-            recurringValue: parseFloat(document.getElementById('affRecurVal').value) || 0, 
+            vipFirstType: document.getElementById('vipFirstType').value, 
+            vipFirstVal: parseFloat(document.getElementById('vipFirstVal').value) || 0, 
+            vipRecurType: document.getElementById('vipRecurType').value, 
+            vipRecurVal: parseFloat(document.getElementById('vipRecurVal').value) || 0, 
+            promoFirstType: document.getElementById('promoFirstType').value, 
+            promoFirstVal: parseFloat(document.getElementById('promoFirstVal').value) || 0, 
+            promoRecurType: document.getElementById('promoRecurType').value, 
+            promoRecurVal: parseFloat(document.getElementById('promoRecurVal').value) || 0, 
             minWithdrawal: parseInt(document.getElementById('affMinWithdraw').value) || 300 
         }; 
         save(); alert("💾 บันทึกการตั้งค่าเรทค่าคอมมิชชั่นเรียบร้อยแล้ว!"); 
@@ -732,6 +812,7 @@
         const newStore = { 
             name: r.storeName, pin: customPin.trim(), userId: r.userId, phone: r.phone || 'ไม่ระบุ', 
             refCode: r.refCode || '', isVIP: false, freePromoDays: 0, hasPaidFirstComm: false, 
+            hasPaidVipComm: false, hasPaidPromoComm: false, // ⚡ เพิ่มฟิลด์แยกจ่าย
             storePhoto: r.storePhoto || '', idCard: r.idCard || '', commercial: r.commercial || '' 
         };
         
@@ -762,7 +843,11 @@
         const req = appData.pendingVipRequests[index]; const store = appData.registeredStores.find(s => s.name === req.storeName);
         if(store) { 
             store.isVIP = true; store.vipExpireTimestamp = Date.now() + (30 * 24 * 60 * 60 * 1000); store.vipAutoRenew = false; store.freePromoDays = 7; 
-            const vipPrice = appData.vipSettings.price || 500; addCommissionToWallet(store, vipPrice);
+            const vipPrice = appData.vipSettings.price || 500; 
+            
+            // ⚡ แยกจ่ายคอมมิชชั่นของฝั่ง VIP
+            addCommissionToWallet(store, vipPrice, 'vip');
+            
             appData.pendingVipRequests.splice(index, 1); 
             await save();
             
@@ -806,7 +891,8 @@
                 p.expireTimestamp = Date.now() + addMs; appData.activePromotions.unshift(p); 
             }
             
-            if(!p.isFreeRedeem && svc) { addCommissionToWallet(store, svc.price); }
+            // ⚡ แยกจ่ายคอมมิชชั่นของฝั่ง Promo
+            if(!p.isFreeRedeem && svc) { addCommissionToWallet(store, svc.price, 'promo'); }
             lineMsg = `🚀 แจ้งเตือนจาก แอดมินไปไหนดี\n\nแบนเนอร์โปรโมชั่นของร้าน ${p.storeName} ได้รับการอนุมัติและกำลังแสดงผลบนหน้าแอปแล้วครับ!\n(อายุการแสดงผลเพิ่มขึ้น ${addDays} วัน)`;
         }
 
