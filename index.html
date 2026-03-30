@@ -32,8 +32,7 @@
         .search-box-container { display: flex; gap: 12px; width: 100%; }
         .btn-primary { padding: 14px 24px; background: var(--primary); color: white; border: none; border-radius: 10px; font-family: 'Kanit'; font-weight: 500; font-size: 15px; cursor: pointer; transition: 0.3s; white-space: nowrap; width: 100%; box-shadow: 0 4px 10px rgba(197, 160, 89, 0.3); }
         .btn-primary:hover { background: var(--primary-hover); transform: translateY(-2px); }
-        .btn-secondary { background: var(--dark); color: var(--primary); padding: 12px 15px; border-radius: 10px; border: 1px solid var(--primary); cursor: pointer; font-family: 'Kanit'; font-weight: 500; text-align: center; transition: 0.3s; text-decoration: none; display: inline-block;}
-        .btn-secondary:hover { background: var(--primary); color: white; transform: translateY(-2px); }
+        .btn-secondary { background: var(--dark); color: var(--primary); padding: 12px 15px; border-radius: 10px; border: 1px solid var(--primary); cursor: pointer; font-family: 'Kanit'; font-weight: 500; text-align: center; transition: 0.3s; display: inline-block;}
         .btn-outline { background: transparent; color: var(--primary); border: 1px solid var(--border); padding: 10px 15px; border-radius: 10px; cursor: pointer; font-family: 'Kanit'; font-weight: 500; transition: 0.3s; }
         .btn-outline:hover { border-color: var(--primary); background: rgba(197, 160, 89, 0.1); }
         .place-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; margin-top: 24px; }
@@ -47,25 +46,20 @@
         .btn-action { flex: 1; text-align: center; color: white; text-decoration: none; padding: 10px 5px; border-radius: 10px; font-weight: 500; font-size: 12px; transition: 0.3s; border: none; cursor: pointer; font-family: 'Kanit'; min-width: 30%; }
         .btn-nav { background: #4285F4 !important; color: #FFF !important; border: none !important; font-weight: 600; box-shadow: 0 4px 10px rgba(66, 133, 244, 0.3); }
         .btn-call { background: var(--primary); color: white; }
+        .btn-line { background: #06C755 !important; color: #FFF !important; border: none !important; font-weight: 600;}
+        .btn-fb { background: #1877F2 !important; color: #FFF !important; border: none !important; font-weight: 600;}
         .btn-share { background: transparent; color: var(--text-gold); border: 1px solid var(--border); }
         .status-tag { display: inline-flex; align-items: center; justify-content: center; padding: 4px 8px; border-radius: 20px; font-size: 11px; font-weight: 500; white-space: nowrap; box-shadow: 0 2px 5px rgba(0,0,0,0.2); line-height: 1.2; }
         .card-vip { border: 2px solid #FFD700 !important; box-shadow: 0 0 20px rgba(255, 215, 0, 0.25) !important; transform: translateY(-2px); }
         .card-vip:hover { box-shadow: 0 15px 40px rgba(255, 215, 0, 0.4) !important; border-color: #FFF !important; }
         .vip-crown-badge { position: absolute; top: -10px; left: -10px; background: linear-gradient(135deg, #FFD700, #C5A059, #FFD700); color: #000; padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: 800; z-index: 15; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border: 2px solid #FFF; animation: pulseGlow 2s infinite; pointer-events: none; }
         @keyframes pulseGlow { 0% { box-shadow: 0 0 10px rgba(255,215,0,0.4); } 50% { box-shadow: 0 0 20px rgba(255,215,0,0.8); } 100% { box-shadow: 0 0 10px rgba(255,215,0,0.4); } }
-        .btn-line { background: #06C755 !important; color: #FFF !important; border: none !important; font-weight: 600;}
-        .btn-fb { background: #1877F2 !important; color: #FFF !important; border: none !important; font-weight: 600;}
-        @keyframes shine { 100% { left: 125%; } }
-        .shine-effect::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%); transform: skewX(-25deg); animation: shine 3s infinite; pointer-events: none; z-index: 5; }
-        .promo-btn-hover:hover { filter: brightness(1.1); transform: translateY(-2px); }
+        .btn-line-glow { background: linear-gradient(90deg, #06C755, #05A044); color: white; border: none; padding: 14px 20px; border-radius: 12px; font-family: 'Kanit'; font-weight: 600; font-size: 16px; width: 100%; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 8px 20px rgba(6, 199, 85, 0.4); }
         .highlight-banner { background: linear-gradient(135deg, var(--dark), var(--dark-light)); color: white; padding: 25px; border-radius: 16px; margin-top: 24px; box-shadow: 0 15px 35px rgba(26, 28, 32, 0.4); display: none; position: relative; overflow: hidden; border: 1px solid var(--border); }
-        .highlight-banner::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(197,160,89,0.15) 0%, transparent 60%); pointer-events: none; }
-        .highlight-banner h3 { margin: 0 0 5px 0; font-size: 20px; color: var(--primary); font-weight: 500; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
         .dashboard-card { background: var(--surface); padding: 25px; border-radius: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); margin-bottom: 24px; border: 1px solid var(--border); }
         .dashboard-card h3 { margin-top: 0; color: var(--primary-light); border-bottom: 2px solid var(--border); padding-bottom: 12px; font-weight: 500; }
         .form-group { margin-bottom: 22px; }
         .form-group label { display: block; font-weight: 500; font-size: 15px; color: #FFF; margin-bottom: 4px; }
-        .form-group .hint { font-size: 12.5px; color: var(--text-muted); margin-top: 0; margin-bottom: 10px; line-height: 1.4; }
         
         #loginOverlay { position: fixed; inset: 0; background: #0b0f19; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
         .bg-glow { position: absolute; width: 400px; height: 400px; background: radial-gradient(circle, rgba(6,199,85,0.15) 0%, transparent 70%); border-radius: 50%; top: -10%; left: -20%; animation: floatGlow 8s infinite alternate; }
@@ -75,16 +69,11 @@
         .glass-card { background: rgba(20, 24, 32, 0.6); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); border-top: 1px solid rgba(197, 160, 89, 0.4); box-shadow: 0 25px 50px rgba(0,0,0,0.5); padding: 35px 25px; border-radius: 24px; text-align: center; width: 90%; max-width: 360px; z-index: 10; animation: slideUpFade 0.6s ease-out; }
         @keyframes slideUpFade { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
         .logo-circle { width: 110px; height: 110px; border-radius: 50%; background: linear-gradient(135deg, #1A1D23, #0b0f19); border: 2px solid #C5A059; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 0 25px rgba(197,160,89,0.4), inset 0 0 15px rgba(197,160,89,0.2); }
-        .logo-text { color: #FFD700; font-family: 'Kanit'; font-weight: 700; font-size: 26px; line-height: 1.1; text-shadow: 0 0 10px rgba(255,215,0,0.5); margin: 0; }
-        .btn-enter-glow { background: linear-gradient(135deg, #FFD700, #C5A059); color: #000; border: none; padding: 14px 20px; border-radius: 12px; font-family: 'Kanit'; font-weight: 600; font-size: 16px; width: 100%; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; position: relative; overflow: hidden; box-shadow: 0 8px 20px rgba(197, 160, 89, 0.4); animation: pulse-gold 2.5s infinite; box-sizing: border-box; }
-        .btn-enter-glow:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(197, 160, 89, 0.6); }
-        .btn-enter-glow::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, transparent, rgba(255,255,255,0.4), transparent); transform: skewX(-25deg); animation: shineBtn 3s infinite; }
-        .btn-line-glow { background: linear-gradient(90deg, #06C755, #05A044); color: white; border: none; padding: 14px 20px; border-radius: 12px; font-family: 'Kanit'; font-weight: 600; font-size: 16px; width: 100%; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; position: relative; overflow: hidden; box-shadow: 0 8px 20px rgba(6, 199, 85, 0.4); box-sizing: border-box; }
-        .btn-line-glow:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(6, 199, 85, 0.6); }
+        .logo-text { color: #FFD700; font-family: 'Kanit'; font-weight: 700; font-size: 26px; line-height: 1.1; margin: 0; }
+        .btn-enter-glow { background: linear-gradient(135deg, #FFD700, #C5A059); color: #000; border: none; padding: 14px 20px; border-radius: 12px; font-family: 'Kanit'; font-weight: 600; font-size: 16px; width: 100%; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 8px 20px rgba(197, 160, 89, 0.4); }
+        
         #partner-friend-blocker { display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 50px 20px; background: var(--surface); border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         #partner-actual-content { display: none; }
-        .line-logo-vertical { width: 100px; height: auto; margin-bottom: 25px; }
-        .friend-note { color: #FFF; font-size: 16px; font-weight: 400; line-height: 1.6; max-width: 300px; margin-bottom: 30px; }
         .spinner { width: 50px; height: 50px; border: 5px solid rgba(197,160,89,0.2); border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         #appContent { display: none; }
@@ -92,7 +81,7 @@
         .promo-carousel::-webkit-scrollbar { display: none; }
         .promo-item { flex: 0 0 85%; max-width: 340px; scroll-snap-align: center; }
         
-        /* ⚡ CSS สำหรับ Image Modal และ Slider */
+        /* ⚡ CSS สำหรับ Image Modal, Slider และ ระบบจัดการคูปอง/กิจกรรม */
         #imageViewerModal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:999999; flex-direction:column; justify-content:center; align-items:center; animation: fadeIn 0.3s ease; }
         #imageViewerModal img { max-width:95%; max-height:85vh; object-fit:contain; border-radius:12px; box-shadow:0 0 30px rgba(0,0,0,0.8); }
         .close-modal-btn { position:absolute; top:20px; right:20px; color:white; background:rgba(255,255,255,0.2); width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:24px; cursor:pointer; transition:0.3s; z-index: 10; }
@@ -100,11 +89,11 @@
         .promo-slider-container { position:relative; width:100%; height:180px; overflow:hidden; background:#000; pointer-events:auto; }
         .slide-item { position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; transition:opacity 0.8s ease-in-out; cursor:pointer; }
         .slide-indicator { position:absolute; bottom:8px; right:8px; background:rgba(0,0,0,0.6); color:#fff; font-size:11px; padding:3px 8px; border-radius:12px; z-index:10; font-weight:bold; letter-spacing: 1px; backdrop-filter: blur(4px); pointer-events:none; }
-        
+        .vip-lock-box { background: rgba(255,255,255,0.05); border: 1px dashed #555; padding: 20px; border-radius: 12px; text-align: center; margin-top: 15px; }
+
         /* ⚡ Popup Modals สำหรับคูปองและกิจกรรม */
         .feature-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:99999; flex-direction:column; justify-content:center; align-items:center; padding: 20px; animation: fadeIn 0.2s ease; }
         .feature-modal-content { background:var(--surface); border:1px solid var(--primary); padding:25px; border-radius:16px; width:100%; max-width:350px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
-        .vip-lock-box { background: rgba(255,255,255,0.05); border: 1px dashed #555; padding: 20px; border-radius: 12px; text-align: center; margin-top: 15px; }
     </style>
 </head>
 <body>
@@ -117,8 +106,8 @@
 <div id="couponModal" class="feature-modal">
     <div class="feature-modal-content">
         <h3 style="margin-top:0; color:#D9534F;">🎟️ จัดการคูปองส่วนลด</h3>
-        <p style="font-size:13px; color:#aaa;">ตั้งค่าข้อความคูปองให้ลูกค้าเห็นเด่นชัดบนแผนที่</p>
-        <input type="text" id="couponText" placeholder="เช่น ลด 10% เมื่อแสดงแอป" style="margin-bottom:15px; border-color:#D9534F;">
+        <p style="font-size:13px; color:#aaa;">ตั้งค่าข้อความคูปองให้ลูกค้าเห็นเด่นชัด (ปล่อยว่างเพื่อปิดคูปอง)</p>
+        <input type="text" id="couponText" placeholder="เช่น ลด 10% เมื่อแสดงแอป" style="margin-bottom:15px; border-color:#D9534F; color:#FFF;">
         <div style="display:flex; gap:10px;">
             <button class="btn-primary" style="flex:2; background:#D9534F; color:#FFF;" onclick="saveCoupon()">💾 บันทึก</button>
             <button class="btn-outline" style="flex:1; border-color:#D9534F; color:#D9534F;" onclick="deleteCoupon()">🗑️ ลบ</button>
@@ -130,8 +119,8 @@
 <div id="eventModal" class="feature-modal">
     <div class="feature-modal-content">
         <h3 style="margin-top:0; color:#17a2b8;">🎉 กิจกรรมวันนี้</h3>
-        <p style="font-size:13px; color:#aaa;">โปรโมทอีเวนต์ด่วนๆ วันนี้ให้ลูกค้าทราบ</p>
-        <input type="text" id="eventText" placeholder="เช่น 20:00 น. พบกับดนตรีสด!" style="margin-bottom:15px; border-color:#17a2b8;">
+        <p style="font-size:13px; color:#aaa;">โปรโมทอีเวนต์ด่วนๆ วันนี้ (ปล่อยว่างเพื่อปิดกิจกรรม)</p>
+        <input type="text" id="eventText" placeholder="เช่น 20:00 น. พบกับดนตรีสด!" style="margin-bottom:15px; border-color:#17a2b8; color:#FFF;">
         <div style="display:flex; gap:10px;">
             <button class="btn-primary" style="flex:2; background:#17a2b8; color:#FFF;" onclick="saveEvent()">💾 บันทึก</button>
             <button class="btn-outline" style="flex:1; border-color:#17a2b8; color:#17a2b8;" onclick="deleteEvent()">🗑️ ลบ</button>
@@ -285,7 +274,7 @@
 
     <div id="page-partner" class="page">
         <div id="partner-friend-blocker" style="display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 50px 20px; background: var(--surface); border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
-            <img src="https://official-static.line-scdn.net/branding/logo-vertical.png" alt="LINE Official Account" style="width: 100px; margin-bottom: 25px;">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/LINE_logo.svg" alt="LINE Official Account" style="width: 80px; margin-bottom: 25px;">
             <div style="color: #FFF; font-size: 16px; font-weight: 400; line-height: 1.6; max-width: 300px; margin-bottom: 30px;"><span style="color:var(--primary); font-weight:600;">⚠️ สำหรับร้านค้า</span><br>กรุณาเข้าใช้งานผ่านแอป LINE<br>เพื่อรับรหัส PIN ในการจัดการร้านครับ</div>
             <button class="btn-line-glow" style="width: auto; padding: 14px 24px; animation: none;" onclick="smartLogin('partner')">📱 เปิดใช้งานผ่านแอป LINE</button>
             <button class="btn-outline" style="margin-top: 20px; font-size: 13px; border-color:var(--dark-muted); color:var(--text-muted);" onclick="checkFriendshipForPartner(true)">ฉันเพิ่มเพื่อนแล้ว ตรวจสอบอีกครั้ง</button>
@@ -449,7 +438,6 @@
 
     let appData = { registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], mainCategories: [], categories: [], closedReports: [], blacklistedPlaces: [], services: [], pendingVipRequests: [], affiliateWallets: [], withdrawalRequests: [] };
 
-    // ⚡ ปรับขนาดรูปเป็น HD (1200px) และคุณภาพ 85% ให้ชัดแจ๋ว
     const resizeImg = (file) => new Promise((resolve) => {
         if(!file) return resolve('');
         const reader = new FileReader(); reader.readAsDataURL(file);
@@ -478,7 +466,6 @@
         try { await fetch(API_URL, { method: 'POST', body: JSON.stringify({ telegramMsg: msg }) }); } catch(e) {}
     }
 
-    // ⚡ ดูรูปเต็มจอ
     function openImageModal(src) {
         document.getElementById('viewerImg').src = src;
         document.getElementById('imageViewerModal').style.display = 'flex';
@@ -506,20 +493,23 @@
         try { await db.collection('painaidee').doc('systemData').set(appData); return true; } catch(e) { throw e; }
     }
 
-    // ⚡ แก้ไขให้ล็อกอิน LINE ทำงานสมบูรณ์ด้วยวิธีเดิม
+    // ⚡ แก้ไข SmartLogin (วิธีแก้โค้ดวนลูป + เตะเข้าแอป LINE ทันที)
     function smartLogin(targetPage) {
         let baseUrl = window.location.href.split('?')[0];
         let pageParam = targetPage ? '?page=' + targetPage : '';
 
         if (liff.isInClient()) {
-            liff.login({ redirectUri: baseUrl + pageParam });
+            if (!liff.isLoggedIn()) {
+                liff.login();
+            } else {
+                if(targetPage) switchPage(targetPage);
+            }
         } else {
             let liffUrl = 'https://liff.line.me/2009598846-wiCUeV35' + pageParam;
             window.location.href = liffUrl;
         }
     }
 
-    // ⚡ เก็บสถิติ (แยก Database) 
     async function trackAction(storeName, actionType) {
         if (!storeName) return;
         try {
@@ -604,47 +594,6 @@
         document.getElementById('customerDetailModal').style.display = 'flex';
     }
 
-    async function initSystem() {
-        try {
-            await liff.init({ liffId: "2009598846-wiCUeV35" });
-            await loadFromCloud();
-            
-            const urlParams = new URLSearchParams(window.location.search);
-            const targetPage = urlParams.get('page'); const refParam = urlParams.get('ref');
-            if (refParam) { sessionStorage.setItem('savedRefCode', refParam); }
-
-            if (liff.isLoggedIn()) {
-                isAppReady = true; document.getElementById('loadingText').innerText = "กำลังดึงข้อมูลแผนที่...";
-                const profile = await liff.getProfile();
-                document.getElementById('header-profile').innerHTML = `<img src="${profile.pictureUrl}" style="width:100%; height:100%; object-fit:cover;">`;
-                const myCode = "AFF" + profile.userId.substring(0, 5).toUpperCase(); window.myAffCode = myCode;
-                if(document.getElementById('myAffiliateCode')) { document.getElementById('myAffiliateCode').innerText = myCode; }
-                
-                document.getElementById('affiliate-actual-content').style.display = 'block'; document.getElementById('affiliate-guest-view').style.display = 'none';
-                document.getElementById('loginOverlay').style.display = 'none'; document.getElementById('appContent').style.display = 'block';
-                updateWalletUI(); 
-                
-                const savedRef = sessionStorage.getItem('savedRefCode');
-                if (savedRef && document.getElementById('regRefCode')) { if (savedRef.toUpperCase() !== myCode.toUpperCase()) { document.getElementById('regRefCode').value = savedRef; } }
-
-                if (targetPage === 'partner') { 
-                    setTimeout(() => { navigateToPartner(); }, 300); 
-                } else if (targetPage === 'affiliate') { 
-                    setTimeout(() => { navigateToAffiliate(); }, 300); 
-                } else {
-                    setTimeout(() => { switchPage('home'); }, 300); 
-                }
-
-            } else {
-                isAppReady = true; document.getElementById('header-profile').innerHTML = `<div style="font-size: 50px; line-height: 100px; text-align: center;">👤</div>`;
-                document.getElementById('affiliate-actual-content').style.display = 'none'; document.getElementById('affiliate-guest-view').style.display = 'block';
-                showLoginCard();
-            }
-        } catch (err) { 
-            console.error("LIFF Init Error:", err); isAppReady = true; document.getElementById('header-profile').innerHTML = `<div style="font-size: 50px; line-height: 100px; text-align: center;">👤</div>`; showLoginCard();
-        }
-    }
-
     function updateWalletUI() {
         if(!window.myAffCode) return;
         const wallets = appData.affiliateWallets || []; const myWallet = wallets.find(w => w.refCode === window.myAffCode); const balance = myWallet ? myWallet.balance : 0;
@@ -715,7 +664,8 @@
     }
 
     function renderFriendBlocker() {
-        document.getElementById('partner-friend-blocker').innerHTML = `<img src="https://official-static.line-scdn.net/branding/logo-vertical.png" alt="LINE Official Account" class="line-logo-vertical"><div class="friend-note"><span style="color:var(--primary); font-weight:600;">⚠️ สำคัญมาก</span><br>สำหรับร้านค้าจำเป็นต้องเพิ่มเพื่อนก่อน เพื่อรับรหัสผ่านในการใช้งานครับ</div><button class="btn-line-glow" style="width: auto; padding: 14px 24px; border:none; border-radius:12px; font-family:'Kanit'; font-weight:600; font-size:16px; cursor:pointer; animation: none;" onclick="window.location.href='https://lin.ee/5SBoptj'">➕ เพิ่มเพื่อน LINE OA ของเรา</button><button class="btn-outline" style="margin-top: 20px; font-size: 13px; border-color:var(--dark-muted); color:var(--text-muted);" onclick="checkFriendshipForPartner(true)">ฉันเพิ่มเพื่อนแล้ว ตรวจสอบอีกครั้ง</button>`;
+        // แก้ไขโลโก้ LINE ตรงนี้ให้โชว์รูปได้ปกติครับ
+        document.getElementById('partner-friend-blocker').innerHTML = `<img src="https://upload.wikimedia.org/wikipedia/commons/4/41/LINE_logo.svg" alt="LINE Official Account" style="width: 80px; margin-bottom: 25px;"><div class="friend-note"><span style="color:var(--primary); font-weight:600;">⚠️ สำคัญมาก</span><br>สำหรับร้านค้าจำเป็นต้องเพิ่มเพื่อนก่อน เพื่อรับรหัสผ่านในการใช้งานครับ</div><button class="btn-line-glow" style="width: auto; padding: 14px 24px; border:none; border-radius:12px; font-family:'Kanit'; font-weight:600; font-size:16px; cursor:pointer; animation: none;" onclick="window.location.href='https://lin.ee/5SBoptj'">➕ เพิ่มเพื่อน LINE OA ของเรา</button><button class="btn-outline" style="margin-top: 20px; font-size: 13px; border-color:var(--dark-muted); color:var(--text-muted);" onclick="checkFriendshipForPartner(true)">ฉันเพิ่มเพื่อนแล้ว ตรวจสอบอีกครั้ง</button>`;
     }
 
     let map, service, infoWindow, currentCoords = { lat: 15.2287, lng: 104.8564 }, googlePlaces = [], currentPagination = null; let gpsMarker = null, activeMarker = null;
@@ -753,8 +703,6 @@
     }
 
     // ⚡ ฟังก์ชันคำนวณสถานะเปิด-ปิดอัจฉริยะ (VIP Custom Status)
-   // ⚡ ฟังก์ชันคำนวณสถานะเปิด-ปิดอัจฉริยะ (VIP Custom Status)
-    // ⚡ ฟังก์ชันคำนวณสถานะเปิด-ปิดอัจฉริยะ (Custom Status)
     function getCustomStoreStatus(hoursObj) {
         if(!hoursObj) return null;
         const now = new Date(); const day = now.getDay(); 
@@ -776,7 +724,6 @@
 
         let isOpen = false; let minsToClose = 0; let minsToOpen = 0;
 
-        // ถ้าร้านเปิดข้ามวัน (เช่น 18:00 - 02:00)
         if (closeMins < openMins) closeMins += 1440; 
 
         let evalMinutes = currentMinutes;
@@ -814,8 +761,6 @@
 
                 const store = (appData.registeredStores || []).find(s => s.name === place.name); const now = Date.now();
                 const isVIP = store && store.isVIP && (!store.vipExpireTimestamp || store.vipExpireTimestamp > now || store.vipAutoRenew);
-                
-                // ⚡ ปลดล็อกเงื่อนไข ถ้าร้านมีเวลาเปิด-ปิด โชว์ทันที
                 const customStatus = (store && store.operatingHours) ? getCustomStoreStatus(store.operatingHours) : null;
 
                 if (customStatus) {
@@ -829,6 +774,7 @@
                     else if(isOpen === false) isOpenNowHtml = '<span style="background:#D9534F; color:#FFF; padding:3px 8px; border-radius:10px; font-size:11px; margin-left:6px;">ปิดแล้ว</span>';
                 }
 
+                // ⚡ โชว์ปุ่มคูปองและกิจกรรมในแผนที่ ถ้าเป็น VIP ให้กดดูได้
                 let extraHtml = "";
                 if(store && store.coupon && store.coupon.trim() !== "") extraHtml += `<button onclick="showCustomerDetail('coupon', '${store.coupon.replace(/'/g, "\\'")}', '${store.name.replace(/'/g, "\\'")}')" style="margin:8px 5px 0 0; font-size:12px; font-weight:bold; background:rgba(217, 83, 79, 0.1); border:1px solid #D9534F; color:#D9534F; padding:6px 12px; border-radius:12px; cursor:pointer;">🎟️ กดดูคูปอง</button>`;
                 if(store && store.event && store.event.trim() !== "") extraHtml += `<button onclick="showCustomerDetail('event', '${store.event.replace(/'/g, "\\'")}', '${store.name.replace(/'/g, "\\'")}')" style="margin:8px 0 0; font-size:12px; font-weight:bold; background:rgba(23, 162, 184, 0.1); border:1px solid #17a2b8; color:#17a2b8; padding:6px 12px; border-radius:12px; cursor:pointer;">🎉 ดูกิจกรรม</button>`;
@@ -925,8 +871,6 @@
             if (window.google && window.google.maps && window.google.maps.geometry) { distanceKm = (google.maps.geometry.spherical.computeDistanceBetween(originPoint, p.geometry.location) / 1000).toFixed(1); }
 
             let openStatusHtml = '<span class="status-tag" style="background:var(--bg-light); color:var(--text-muted); border:1px solid var(--border);">⚪ เวลา: ทางร้านไม่ได้ระบุ</span>'; 
-            
-            // ⚡ โชว์เวลาทันทีถ้าร้านตั้งเวลาไว้
             const customStatus = (store && store.operatingHours) ? getCustomStoreStatus(store.operatingHours) : null;
 
             if (customStatus) {
@@ -952,6 +896,7 @@
             const hasLine = store && store.lineUrl && store.lineUrl.trim() !== ''; const hasFb = store && store.fbUrl && store.fbUrl.trim() !== '';
             const imgUrl = p.photos ? p.photos[0].getUrl({maxWidth:400}) : 'https://via.placeholder.com/400x200?text=Painaidee';
 
+            // ⚡ โชว์ Tag พิเศษที่หน้าร้าน และกดเพื่อดูรายละเอียดได้ทันที
             let extraTags = "";
             if(store && store.coupon && store.coupon.trim() !== "") extraTags += `<span onclick="showCustomerDetail('coupon', '${store.coupon.replace(/'/g, "\\'")}', '${store.name.replace(/'/g, "\\'")}'); event.stopPropagation();" style="background:rgba(217, 83, 79, 0.1); color:var(--danger); padding:4px 10px; border-radius:10px; font-size:11px; font-weight:bold; margin-right:5px; display:inline-block; margin-bottom:5px; cursor:pointer; border:1px solid rgba(217, 83, 79, 0.3); pointer-events:auto;">🎟️ กดดูคูปอง</span>`;
             if(store && store.event && store.event.trim() !== "") extraTags += `<span onclick="showCustomerDetail('event', '${store.event.replace(/'/g, "\\'")}', '${store.name.replace(/'/g, "\\'")}'); event.stopPropagation();" style="background:rgba(23, 162, 184, 0.1); color:var(--info); padding:4px 10px; border-radius:10px; font-size:11px; font-weight:bold; display:inline-block; margin-bottom:5px; cursor:pointer; border:1px solid rgba(23, 162, 184, 0.3); pointer-events:auto;">🎉 ดูกิจกรรม</span>`;
@@ -983,45 +928,8 @@
         if(currentPagination && currentPagination.hasNextPage && googlePlaces.length < 80) html += `<div style="grid-column:1/-1; text-align:center;"><button class="btn-outline" style="width:200px; border-color:var(--primary);" onclick="this.innerHTML='โหลดเพิ่ม...'; currentPagination.nextPage()">⬇️ ดูเพิ่มเติม</button></div>`;
         list.innerHTML = html; renderPromos();
     }
-            
-            const hasLine = isVIP && store && store.lineUrl && store.lineUrl.trim() !== ''; const hasFb = isVIP && store && store.fbUrl && store.fbUrl.trim() !== '';
-            const imgUrl = p.photos ? p.photos[0].getUrl({maxWidth:400}) : 'https://via.placeholder.com/400x200?text=Painaidee';
 
-            // ⚡ โชว์ Tag พิเศษที่หน้าร้าน และกดเพื่อดูรายละเอียดได้ทันที
-            let extraTags = "";
-            if(isVIP && store.coupon && store.coupon.trim() !== "") extraTags += `<span onclick="showCustomerDetail('coupon', '${store.coupon.replace(/'/g, "\\'")}', '${store.name.replace(/'/g, "\\'")}'); event.stopPropagation();" style="background:rgba(217, 83, 79, 0.1); color:var(--danger); padding:4px 10px; border-radius:10px; font-size:11px; font-weight:bold; margin-right:5px; display:inline-block; margin-bottom:5px; cursor:pointer; border:1px solid rgba(217, 83, 79, 0.3); pointer-events:auto;">🎟️ กดดูคูปอง</span>`;
-            if(isVIP && store.event && store.event.trim() !== "") extraTags += `<span onclick="showCustomerDetail('event', '${store.event.replace(/'/g, "\\'")}', '${store.name.replace(/'/g, "\\'")}'); event.stopPropagation();" style="background:rgba(23, 162, 184, 0.1); color:var(--info); padding:4px 10px; border-radius:10px; font-size:11px; font-weight:bold; display:inline-block; margin-bottom:5px; cursor:pointer; border:1px solid rgba(23, 162, 184, 0.3); pointer-events:auto;">🎉 ดูกิจกรรม</span>`;
-
-            return `<div class="place-card ${isVIP ? 'card-vip':''}" onclick="focusPlace('${p.place_id}'); trackAction('${p.name}', 'view')">
-                ${isVIP?'<div class="vip-crown-badge">👑 VIP RECOMMEND</div>':''}
-                <div class="distance-badge">${distanceKm} กม.</div>
-                <img src="${imgUrl}" class="main-img" onclick="event.stopPropagation(); openImageModal(this.src)">
-                <div class="place-info">
-                    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; gap: 8px;">
-                        <h3 style="margin:0; font-size: 16px; flex: 1; color:${isVIP?'#FFD700':'var(--text-gold)'}; font-weight:600; line-height:1.2;">${p.name}</h3>
-                        <div style="text-align:right; flex-shrink: 0;">${openStatusHtml}</div>
-                    </div>
-                    <div style="margin-bottom:5px;">${extraTags}</div>
-                    <p style="font-size:13px; color:var(--text-muted); margin:0 0 5px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.vicinity}</p>
-                    <div><span style="color:var(--primary); font-weight:600;">⭐ ${p.rating || 'ใหม่'}</span></div>
-                    <div class="action-buttons">
-                        <button class="btn-action btn-nav" onclick="window.open('${navUrl}', '_blank'); trackAction('${p.name}', 'dir'); event.stopPropagation();">นำทาง</button>
-                        <button class="btn-action btn-call" onclick="callPlace('${p.place_id}', event)">โทร</button>
-                        ${hasLine ? `<button class="btn-action btn-line" onclick="window.open('${store.lineUrl.startsWith('http') ? store.lineUrl : 'https://'+store.lineUrl}', '_blank'); event.stopPropagation();">LINE</button>` : ''}
-                        ${hasFb ? `<button class="btn-action btn-fb" onclick="window.open('${store.fbUrl.startsWith('http') ? store.fbUrl : 'https://'+store.fbUrl}', '_blank'); event.stopPropagation();">FB</button>` : ''}
-                        <button class="btn-action btn-share" onclick="sharePlace('${p.name.replace(/'/g, "\\'")}', ${p.geometry.location.lat()}, ${p.geometry.location.lng()}, event)">แชร์</button>
-                    </div>
-                    <div style="margin-top:15px; text-align:right;"><span style="color:var(--danger); font-size:11px; cursor:pointer; opacity:0.6; border-bottom: 1px dotted var(--danger);" onclick="reportClosed('${p.place_id}','${p.name.replace(/'/g,"")}'); event.stopPropagation();">🚩 แจ้งร้านปิดถาวร</span></div>
-                </div>
-            </div>`;
-        }).join('');
-        
-        if(currentPagination && currentPagination.hasNextPage && googlePlaces.length < 80) html += `<div style="grid-column:1/-1; text-align:center;"><button class="btn-outline" style="width:200px; border-color:var(--primary);" onclick="this.innerHTML='โหลดเพิ่ม...'; currentPagination.nextPage()">⬇️ ดูเพิ่มเติม</button></div>`;
-        list.innerHTML = html; renderPromos();
-    }
-
-    // ⚡ ระบบแบนเนอร์โปรโมทอัจฉริยะ (ดึงเวลาแบบ VIP มาแสดง และแสดง Slider)
-   function renderPromos() {
+    function renderPromos() {
         let curProv = document.getElementById('provinceSelect').value; const now = Date.now();
         const activePromos = (appData.activePromotions || []).filter(p => { if (p.expireTimestamp && now > p.expireTimestamp && !p.autoRenew) return false; return true; }); 
         
@@ -1040,7 +948,6 @@
                 if (store && store.isVIP && (!store.vipExpireTimestamp || store.vipExpireTimestamp > now || store.vipAutoRenew)) isVIP = true;
                 const hasLine = store && store.lineUrl && store.lineUrl.trim() !== ''; const hasFb = store && store.fbUrl && store.fbUrl.trim() !== '';
                 
-                // ⚡ โชว์เวลาเปิด-ปิดทันที ไม่ต้องรอ VIP
                 let timeHtml = '<span style="background:rgba(255,255,255,0.1); color:#aaa; padding:2px 8px; border-radius:10px; font-size:11px; border:1px solid rgba(255,255,255,0.2);">⚪ ไม่ระบุเวลา</span>';
                 if(store && store.operatingHours) { const customStatus = getCustomStoreStatus(store.operatingHours); if(customStatus) timeHtml = customStatus.html; }
 
@@ -1083,7 +990,6 @@
         } else { banner.style.display = 'none'; }
     }
 
-    // ⚡ ระบบหมุนสไลด์ภาพอัตโนมัติ (ทุก 3.5 วินาที)
     setInterval(() => {
         document.querySelectorAll('.promo-slider-container').forEach(slider => {
             let imgs = slider.querySelectorAll('.slide-item');
@@ -1092,11 +998,11 @@
             if(activeIdx === -1) activeIdx = 0;
             
             imgs[activeIdx].style.opacity = '0';
-            imgs[activeIdx].style.pointerEvents = 'none'; // ซ่อนการกดรูปเก่า
+            imgs[activeIdx].style.pointerEvents = 'none';
             
             let nextIdx = (activeIdx + 1) % imgs.length;
             imgs[nextIdx].style.opacity = '1';
-            imgs[nextIdx].style.pointerEvents = 'auto'; // เปิดให้กดรูปใหม่ได้
+            imgs[nextIdx].style.pointerEvents = 'auto';
             
             let indicator = slider.querySelector('.slide-indicator');
             if(indicator) indicator.innerText = `${nextIdx + 1}/${imgs.length} 📸`;
@@ -1158,7 +1064,6 @@
         } else if (store) { alert("⚠️ ร้านนี้ไม่ได้เชื่อมโยงกับระบบ LINE ไว้ กรุณาติดต่อแอดมินโดยตรงครับ"); } else { alert("❌ ไม่พบชื่อร้านนี้ในระบบ กรุณาตรวจสอบตัวสะกดอีกครั้งครับ"); }
     }
 
-    // ⚡ ระบบจัดการร้านค้า (รวมการเช็ค VIP & Stats Lock)
     function verifyStore(silent = false) {
         const stores = appData.registeredStores || []; const store = stores.find(s => s.pin === document.getElementById('storePinInput').value);
         if(store) { 
@@ -1170,13 +1075,11 @@
             document.getElementById('displayBankAcc').innerText = appData.vipSettings?.bankAccount || 'รอแอดมินตั้งค่าบัญชี (ไปไหนดี)';
 
             if(isVIP) {
-                // ร้านที่เป็น VIP ปลดล็อกทุกอย่าง
                 document.getElementById('vipUpdateSection').style.display = 'block'; 
                 document.getElementById('vipSubscribeSection').style.display = 'block';
                 document.getElementById('vipSubscribeTitle').innerHTML = '👑 ต่ออายุ VIP <span style="font-size:12px; color:#06C755;">(สถานะ: ใช้งานได้)</span>'; 
-                document.getElementById('nonVipStatsBlock').style.display = 'none'; // ซ่อนบล็อกแจ้งเตือน
+                document.getElementById('nonVipStatsBlock').style.display = 'none'; 
                 
-                // ⚡ อ่านสถิติจาก Collection แยก แบบเรียลไทม์
                 db.collection('storeStats').doc(store.name).get().then(doc => {
                     let d = doc.exists ? doc.data() : { views: 0, directions: 0 };
                     document.getElementById('statViews').innerText = d.views || 0;
@@ -1189,11 +1092,10 @@
                     renderHoursGrid(store);
                 }
             } else {
-                // ร้านที่ไม่ใช่ VIP ล็อกการเข้าถึง
                 document.getElementById('vipUpdateSection').style.display = 'none'; 
                 document.getElementById('vipSubscribeSection').style.display = 'block'; 
                 document.getElementById('vipSubscribeTitle').innerHTML = '👑 สมัครสมาชิก VIP';
-                document.getElementById('nonVipStatsBlock').style.display = 'block'; // โชว์บล็อกแจ้งเตือนให้อัปเกรด
+                document.getElementById('nonVipStatsBlock').style.display = 'block'; 
             }
 
             const activePromo = (appData.activePromotions || []).find(p => p.storeName === store.name); const hasFreePromo = store.freePromoDays && store.freePromoDays > 0; const promoTitle = document.getElementById('buyPromoTitle'); const slipArea = document.getElementById('promoSlipArea');
@@ -1216,7 +1118,6 @@
         }
     }
 
-    // ⚡ ฟังก์ชันเรนเดอร์ช่องเวลา (แก้ให้ช่องใหญ่ขึ้น กดง่ายขึ้น)
     function renderHoursGrid(store) {
         const daysTH = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
         let hoursHtml = '';
@@ -1244,7 +1145,6 @@
         document.getElementById(`close_${dayIndex}`).disabled = isClosed;
     }
 
-    // ⚡ ปุ่มตั้งเวลาพร้อมกันหลายวัน
     function applyBulkTime() {
         const op = document.getElementById('bulk_open').value;
         const cl = document.getElementById('bulk_close').value;
@@ -1258,7 +1158,6 @@
         }
     }
 
-    // ⚡ ปุ่มเปิด 24 ชม. หลายวัน
     function applyBulk24h() {
         for(let i=0; i<7; i++) {
             if(document.getElementById('day_'+i).checked) {
@@ -1270,7 +1169,6 @@
         }
     }
 
-    // ⚡ ปุ่มตั้งวันหยุดหลายวัน
     function applyBulkClosed() {
         for(let i=0; i<7; i++) {
             if(document.getElementById('day_'+i).checked) {
@@ -1296,7 +1194,6 @@
         alert('💾 บันทึกเวลาเปิด-ปิดร้านเรียบร้อยแล้ว!\n(ระบบจะแสดงผลในหน้าแผนที่อัตโนมัติ)');
     }
 
-    // ⚡ ฟังก์ชันจัดการคูปอง (Popup)
     function openCouponEditor() {
         const store = appData.registeredStores.find(s => s.pin === document.getElementById('storePinInput').value);
         if(!store) return;
@@ -1322,7 +1219,6 @@
         alert('🗑️ ลบคูปองเรียบร้อยแล้ว!');
     }
 
-    // ⚡ ฟังก์ชันจัดการกิจกรรม (Popup)
     function openEventEditor() {
         const store = appData.registeredStores.find(s => s.pin === document.getElementById('storePinInput').value);
         if(!store) return;
