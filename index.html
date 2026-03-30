@@ -32,7 +32,8 @@
         .search-box-container { display: flex; gap: 12px; width: 100%; }
         .btn-primary { padding: 14px 24px; background: var(--primary); color: white; border: none; border-radius: 10px; font-family: 'Kanit'; font-weight: 500; font-size: 15px; cursor: pointer; transition: 0.3s; white-space: nowrap; width: 100%; box-shadow: 0 4px 10px rgba(197, 160, 89, 0.3); }
         .btn-primary:hover { background: var(--primary-hover); transform: translateY(-2px); }
-        .btn-secondary { background: var(--dark); color: var(--primary); padding: 12px 15px; border-radius: 10px; border: 1px solid var(--primary); cursor: pointer; font-family: 'Kanit'; font-weight: 500; text-align: center; transition: 0.3s; display: inline-block;}
+        .btn-secondary { background: var(--dark); color: var(--primary); padding: 12px 15px; border-radius: 10px; border: 1px solid var(--primary); cursor: pointer; font-family: 'Kanit'; font-weight: 500; text-align: center; transition: 0.3s; text-decoration: none; display: inline-block;}
+        .btn-secondary:hover { background: var(--primary); color: white; transform: translateY(-2px); }
         .btn-outline { background: transparent; color: var(--primary); border: 1px solid var(--border); padding: 10px 15px; border-radius: 10px; cursor: pointer; font-family: 'Kanit'; font-weight: 500; transition: 0.3s; }
         .btn-outline:hover { border-color: var(--primary); background: rgba(197, 160, 89, 0.1); }
         .place-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; margin-top: 24px; }
@@ -56,18 +57,32 @@
         @keyframes pulseGlow { 0% { box-shadow: 0 0 10px rgba(255,215,0,0.4); } 50% { box-shadow: 0 0 20px rgba(255,215,0,0.8); } 100% { box-shadow: 0 0 10px rgba(255,215,0,0.4); } }
         .btn-line-glow { background: linear-gradient(90deg, #06C755, #05A044); color: white; border: none; padding: 14px 20px; border-radius: 12px; font-family: 'Kanit'; font-weight: 600; font-size: 16px; width: 100%; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 8px 20px rgba(6, 199, 85, 0.4); }
         .highlight-banner { background: linear-gradient(135deg, var(--dark), var(--dark-light)); color: white; padding: 25px; border-radius: 16px; margin-top: 24px; box-shadow: 0 15px 35px rgba(26, 28, 32, 0.4); display: none; position: relative; overflow: hidden; border: 1px solid var(--border); }
+        .highlight-banner::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(197,160,89,0.15) 0%, transparent 60%); pointer-events: none; }
+        .highlight-banner h3 { margin: 0 0 5px 0; font-size: 20px; color: var(--primary); font-weight: 500; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
         .dashboard-card { background: var(--surface); padding: 25px; border-radius: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); margin-bottom: 24px; border: 1px solid var(--border); }
         .dashboard-card h3 { margin-top: 0; color: var(--primary-light); border-bottom: 2px solid var(--border); padding-bottom: 12px; font-weight: 500; }
         .form-group { margin-bottom: 22px; }
         .form-group label { display: block; font-weight: 500; font-size: 15px; color: #FFF; margin-bottom: 4px; }
+        .form-group .hint { font-size: 12.5px; color: var(--text-muted); margin-top: 0; margin-bottom: 10px; line-height: 1.4; }
+        
         #loginOverlay { position: fixed; inset: 0; background: #0b0f19; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
+        .bg-glow { position: absolute; width: 400px; height: 400px; background: radial-gradient(circle, rgba(6,199,85,0.15) 0%, transparent 70%); border-radius: 50%; top: -10%; left: -20%; animation: floatGlow 8s infinite alternate; }
+        .bg-glow2 { position: absolute; width: 500px; height: 500px; background: radial-gradient(circle, rgba(197,160,89,0.1) 0%, transparent 70%); border-radius: 50%; bottom: -20%; right: -20%; animation: floatGlow2 10s infinite alternate; }
+        @keyframes floatGlow { 0% { transform: translate(0, 0); } 100% { transform: translate(50px, 50px); } }
+        @keyframes floatGlow2 { 0% { transform: translate(0, 0); } 100% { transform: translate(-50px, -50px); } }
         .glass-card { background: rgba(20, 24, 32, 0.6); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); border-top: 1px solid rgba(197, 160, 89, 0.4); box-shadow: 0 25px 50px rgba(0,0,0,0.5); padding: 35px 25px; border-radius: 24px; text-align: center; width: 90%; max-width: 360px; z-index: 10; animation: slideUpFade 0.6s ease-out; }
         @keyframes slideUpFade { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
         .logo-circle { width: 110px; height: 110px; border-radius: 50%; background: linear-gradient(135deg, #1A1D23, #0b0f19); border: 2px solid #C5A059; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 0 25px rgba(197,160,89,0.4), inset 0 0 15px rgba(197,160,89,0.2); }
         .logo-text { color: #FFD700; font-family: 'Kanit'; font-weight: 700; font-size: 26px; line-height: 1.1; text-shadow: 0 0 10px rgba(255,215,0,0.5); margin: 0; }
-        .btn-enter-glow { background: linear-gradient(135deg, #FFD700, #C5A059); color: #000; border: none; padding: 14px 20px; border-radius: 12px; font-family: 'Kanit'; font-weight: 600; font-size: 16px; width: 100%; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 8px 20px rgba(197, 160, 89, 0.4); }
+        .btn-enter-glow { background: linear-gradient(135deg, #FFD700, #C5A059); color: #000; border: none; padding: 14px 20px; border-radius: 12px; font-family: 'Kanit'; font-weight: 600; font-size: 16px; width: 100%; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; position: relative; overflow: hidden; box-shadow: 0 8px 20px rgba(197, 160, 89, 0.4); animation: pulse-gold 2.5s infinite; box-sizing: border-box; }
+        .btn-enter-glow:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(197, 160, 89, 0.6); }
+        .btn-enter-glow::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, transparent, rgba(255,255,255,0.4), transparent); transform: skewX(-25deg); animation: shineBtn 3s infinite; }
+        .btn-line-glow { background: linear-gradient(90deg, #06C755, #05A044); color: white; border: none; padding: 14px 20px; border-radius: 12px; font-family: 'Kanit'; font-weight: 600; font-size: 16px; width: 100%; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; position: relative; overflow: hidden; box-shadow: 0 8px 20px rgba(6, 199, 85, 0.4); box-sizing: border-box; }
+        .btn-line-glow:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(6, 199, 85, 0.6); }
         #partner-friend-blocker { display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 50px 20px; background: var(--surface); border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         #partner-actual-content { display: none; }
+        .line-logo-vertical { width: 100px; height: auto; margin-bottom: 25px; }
+        .friend-note { color: #FFF; font-size: 16px; font-weight: 400; line-height: 1.6; max-width: 300px; margin-bottom: 30px; }
         .spinner { width: 50px; height: 50px; border: 5px solid rgba(197,160,89,0.2); border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         #appContent { display: none; }
@@ -75,14 +90,13 @@
         .promo-carousel::-webkit-scrollbar { display: none; }
         .promo-item { flex: 0 0 85%; max-width: 340px; scroll-snap-align: center; }
         
-        /* ⚡ CSS สำหรับ Image Modal, Slider และ ระบบจัดการคูปอง/กิจกรรม */
+        /* ⚡ CSS สำหรับ Image Modal และ Slider */
         #imageViewerModal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:999999; flex-direction:column; justify-content:center; align-items:center; animation: fadeIn 0.3s ease; }
         #imageViewerModal img { max-width:95%; max-height:85vh; object-fit:contain; border-radius:12px; box-shadow:0 0 30px rgba(0,0,0,0.8); }
         .close-modal-btn { position:absolute; top:20px; right:20px; color:white; background:rgba(255,255,255,0.2); width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:24px; cursor:pointer; transition:0.3s; z-index: 10; }
         .close-modal-btn:hover { background:rgba(255,255,255,0.4); transform:scale(1.1); }
         .promo-slider-container { position:relative; width:100%; height:180px; overflow:hidden; background:#000; pointer-events:auto; }
         .slide-item { position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; transition:opacity 0.8s ease-in-out; cursor:pointer; }
-        .slide-item:hover { filter: brightness(1.1); }
         .slide-indicator { position:absolute; bottom:8px; right:8px; background:rgba(0,0,0,0.6); color:#fff; font-size:11px; padding:3px 8px; border-radius:12px; z-index:10; font-weight:bold; letter-spacing: 1px; backdrop-filter: blur(4px); }
         .vip-lock-box { background: rgba(255,255,255,0.05); border: 1px dashed #555; padding: 20px; border-radius: 12px; text-align: center; margin-top: 15px; }
 
@@ -101,10 +115,10 @@
 <div id="couponModal" class="feature-modal">
     <div class="feature-modal-content">
         <h3 style="margin-top:0; color:#D9534F;">🎟️ จัดการคูปองส่วนลด</h3>
-        <p style="font-size:13px; color:#aaa;">ตั้งค่าข้อความคูปองให้ลูกค้าเห็นเด่นชัด (ปล่อยว่างเพื่อปิดคูปอง)</p>
-        <input type="text" id="couponText" placeholder="เช่น ลด 10% เมื่อแสดงแอป" style="margin-bottom:15px; border-color:#D9534F; color:#FFF;">
+        <p style="font-size:13px; color:#aaa;">ตั้งค่าข้อความคูปองให้ลูกค้าเห็นเด่นชัดบนแผนที่ (ปล่อยว่างเพื่อปิดคูปอง)</p>
+        <input type="text" id="couponText" placeholder="เช่น ลด 10% เมื่อแสดงแอป, ฟรีเครื่องดื่ม 1 แก้ว" style="margin-bottom:15px; border-color:#D9534F;">
         <div style="display:flex; gap:10px;">
-            <button class="btn-primary" style="flex:2; background:#D9534F; color:#FFF;" onclick="saveCoupon()">💾 บันทึก</button>
+            <button class="btn-primary" style="flex:1; background:#D9534F; color:#FFF;" onclick="saveCoupon()">💾 บันทึก</button>
             <button class="btn-outline" style="flex:1; border-color:#D9534F; color:#D9534F;" onclick="deleteCoupon()">🗑️ ลบ</button>
             <button class="btn-outline" style="flex:1; border-color:#666; color:#aaa;" onclick="document.getElementById('couponModal').style.display='none'">ยกเลิก</button>
         </div>
@@ -114,10 +128,10 @@
 <div id="eventModal" class="feature-modal">
     <div class="feature-modal-content">
         <h3 style="margin-top:0; color:#17a2b8;">🎉 กิจกรรมวันนี้</h3>
-        <p style="font-size:13px; color:#aaa;">โปรโมทอีเวนต์ด่วนๆ วันนี้ (ปล่อยว่างเพื่อปิดกิจกรรม)</p>
-        <input type="text" id="eventText" placeholder="เช่น 20:00 น. พบกับดนตรีสด!" style="margin-bottom:15px; border-color:#17a2b8; color:#FFF;">
+        <p style="font-size:13px; color:#aaa;">โปรโมทอีเวนต์ด่วนๆ วันนี้ให้ลูกค้าทราบ (ปล่อยว่างเพื่อปิดกิจกรรม)</p>
+        <input type="text" id="eventText" placeholder="เช่น 20:00 น. พบกับดนตรีสดวงคาราบาว!" style="margin-bottom:15px; border-color:#17a2b8;">
         <div style="display:flex; gap:10px;">
-            <button class="btn-primary" style="flex:2; background:#17a2b8; color:#FFF;" onclick="saveEvent()">💾 บันทึก</button>
+            <button class="btn-primary" style="flex:1; background:#17a2b8; color:#FFF;" onclick="saveEvent()">💾 บันทึก</button>
             <button class="btn-outline" style="flex:1; border-color:#17a2b8; color:#17a2b8;" onclick="deleteEvent()">🗑️ ลบ</button>
             <button class="btn-outline" style="flex:1; border-color:#666; color:#aaa;" onclick="document.getElementById('eventModal').style.display='none'">ยกเลิก</button>
         </div>
@@ -334,12 +348,36 @@
 
                         <div id="vipHoursSection" style="margin-top: 20px; border-top: 1px dashed var(--primary); padding-top: 15px;">
                             <h4 style="margin: 0 0 10px 0; color: #FFD700; font-size: 16px;">⏰ เวลาเปิด-ปิดร้าน (คำนวณสถานะอัตโนมัติ)</h4>
-                            <div style="display:flex; justify-content:space-between; margin-bottom:12px; background:rgba(197, 160, 89, 0.1); padding:10px; border-radius:8px; border:1px solid rgba(197,160,89,0.3);">
-                                <label style="color:#C5A059; font-size:13px; font-weight:bold; display:flex; align-items:center; gap:5px; cursor:pointer;"><input type="checkbox" id="applyAllDays" onchange="toggleApplyAll()" style="width:16px; height:16px;"> เปิดบริการทุกวัน</label>
-                                <label style="color:#06C755; font-size:13px; font-weight:bold; display:flex; align-items:center; gap:5px; cursor:pointer;"><input type="checkbox" id="open24hAll" onchange="toggle24hAll()" style="width:16px; height:16px;"> เปิดตลอด 24 ชม.</label>
+                            
+                            <div style="background:rgba(0,0,0,0.3); padding:15px; border-radius:10px; border:1px solid var(--border); margin-bottom:15px;">
+                                <p style="font-size: 13px; color:var(--text-muted); margin: 0 0 10px 0;">1. ติ๊กเลือกวัน (จันทร์-อาทิตย์)</p>
+                                <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:15px;">
+                                    <label style="font-size:13px; color:#FFF;"><input type="checkbox" id="day_1" checked> จ.</label>
+                                    <label style="font-size:13px; color:#FFF;"><input type="checkbox" id="day_2" checked> อ.</label>
+                                    <label style="font-size:13px; color:#FFF;"><input type="checkbox" id="day_3" checked> พ.</label>
+                                    <label style="font-size:13px; color:#FFF;"><input type="checkbox" id="day_4" checked> พฤ.</label>
+                                    <label style="font-size:13px; color:#FFF;"><input type="checkbox" id="day_5" checked> ศ.</label>
+                                    <label style="font-size:13px; color:#FFF;"><input type="checkbox" id="day_6" checked> ส.</label>
+                                    <label style="font-size:13px; color:#FFF;"><input type="checkbox" id="day_0" checked> อา.</label>
+                                </div>
+                                
+                                <p style="font-size: 13px; color:var(--text-muted); margin: 0 0 10px 0;">2. เลือกเวลาทำการ</p>
+                                <div style="display:flex; align-items:center; gap:10px; margin-bottom:15px;">
+                                    <input type="time" id="bulk_open" value="08:00" class="input-dark" style="padding:8px; font-size:14px; flex:1; margin:0;">
+                                    <span style="color:#999;">ถึง</span>
+                                    <input type="time" id="bulk_close" value="17:00" class="input-dark" style="padding:8px; font-size:14px; flex:1; margin:0;">
+                                </div>
+                                
+                                <div style="display:flex; gap:8px;">
+                                    <button class="btn-primary" style="flex:1; padding:8px; font-size:12px; border-radius:6px;" onclick="applyBulkTime()">✅ ใช้เวลานี้</button>
+                                    <button class="btn-outline" style="flex:1; padding:8px; font-size:12px; border-radius:6px; border-color:#06C755; color:#06C755;" onclick="applyBulk24h()">เปิด 24 ชม.</button>
+                                    <button class="btn-outline" style="flex:1; padding:8px; font-size:12px; border-radius:6px; border-color:var(--danger); color:var(--danger);" onclick="applyBulkClosed()">ตั้งวันหยุด</button>
+                                </div>
                             </div>
+
+                            <p style="font-size: 13px; color:var(--text-gold); margin: 0 0 10px 0;">สรุปเวลาเปิด-ปิดรายวัน:</p>
                             <div id="hoursGrid" style="display: flex; flex-direction: column; gap: 8px;"></div>
-                            <button class="btn-primary" style="width: 100%; margin-top: 12px;" onclick="saveOperatingHours()">💾 บันทึกเวลาเปิด-ปิด</button>
+                            <button class="btn-primary" style="width: 100%; margin-top: 15px;" onclick="saveOperatingHours()">💾 บันทึกเวลาเปิด-ปิดลงระบบ</button>
                         </div>
 
                         <div style="margin-top: 20px; border-top: 1px dashed var(--primary); padding-top: 15px;">
@@ -466,12 +504,19 @@
         try { await db.collection('painaidee').doc('systemData').set(appData); return true; } catch(e) { throw e; }
     }
 
+    // ⚡ แก้ไข SmartLogin (วิธีแก้โค้ดวนลูป) 100%
     function smartLogin(targetPage) {
-        let baseUrl = window.location.href.split('?')[0];
         let pageParam = targetPage ? '?page=' + targetPage : '';
-
-        if (!liff.isLoggedIn()) {
-            liff.login({ redirectUri: baseUrl + pageParam });
+        let liffUrl = 'https://liff.line.me/2009598846-wiCUeV35' + pageParam;
+        
+        if (liff.isInClient()) {
+            if (!liff.isLoggedIn()) {
+                liff.login();
+            } else {
+                if(targetPage) switchPage(targetPage);
+            }
+        } else {
+            window.location.href = liffUrl;
         }
     }
 
@@ -558,47 +603,6 @@
         }
         
         document.getElementById('customerDetailModal').style.display = 'flex';
-    }
-
-    async function initSystem() {
-        try {
-            await liff.init({ liffId: "2009598846-wiCUeV35" });
-            await loadFromCloud();
-            
-            const urlParams = new URLSearchParams(window.location.search);
-            const targetPage = urlParams.get('page'); const refParam = urlParams.get('ref');
-            if (refParam) { sessionStorage.setItem('savedRefCode', refParam); }
-
-            if (liff.isLoggedIn()) {
-                isAppReady = true; document.getElementById('loadingText').innerText = "กำลังดึงข้อมูลแผนที่...";
-                const profile = await liff.getProfile();
-                document.getElementById('header-profile').innerHTML = `<img src="${profile.pictureUrl}" style="width:100%; height:100%; object-fit:cover;">`;
-                const myCode = "AFF" + profile.userId.substring(0, 5).toUpperCase(); window.myAffCode = myCode;
-                if(document.getElementById('myAffiliateCode')) { document.getElementById('myAffiliateCode').innerText = myCode; }
-                
-                document.getElementById('affiliate-actual-content').style.display = 'block'; document.getElementById('affiliate-guest-view').style.display = 'none';
-                document.getElementById('loginOverlay').style.display = 'none'; document.getElementById('appContent').style.display = 'block';
-                updateWalletUI(); 
-                
-                const savedRef = sessionStorage.getItem('savedRefCode');
-                if (savedRef && document.getElementById('regRefCode')) { if (savedRef.toUpperCase() !== myCode.toUpperCase()) { document.getElementById('regRefCode').value = savedRef; } }
-
-                if (targetPage === 'partner') { 
-                    setTimeout(() => { navigateToPartner(); }, 300); 
-                } else if (targetPage === 'affiliate') { 
-                    setTimeout(() => { navigateToAffiliate(); }, 300); 
-                } else {
-                    setTimeout(() => { switchPage('home'); }, 300); 
-                }
-
-            } else {
-                isAppReady = true; document.getElementById('header-profile').innerHTML = `<div style="font-size: 50px; line-height: 100px; text-align: center;">👤</div>`;
-                document.getElementById('affiliate-actual-content').style.display = 'none'; document.getElementById('affiliate-guest-view').style.display = 'block';
-                showLoginCard();
-            }
-        } catch (err) { 
-            console.error("LIFF Init Error:", err); isAppReady = true; document.getElementById('header-profile').innerHTML = `<div style="font-size: 50px; line-height: 100px; text-align: center;">👤</div>`; showLoginCard();
-        }
     }
 
     function updateWalletUI() {
@@ -953,7 +957,7 @@
                 let imgs = p.images && p.images.length > 0 ? p.images : [p.image];
                 let sliderHtml = `<div class="promo-slider-container shine-effect">`;
                 imgs.forEach((img, idx) => {
-                    sliderHtml += `<img src="${img}" class="slide-item" onclick="event.stopPropagation(); openImageModal(this.src)" style="opacity: ${idx === 0 ? '1' : '0'};">`;
+                    sliderHtml += `<img src="${img}" class="slide-item" onclick="event.stopPropagation(); openImageModal(this.src)" style="opacity: ${idx === 0 ? '1' : '0'}; pointer-events: ${idx === 0 ? 'auto' : 'none'};">`;
                 });
                 if(imgs.length > 1) sliderHtml += `<div class="slide-indicator">1/${imgs.length} 📸</div>`;
                 sliderHtml += `</div>`;
@@ -998,8 +1002,10 @@
             let activeIdx = Array.from(imgs).findIndex(img => img.style.opacity === '1');
             if(activeIdx === -1) activeIdx = 0;
             imgs[activeIdx].style.opacity = '0';
+            imgs[activeIdx].style.pointerEvents = 'none';
             let nextIdx = (activeIdx + 1) % imgs.length;
             imgs[nextIdx].style.opacity = '1';
+            imgs[nextIdx].style.pointerEvents = 'auto';
             let indicator = slider.querySelector('.slide-indicator');
             if(indicator) indicator.innerText = `${nextIdx + 1}/${imgs.length} 📸`;
         });
@@ -1125,12 +1131,12 @@
             let d = store.operatingHours && store.operatingHours[i] ? store.operatingHours[i] : {open:'08:00', close:'17:00', isClosed: false};
             // ⚡ แก้ไขให้ช่องเวลาใหญ่ขึ้น สีสว่างขึ้น และคลิกได้ง่ายๆ 100%
             hoursHtml += `
-            <div style="display:flex; align-items:center; justify-content:space-between; gap:5px; background:rgba(0,0,0,0.3); padding:10px; border-radius:8px; border:1px solid rgba(197, 160, 89, 0.2);">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:5px; background:rgba(0,0,0,0.3); padding:10px; border-radius:8px; border:1px solid rgba(197, 160, 89, 0.2); margin-bottom:5px;">
                 <span style="width:60px; font-size:14px; color:#FFF; font-weight:bold;">${daysTH[i]}</span>
                 <div style="display:flex; align-items:center; gap:5px;">
-                    <input type="time" id="open_${i}" value="${d.open}" style="padding:8px; font-size:14px; width:100px; background:#121418; color:#fff; border:1px solid #C5A059; border-radius:5px; pointer-events:auto;" ${d.isClosed?'disabled':''}>
+                    <input type="time" id="open_${i}" value="${d.open}" style="padding:8px; font-size:14px; width:100px; background:#121418; color:#fff; border:1px solid #C5A059; border-radius:5px; pointer-events:auto; margin:0;" ${d.isClosed?'disabled':''}>
                     <span style="color:#999;">-</span>
-                    <input type="time" id="close_${i}" value="${d.close}" style="padding:8px; font-size:14px; width:100px; background:#121418; color:#fff; border:1px solid #C5A059; border-radius:5px; pointer-events:auto;" ${d.isClosed?'disabled':''}>
+                    <input type="time" id="close_${i}" value="${d.close}" style="padding:8px; font-size:14px; width:100px; background:#121418; color:#fff; border:1px solid #C5A059; border-radius:5px; pointer-events:auto; margin:0;" ${d.isClosed?'disabled':''}>
                 </div>
                 <label style="font-size:13px; display:flex; align-items:center; gap:5px; color:var(--danger); font-weight:bold; margin-left:5px;">
                     <input type="checkbox" id="closed_${i}" ${d.isClosed?'checked':''} onchange="toggleDayStatus(${i})" style="width:18px; height:18px;"> ปิด
@@ -1146,35 +1152,38 @@
         document.getElementById(`close_${dayIndex}`).disabled = isClosed;
     }
 
-    // ⚡ ปุ่มเปิดทุกวัน (ก๊อปปี้จากวันจันทร์)
-    function toggleApplyAll() {
-        const isChecked = document.getElementById('applyAllDays').checked;
-        if(isChecked) {
-            document.getElementById('open24hAll').checked = false; // เอาติ๊ก 24 ออก
-            const openTime = document.getElementById('open_1').value; // เอาวันจันทร์เป็นหลัก
-            const closeTime = document.getElementById('close_1').value;
-            const isClosed = document.getElementById('closed_1').checked;
-            for(let i=0; i<7; i++) {
-                if(i !== 1) {
-                    document.getElementById(`open_${i}`).value = openTime;
-                    document.getElementById(`close_${i}`).value = closeTime;
-                    document.getElementById(`closed_${i}`).checked = isClosed;
-                    toggleDayStatus(i);
-                }
+    // ⚡ ปุ่มตั้งเวลาพร้อมกันหลายวัน
+    function applyBulkTime() {
+        const op = document.getElementById('bulk_open').value;
+        const cl = document.getElementById('bulk_close').value;
+        for(let i=0; i<7; i++) {
+            if(document.getElementById('day_'+i).checked) {
+                document.getElementById('open_'+i).value = op;
+                document.getElementById('close_'+i).value = cl;
+                document.getElementById('closed_'+i).checked = false;
+                toggleDayStatus(i);
             }
         }
     }
 
-    // ⚡ ปุ่มเปิด 24 ชั่วโมง
-    function toggle24hAll() {
-        const isChecked = document.getElementById('open24hAll').checked;
-        if(isChecked) document.getElementById('applyAllDays').checked = false;
+    // ⚡ ปุ่มเปิด 24 ชม. หลายวัน
+    function applyBulk24h() {
         for(let i=0; i<7; i++) {
-            document.getElementById(`closed_${i}`).checked = false;
-            toggleDayStatus(i);
-            if(isChecked) {
-                document.getElementById(`open_${i}`).value = '00:00';
-                document.getElementById(`close_${i}`).value = '23:59';
+            if(document.getElementById('day_'+i).checked) {
+                document.getElementById('open_'+i).value = '00:00';
+                document.getElementById('close_'+i).value = '23:59';
+                document.getElementById('closed_'+i).checked = false;
+                toggleDayStatus(i);
+            }
+        }
+    }
+
+    // ⚡ ปุ่มตั้งวันหยุดหลายวัน
+    function applyBulkClosed() {
+        for(let i=0; i<7; i++) {
+            if(document.getElementById('day_'+i).checked) {
+                document.getElementById('closed_'+i).checked = true;
+                toggleDayStatus(i);
             }
         }
     }
@@ -1195,7 +1204,6 @@
         alert('💾 บันทึกเวลาเปิด-ปิดร้านเรียบร้อยแล้ว!\n(ระบบจะแสดงผลในหน้าแผนที่อัตโนมัติ)');
     }
 
-    // ⚡ ฟังก์ชัน Popup การตลาด
     function openCouponEditor() {
         const store = appData.registeredStores.find(s => s.pin === document.getElementById('storePinInput').value);
         if(!store) return;
@@ -1212,7 +1220,6 @@
         alert('✅ อัปเดตคูปองส่วนลดเรียบร้อยแล้ว!');
     }
     
-    // ⚡ ฟังก์ชันลบคูปอง
     async function deleteCoupon() {
         const store = appData.registeredStores.find(s => s.pin === document.getElementById('storePinInput').value);
         if(!store) return;
@@ -1238,7 +1245,6 @@
         alert('✅ อัปเดตกิจกรรมเรียบร้อยแล้ว!');
     }
 
-    // ⚡ ฟังก์ชันลบกิจกรรม
     async function deleteEvent() {
         const store = appData.registeredStores.find(s => s.pin === document.getElementById('storePinInput').value);
         if(!store) return;
