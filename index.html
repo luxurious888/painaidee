@@ -334,6 +334,7 @@
 
     let appData = { registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], mainCategories: [], categories: [], closedReports: [], blacklistedPlaces: [], services: [], pendingVipRequests: [], affiliateWallets: [], withdrawalRequests: [] };
 
+    // ⚡ ปรับปรุงความคมชัดของรูปภาพ (ขนาดใหญ่ขึ้นและคุณภาพสูงขึ้น)
     const resizeImg = (file) => new Promise((resolve) => {
         if(!file) return resolve('');
         const reader = new FileReader(); reader.readAsDataURL(file);
@@ -341,10 +342,15 @@
             const img = new Image(); img.src = e.target.result;
             img.onload = () => {
                 const canvas = document.createElement('canvas');
-                let width = img.width; let height = img.height; const max_size = 350; 
-                if (width > max_size || height > max_size) { if (width > height) { height = Math.round((height *= max_size / width)); width = max_size; } else { width = Math.round((width *= max_size / height)); height = max_size; } }
+                let width = img.width; let height = img.height; 
+                const max_size = 1200; // <--- ปรับจาก 350px เป็น 1200px
+                if (width > max_size || height > max_size) { 
+                    if (width > height) { height = Math.round((height *= max_size / width)); width = max_size; } 
+                    else { width = Math.round((width *= max_size / height)); height = max_size; } 
+                }
                 canvas.width = width; canvas.height = height; canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-                resolve(canvas.toDataURL('image/jpeg', 0.4)); 
+                // <--- ปรับคุณภาพจาก 0.4 เป็น 0.85 เพื่อความคมชัด
+                resolve(canvas.toDataURL('image/jpeg', 0.85)); 
             };
             img.onerror = () => resolve('');
         };
@@ -375,6 +381,12 @@
                 
                 renderUI(); updateWalletUI(); renderPromos();
                 if (googlePlaces.length > 0) renderCards(document.getElementById('searchBox').value || 'ร้านอาหาร');
+                
+                // ⚡ สคริปต์อัปเดตหน้าจัดการร้านค้าอัตโนมัติเมื่อแอดมินกดอนุมัติ
+                if (document.getElementById('lockedFeatures') && document.getElementById('lockedFeatures').style.display === 'block') {
+                    verifyStore(true);
+                }
+
                 resolve();
             }, (error) => { console.log("Error loading data:", error); resolve(); });
         });
@@ -385,7 +397,6 @@
         catch(e) { throw e; }
     }
 
-    // ⚡ ระบบ Smart Login (อยู่ใน LINE ล็อกอินเลย / อยู่ Chrome เตะเข้าแอป)
     function smartLogin(targetPage) {
         let baseUrl = window.location.href.split('?')[0];
         let pageParam = targetPage ? '?page=' + targetPage : '';
@@ -474,7 +485,6 @@
                 const savedRef = sessionStorage.getItem('savedRefCode');
                 if (savedRef && document.getElementById('regRefCode')) { if (savedRef.toUpperCase() !== myCode.toUpperCase()) { document.getElementById('regRefCode').value = savedRef; } }
 
-                // ⚡ ล็อกเป้าหมายการเด้งหน้า (มาทางไหน ให้อยู่หน้านั้น)
                 if (targetPage === 'partner') { 
                     setTimeout(() => { navigateToPartner(); }, 300); 
                 } else if (targetPage === 'affiliate') { 
@@ -600,7 +610,6 @@
         }
     }
 
-    // ⚡ ฟังก์ชันคำนวณสถานะเปิด/ปิดร้านจากเวลาที่ VIP ตั้งค่าเอง
     function getCustomStoreStatus(hoursObj) {
         if(!hoursObj) return null;
         const now = new Date();
@@ -625,14 +634,12 @@
         let minsToClose = 0;
 
         if (closeMins < openMins) { 
-            // กรณีข้ามคืน เช่น 18:00 - 02:00
             if (currentMinutes >= openMins) {
                 isOpen = true; minsToClose = (closeMins + 1440) - currentMinutes;
             } else if (currentMinutes < closeMins) {
                 isOpen = true; minsToClose = closeMins - currentMinutes;
             }
         } else { 
-            // กรณีปกติ เช่น 08:00 - 17:00
             if (currentMinutes >= openMins && currentMinutes < closeMins) {
                 isOpen = true; minsToClose = closeMins - currentMinutes;
             }
@@ -649,7 +656,6 @@
         }
     }
 
-    // ⚡ ฟังก์ชัน Popup บนแผนที่ (แอบไปดึงเวลาแบบละเอียดมาโชว์)
     function focusPlace(placeId) {
         const place = googlePlaces.find(p => p.place_id === placeId);
         if (place && place.geometry && place.geometry.location) {
@@ -661,7 +667,6 @@
                 let timeText = "ทางร้านไม่ได้ระบุเวลาเปิด-ปิด";
                 let isOpenNowHtml = "";
 
-                // ตรวจสอบว่าร้านนี้เป็น VIP และมี Custom Hours หรือไม่
                 const store = (appData.registeredStores || []).find(s => s.name === place.name);
                 const now = Date.now();
                 const isVIP = store && store.isVIP && (!store.vipExpireTimestamp || store.vipExpireTimestamp > now || store.vipAutoRenew);
@@ -671,7 +676,6 @@
                     timeText = customStatus.text;
                     isOpenNowHtml = customStatus.label;
                 } else if (status === google.maps.places.PlacesServiceStatus.OK && details.opening_hours) {
-                    // ถ้าไม่มี Custom Hours ให้ดึงของ Google Maps มาโชว์ (ถ้ามี)
                     if (details.opening_hours.weekday_text) {
                         const today = new Date().getDay(); const dIndex = today === 0 ? 6 : today - 1;
                         timeText = details.opening_hours.weekday_text[dIndex]; 
@@ -775,15 +779,12 @@
             let distanceKm = "0.0";
             if (window.google && window.google.maps && window.google.maps.geometry) { distanceKm = (google.maps.geometry.spherical.computeDistanceBetween(originPoint, p.geometry.location) / 1000).toFixed(1); }
 
-            // ⚡ เช็คเวลาปิดเปิด (ให้ความสำคัญกับ Custom Hours ของ VIP ก่อน)
             let openStatusHtml = '<span class="status-tag" style="background:var(--bg-light); color:var(--text-muted); border:1px solid var(--border);">⚪ เวลา: ทางร้านไม่ได้ระบุ</span>'; 
-            
             const customStatus = (isVIP && store.operatingHours) ? getCustomStoreStatus(store.operatingHours) : null;
 
             if (customStatus) {
                 openStatusHtml = customStatus.html;
             } else {
-                // ถ้าไม่มีข้อมูล VIP ก็ใช้ของ Google
                 if (p.business_status === 'CLOSED_TEMPORARILY') { 
                     openStatusHtml = '<span class="status-tag" style="background:#FFF3F3; color:var(--danger); border:1px solid rgba(217,83,79,0.2);">🔴 ปิดชั่วคราว</span>'; 
                 } else if (p.business_status === 'CLOSED_PERMANENTLY') { 
@@ -927,7 +928,6 @@
         } else if (store) { alert("⚠️ ร้านนี้ไม่ได้เชื่อมโยงกับระบบ LINE ไว้ กรุณาติดต่อแอดมินโดยตรงครับ"); } else { alert("❌ ไม่พบชื่อร้านนี้ในระบบ กรุณาตรวจสอบตัวสะกดอีกครั้งครับ"); }
     }
 
-    // ⚡ ฟังก์ชันสร้างฟอร์มกรอกเวลาเปิด-ปิดร้าน
     function renderHoursGrid(store) {
         const daysTH = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
         let hoursHtml = '';
@@ -969,7 +969,7 @@
         alert('💾 บันทึกเวลาเปิด-ปิดร้านเรียบร้อยแล้ว!\n(ระบบจะแสดงผลในหน้านักล่าอัตโนมัติ)');
     }
 
-    function verifyStore() {
+    function verifyStore(silent = false) {
         const stores = appData.registeredStores || []; const store = stores.find(s => s.pin === document.getElementById('storePinInput').value);
         if(store) { 
             document.getElementById('lockedFeatures').style.display = 'block'; document.getElementById('storeVerifyCard').style.display = 'none'; 
@@ -981,11 +981,13 @@
             if(isVIP) {
                 document.getElementById('vipUpdateSection').style.display = 'block'; document.getElementById('vipSubscribeSection').style.display = 'block';
                 document.getElementById('vipSubscribeTitle').innerHTML = '👑 ต่ออายุ VIP <span style="font-size:12px; color:#06C755;">(สถานะ: ใช้งานได้)</span>'; 
-                document.getElementById('vipLineInput').value = store.lineUrl || ''; 
-                document.getElementById('vipFbInput').value = store.fbUrl || '';
                 
-                // ⚡ สร้างฟอร์มเวลาเปิด-ปิดให้ VIP
-                renderHoursGrid(store);
+                // ถ้าระบบอัปเดตแบบ Real-time จะไม่ไปเขียนทับค่าที่ลูกค้ากำลังพิมพ์อยู่
+                if(!silent) {
+                    document.getElementById('vipLineInput').value = store.lineUrl || ''; 
+                    document.getElementById('vipFbInput').value = store.fbUrl || '';
+                    renderHoursGrid(store);
+                }
             } else {
                 document.getElementById('vipUpdateSection').style.display = 'none'; document.getElementById('vipSubscribeSection').style.display = 'block'; document.getElementById('vipSubscribeTitle').innerHTML = '👑 สมัครสมาชิก VIP';
             }
@@ -993,7 +995,8 @@
             const activePromo = (appData.activePromotions || []).find(p => p.storeName === store.name); const hasFreePromo = store.freePromoDays && store.freePromoDays > 0; const promoTitle = document.getElementById('buyPromoTitle'); const slipArea = document.getElementById('promoSlipArea');
 
             if (activePromo) {
-                document.getElementById('editPromoSection').style.display = 'block'; document.getElementById('buyPromoSection').style.display = 'none'; document.getElementById('editPromoDetailInput').value = activePromo.detail || '';
+                document.getElementById('editPromoSection').style.display = 'block'; document.getElementById('buyPromoSection').style.display = 'none'; 
+                if(!silent) document.getElementById('editPromoDetailInput').value = activePromo.detail || '';
             } else {
                 document.getElementById('editPromoSection').style.display = 'none'; document.getElementById('buyPromoSection').style.display = 'block';
                 if(hasFreePromo) {
@@ -1003,8 +1006,10 @@
                     const sData = (appData.services && appData.services.length > 0) ? appData.services : []; document.getElementById('promoServiceSelect').innerHTML = sData.map(s => `<option value="${s.name} - ${s.price}฿">${s.name} - ${s.price}฿</option>`).join('');
                 }
             }
-            alert("ยืนยันตัวตนสำเร็จ! ยินดีต้อนรับร้าน " + store.name); 
-        } else alert("รหัส PIN ไม่ถูกต้อง");
+            if(!silent) alert("ยืนยันตัวตนสำเร็จ! ยินดีต้อนรับร้าน " + store.name); 
+        } else {
+            if(!silent) alert("รหัส PIN ไม่ถูกต้อง");
+        }
     }
 
     function openRenewPromo() {
@@ -1023,7 +1028,8 @@
             if(!appData.pendingVipRequests) appData.pendingVipRequests = []; appData.pendingVipRequests = appData.pendingVipRequests.filter(r => r.storeName !== store.name); appData.pendingVipRequests.push({ id: Date.now().toString(), storeName: store.name, slipImage: slipUrl, requestDate: new Date().toLocaleString() });
             
             await saveToCloud(); sendTelegramNotify(`👑 <b>มีร้านค้าส่งสลิปขอเปิด VIP!</b>\n\n🏬 ร้าน: <b>${store.name}</b>\n\n👉 กรุณาเข้าหน้าแอดมินเพื่อตรวจสอบสลิปครับ`);
-            alert("ส่งสลิปสำเร็จ! กรุณารอแอดมินอนุมัติสถานะ VIP ครับ (หลังจากอนุมัติ ช่องกรอก LINE/FB จะเปิดให้ใช้งาน)"); document.getElementById('vipSlipInput').value = '';
+            alert("ส่งสลิปสำเร็จ! กรุณารอแอดมินอนุมัติสถานะ VIP ครับ (ช่องกรอกข้อมูล VIP จะปรากฏให้อัตโนมัติเมื่อแอดมินอนุมัติเรียบร้อย)"); 
+            document.getElementById('vipSlipInput').value = '';
         } catch (error) { alert("❌ ไม่สามารถส่งข้อมูลได้ กรุณาลองใหม่อีกครั้ง"); } finally { btn.innerText = "ส่งสลิปเพื่ออัปเกรด VIP"; btn.disabled = false; }
     }
 
