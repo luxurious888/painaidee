@@ -667,14 +667,48 @@
         }
     }
 
-    function searchAndFocusStore(storeName) {
-        document.getElementById('searchBox').value = storeName; executeSearch('text'); window.scrollTo({top: document.getElementById('map').offsetTop - 20, behavior:'smooth'});
-        service.textSearch({ query: storeName, location: currentCoords, radius: 50000 }, (res, status) => {
-            if (status === "OK" && res.length > 0) {
-                map.panTo(res[0].geometry.location); map.setZoom(17);
-                if (activeMarker) activeMarker.setMap(null); activeMarker = new google.maps.Marker({ position: res[0].geometry.location, map: map, animation: google.maps.Animation.DROP });
-            }
-        });
+    function focusPlace(placeId) {
+        const place = googlePlaces.find(p => p.place_id === placeId);
+        if (place && place.geometry && place.geometry.location) {
+            map.panTo(place.geometry.location); map.setZoom(17);
+            if (activeMarker) activeMarker.setMap(null); 
+            activeMarker = new google.maps.Marker({ position: place.geometry.location, map: map, animation: google.maps.Animation.DROP });
+            window.scrollTo({ top: document.getElementById('map').offsetTop - 20, behavior: 'smooth' });
+
+            // ⚡ ดึงข้อมูล "เวลาเปิดปิดแบบละเอียด" เฉพาะร้านที่โดนคลิก (ประหยัด API และแอปโหลดไว)
+            service.getDetails({ placeId: placeId, fields: ['name', 'opening_hours'] }, (details, status) => {
+                let timeText = "ไม่มีข้อมูลเวลาเปิด-ปิดจากระบบแผนที่";
+                let isOpenNowHtml = "";
+
+                if (status === google.maps.places.PlacesServiceStatus.OK && details.opening_hours) {
+                    // ดึงเวลาเปิดปิดของ "วันนี้"
+                    if (details.opening_hours.weekday_text) {
+                        const today = new Date().getDay(); // 0 = อาทิตย์, 1 = จันทร์
+                        const dIndex = today === 0 ? 6 : today - 1; // Google Array เริ่มที่วันจันทร์
+                        timeText = details.opening_hours.weekday_text[dIndex]; 
+                    }
+                    
+                    // เช็คสถานะ เปิด/ปิด แบบ Real-time
+                    let isOpen = undefined;
+                    if (typeof details.opening_hours.isOpen === 'function') isOpen = details.opening_hours.isOpen();
+                    else if ('open_now' in details.opening_hours) isOpen = details.opening_hours.open_now;
+
+                    if(isOpen === true) isOpenNowHtml = '<span style="background:#06C755; color:#FFF; padding:3px 8px; border-radius:10px; font-size:11px; margin-left:6px;">เปิดอยู่</span>';
+                    else if(isOpen === false) isOpenNowHtml = '<span style="background:#D9534F; color:#FFF; padding:3px 8px; border-radius:10px; font-size:11px; margin-left:6px;">ปิดแล้ว</span>';
+                }
+
+                // สร้างป้าย Popup บนแผนที่
+                const contentStr = `
+                    <div style="padding: 10px; font-family: 'Kanit'; color: #333; min-width: 220px; text-align: left;">
+                        <h4 style="margin: 0 0 8px 0; color: #C5A059; font-size: 16px; border-bottom: 1px solid #eee; padding-bottom: 5px; display: flex; align-items: center;">${place.name} ${isOpenNowHtml}</h4>
+                        <p style="margin: 0 0 4px 0; font-size: 13px; font-weight: 600; color: #444;">⏰ เวลาทำการวันนี้:</p>
+                        <p style="margin: 0; font-size: 13px; color: #06C755; font-weight: 500;">${timeText}</p>
+                    </div>
+                `;
+                infoWindow.setContent(contentStr);
+                infoWindow.open(map, activeMarker);
+            });
+        }
     }
 
     function renderUI() {
