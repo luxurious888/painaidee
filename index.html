@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ไปไหนดี - Painaidee</title>
-    
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
@@ -12,14 +11,13 @@
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap');
-        
         :root { --primary: #C5A059; --primary-light: #DFBF8B; --primary-hover: #AF8B48; --dark: #121418; --dark-light: #1A1D23; --dark-muted: #2A2E36; --bg-light: #121418; --surface: #1A1D23; --border: rgba(197, 160, 89, 0.2); --text-main: #FFFFFF; --text-gold: #C5A059; --text-muted: #999999; --danger: #D9534F; --line-green: #06C755; --fb-blue: #1877F2; --info: #17a2b8; }
         body { font-family: 'Kanit', sans-serif; margin: 0; background-color: var(--bg-light); padding-bottom: 50px; color: var(--text-gold); overflow-x: hidden; scroll-behavior: smooth; }
         nav { display: flex; justify-content: space-around; background: var(--surface); padding: 10px 0; position: sticky; top: 0; z-index: 2000; box-shadow: 0 4px 20px rgba(0,0,0,0.1); border-bottom: 1px solid var(--border); }
-        nav div { cursor: pointer; font-weight: 500; color: var(--text-muted); padding: 12px 10px; font-size: 14px; transition: 0.3s; position: relative; letter-spacing: 0.5px; text-align: center; flex: 1; }
+        nav div { cursor: pointer; font-weight: 500; color: var(--text-muted); padding: 12px 10px; font-size: 14px; transition: 0.3s; position: relative; text-align: center; flex: 1; }
         nav div.active { color: var(--primary); font-weight: 600; }
         nav div.active::after { content: ''; position: absolute; bottom: 0; left: 15%; width: 70%; height: 3px; background: var(--primary); border-radius: 3px 3px 0 0; box-shadow: 0 -3px 10px rgba(197, 160, 89, 0.5); }
-        header { background: var(--dark); color: var(--surface); padding: 30px 20px; text-align: center; border-radius: 0 0 24px 24px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(26, 28, 32, 0.3); border: 1px solid var(--border); border-top: none; }
+        header { background: var(--dark); padding: 30px 20px; text-align: center; border-radius: 0 0 24px 24px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(26, 28, 32, 0.3); border: 1px solid var(--border); border-top: none; }
         header h1 { margin: 0; color: var(--primary); font-weight: 600; letter-spacing: 1px; }
         header p { margin: 8px 0 0 0; font-weight: 300; opacity: 0.8; font-size: 14px; color: #FFF; }
         .page { display: none; padding: 15px; max-width: 900px; margin: 0 auto; animation: fadeIn 0.4s ease; }
@@ -32,76 +30,50 @@
         .search-box-container { display: flex; gap: 12px; width: 100%; }
         .btn-primary { padding: 14px 24px; background: var(--primary); color: white; border: none; border-radius: 10px; font-family: 'Kanit'; font-weight: 500; font-size: 15px; cursor: pointer; transition: 0.3s; white-space: nowrap; width: 100%; box-shadow: 0 4px 10px rgba(197, 160, 89, 0.3); }
         .btn-primary:hover { background: var(--primary-hover); transform: translateY(-2px); }
-        .btn-secondary { background: var(--dark); color: var(--primary); padding: 12px 15px; border-radius: 10px; border: 1px solid var(--primary); cursor: pointer; font-family: 'Kanit'; font-weight: 500; text-align: center; transition: 0.3s; text-decoration: none; display: inline-block;}
-        .btn-secondary:hover { background: var(--primary); color: white; transform: translateY(-2px); }
+        .btn-secondary { background: var(--dark); color: var(--primary); padding: 12px 15px; border-radius: 10px; border: 1px solid var(--primary); cursor: pointer; font-family: 'Kanit'; font-weight: 500; text-align: center; transition: 0.3s; display: inline-block;}
         .btn-outline { background: transparent; color: var(--primary); border: 1px solid var(--border); padding: 10px 15px; border-radius: 10px; cursor: pointer; font-family: 'Kanit'; font-weight: 500; transition: 0.3s; }
         .btn-outline:hover { border-color: var(--primary); background: rgba(197, 160, 89, 0.1); }
+        .btn-danger { background: var(--danger); color: white; border: none; padding: 10px 15px; border-radius: 10px; cursor: pointer; font-family: 'Kanit'; font-weight: 500; transition: 0.3s; }
         .place-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; margin-top: 24px; }
         .place-card { background: var(--surface); border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid rgba(197,160,89,0.15); transition: 0.4s; cursor: pointer; position: relative; display: flex; flex-direction: column; }
-        .place-card:hover { transform: translateY(-6px); box-shadow: 0 15px 40px rgba(197, 160, 89, 0.25); border-color: rgba(197, 160, 89, 0.5); }
-        .place-card img.main-img { width: 100%; height: 180px; object-fit: cover; background-color: var(--dark-muted); pointer-events: auto; transition: 0.3s; }
-        .place-card img.main-img:hover { filter: brightness(1.1); }
+        .place-card img.main-img { width: 100%; height: 180px; object-fit: cover; background-color: var(--dark-muted); transition: 0.3s; }
         .place-info { padding: 20px; display: flex; flex-direction: column; flex-grow: 1; pointer-events: none; }
-        .distance-badge { position: absolute; top: 15px; right: 15px; background: rgba(26, 28, 32, 0.9); color: var(--primary-light); padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; backdrop-filter: blur(5px); border: 1px solid rgba(197, 160, 89, 0.3); box-shadow: 0 3px 10px rgba(0,0,0,0.2); z-index: 10; pointer-events: none; }
+        .distance-badge { position: absolute; top: 15px; right: 15px; background: rgba(26, 28, 32, 0.9); color: var(--primary-light); padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; backdrop-filter: blur(5px); border: 1px solid rgba(197, 160, 89, 0.3); z-index: 10; pointer-events: none; }
         .action-buttons { display: flex; gap: 8px; margin-top: auto; padding-top: 15px; flex-wrap: wrap; pointer-events: auto; }
-        .btn-action { flex: 1; text-align: center; color: white; text-decoration: none; padding: 10px 5px; border-radius: 10px; font-weight: 500; font-size: 12px; transition: 0.3s; border: none; cursor: pointer; font-family: 'Kanit'; min-width: 30%; }
-        .btn-nav { background: #4285F4 !important; color: #FFF !important; border: none !important; font-weight: 600; box-shadow: 0 4px 10px rgba(66, 133, 244, 0.3); }
-        .btn-call { background: var(--primary); color: white; }
+        .btn-action { flex: 1; text-align: center; color: white; padding: 10px 5px; border-radius: 10px; font-weight: 500; font-size: 12px; border: none; cursor: pointer; font-family: 'Kanit'; min-width: 30%; }
+        .btn-nav { background: #4285F4 !important; } .btn-call { background: var(--primary); color: white; }
+        .btn-line { background: #06C755 !important; } .btn-fb { background: #1877F2 !important; }
         .btn-share { background: transparent; color: var(--text-gold); border: 1px solid var(--border); }
-        .status-tag { display: inline-flex; align-items: center; justify-content: center; padding: 4px 8px; border-radius: 20px; font-size: 11px; font-weight: 500; white-space: nowrap; box-shadow: 0 2px 5px rgba(0,0,0,0.2); line-height: 1.2; }
+        .status-tag { display: inline-flex; align-items: center; justify-content: center; padding: 4px 8px; border-radius: 20px; font-size: 11px; font-weight: 500; white-space: nowrap; }
         .card-vip { border: 2px solid #FFD700 !important; box-shadow: 0 0 20px rgba(255, 215, 0, 0.25) !important; transform: translateY(-2px); }
-        .card-vip:hover { box-shadow: 0 15px 40px rgba(255, 215, 0, 0.4) !important; border-color: #FFF !important; }
-        .vip-crown-badge { position: absolute; top: -10px; left: -10px; background: linear-gradient(135deg, #FFD700, #C5A059, #FFD700); color: #000; padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: 800; z-index: 15; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border: 2px solid #FFF; animation: pulseGlow 2s infinite; pointer-events: none; }
-        @keyframes pulseGlow { 0% { box-shadow: 0 0 10px rgba(255,215,0,0.4); } 50% { box-shadow: 0 0 20px rgba(255,215,0,0.8); } 100% { box-shadow: 0 0 10px rgba(255,215,0,0.4); } }
-        .btn-line { background: #06C755 !important; color: #FFF !important; border: none !important; font-weight: 600;}
-        .btn-fb { background: #1877F2 !important; color: #FFF !important; border: none !important; font-weight: 600;}
-        @keyframes shine { 100% { left: 125%; } }
-        .shine-effect::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%); transform: skewX(-25deg); animation: shine 3s infinite; pointer-events: none; z-index: 5; }
-        .promo-btn-hover:hover { filter: brightness(1.1); transform: translateY(-2px); }
+        .vip-crown-badge { position: absolute; top: -10px; left: -10px; background: linear-gradient(135deg, #FFD700, #C5A059, #FFD700); color: #000; padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: 800; z-index: 15; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border: 2px solid #FFF; pointer-events: none; }
+        .btn-line-glow { background: linear-gradient(90deg, #06C755, #05A044); color: white; border: none; padding: 14px 20px; border-radius: 12px; font-family: 'Kanit'; font-weight: 600; font-size: 16px; width: 100%; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 8px 20px rgba(6, 199, 85, 0.4); }
         .highlight-banner { background: linear-gradient(135deg, var(--dark), var(--dark-light)); color: white; padding: 25px; border-radius: 16px; margin-top: 24px; box-shadow: 0 15px 35px rgba(26, 28, 32, 0.4); display: none; position: relative; overflow: hidden; border: 1px solid var(--border); }
-        .highlight-banner::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(197,160,89,0.15) 0%, transparent 60%); pointer-events: none; }
-        .highlight-banner h3 { margin: 0 0 5px 0; font-size: 20px; color: var(--primary); font-weight: 500; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
         .dashboard-card { background: var(--surface); padding: 25px; border-radius: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); margin-bottom: 24px; border: 1px solid var(--border); }
         .dashboard-card h3 { margin-top: 0; color: var(--primary-light); border-bottom: 2px solid var(--border); padding-bottom: 12px; font-weight: 500; }
         .form-group { margin-bottom: 22px; }
         .form-group label { display: block; font-weight: 500; font-size: 15px; color: #FFF; margin-bottom: 4px; }
-        .form-group .hint { font-size: 12.5px; color: var(--text-muted); margin-top: 0; margin-bottom: 10px; line-height: 1.4; }
-        
         #loginOverlay { position: fixed; inset: 0; background: #0b0f19; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
-        .bg-glow { position: absolute; width: 400px; height: 400px; background: radial-gradient(circle, rgba(6,199,85,0.15) 0%, transparent 70%); border-radius: 50%; top: -10%; left: -20%; animation: floatGlow 8s infinite alternate; }
-        .bg-glow2 { position: absolute; width: 500px; height: 500px; background: radial-gradient(circle, rgba(197,160,89,0.1) 0%, transparent 70%); border-radius: 50%; bottom: -20%; right: -20%; animation: floatGlow2 10s infinite alternate; }
-        @keyframes floatGlow { 0% { transform: translate(0, 0); } 100% { transform: translate(50px, 50px); } }
-        @keyframes floatGlow2 { 0% { transform: translate(0, 0); } 100% { transform: translate(-50px, -50px); } }
-        .glass-card { background: rgba(20, 24, 32, 0.6); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); border-top: 1px solid rgba(197, 160, 89, 0.4); box-shadow: 0 25px 50px rgba(0,0,0,0.5); padding: 35px 25px; border-radius: 24px; text-align: center; width: 90%; max-width: 360px; z-index: 10; animation: slideUpFade 0.6s ease-out; }
+        .glass-card { background: rgba(20, 24, 32, 0.6); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); border-top: 1px solid rgba(197, 160, 89, 0.4); box-shadow: 0 25px 50px rgba(0,0,0,0.5); padding: 35px 25px; border-radius: 24px; text-align: center; width: 90%; max-width: 360px; z-index: 10; animation: slideUpFade 0.6s ease-out; }
         @keyframes slideUpFade { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        .logo-circle { width: 110px; height: 110px; border-radius: 50%; background: linear-gradient(135deg, #1A1D23, #0b0f19); border: 2px solid #C5A059; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 0 25px rgba(197,160,89,0.4), inset 0 0 15px rgba(197,160,89,0.2); }
-        .logo-text { color: #FFD700; font-family: 'Kanit'; font-weight: 700; font-size: 26px; line-height: 1.1; text-shadow: 0 0 10px rgba(255,215,0,0.5); margin: 0; }
-        .btn-enter-glow { background: linear-gradient(135deg, #FFD700, #C5A059); color: #000; border: none; padding: 14px 20px; border-radius: 12px; font-family: 'Kanit'; font-weight: 600; font-size: 16px; width: 100%; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; position: relative; overflow: hidden; box-shadow: 0 8px 20px rgba(197, 160, 89, 0.4); animation: pulse-gold 2.5s infinite; box-sizing: border-box; }
-        .btn-enter-glow:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(197, 160, 89, 0.6); }
-        .btn-enter-glow::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, transparent, rgba(255,255,255,0.4), transparent); transform: skewX(-25deg); animation: shineBtn 3s infinite; }
-        .btn-line-glow { background: linear-gradient(90deg, #06C755, #05A044); color: white; border: none; padding: 14px 20px; border-radius: 12px; font-family: 'Kanit'; font-weight: 600; font-size: 16px; width: 100%; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; position: relative; overflow: hidden; box-shadow: 0 8px 20px rgba(6, 199, 85, 0.4); box-sizing: border-box; }
-        .btn-line-glow:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(6, 199, 85, 0.6); }
-        #partner-friend-blocker { display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 50px 20px; background: var(--surface); border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        #partner-actual-content { display: none; }
-        .line-logo-vertical { width: 100px; height: auto; margin-bottom: 25px; }
-        .friend-note { color: #FFF; font-size: 16px; font-weight: 400; line-height: 1.6; max-width: 300px; margin-bottom: 30px; }
         .spinner { width: 50px; height: 50px; border: 5px solid rgba(197,160,89,0.2); border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        #appContent { display: none; }
         .promo-carousel { display: flex; overflow-x: auto; gap: 16px; padding-bottom: 15px; scroll-snap-type: x mandatory; scrollbar-width: none; margin-top: 15px; }
         .promo-carousel::-webkit-scrollbar { display: none; }
         .promo-item { flex: 0 0 85%; max-width: 340px; scroll-snap-align: center; }
         
-        /* ⚡ CSS สำหรับ Image Modal, Slider และระบบล็อกสถิติ VIP */
+        /* ⚡ Slider & Image Modal & Lock Box */
         #imageViewerModal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:999999; flex-direction:column; justify-content:center; align-items:center; animation: fadeIn 0.3s ease; }
         #imageViewerModal img { max-width:95%; max-height:85vh; object-fit:contain; border-radius:12px; box-shadow:0 0 30px rgba(0,0,0,0.8); }
-        .close-modal-btn { position:absolute; top:20px; right:20px; color:white; background:rgba(255,255,255,0.2); width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:24px; cursor:pointer; transition:0.3s; z-index: 10; }
-        .close-modal-btn:hover { background:rgba(255,255,255,0.4); transform:scale(1.1); }
-        .promo-slider-container { position:relative; width:100%; height:180px; overflow:hidden; background:#000; }
+        .close-modal-btn { position:absolute; top:20px; right:20px; color:white; background:rgba(255,255,255,0.2); width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:24px; cursor:pointer; z-index: 10; }
+        .promo-slider-container { position:relative; width:100%; height:180px; overflow:hidden; background:#000; pointer-events:auto; }
         .slide-item { position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; transition:opacity 0.8s ease-in-out; cursor:pointer; }
-        .slide-item:hover { filter: brightness(1.1); }
-        .slide-indicator { position:absolute; bottom:8px; right:8px; background:rgba(0,0,0,0.6); color:#fff; font-size:11px; padding:3px 8px; border-radius:12px; z-index:10; font-weight:bold; letter-spacing: 1px; backdrop-filter: blur(4px); }
+        .slide-indicator { position:absolute; bottom:8px; right:8px; background:rgba(0,0,0,0.6); color:#fff; font-size:11px; padding:3px 8px; border-radius:12px; z-index:10; font-weight:bold; backdrop-filter: blur(4px); }
         .vip-lock-box { background: rgba(255,255,255,0.05); border: 1px dashed #555; padding: 20px; border-radius: 12px; text-align: center; margin-top: 15px; }
+
+        /* ⚡ Popup Modals สำหรับคูปองและกิจกรรม */
+        .feature-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:99999; flex-direction:column; justify-content:center; align-items:center; padding: 20px; animation: fadeIn 0.2s ease; }
+        .feature-modal-content { background:var(--surface); border:1px solid var(--primary); padding:25px; border-radius:16px; width:100%; max-width:350px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
     </style>
 </head>
 <body>
@@ -111,34 +83,46 @@
     <img id="viewerImg" src="" onclick="event.stopPropagation()">
 </div>
 
-<div id="loginOverlay">
-    <div class="bg-glow"></div>
-    <div class="bg-glow2"></div>
+<div id="couponModal" class="feature-modal">
+    <div class="feature-modal-content">
+        <h3 style="margin-top:0; color:#D9534F;">🎟️ จัดการคูปองส่วนลด</h3>
+        <p style="font-size:13px; color:#aaa;">ตั้งค่าข้อความคูปองให้ลูกค้าเห็นเด่นชัดบนแผนที่ (ปล่อยว่างเพื่อปิดคูปอง)</p>
+        <input type="text" id="couponText" placeholder="เช่น ลด 10% เมื่อแสดงแอป, ฟรีเครื่องดื่ม 1 แก้ว" style="margin-bottom:15px; border-color:#D9534F;">
+        <div style="display:flex; gap:10px;">
+            <button class="btn-primary" style="flex:1; background:#D9534F; color:#FFF;" onclick="saveCoupon()">💾 บันทึก</button>
+            <button class="btn-outline" style="flex:1; border-color:#666; color:#aaa;" onclick="document.getElementById('couponModal').style.display='none'">ยกเลิก</button>
+        </div>
+    </div>
+</div>
 
+<div id="eventModal" class="feature-modal">
+    <div class="feature-modal-content">
+        <h3 style="margin-top:0; color:#17a2b8;">🎉 กิจกรรมวันนี้</h3>
+        <p style="font-size:13px; color:#aaa;">โปรโมทอีเวนต์ด่วนๆ วันนี้ให้ลูกค้าทราบ (ปล่อยว่างเพื่อปิดกิจกรรม)</p>
+        <input type="text" id="eventText" placeholder="เช่น 20:00 น. พบกับดนตรีสดวงคาราบาว!" style="margin-bottom:15px; border-color:#17a2b8;">
+        <div style="display:flex; gap:10px;">
+            <button class="btn-primary" style="flex:1; background:#17a2b8; color:#FFF;" onclick="saveEvent()">💾 บันทึก</button>
+            <button class="btn-outline" style="flex:1; border-color:#666; color:#aaa;" onclick="document.getElementById('eventModal').style.display='none'">ยกเลิก</button>
+        </div>
+    </div>
+</div>
+
+<div id="loginOverlay">
     <div id="loadingSpinner" style="display: flex; flex-direction: column; align-items: center; z-index: 10;">
         <div class="spinner" style="width: 70px; height: 70px; border-width: 6px;"></div>
-        <h3 style="color: var(--primary); margin: 0; font-size: 20px; letter-spacing: 1px;" id="loadingText">กำลังเตรียมระบบ...</h3>
-        <p style="color: rgba(255,255,255,0.7); font-size: 14px; margin-top: 8px;">กรุณารอสักครู่เพื่อเข้าสู่แอปไปไหนดี</p>
+        <h3 style="color: var(--primary); margin: 0; font-size: 20px;">กำลังเตรียมระบบ...</h3>
     </div>
 
     <div class="glass-card" id="loginCard" style="display: none;">
-        <div class="logo-circle"><p class="logo-text">ไป<br>ไหนดี</p></div>
-        <h2 style="color: #FFF; margin: 0 0 20px 0; font-size: 22px; font-weight: 600;">เลือกรูปแบบการใช้งาน</h2>
-        
+        <div style="width:110px; height:110px; border-radius:50%; border: 2px solid #C5A059; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;"><h1 style="color: #FFD700; margin: 0;">ไป<br>ไหนดี</h1></div>
+        <h2 style="color: #FFF; margin: 0 0 20px 0; font-size: 22px;">เลือกรูปแบบการใช้งาน</h2>
         <div style="margin-bottom: 20px;">
-            <button onclick="enterApp()" class="btn-enter-glow" style="margin-bottom: 8px;">🚀 เข้าใช้งานทั่วไป</button>
-            <p style="font-size: 12.5px; color: rgba(255,255,255,0.7); margin: 0; line-height: 1.4;">* สำหรับผู้ใช้งานทั่วไป ค้นหาร้านและดูโปรโมชั่น <br><span style="color: var(--primary-light);">(ไม่ต้องล็อกอิน)</span></p>
+            <button onclick="enterApp()" class="btn-primary" style="margin-bottom: 8px;">🚀 เข้าใช้งานทั่วไป</button>
+            <p style="font-size: 12.5px; color: #aaa; margin: 0;">(ไม่ต้องล็อกอิน)</p>
         </div>
-
-        <div style="display: flex; align-items: center; margin-bottom: 20px;">
-            <div style="flex: 1; height: 1px; background: rgba(255,255,255,0.2);"></div>
-            <span style="color: rgba(255,255,255,0.5); padding: 0 10px; font-size: 12px;">หรือ</span>
-            <div style="flex: 1; height: 1px; background: rgba(255,255,255,0.2);"></div>
-        </div>
-
         <div>
             <button onclick="smartLogin('')" class="btn-line-glow" style="margin-bottom: 8px;">📱 เข้าสู่ระบบด้วย LINE</button>
-            <p style="font-size: 12.5px; color: rgba(255,255,255,0.7); margin: 0; line-height: 1.4;">* เหมาะสำหรับร้านค้า และนักรีวิวเพื่อสร้างรายได้</p>
+            <p style="font-size: 12.5px; color: #aaa; margin: 0;">เหมาะสำหรับร้านค้า & ตัวแทน</p>
         </div>
     </div>
 </div>
@@ -152,31 +136,19 @@
 
     <div id="page-home" class="page active">
         <header>
-            <div style="margin: 0 auto 15px; display: flex; justify-content: center;">
-                <div id="header-profile" style="width:100px; height:100px; border-radius:50%; background:var(--surface); border: 2px solid var(--primary); display: flex; flex-direction: column; align-items:center; justify-content:center; overflow: hidden; box-shadow: 0 0 15px rgba(197,160,89,0.3);"></div>
-            </div>
+            <div id="header-profile" style="width:100px; height:100px; border-radius:50%; background:var(--surface); border: 2px solid var(--primary); margin: 0 auto 15px; overflow: hidden;"></div>
             <h1 id="header-name">ไปไหนดี</h1>
             <p>ค้นหาร้านอาหารและสถานที่น่าสนใจทั่วไทย</p>
-            
             <div id="header-guest-login" style="display: none; margin-top: 20px;">
-                <button class="btn-line-glow" style="width: auto; margin: 0 auto; padding: 10px 24px; border-radius: 20px; font-size: 14px; box-shadow: 0 4px 15px rgba(6, 199, 85, 0.3);" onclick="smartLogin('')">
-                    📱 ล็อคอินด้วย LINE
-                </button>
-                <p style="font-size: 12px; color: var(--text-muted); margin-top: 10px; line-height: 1.4;">ล็อคอินไลน์เพื่อรับรหัสแนะนำเพื่อน<br>เพื่อสร้างรายได้กับเรา!</p>
+                <button class="btn-line-glow" style="width: auto; margin: 0 auto;" onclick="smartLogin('')">📱 ล็อคอินด้วย LINE</button>
             </div>
         </header>
         
         <div id="map"></div>
         
         <div class="search-area">
-            <div style="margin-bottom: 12px;">
-                <select id="provinceSelect" onchange="changeLocation()" style="width: 100%;">
-                    <option value="current" selected>📍 ตำแหน่งปัจจุบัน</option>
-                </select>
-            </div>
-            
+            <select id="provinceSelect" onchange="changeLocation()" style="margin-bottom: 12px; width: 100%;"><option value="current">📍 ตำแหน่งปัจจุบัน</option></select>
             <div id="dynamic-category-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;"></div>
-
             <div class="search-box-container">
                 <input type="text" id="searchBox" placeholder="พิมพ์ชื่อที่ต้องการค้นหา..." onkeydown="if(event.key === 'Enter') executeSearch('text')">
                 <button class="btn-primary" style="width: auto;" onclick="executeSearch('text')">ค้นหา</button>
@@ -185,7 +157,7 @@
 
         <div id="promoBanner" class="highlight-banner" style="display: block;">
             <h3>✨ Exclusive Promotions</h3>
-            <p style="font-size: 13px; margin:0 0 5px 0; color:rgba(255,255,255,0.6);">แบรนด์ยอดฮิตประจำจังหวัด ห้ามพลาด!</p>
+            <p style="font-size: 13px; margin:0 0 5px 0; color:#aaa;">แบรนด์ยอดฮิตประจำจังหวัด ห้ามพลาด!</p>
             <div id="approvedPromoList" class="promo-carousel">
                 <div style="width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px 0;">
                     <div class="spinner" style="width: 35px; height: 35px; border-width: 3px; margin: 0 auto 10px;"></div>
@@ -203,7 +175,7 @@
         <div id="affiliate-guest-view" style="display: none; text-align: center; padding: 40px 20px; background: var(--surface); border-radius: 16px; border: 1px solid var(--border);">
             <div style="font-size: 60px; margin-bottom: 10px;">💸</div>
             <h2 style="color: var(--primary); margin-top: 0;">สร้างรายได้กับเรา</h2>
-            <p style="color: var(--text-muted); margin-bottom: 30px;">ล็อคอินไลน์เพื่อรับลิงก์แนะนำเพื่อน<br>เพื่อสร้างรายได้จากการแนะนำร้านค้าเลย!</p>
+            <p style="color: #999; margin-bottom: 30px;">ล็อคอินไลน์เพื่อรับลิงก์แนะนำเพื่อน<br>เพื่อสร้างรายได้จากการแนะนำร้านค้าเลย!</p>
             <button class="btn-line-glow" style="width: auto; margin: 0 auto; padding: 14px 24px; animation: none;" onclick="smartLogin('affiliate')">
                 📱 ล็อคอินด้วย LINE
             </button>
@@ -212,31 +184,27 @@
         <div id="affiliate-actual-content" style="display: none;">
             <div class="dashboard-card" style="text-align: center; border: 2px dashed var(--info); background: rgba(23, 162, 184, 0.05);">
                 <h3 style="color: var(--info); margin-top:0; border: none;">🎁 ระบบแนะนำเพื่อนสร้างรายได้</h3>
-                <p style="font-size: 13.5px; color: var(--text-muted); margin-top: -10px; margin-bottom: 20px;">
-                    คัดลอกลิงก์ด้านล่าง ส่งให้เพื่อนมาลงทะเบียนร้านค้า<br>รับค่าคอมมิชชั่นทันทีที่ร้านค้าซื้อโปรโมชั่นสำเร็จ!
-                </p>
+                <p style="font-size: 13.5px; color: #999; margin-top: -10px; margin-bottom: 20px;">คัดลอกลิงก์ด้านล่าง ส่งให้เพื่อนมาลงทะเบียนร้านค้า<br>รับค่าคอมมิชชั่นทันทีที่ร้านค้าซื้อโปรโมชั่นสำเร็จ!</p>
                 
                 <div style="padding: 15px; border: 1px solid rgba(23, 162, 184, 0.3); border-radius: 12px; background: rgba(0,0,0,0.3); margin-bottom: 20px;">
                     <p style="margin: 0 0 5px 0; color: #FFF; font-size: 14px;">🎁 รหัสแนะนำเพื่อน (Affiliate)</p>
-                    <p style="margin: 0 0 15px 0; color: var(--text-muted); font-size: 12px;">ส่งรหัส หรือ ส่งลิงก์ให้เพื่อนสมัครร้านค้า เพื่อรับค่าคอมมิชชั่น!</p>
                     <h3 id="myAffiliateCode" style="margin: 0 0 15px 0; color: var(--info); font-size: 28px; letter-spacing: 2px; font-weight: bold;">-</h3>
-                    
                     <div style="display: flex; gap: 10px; justify-content: center;">
-                        <button class="btn-outline" style="flex: 1; padding: 10px; font-size: 14px; border-color: var(--info); color: var(--info); background: transparent;" onclick="copyHeaderAffCode()">📋 คัดลอกรหัส</button>
-                        <button class="btn-primary" style="flex: 1; padding: 10px; font-size: 14px; background: linear-gradient(135deg, #17a2b8, #00d2ff); color: #FFF; border: none; box-shadow: 0 4px 10px rgba(23, 162, 184, 0.3);" onclick="copyAffLink()">🔗 คัดลอกเป็นลิงก์</button>
+                        <button class="btn-outline" style="flex: 1; border-color: var(--info); color: var(--info);" onclick="copyHeaderAffCode()">📋 คัดลอกรหัส</button>
+                        <button class="btn-primary" style="flex: 1; background: linear-gradient(135deg, #17a2b8, #00d2ff);" onclick="copyAffLink()">🔗 คัดลอกเป็นลิงก์</button>
                     </div>
                 </div>
                 
-                <div style="background: rgba(0,0,0,0.4); border: 1px solid rgba(6, 199, 85, 0.3); border-radius: 16px; padding: 25px 20px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
-                    <p style="margin: 0 0 5px 0; font-size: 14px; color: var(--text-muted);">ยอดเงินค่าคอมมิชชั่นสะสม</p>
-                    <p style="margin: 0 0 5px 0; font-size: 36px; color: var(--line-green); font-weight: bold; text-shadow: 0 0 10px rgba(6,199,85,0.4);" id="aff-page-balance">0.00 ฿</p>
+                <div style="background: rgba(0,0,0,0.4); border: 1px solid rgba(6, 199, 85, 0.3); border-radius: 16px; padding: 25px 20px; margin-bottom: 20px;">
+                    <p style="margin: 0 0 5px 0; font-size: 14px; color: #999;">ยอดเงินค่าคอมมิชชั่นสะสม</p>
+                    <p style="margin: 0 0 5px 0; font-size: 36px; color: var(--line-green); font-weight: bold;" id="aff-page-balance">0.00 ฿</p>
                     <p style="margin: 0 0 20px 0; font-size: 12px; color: var(--danger);" id="aff-min-text">*(ถอนขั้นต่ำ 300 บาท)*</p>
-                    <button id="btn-page-withdraw" onclick="requestWithdraw()" style="background: var(--dark-muted); color: var(--text-muted); border: 1px solid var(--border); padding: 14px; border-radius: 12px; font-size: 15px; font-family: 'Kanit'; font-weight: 600; width: 100%; cursor: not-allowed; transition: 0.3s;" disabled>ถอนเงินเข้าบัญชี</button>
+                    <button id="btn-page-withdraw" onclick="requestWithdraw()" style="background: var(--dark-muted); color: #999; border: 1px solid var(--border); padding: 14px; border-radius: 12px; width: 100%; font-weight: bold;" disabled>ถอนเงินเข้าบัญชี</button>
                 </div>
 
                 <div style="text-align: left; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 25px;">
                     <h4 style="margin: 0 0 15px 0; color: var(--primary-light); font-size: 16px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">📋 ประวัติร้านค้าที่แนะนำ</h4>
-                    <div id="affiliate-history-list" style="max-height: 200px; overflow-y: auto; font-size: 13px; color: var(--text-muted);"></div>
+                    <div id="affiliate-history-list" style="max-height: 200px; overflow-y: auto; font-size: 13px; color: #999;"></div>
                 </div>
             </div>
         </div>
@@ -244,49 +212,49 @@
 
     <div id="page-partner" class="page">
         <div id="partner-friend-blocker" style="display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 50px 20px; background: var(--surface); border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
-            <img src="https://official-static.line-scdn.net/branding/logo-vertical.png" alt="LINE Official Account" style="width: 100px; margin-bottom: 25px;">
-            <div style="color: #FFF; font-size: 16px; font-weight: 400; line-height: 1.6; max-width: 300px; margin-bottom: 30px;"><span style="color:var(--primary); font-weight:600;">⚠️ สำหรับร้านค้า</span><br>กรุณาเข้าใช้งานผ่านแอป LINE<br>เพื่อรับรหัส PIN ในการจัดการร้านครับ</div>
+            <img src="https://official-static.line-scdn.net/branding/logo-vertical.png" alt="LINE" style="width: 100px; margin-bottom: 25px;">
+            <div style="color: #FFF; font-size: 16px; margin-bottom: 30px;"><span style="color:var(--primary); font-weight:600;">⚠️ สำหรับร้านค้า</span><br>กรุณาเข้าใช้งานผ่านแอป LINE<br>เพื่อรับรหัส PIN ในการจัดการร้านครับ</div>
             <button class="btn-line-glow" style="width: auto; padding: 14px 24px; animation: none;" onclick="smartLogin('partner')">📱 เปิดใช้งานผ่านแอป LINE</button>
-            <button class="btn-outline" style="margin-top: 20px; font-size: 13px; border-color:var(--dark-muted); color:var(--text-muted);" onclick="checkFriendshipForPartner(true)">ฉันเพิ่มเพื่อนแล้ว ตรวจสอบอีกครั้ง</button>
         </div>
 
         <div id="partner-actual-content" style="display: none;">
             <div class="dashboard-card" id="registerNewStoreCard" style="border-top: 3px solid var(--primary); border-bottom: 3px solid var(--primary);">
                 <h3 style="border:none;">ลงทะเบียนร้านค้าใหม่</h3>
-                <p style="font-size: 14px; color: var(--text-muted); margin-top: -10px; margin-bottom: 20px;">ส่งเอกสารให้แอดมินตรวจสอบ เพื่อรับ "รหัสลับ (Store PIN)"</p>
+                <p style="font-size: 14px; color: #999; margin-top: -10px; margin-bottom: 20px;">ส่งเอกสารให้แอดมินตรวจสอบ เพื่อรับ "รหัสลับ (Store PIN)"</p>
                 
                 <div class="form-group">
                     <label>1. ค้นหาพิกัดร้านจากแผนที่</label>
-                    <p class="hint">พิมพ์ชื่อร้านเพื่อปักหมุดตำแหน่งร้านของคุณบนแผนที่</p>
-                    <div style="display: flex; gap: 10px;"><input type="text" id="regStoreName" placeholder="พิมพ์ชื่อร้านเพื่อค้นหา..."><button class="btn-outline" style="width: auto; white-space: nowrap;" onclick="searchRegStore()">ค้นหา</button></div>
+                    <div style="display: flex; gap: 10px;"><input type="text" id="regStoreName" placeholder="พิมพ์ชื่อร้านเพื่อค้นหา..."><button class="btn-outline" style="width: auto;" onclick="searchRegStore()">ค้นหา</button></div>
                     <div id="regStoreVerifyCard" style="display:none; background:var(--bg-light); padding:15px; border-radius:10px; margin-top:10px; border:1px solid var(--border);">
                         <h4 id="regVerifyStoreName" style="margin:0 0 10px 0; color:var(--primary);"></h4><div id="regMiniMap" style="width:100%; height:150px; border-radius:10px;"></div>
                     </div>
                 </div>
-                
                 <div class="form-group"><label>2. รูปถ่ายหน้าร้านคู่เจ้าของร้าน <span style="color:var(--danger);">*</span></label><input type="file" id="regStorePhoto" accept="image/*"></div>
                 <div class="form-group"><label>3. สำเนาบัตรประชาชน/พาสปอร์ต <span style="color:var(--danger);">*</span></label><input type="file" id="regIdCard" accept="image/*"></div>
                 <div class="form-group"><label>4. ใบทะเบียนพาณิชย์ (ถ้ามี)</label><input type="file" id="regCommercial" accept="image/*"></div>
                 <div class="form-group"><label>5. เบอร์โทรศัพท์ติดต่อ <span style="color:var(--danger);">*</span></label><input type="text" id="regPhone" placeholder="08X-XXX-XXXX"></div>
-                <div class="form-group"><label>6. รหัสผู้แนะนำ Affiliate (ถ้ามี)</label><input type="text" id="regRefCode" placeholder="กรอกรหัสผู้แนะนำ (ไม่บังคับ)" style="border-color: var(--info);"></div>
-                <button class="btn-secondary" id="btnSubmitReg" style="width: 100%; margin-top: 10px; padding: 15px; font-size: 16px;" onclick="submitStoreRegistration()">🚀 ส่งข้อมูลเพื่อรับ PIN</button>
+                <div class="form-group"><label>6. รหัสผู้แนะนำ Affiliate (ถ้ามี)</label><input type="text" id="regRefCode" placeholder="กรอกรหัสผู้แนะนำ (ไม่บังคับ)"></div>
+                <button class="btn-secondary" id="btnSubmitReg" style="width: 100%; padding: 15px;" onclick="submitStoreRegistration()">🚀 ส่งข้อมูลเพื่อรับ PIN</button>
             </div>
 
             <div class="dashboard-card">
                 <h3>จัดการร้านค้า / อัปเดตโปรโมชั่น</h3>
                 <div class="form-group">
                     <label>รหัสลับร้านค้า (Store PIN)</label>
-                    <div style="display: flex; gap: 10px;"><input type="password" id="storePinInput" placeholder="รหัส PIN 6 หลัก"><button class="btn-outline" style="width: auto; white-space: nowrap;" onclick="verifyStore(false)">ตรวจสอบ</button></div>
-                    <div style="text-align: right; margin-top: 8px;"><a href="#" onclick="forgotPin()" style="font-size: 13px; color: var(--info); text-decoration: underline;">ลืมรหัส PIN?</a></div>
+                    <div style="display: flex; gap: 10px;"><input type="password" id="storePinInput" placeholder="รหัส PIN 6 หลัก"><button class="btn-outline" style="width: auto;" onclick="verifyStore(false)">ตรวจสอบ</button></div>
+                    <div style="text-align: right; margin-top: 8px;"><a href="#" onclick="forgotPin()" style="font-size: 13px; color: var(--info);">ลืมรหัส PIN?</a></div>
                 </div>
-                <div id="storeVerifyCard" style="display:none; background:var(--bg-light); padding:15px; border-radius:10px; margin-bottom:15px; border:1px solid var(--border);"><h4 id="verifyStoreName" style="margin:0 0 10px 0; color:var(--primary);"></h4><div id="miniMap" style="width:100%; height:150px; border-radius:10px;"></div></div>
 
                 <div id="lockedFeatures" style="display: none; margin-top: 20px;">
+                    
                     <div id="vipSubscribeSection" style="padding: 20px; border: 2px solid #FFD700; border-radius: 16px; background: linear-gradient(180deg, rgba(255, 215, 0, 0.1) 0%, var(--surface) 100%); margin-bottom: 25px; text-align: center;">
                         <h4 id="vipSubscribeTitle" style="margin: 0 0 10px 0; color: #FFD700; font-size: 18px;">👑 สมัครสมาชิก VIP</h4>
-                        <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid rgba(197, 160, 89, 0.3);"><p style="margin: 0; color: #FFF; font-size: 16px;">ค่าบริการ: <strong style="color: var(--line-green); font-size: 20px;" id="displayVipPrice">500</strong> <strong>บาท/เดือน</strong></p><p style="margin: 5px 0 0 0; font-size: 13px; color: var(--primary-light);">บัญชีโอนเงิน: <span id="displayBankAcc">รอแอดมินตั้งค่าบัญชี</span></p></div>
+                        <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid rgba(197, 160, 89, 0.3);">
+                            <p style="margin: 0; color: #FFF; font-size: 16px;">ค่าบริการ: <strong style="color: var(--line-green); font-size: 20px;" id="displayVipPrice">500</strong> <strong>บาท/เดือน</strong></p>
+                            <p style="margin: 5px 0 0 0; font-size: 13px; color: var(--primary-light);">บัญชีโอนเงิน: <span id="displayBankAcc">รอแอดมินตั้งค่าบัญชี</span></p>
+                        </div>
                         <div class="form-group" style="text-align: left;"><label>🧾 แนบสลิปการโอนเงิน <span style="color:var(--danger);">*</span></label><input type="file" id="vipSlipInput" accept="image/*"></div>
-                        <button id="btnSubmitVip" class="btn-primary" style="background: linear-gradient(135deg, #FFD700, #C5A059); color: #000; font-weight: 600; padding: 12px; font-size: 16px;" onclick="submitVipRequest()">ส่งสลิปเพื่ออัปเกรด VIP</button>
+                        <button id="btnSubmitVip" class="btn-primary" style="background: linear-gradient(135deg, #FFD700, #C5A059); color: #000;" onclick="submitVipRequest()">ส่งสลิปเพื่ออัปเกรด VIP</button>
                     </div>
 
                     <div id="vipUpdateSection" style="padding: 15px; border: 1px dashed var(--primary); border-radius: 12px; margin-bottom: 25px; background: rgba(197, 160, 89, 0.05); display: none;">
@@ -319,15 +287,15 @@
                         <div style="margin-top: 20px; border-top: 1px dashed var(--primary); padding-top: 15px;">
                             <h4 style="color: #FFD700; font-size: 16px; margin-bottom: 15px;">🎁 การตลาด & กิจกรรม</h4>
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                                <button class="btn-outline" style="font-size: 12px; padding: 10px;" onclick="alert('ฟีเจอร์คูปองส่วนลด กำลังจะเปิดให้ใช้งานเร็วๆ นี้ครับ!')">🎟️ จัดการคูปอง</button>
-                                <button class="btn-outline" style="font-size: 12px; padding: 10px;" onclick="alert('ฟีเจอร์จัดกิจกรรมร้านค้า กำลังจะเปิดให้ใช้งานเร็วๆ นี้ครับ!')">🎉 กิจกรรมวันนี้</button>
+                                <button class="btn-outline" style="font-size: 12px; padding: 10px; border-color:#D9534F; color:#D9534F;" onclick="openCouponEditor()">🎟️ จัดการคูปอง</button>
+                                <button class="btn-outline" style="font-size: 12px; padding: 10px; border-color:#17a2b8; color:#17a2b8;" onclick="openEventEditor()">🎉 กิจกรรมวันนี้</button>
                             </div>
                         </div>
                     </div>
 
                     <div id="nonVipStatsBlock" class="vip-lock-box" style="display:none;">
                         <div style="font-size: 30px; margin-bottom: 10px;">👑</div>
-                        <p style="font-size:14px; color:#ccc; margin-bottom:15px; line-height:1.5;">คุณสามารถอัปเกรดเป็น <span style="color:var(--primary); font-weight:bold;">VIP</span><br>เพื่อปลดล็อกข้อมูลสถิติผู้เข้าชม, ตั้งเวลาทำการแบบละเอียด, และเพิ่มความน่าเชื่อถือให้กับร้านของคุณ!</p>
+                        <p style="font-size:14px; color:#ccc; margin-bottom:15px; line-height:1.5;">คุณสามารถอัปเกรดเป็น <span style="color:var(--primary); font-weight:bold;">VIP</span><br>เพื่อปลดล็อกข้อมูลสถิติผู้เข้าชม, ตั้งเวลาทำการแบบละเอียด, ใส่คูปอง/กิจกรรม และเพิ่มความน่าเชื่อถือให้กับร้านของคุณ!</p>
                         <button class="btn-outline" style="border-color:var(--primary); color:var(--primary);" onclick="document.getElementById('vipSubscribeSection').scrollIntoView({behavior: 'smooth'})">🚀 ดูรายละเอียดการอัปเกรด VIP</button>
                     </div>
 
@@ -726,7 +694,19 @@
                     else if(isOpen === false) isOpenNowHtml = '<span style="background:#D9534F; color:#FFF; padding:3px 8px; border-radius:10px; font-size:11px; margin-left:6px;">ปิดแล้ว</span>';
                 }
 
-                const contentStr = `<div style="padding: 10px; font-family: 'Kanit'; color: #333; min-width: 220px; text-align: left;"><h4 style="margin: 0 0 8px 0; color: #C5A059; font-size: 16px; border-bottom: 1px solid #eee; padding-bottom: 5px; display: flex; align-items: center;">${place.name} ${isOpenNowHtml}</h4><p style="margin: 0 0 4px 0; font-size: 13px; font-weight: 600; color: #444;">⏰ เวลาทำการวันนี้:</p><p style="margin: 0; font-size: 13px; color: #06C755; font-weight: 500;">${timeText}</p></div>`;
+                // ⚡ โชว์คูปองและกิจกรรมในแผนที่ ถ้าเป็น VIP
+                let extraHtml = "";
+                if(isVIP && store.coupon && store.coupon.trim() !== "") extraHtml += `<p style="margin:6px 0 0; font-size:12px; color:#D9534F; font-weight:bold;">🎟️ คูปอง: ${store.coupon}</p>`;
+                if(isVIP && store.event && store.event.trim() !== "") extraHtml += `<p style="margin:6px 0 0; font-size:12px; color:#17a2b8; font-weight:bold;">🎉 วันนี้: ${store.event}</p>`;
+
+                const contentStr = `
+                    <div style="padding: 10px; font-family: 'Kanit'; color: #333; min-width: 220px; text-align: left;">
+                        <h4 style="margin: 0 0 8px 0; color: #C5A059; font-size: 16px; border-bottom: 1px solid #eee; padding-bottom: 5px; display: flex; align-items: center;">${place.name} ${isOpenNowHtml}</h4>
+                        <p style="margin: 0 0 4px 0; font-size: 13px; font-weight: 600; color: #444;">⏰ เวลาทำการวันนี้:</p>
+                        <p style="margin: 0; font-size: 13px; color: #06C755; font-weight: 500;">${timeText}</p>
+                        ${extraHtml}
+                    </div>
+                `;
                 infoWindow.setContent(contentStr); infoWindow.open(map, activeMarker);
             });
         }
@@ -836,6 +816,11 @@
             const hasLine = isVIP && store && store.lineUrl && store.lineUrl.trim() !== ''; const hasFb = isVIP && store && store.fbUrl && store.fbUrl.trim() !== '';
             const imgUrl = p.photos ? p.photos[0].getUrl({maxWidth:400}) : 'https://via.placeholder.com/400x200?text=Painaidee';
 
+            // ⚡ โชว์ Tag พิเศษที่หน้าร้าน
+            let extraTags = "";
+            if(isVIP && store.coupon && store.coupon.trim() !== "") extraTags += `<span style="background:rgba(217, 83, 79, 0.1); color:var(--danger); padding:2px 8px; border-radius:10px; font-size:10px; font-weight:bold; margin-right:5px;">🎟️ มีคูปอง</span>`;
+            if(isVIP && store.event && store.event.trim() !== "") extraTags += `<span style="background:rgba(23, 162, 184, 0.1); color:var(--info); padding:2px 8px; border-radius:10px; font-size:10px; font-weight:bold;">🎉 มีกิจกรรม</span>`;
+
             return `<div class="place-card ${isVIP ? 'card-vip':''}" onclick="focusPlace('${p.place_id}'); trackAction('${p.name}', 'view')">
                 ${isVIP?'<div class="vip-crown-badge">👑 VIP RECOMMEND</div>':''}
                 <div class="distance-badge">${distanceKm} กม.</div>
@@ -845,7 +830,8 @@
                         <h3 style="margin:0; font-size: 16px; flex: 1; color:${isVIP?'#FFD700':'var(--text-gold)'}; font-weight:600; line-height:1.2;">${p.name}</h3>
                         <div style="text-align:right; flex-shrink: 0;">${openStatusHtml}</div>
                     </div>
-                    <p style="font-size:13px; color:var(--text-muted); margin:0 0 10px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.vicinity}</p>
+                    <p style="font-size:13px; color:var(--text-muted); margin:0 0 5px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.vicinity}</p>
+                    <div style="margin-bottom:8px;">${extraTags}</div>
                     <div><span style="color:var(--primary); font-weight:600;">⭐ ${p.rating || 'ใหม่'}</span></div>
                     <div class="action-buttons">
                         <button class="btn-action btn-nav" onclick="window.open('${navUrl}', '_blank'); trackAction('${p.name}', 'dir'); event.stopPropagation();">นำทาง</button>
@@ -896,12 +882,20 @@
                 if(imgs.length > 1) sliderHtml += `<div class="slide-indicator">1/${imgs.length} 📸</div>`;
                 sliderHtml += `</div>`;
 
+                // ⚡ โชว์คูปองในแบนเนอร์ (ถ้ามี)
+                let extraHtml = "";
+                if(isVIP && store.coupon && store.coupon.trim() !== "") extraHtml += `<span style="background:rgba(217,83,79,0.1); color:var(--danger); padding:2px 8px; border-radius:10px; font-size:10px; font-weight:bold; margin-right:5px;">🎟️ มีคูปอง</span>`;
+                if(isVIP && store.event && store.event.trim() !== "") extraHtml += `<span style="background:rgba(23,162,184,0.1); color:var(--info); padding:2px 8px; border-radius:10px; font-size:10px; font-weight:bold;">🎉 มีกิจกรรม</span>`;
+
                 return `
                 <div class="promo-item place-card" style="border:2px solid var(--primary); box-shadow: 0 0 20px rgba(197,160,89,0.2);">
                     <div style="position:absolute; top:12px; right:-28px; background:#D9534F; color:#FFF; padding:4px 30px; transform:rotate(45deg); font-size:11px; font-weight:800; z-index:20; box-shadow: 0 2px 5px rgba(0,0,0,0.3); pointer-events: none;">HOT 🔥</div>
                     ${sliderHtml} 
                     <div style="padding:18px; display:flex; flex-direction:column; flex-grow:1;">
-                        ${p.category ? `<span style="background:var(--primary); color:#000; padding:2px 10px; border-radius:12px; font-size:11px; font-weight:600; display:inline-block; margin-bottom:8px; align-self:flex-start;">📌 ${p.category}</span>` : ''}
+                        <div style="margin-bottom:8px;">
+                            ${p.category ? `<span style="background:var(--primary); color:#000; padding:2px 10px; border-radius:12px; font-size:11px; font-weight:600; display:inline-block; margin-right:5px;">📌 ${p.category}</span>` : ''}
+                            ${extraHtml}
+                        </div>
                         
                         <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
                             <h3 style="margin:0; font-size:18px; color:#FFD700; font-weight:600; text-shadow:0 0 5px rgba(255,215,0,0.3); flex:1;">✨ ${p.storeName}</h3>
@@ -920,7 +914,6 @@
         } else { banner.style.display = 'none'; }
     }
 
-    // ⚡ ระบบหมุนสไลด์ภาพอัตโนมัติ (ทุก 3.5 วินาที)
     setInterval(() => {
         document.querySelectorAll('.promo-slider-container').forEach(slider => {
             let imgs = slider.querySelectorAll('.slide-item');
@@ -1002,11 +995,10 @@
             document.getElementById('displayBankAcc').innerText = appData.vipSettings?.bankAccount || 'รอแอดมินตั้งค่าบัญชี (ไปไหนดี)';
 
             if(isVIP) {
-                // ร้านที่เป็น VIP ปลดล็อกทุกอย่าง
                 document.getElementById('vipUpdateSection').style.display = 'block'; 
                 document.getElementById('vipSubscribeSection').style.display = 'block';
                 document.getElementById('vipSubscribeTitle').innerHTML = '👑 ต่ออายุ VIP <span style="font-size:12px; color:#06C755;">(สถานะ: ใช้งานได้)</span>'; 
-                document.getElementById('nonVipStatsBlock').style.display = 'none'; // ซ่อนบล็อกแจ้งเตือน
+                document.getElementById('nonVipStatsBlock').style.display = 'none';
                 
                 document.getElementById('statViews').innerText = store.stats ? store.stats.views || 0 : 0;
                 document.getElementById('statDirections').innerText = store.stats ? store.stats.directions || 0 : 0;
@@ -1017,11 +1009,10 @@
                     renderHoursGrid(store);
                 }
             } else {
-                // ร้านที่ไม่ใช่ VIP ล็อกการเข้าถึง
                 document.getElementById('vipUpdateSection').style.display = 'none'; 
                 document.getElementById('vipSubscribeSection').style.display = 'block'; 
                 document.getElementById('vipSubscribeTitle').innerHTML = '👑 สมัครสมาชิก VIP';
-                document.getElementById('nonVipStatsBlock').style.display = 'block'; // โชว์บล็อกแจ้งเตือนให้อัปเกรด
+                document.getElementById('nonVipStatsBlock').style.display = 'block'; 
             }
 
             const activePromo = (appData.activePromotions || []).find(p => p.storeName === store.name); const hasFreePromo = store.freePromoDays && store.freePromoDays > 0; const promoTitle = document.getElementById('buyPromoTitle'); const slipArea = document.getElementById('promoSlipArea');
@@ -1069,12 +1060,11 @@
         document.getElementById(`close_${dayIndex}`).disabled = isClosed;
     }
 
-    // ⚡ ปุ่มเปิดทุกวัน (ก๊อปปี้จากวันจันทร์)
     function toggleApplyAll() {
         const isChecked = document.getElementById('applyAllDays').checked;
         if(isChecked) {
-            document.getElementById('open24hAll').checked = false; // เอาติ๊ก 24 ออก
-            const openTime = document.getElementById('open_1').value; // เอาวันจันทร์เป็นหลัก
+            document.getElementById('open24hAll').checked = false;
+            const openTime = document.getElementById('open_1').value; 
             const closeTime = document.getElementById('close_1').value;
             const isClosed = document.getElementById('closed_1').checked;
             for(let i=0; i<7; i++) {
@@ -1088,7 +1078,6 @@
         }
     }
 
-    // ⚡ ปุ่มเปิด 24 ชั่วโมง
     function toggle24hAll() {
         const isChecked = document.getElementById('open24hAll').checked;
         if(isChecked) document.getElementById('applyAllDays').checked = false;
@@ -1116,6 +1105,39 @@
         }
         await saveToCloud();
         alert('💾 บันทึกเวลาเปิด-ปิดร้านเรียบร้อยแล้ว!\n(ระบบจะแสดงผลในหน้าแผนที่อัตโนมัติ)');
+    }
+
+    // ⚡ ฟังก์ชันเปิด Popup การตลาด
+    function openCouponEditor() {
+        const store = appData.registeredStores.find(s => s.pin === document.getElementById('storePinInput').value);
+        if(!store) return;
+        document.getElementById('couponText').value = store.coupon || '';
+        document.getElementById('couponModal').style.display = 'flex';
+    }
+
+    async function saveCoupon() {
+        const store = appData.registeredStores.find(s => s.pin === document.getElementById('storePinInput').value);
+        if(!store) return;
+        store.coupon = document.getElementById('couponText').value.trim();
+        await saveToCloud();
+        document.getElementById('couponModal').style.display = 'none';
+        alert('✅ อัปเดตคูปองส่วนลดเรียบร้อยแล้ว!');
+    }
+
+    function openEventEditor() {
+        const store = appData.registeredStores.find(s => s.pin === document.getElementById('storePinInput').value);
+        if(!store) return;
+        document.getElementById('eventText').value = store.event || '';
+        document.getElementById('eventModal').style.display = 'flex';
+    }
+
+    async function saveEvent() {
+        const store = appData.registeredStores.find(s => s.pin === document.getElementById('storePinInput').value);
+        if(!store) return;
+        store.event = document.getElementById('eventText').value.trim();
+        await saveToCloud();
+        document.getElementById('eventModal').style.display = 'none';
+        alert('✅ อัปเดตกิจกรรมเรียบร้อยแล้ว!');
     }
 
     function openRenewPromo() {
@@ -1157,7 +1179,6 @@
         btn.innerText = "กำลังอัปโหลดข้อมูล (ความเร็วสูง)... 🚀"; btn.disabled = true;
         
         try {
-            // ⚡ ระบบประมวลผลหลายรูป
             let imgUrls = [];
             if(pImgFiles.length > 0) {
                 for(let i=0; i<pImgFiles.length; i++) {
