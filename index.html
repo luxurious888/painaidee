@@ -56,11 +56,19 @@
         @keyframes pulseGlow { 0% { box-shadow: 0 0 10px rgba(255,215,0,0.4); } 50% { box-shadow: 0 0 20px rgba(255,215,0,0.8); } 100% { box-shadow: 0 0 10px rgba(255,215,0,0.4); } }
         .btn-line-glow { background: linear-gradient(90deg, #06C755, #05A044); color: white; border: none; padding: 14px 20px; border-radius: 12px; font-family: 'Kanit'; font-weight: 600; font-size: 16px; width: 100%; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 8px 20px rgba(6, 199, 85, 0.4); }
         .highlight-banner { background: linear-gradient(135deg, var(--dark), var(--dark-light)); color: white; padding: 25px; border-radius: 16px; margin-top: 24px; box-shadow: 0 15px 35px rgba(26, 28, 32, 0.4); display: none; position: relative; overflow: hidden; border: 1px solid var(--border); }
+        .highlight-banner::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(197,160,89,0.15) 0%, transparent 60%); pointer-events: none; }
+        .highlight-banner h3 { margin: 0 0 5px 0; font-size: 20px; color: var(--primary); font-weight: 500; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
         .dashboard-card { background: var(--surface); padding: 25px; border-radius: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); margin-bottom: 24px; border: 1px solid var(--border); }
         .dashboard-card h3 { margin-top: 0; color: var(--primary-light); border-bottom: 2px solid var(--border); padding-bottom: 12px; font-weight: 500; }
         .form-group { margin-bottom: 22px; }
         .form-group label { display: block; font-weight: 500; font-size: 15px; color: #FFF; margin-bottom: 4px; }
+        .form-group .hint { font-size: 12.5px; color: var(--text-muted); margin-top: 0; margin-bottom: 10px; line-height: 1.4; }
+        
         #loginOverlay { position: fixed; inset: 0; background: #0b0f19; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
+        .bg-glow { position: absolute; width: 400px; height: 400px; background: radial-gradient(circle, rgba(6,199,85,0.15) 0%, transparent 70%); border-radius: 50%; top: -10%; left: -20%; animation: floatGlow 8s infinite alternate; }
+        .bg-glow2 { position: absolute; width: 500px; height: 500px; background: radial-gradient(circle, rgba(197,160,89,0.1) 0%, transparent 70%); border-radius: 50%; bottom: -20%; right: -20%; animation: floatGlow2 10s infinite alternate; }
+        @keyframes floatGlow { 0% { transform: translate(0, 0); } 100% { transform: translate(50px, 50px); } }
+        @keyframes floatGlow2 { 0% { transform: translate(0, 0); } 100% { transform: translate(-50px, -50px); } }
         .glass-card { background: rgba(20, 24, 32, 0.6); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); border-top: 1px solid rgba(197, 160, 89, 0.4); box-shadow: 0 25px 50px rgba(0,0,0,0.5); padding: 35px 25px; border-radius: 24px; text-align: center; width: 90%; max-width: 360px; z-index: 10; animation: slideUpFade 0.6s ease-out; }
         @keyframes slideUpFade { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
         .logo-circle { width: 110px; height: 110px; border-radius: 50%; background: linear-gradient(135deg, #1A1D23, #0b0f19); border: 2px solid #C5A059; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 0 25px rgba(197,160,89,0.4), inset 0 0 15px rgba(197,160,89,0.2); }
@@ -86,7 +94,6 @@
         .slide-indicator { position:absolute; bottom:8px; right:8px; background:rgba(0,0,0,0.6); color:#fff; font-size:11px; padding:3px 8px; border-radius:12px; z-index:10; font-weight:bold; letter-spacing: 1px; backdrop-filter: blur(4px); }
         .vip-lock-box { background: rgba(255,255,255,0.05); border: 1px dashed #555; padding: 20px; border-radius: 12px; text-align: center; margin-top: 15px; }
 
-        /* ⚡ Popup Modals สำหรับคูปองและกิจกรรม */
         .feature-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:99999; flex-direction:column; justify-content:center; align-items:center; padding: 20px; animation: fadeIn 0.2s ease; }
         .feature-modal-content { background:var(--surface); border:1px solid var(--primary); padding:25px; border-radius:16px; width:100%; max-width:350px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
     </style>
@@ -289,7 +296,7 @@
                     </div>
                 </div>
                 
-                <div class="form-group"><label>2. รูปถ่ายหน้าร้านคู่เจ้าของร้าน <span style="color:var(--danger);">*</span></label><input type="file" id="regStorePhoto" accept="image/*"></div>
+                <div class="form-group"><label>2. รูปถ่ายหน้าร้านคู่เจ้า বিন্দুร้าน <span style="color:var(--danger);">*</span></label><input type="file" id="regStorePhoto" accept="image/*"></div>
                 <div class="form-group"><label>3. สำเนาบัตรประชาชน/พาสปอร์ต <span style="color:var(--danger);">*</span></label><input type="file" id="regIdCard" accept="image/*"></div>
                 <div class="form-group"><label>4. ใบทะเบียนพาณิชย์ (ถ้ามี)</label><input type="file" id="regCommercial" accept="image/*"></div>
                 <div class="form-group"><label>5. เบอร์โทรศัพท์ติดต่อ <span style="color:var(--danger);">*</span></label><input type="text" id="regPhone" placeholder="08X-XXX-XXXX"></div>
@@ -335,8 +342,8 @@
                         <div id="vipHoursSection" style="margin-top: 20px; border-top: 1px dashed var(--primary); padding-top: 15px;">
                             <h4 style="margin: 0 0 10px 0; color: #FFD700; font-size: 16px;">⏰ เวลาเปิด-ปิดร้าน (คำนวณสถานะอัตโนมัติ)</h4>
                             <div style="display:flex; justify-content:space-between; margin-bottom:12px; background:rgba(197, 160, 89, 0.1); padding:10px; border-radius:8px; border:1px solid rgba(197,160,89,0.3);">
-                                <label style="color:#C5A059; font-size:13px; font-weight:bold; display:flex; align-items:center; gap:5px; cursor:pointer;"><input type="checkbox" id="applyAllDays" onchange="toggleApplyAll()" style="width:16px; height:16px;"> เปิดบริการทุกวัน</label>
-                                <label style="color:#06C755; font-size:13px; font-weight:bold; display:flex; align-items:center; gap:5px; cursor:pointer;"><input type="checkbox" id="open24hAll" onchange="toggle24hAll()" style="width:16px; height:16px;"> เปิดตลอด 24 ชม.</label>
+                                <label style="color:#C5A059; font-size:13px; font-weight:bold; display:flex; align-items:center; gap:5px; cursor:pointer;"><input type="checkbox" id="applyAllDays" onchange="toggleApplyAll()" style="width:16px; height:16px; accent-color:#C5A059;"> เปิดบริการทุกวัน</label>
+                                <label style="color:#06C755; font-size:13px; font-weight:bold; display:flex; align-items:center; gap:5px; cursor:pointer;"><input type="checkbox" id="open24hAll" onchange="toggle24hAll()" style="width:16px; height:16px; accent-color:#06C755;"> เปิดตลอด 24 ชม.</label>
                             </div>
                             <div id="hoursGrid" style="display: flex; flex-direction: column; gap: 8px;"></div>
                             <button class="btn-primary" style="width: 100%; margin-top: 12px;" onclick="saveOperatingHours()">💾 บันทึกเวลาเปิด-ปิด</button>
@@ -409,7 +416,6 @@
 
     let appData = { registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], mainCategories: [], categories: [], closedReports: [], blacklistedPlaces: [], services: [], pendingVipRequests: [], affiliateWallets: [], withdrawalRequests: [] };
 
-    // ⚡ ปรับขนาดรูปเป็น HD (1200px) และคุณภาพ 85% ให้ชัดแจ๋ว
     const resizeImg = (file) => new Promise((resolve) => {
         if(!file) return resolve('');
         const reader = new FileReader(); reader.readAsDataURL(file);
@@ -438,7 +444,6 @@
         try { await fetch(API_URL, { method: 'POST', body: JSON.stringify({ telegramMsg: msg }) }); } catch(e) {}
     }
 
-    // ⚡ ดูรูปเต็มจอ
     function openImageModal(src) {
         document.getElementById('viewerImg').src = src;
         document.getElementById('imageViewerModal').style.display = 'flex';
@@ -470,12 +475,15 @@
         let baseUrl = window.location.href.split('?')[0];
         let pageParam = targetPage ? '?page=' + targetPage : '';
 
-        if (!liff.isLoggedIn()) {
-            liff.login({ redirectUri: baseUrl + pageParam });
+        if (!liff.isInClient()) {
+            window.location.href = 'https://liff.line.me/2009598846-wiCUeV35' + pageParam;
+        } else {
+            if (!liff.isLoggedIn()) {
+                liff.login({ redirectUri: baseUrl + pageParam });
+            }
         }
     }
 
-    // ⚡ เก็บสถิติ (แยก Database) 
     async function trackAction(storeName, actionType) {
         if (!storeName) return;
         try {
@@ -560,48 +568,7 @@
         document.getElementById('customerDetailModal').style.display = 'flex';
     }
 
-    async function initSystem() {
-        try {
-            await liff.init({ liffId: "2009598846-wiCUeV35" });
-            await loadFromCloud();
-            
-            const urlParams = new URLSearchParams(window.location.search);
-            const targetPage = urlParams.get('page'); const refParam = urlParams.get('ref');
-            if (refParam) { sessionStorage.setItem('savedRefCode', refParam); }
-
-            if (liff.isLoggedIn()) {
-                isAppReady = true; document.getElementById('loadingText').innerText = "กำลังดึงข้อมูลแผนที่...";
-                const profile = await liff.getProfile();
-                document.getElementById('header-profile').innerHTML = `<img src="${profile.pictureUrl}" style="width:100%; height:100%; object-fit:cover;">`;
-                const myCode = "AFF" + profile.userId.substring(0, 5).toUpperCase(); window.myAffCode = myCode;
-                if(document.getElementById('myAffiliateCode')) { document.getElementById('myAffiliateCode').innerText = myCode; }
-                
-                document.getElementById('affiliate-actual-content').style.display = 'block'; document.getElementById('affiliate-guest-view').style.display = 'none';
-                document.getElementById('loginOverlay').style.display = 'none'; document.getElementById('appContent').style.display = 'block';
-                updateWalletUI(); 
-                
-                const savedRef = sessionStorage.getItem('savedRefCode');
-                if (savedRef && document.getElementById('regRefCode')) { if (savedRef.toUpperCase() !== myCode.toUpperCase()) { document.getElementById('regRefCode').value = savedRef; } }
-
-                if (targetPage === 'partner') { 
-                    setTimeout(() => { navigateToPartner(); }, 300); 
-                } else if (targetPage === 'affiliate') { 
-                    setTimeout(() => { navigateToAffiliate(); }, 300); 
-                } else {
-                    setTimeout(() => { switchPage('home'); }, 300); 
-                }
-
-            } else {
-                isAppReady = true; document.getElementById('header-profile').innerHTML = `<div style="font-size: 50px; line-height: 100px; text-align: center;">👤</div>`;
-                document.getElementById('affiliate-actual-content').style.display = 'none'; document.getElementById('affiliate-guest-view').style.display = 'block';
-                showLoginCard();
-            }
-        } catch (err) { 
-            console.error("LIFF Init Error:", err); isAppReady = true; document.getElementById('header-profile').innerHTML = `<div style="font-size: 50px; line-height: 100px; text-align: center;">👤</div>`; showLoginCard();
-        }
-    }
-
-    function updateWalletUI() {
+    async function updateWalletUI() {
         if(!window.myAffCode) return;
         const wallets = appData.affiliateWallets || []; const myWallet = wallets.find(w => w.refCode === window.myAffCode); const balance = myWallet ? myWallet.balance : 0;
         const settings = appData.affiliateSettings || { minWithdrawal: 300 }; const minW = settings.minWithdrawal || 300;
@@ -708,7 +675,6 @@
         }
     }
 
-    // ⚡ ฟังก์ชันคำนวณสถานะเปิด-ปิดอัจฉริยะ (VIP Custom Status)
     function getCustomStoreStatus(hoursObj) {
         if(!hoursObj) return null;
         const now = new Date(); const day = now.getDay(); 
@@ -925,7 +891,6 @@
         list.innerHTML = html; renderPromos();
     }
 
-    // ⚡ ระบบแบนเนอร์โปรโมทอัจฉริยะ (ดึงเวลาแบบ VIP มาแสดง และแสดง Slider)
     function renderPromos() {
         let curProv = document.getElementById('provinceSelect').value; const now = Date.now();
         const activePromos = (appData.activePromotions || []).filter(p => { if (p.expireTimestamp && now > p.expireTimestamp && !p.autoRenew) return false; return true; }); 
@@ -990,7 +955,6 @@
         } else { banner.style.display = 'none'; }
     }
 
-    // ⚡ ระบบหมุนสไลด์ภาพอัตโนมัติ (ทุก 3.5 วินาที)
     setInterval(() => {
         document.querySelectorAll('.promo-slider-container').forEach(slider => {
             let imgs = slider.querySelectorAll('.slide-item');
@@ -1060,7 +1024,6 @@
         } else if (store) { alert("⚠️ ร้านนี้ไม่ได้เชื่อมโยงกับระบบ LINE ไว้ กรุณาติดต่อแอดมินโดยตรงครับ"); } else { alert("❌ ไม่พบชื่อร้านนี้ในระบบ กรุณาตรวจสอบตัวสะกดอีกครั้งครับ"); }
     }
 
-    // ⚡ ระบบจัดการร้านค้า (รวมการเช็ค VIP & Stats Lock)
     function verifyStore(silent = false) {
         const stores = appData.registeredStores || []; const store = stores.find(s => s.pin === document.getElementById('storePinInput').value);
         if(store) { 
@@ -1072,13 +1035,11 @@
             document.getElementById('displayBankAcc').innerText = appData.vipSettings?.bankAccount || 'รอแอดมินตั้งค่าบัญชี (ไปไหนดี)';
 
             if(isVIP) {
-                // ร้านที่เป็น VIP ปลดล็อกทุกอย่าง
                 document.getElementById('vipUpdateSection').style.display = 'block'; 
                 document.getElementById('vipSubscribeSection').style.display = 'block';
                 document.getElementById('vipSubscribeTitle').innerHTML = '👑 ต่ออายุ VIP <span style="font-size:12px; color:#06C755;">(สถานะ: ใช้งานได้)</span>'; 
-                document.getElementById('nonVipStatsBlock').style.display = 'none'; // ซ่อนบล็อกแจ้งเตือน
+                document.getElementById('nonVipStatsBlock').style.display = 'none'; 
                 
-                // ⚡ อ่านสถิติจาก Collection แยก แบบเรียลไทม์
                 db.collection('storeStats').doc(store.name).get().then(doc => {
                     let d = doc.exists ? doc.data() : { views: 0, directions: 0 };
                     document.getElementById('statViews').innerText = d.views || 0;
@@ -1091,11 +1052,10 @@
                     renderHoursGrid(store);
                 }
             } else {
-                // ร้านที่ไม่ใช่ VIP ล็อกการเข้าถึง
                 document.getElementById('vipUpdateSection').style.display = 'none'; 
                 document.getElementById('vipSubscribeSection').style.display = 'block'; 
                 document.getElementById('vipSubscribeTitle').innerHTML = '👑 สมัครสมาชิก VIP';
-                document.getElementById('nonVipStatsBlock').style.display = 'block'; // โชว์บล็อกแจ้งเตือนให้อัปเกรด
+                document.getElementById('nonVipStatsBlock').style.display = 'block'; 
             }
 
             const activePromo = (appData.activePromotions || []).find(p => p.storeName === store.name); const hasFreePromo = store.freePromoDays && store.freePromoDays > 0; const promoTitle = document.getElementById('buyPromoTitle'); const slipArea = document.getElementById('promoSlipArea');
@@ -1146,12 +1106,11 @@
         document.getElementById(`close_${dayIndex}`).disabled = isClosed;
     }
 
-    // ⚡ ปุ่มเปิดทุกวัน (ก๊อปปี้จากวันจันทร์)
     function toggleApplyAll() {
         const isChecked = document.getElementById('applyAllDays').checked;
         if(isChecked) {
-            document.getElementById('open24hAll').checked = false; // เอาติ๊ก 24 ออก
-            const openTime = document.getElementById('open_1').value; // เอาวันจันทร์เป็นหลัก
+            document.getElementById('open24hAll').checked = false;
+            const openTime = document.getElementById('open_1').value; 
             const closeTime = document.getElementById('close_1').value;
             const isClosed = document.getElementById('closed_1').checked;
             for(let i=0; i<7; i++) {
@@ -1165,7 +1124,6 @@
         }
     }
 
-    // ⚡ ปุ่มเปิด 24 ชั่วโมง
     function toggle24hAll() {
         const isChecked = document.getElementById('open24hAll').checked;
         if(isChecked) document.getElementById('applyAllDays').checked = false;
@@ -1195,7 +1153,6 @@
         alert('💾 บันทึกเวลาเปิด-ปิดร้านเรียบร้อยแล้ว!\n(ระบบจะแสดงผลในหน้าแผนที่อัตโนมัติ)');
     }
 
-    // ⚡ ฟังก์ชัน Popup การตลาด
     function openCouponEditor() {
         const store = appData.registeredStores.find(s => s.pin === document.getElementById('storePinInput').value);
         if(!store) return;
@@ -1212,7 +1169,6 @@
         alert('✅ อัปเดตคูปองส่วนลดเรียบร้อยแล้ว!');
     }
     
-    // ⚡ ฟังก์ชันลบคูปอง
     async function deleteCoupon() {
         const store = appData.registeredStores.find(s => s.pin === document.getElementById('storePinInput').value);
         if(!store) return;
@@ -1238,7 +1194,6 @@
         alert('✅ อัปเดตกิจกรรมเรียบร้อยแล้ว!');
     }
 
-    // ⚡ ฟังก์ชันลบกิจกรรม
     async function deleteEvent() {
         const store = appData.registeredStores.find(s => s.pin === document.getElementById('storePinInput').value);
         if(!store) return;
