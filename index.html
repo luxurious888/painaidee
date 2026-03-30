@@ -33,6 +33,7 @@
         .btn-primary { padding: 14px 24px; background: var(--primary); color: white; border: none; border-radius: 10px; font-family: 'Kanit'; font-weight: 500; font-size: 15px; cursor: pointer; transition: 0.3s; white-space: nowrap; width: 100%; box-shadow: 0 4px 10px rgba(197, 160, 89, 0.3); }
         .btn-primary:hover { background: var(--primary-hover); transform: translateY(-2px); }
         .btn-secondary { background: var(--dark); color: var(--primary); padding: 12px 15px; border-radius: 10px; border: 1px solid var(--primary); cursor: pointer; font-family: 'Kanit'; font-weight: 500; text-align: center; transition: 0.3s; display: inline-block;}
+        .btn-secondary:hover { background: var(--primary); color: white; transform: translateY(-2px); }
         .btn-outline { background: transparent; color: var(--primary); border: 1px solid var(--border); padding: 10px 15px; border-radius: 10px; cursor: pointer; font-family: 'Kanit'; font-weight: 500; transition: 0.3s; }
         .btn-outline:hover { border-color: var(--primary); background: rgba(197, 160, 89, 0.1); }
         .place-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; margin-top: 24px; }
@@ -56,10 +57,13 @@
         @keyframes pulseGlow { 0% { box-shadow: 0 0 10px rgba(255,215,0,0.4); } 50% { box-shadow: 0 0 20px rgba(255,215,0,0.8); } 100% { box-shadow: 0 0 10px rgba(255,215,0,0.4); } }
         .btn-line-glow { background: linear-gradient(90deg, #06C755, #05A044); color: white; border: none; padding: 14px 20px; border-radius: 12px; font-family: 'Kanit'; font-weight: 600; font-size: 16px; width: 100%; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 8px 20px rgba(6, 199, 85, 0.4); }
         .highlight-banner { background: linear-gradient(135deg, var(--dark), var(--dark-light)); color: white; padding: 25px; border-radius: 16px; margin-top: 24px; box-shadow: 0 15px 35px rgba(26, 28, 32, 0.4); display: none; position: relative; overflow: hidden; border: 1px solid var(--border); }
+        .highlight-banner::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(197,160,89,0.15) 0%, transparent 60%); pointer-events: none; }
+        .highlight-banner h3 { margin: 0 0 5px 0; font-size: 20px; color: var(--primary); font-weight: 500; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
         .dashboard-card { background: var(--surface); padding: 25px; border-radius: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); margin-bottom: 24px; border: 1px solid var(--border); }
         .dashboard-card h3 { margin-top: 0; color: var(--primary-light); border-bottom: 2px solid var(--border); padding-bottom: 12px; font-weight: 500; }
         .form-group { margin-bottom: 22px; }
         .form-group label { display: block; font-weight: 500; font-size: 15px; color: #FFF; margin-bottom: 4px; }
+        .form-group .hint { font-size: 12.5px; color: var(--text-muted); margin-top: 0; margin-bottom: 10px; line-height: 1.4; }
         
         #loginOverlay { position: fixed; inset: 0; background: #0b0f19; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
         .bg-glow { position: absolute; width: 400px; height: 400px; background: radial-gradient(circle, rgba(6,199,85,0.15) 0%, transparent 70%); border-radius: 50%; top: -10%; left: -20%; animation: floatGlow 8s infinite alternate; }
@@ -70,25 +74,33 @@
         @keyframes slideUpFade { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
         .logo-circle { width: 110px; height: 110px; border-radius: 50%; background: linear-gradient(135deg, #1A1D23, #0b0f19); border: 2px solid #C5A059; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 0 25px rgba(197,160,89,0.4), inset 0 0 15px rgba(197,160,89,0.2); }
         .logo-text { color: #FFD700; font-family: 'Kanit'; font-weight: 700; font-size: 26px; line-height: 1.1; margin: 0; }
-        .btn-enter-glow { background: linear-gradient(135deg, #FFD700, #C5A059); color: #000; border: none; padding: 14px 20px; border-radius: 12px; font-family: 'Kanit'; font-weight: 600; font-size: 16px; width: 100%; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 8px 20px rgba(197, 160, 89, 0.4); }
+        
+        .btn-enter-glow { background: linear-gradient(135deg, #FFD700, #C5A059); color: #000; border: none; padding: 14px 20px; border-radius: 12px; font-family: 'Kanit'; font-weight: 600; font-size: 16px; width: 100%; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; position: relative; overflow: hidden; box-shadow: 0 8px 20px rgba(197, 160, 89, 0.4); animation: pulse-gold 2.5s infinite; box-sizing: border-box; }
+        .btn-enter-glow:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(197, 160, 89, 0.6); }
+        .btn-enter-glow::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, transparent, rgba(255,255,255,0.4), transparent); transform: skewX(-25deg); animation: shineBtn 3s infinite; }
         
         #partner-friend-blocker { display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 50px 20px; background: var(--surface); border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         #partner-actual-content { display: none; }
+        
         .spinner { width: 50px; height: 50px; border: 5px solid rgba(197,160,89,0.2); border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
         #appContent { display: none; }
+        
         .promo-carousel { display: flex; overflow-x: auto; gap: 16px; padding-bottom: 15px; scroll-snap-type: x mandatory; scrollbar-width: none; margin-top: 15px; }
         .promo-carousel::-webkit-scrollbar { display: none; }
         .promo-item { flex: 0 0 85%; max-width: 340px; scroll-snap-align: center; }
         
-        /* ⚡ CSS สำหรับ Image Modal, Slider และ ระบบจัดการคูปอง/กิจกรรม */
+        /* ⚡ CSS สำหรับ Image Modal และ Slider */
         #imageViewerModal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:999999; flex-direction:column; justify-content:center; align-items:center; animation: fadeIn 0.3s ease; }
         #imageViewerModal img { max-width:95%; max-height:85vh; object-fit:contain; border-radius:12px; box-shadow:0 0 30px rgba(0,0,0,0.8); }
         .close-modal-btn { position:absolute; top:20px; right:20px; color:white; background:rgba(255,255,255,0.2); width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:24px; cursor:pointer; transition:0.3s; z-index: 10; }
         .close-modal-btn:hover { background:rgba(255,255,255,0.4); transform:scale(1.1); }
+        
         .promo-slider-container { position:relative; width:100%; height:180px; overflow:hidden; background:#000; pointer-events:auto; }
         .slide-item { position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; transition:opacity 0.8s ease-in-out; cursor:pointer; }
         .slide-indicator { position:absolute; bottom:8px; right:8px; background:rgba(0,0,0,0.6); color:#fff; font-size:11px; padding:3px 8px; border-radius:12px; z-index:10; font-weight:bold; letter-spacing: 1px; backdrop-filter: blur(4px); pointer-events:none; }
+        
         .vip-lock-box { background: rgba(255,255,255,0.05); border: 1px dashed #555; padding: 20px; border-radius: 12px; text-align: center; margin-top: 15px; }
 
         /* ⚡ Popup Modals สำหรับคูปองและกิจกรรม */
@@ -106,8 +118,8 @@
 <div id="couponModal" class="feature-modal">
     <div class="feature-modal-content">
         <h3 style="margin-top:0; color:#D9534F;">🎟️ จัดการคูปองส่วนลด</h3>
-        <p style="font-size:13px; color:#aaa;">ตั้งค่าข้อความคูปองให้ลูกค้าเห็นเด่นชัด (ปล่อยว่างเพื่อปิดคูปอง)</p>
-        <input type="text" id="couponText" placeholder="เช่น ลด 10% เมื่อแสดงแอป" style="margin-bottom:15px; border-color:#D9534F; color:#FFF;">
+        <p style="font-size:13px; color:#aaa;">ตั้งค่าข้อความคูปองให้ลูกค้าเห็นเด่นชัดบนแผนที่</p>
+        <input type="text" id="couponText" placeholder="เช่น ลด 10% เมื่อแสดงแอป" style="margin-bottom:15px; border-color:#D9534F;">
         <div style="display:flex; gap:10px;">
             <button class="btn-primary" style="flex:2; background:#D9534F; color:#FFF;" onclick="saveCoupon()">💾 บันทึก</button>
             <button class="btn-outline" style="flex:1; border-color:#D9534F; color:#D9534F;" onclick="deleteCoupon()">🗑️ ลบ</button>
@@ -119,8 +131,8 @@
 <div id="eventModal" class="feature-modal">
     <div class="feature-modal-content">
         <h3 style="margin-top:0; color:#17a2b8;">🎉 กิจกรรมวันนี้</h3>
-        <p style="font-size:13px; color:#aaa;">โปรโมทอีเวนต์ด่วนๆ วันนี้ (ปล่อยว่างเพื่อปิดกิจกรรม)</p>
-        <input type="text" id="eventText" placeholder="เช่น 20:00 น. พบกับดนตรีสด!" style="margin-bottom:15px; border-color:#17a2b8; color:#FFF;">
+        <p style="font-size:13px; color:#aaa;">โปรโมทอีเวนต์ด่วนๆ วันนี้ให้ลูกค้าทราบ</p>
+        <input type="text" id="eventText" placeholder="เช่น 20:00 น. พบกับดนตรีสด!" style="margin-bottom:15px; border-color:#17a2b8;">
         <div style="display:flex; gap:10px;">
             <button class="btn-primary" style="flex:2; background:#17a2b8; color:#FFF;" onclick="saveEvent()">💾 บันทึก</button>
             <button class="btn-outline" style="flex:1; border-color:#17a2b8; color:#17a2b8;" onclick="deleteEvent()">🗑️ ลบ</button>
@@ -438,6 +450,7 @@
 
     let appData = { registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], mainCategories: [], categories: [], closedReports: [], blacklistedPlaces: [], services: [], pendingVipRequests: [], affiliateWallets: [], withdrawalRequests: [] };
 
+    // ⚡ ปรับขนาดรูปเป็น HD (1200px) และคุณภาพ 85% ให้ชัดแจ๋ว
     const resizeImg = (file) => new Promise((resolve) => {
         if(!file) return resolve('');
         const reader = new FileReader(); reader.readAsDataURL(file);
@@ -466,9 +479,52 @@
         try { await fetch(API_URL, { method: 'POST', body: JSON.stringify({ telegramMsg: msg }) }); } catch(e) {}
     }
 
+    // ⚡ ดูรูปเต็มจอ
     function openImageModal(src) {
         document.getElementById('viewerImg').src = src;
         document.getElementById('imageViewerModal').style.display = 'flex';
+    }
+
+    // ⚡ นี่คือฟังก์ชันที่หายไปในรอบที่แล้วครับ (ดึงข้อมูลและจัดการเข้าสู่ระบบ)
+    async function initSystem() {
+        try {
+            await liff.init({ liffId: "2009598846-wiCUeV35" });
+            await loadFromCloud();
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const targetPage = urlParams.get('page'); const refParam = urlParams.get('ref');
+            if (refParam) { sessionStorage.setItem('savedRefCode', refParam); }
+
+            if (liff.isLoggedIn()) {
+                isAppReady = true; document.getElementById('loadingText').innerText = "กำลังดึงข้อมูลแผนที่...";
+                const profile = await liff.getProfile();
+                document.getElementById('header-profile').innerHTML = `<img src="${profile.pictureUrl}" style="width:100%; height:100%; object-fit:cover;">`;
+                const myCode = "AFF" + profile.userId.substring(0, 5).toUpperCase(); window.myAffCode = myCode;
+                if(document.getElementById('myAffiliateCode')) { document.getElementById('myAffiliateCode').innerText = myCode; }
+                
+                document.getElementById('affiliate-actual-content').style.display = 'block'; document.getElementById('affiliate-guest-view').style.display = 'none';
+                document.getElementById('loginOverlay').style.display = 'none'; document.getElementById('appContent').style.display = 'block';
+                updateWalletUI(); 
+                
+                const savedRef = sessionStorage.getItem('savedRefCode');
+                if (savedRef && document.getElementById('regRefCode')) { if (savedRef.toUpperCase() !== myCode.toUpperCase()) { document.getElementById('regRefCode').value = savedRef; } }
+
+                if (targetPage === 'partner') { 
+                    setTimeout(() => { navigateToPartner(); }, 300); 
+                } else if (targetPage === 'affiliate') { 
+                    setTimeout(() => { navigateToAffiliate(); }, 300); 
+                } else {
+                    setTimeout(() => { switchPage('home'); }, 300); 
+                }
+
+            } else {
+                isAppReady = true; document.getElementById('header-profile').innerHTML = `<div style="font-size: 50px; line-height: 100px; text-align: center;">👤</div>`;
+                document.getElementById('affiliate-actual-content').style.display = 'none'; document.getElementById('affiliate-guest-view').style.display = 'block';
+                showLoginCard();
+            }
+        } catch (err) { 
+            console.error("LIFF Init Error:", err); isAppReady = true; document.getElementById('header-profile').innerHTML = `<div style="font-size: 50px; line-height: 100px; text-align: center;">👤</div>`; showLoginCard();
+        }
     }
 
     let unsubscribe = null;
@@ -493,7 +549,7 @@
         try { await db.collection('painaidee').doc('systemData').set(appData); return true; } catch(e) { throw e; }
     }
 
-    // ⚡ แก้ไข SmartLogin (วิธีแก้โค้ดวนลูป + เตะเข้าแอป LINE ทันที)
+    // ⚡ แก้ไข SmartLogin (เตะเข้าแอป LINE ทันที)
     function smartLogin(targetPage) {
         let baseUrl = window.location.href.split('?')[0];
         let pageParam = targetPage ? '?page=' + targetPage : '';
@@ -551,123 +607,6 @@
         {id:'uthaithani',name:'อุทัยธานี',lat:15.3730,lng:100.0243},{id:'ubon',name:'อุบลราชธานี',lat:15.2287,lng:104.8564}
     ];
 
-    let isAppReady = false;
-
-    document.addEventListener('DOMContentLoaded', () => {
-        initSystem();
-        setTimeout(() => { 
-            document.getElementById('loadingSpinner').style.display = 'none';
-            if (!isAppReady) { document.getElementById('loginCard').style.display = 'block'; }
-        }, 5000);
-    });
-
-    function showLoginCard() { document.getElementById('loadingSpinner').style.display = 'none'; document.getElementById('loginCard').style.display = 'block'; }
-    function enterApp() { document.getElementById('loginOverlay').style.display = 'none'; document.getElementById('appContent').style.display = 'block'; }
-
-    function copyHeaderAffCode() {
-        if(window.myAffCode) { navigator.clipboard.writeText(window.myAffCode).then(() => { alert("คัดลอกรหัสแนะนำ " + window.myAffCode + " สำเร็จ!"); }); }
-    }
-
-    function copyAffLink() {
-        if(window.myAffCode) {
-            const link = "https://liff.line.me/2009598846-wiCUeV35?ref=" + window.myAffCode;
-            navigator.clipboard.writeText(link).then(() => { alert("คัดลอกลิงก์แนะนำเพื่อนสำเร็จ! 🚀\nส่งให้เพื่อนกดลิงก์นี้เพื่อสมัครร้านค้าได้เลยครับ"); });
-        }
-    }
-
-    // ⚡ ฟังก์ชันสำหรับดูรายละเอียดคูปองและกิจกรรม (ฝั่งลูกค้า)
-    function showCustomerDetail(type, text, storeName) {
-        document.getElementById('cdStoreName').innerText = `ร้าน: ${storeName}`;
-        document.getElementById('cdText').innerText = text;
-        
-        if(type === 'coupon') {
-            document.getElementById('cdTitle').innerText = '🎟️ คูปองส่วนลดพิเศษ';
-            document.getElementById('cdTitle').style.color = '#D9534F';
-            document.getElementById('btnClaim').style.display = 'inline-block';
-            document.getElementById('btnClaim').style.background = '#D9534F';
-        } else {
-            document.getElementById('cdTitle').innerText = '🎉 กิจกรรมน่าสนใจวันนี้';
-            document.getElementById('cdTitle').style.color = '#17a2b8';
-            document.getElementById('btnClaim').style.display = 'none';
-        }
-        
-        document.getElementById('customerDetailModal').style.display = 'flex';
-    }
-
-    function updateWalletUI() {
-        if(!window.myAffCode) return;
-        const wallets = appData.affiliateWallets || []; const myWallet = wallets.find(w => w.refCode === window.myAffCode); const balance = myWallet ? myWallet.balance : 0;
-        const settings = appData.affiliateSettings || { minWithdrawal: 300 }; const minW = settings.minWithdrawal || 300;
-        
-        if(document.getElementById('aff-page-balance')) { document.getElementById('aff-page-balance').innerText = balance.toLocaleString() + ' ฿'; }
-        if(document.getElementById('aff-min-text')) { document.getElementById('aff-min-text').innerText = `*(ถอนขั้นต่ำ ${minW} บาท)*`; }
-        
-        const btn = document.getElementById('btn-page-withdraw');
-        if(btn) {
-            btn.innerText = `ถอนเงินเข้าบัญชี (ขั้นต่ำ ${minW})`;
-            if (balance >= minW) { btn.style.background = 'linear-gradient(90deg, #06C755, #05A044)'; btn.style.color = '#FFF'; btn.style.borderColor = '#06C755'; btn.style.cursor = 'pointer'; btn.disabled = false;
-            } else { btn.style.background = 'var(--dark-muted)'; btn.style.color = 'var(--text-muted)'; btn.style.borderColor = 'var(--border)'; btn.style.cursor = 'not-allowed'; btn.disabled = true; }
-        }
-
-        const historyList = document.getElementById('affiliate-history-list');
-        if(historyList) {
-            const referredStores = (appData.registeredStores || []).filter(s => s.refCode && s.refCode.toUpperCase() === window.myAffCode.toUpperCase());
-            if(referredStores.length > 0) {
-                historyList.innerHTML = referredStores.map((s, i) => `
-                    <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(197, 160, 89, 0.1);">
-                        <div><p style="margin: 0; color: #FFF; font-weight: 500;">${i+1}. ${s.name}</p><p style="margin: 0; font-size: 11px; color: ${s.hasPaidFirstComm ? '#06C755' : '#999'};">${s.hasPaidFirstComm ? '✅ สร้างรายได้แล้ว' : '⏳ รอร้านค้าอัปเกรด'}</p></div>
-                        ${s.isVIP ? `<span style="background: #FFD700; color: #000; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold;">VIP</span>` : ''}
-                    </div>`).join('');
-            } else { historyList.innerHTML = `<p style="text-align: center; color: #777; margin: 10px 0;">ยังไม่มีประวัติการแนะนำ</p>`; }
-        }
-    }
-
-    async function requestWithdraw() {
-        const wallets = appData.affiliateWallets || []; const myWallet = wallets.find(w => w.refCode === window.myAffCode); if(!myWallet) return;
-        const settings = appData.affiliateSettings || { minWithdrawal: 300 }; if(myWallet.balance < settings.minWithdrawal) return;
-        
-        const bankInfo = prompt(`ยอดเงินที่สามารถถอนได้คือ ${myWallet.balance.toLocaleString()} บาท\n\nกรุณากรอกข้อมูลบัญชีรับเงิน\n(รูปแบบ: ชื่อธนาคาร / เลขบัญชี / ชื่อ-สกุล):`);
-        if(!bankInfo || bankInfo.trim() === '') return;
-        if(!appData.withdrawalRequests) appData.withdrawalRequests = [];
-        
-        const reqAmount = myWallet.balance; myWallet.balance = 0; let uid = ""; try { if(liff.isLoggedIn()) uid = (await liff.getProfile()).userId; } catch(e){}
-
-        appData.withdrawalRequests.push({ id: Date.now().toString(), refCode: window.myAffCode, userId: uid, amount: reqAmount, bankDetails: bankInfo, status: 'pending', requestDate: new Date().toLocaleString() });
-        try {
-            document.getElementById('btn-page-withdraw').innerText = 'กำลังส่งเรื่อง...'; document.getElementById('btn-page-withdraw').disabled = true;
-            await saveToCloud(); sendTelegramNotify(`💸 <b>มีคำร้องขอถอนเงินค่าคอม!</b>\n\nรหัสตัวแทน: ${window.myAffCode}\nยอดถอน: <b>${reqAmount.toLocaleString()} บาท</b>\nบัญชี: ${bankInfo}\n\n👉 กรุณาโอนเงินและกดอนุมัติในหน้าแอดมินครับ`);
-            alert("ส่งคำร้องขอถอนเงินเรียบร้อยแล้ว! แอดมินจะตรวจสอบและโอนเงินให้ท่านในเร็วๆ นี้ครับ"); updateWalletUI(); 
-        } catch(e) { alert("เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่"); myWallet.balance = reqAmount; updateWalletUI(); }
-    }
-
-    function switchPage(p) { document.querySelectorAll('.page').forEach(el => el.classList.remove('active')); document.querySelectorAll('nav div').forEach(el => el.classList.remove('active')); document.getElementById('page-'+p).classList.add('active'); document.getElementById('tab-'+p).classList.add('active'); }
-    async function navigateToAffiliate() { switchPage('affiliate'); }
-
-    async function navigateToPartner() {
-        if (!liff.isLoggedIn()) {
-            const blocker = document.getElementById('partner-friend-blocker'); const content = document.getElementById('partner-actual-content'); switchPage('partner'); blocker.style.display = 'flex'; content.style.display = 'none';
-            return;
-        }
-        switchPage('partner'); checkFriendshipForPartner(false); 
-    }
-
-    async function checkFriendshipForPartner(showAlert) {
-        const blocker = document.getElementById('partner-friend-blocker'); const content = document.getElementById('partner-actual-content');
-        if(showAlert) blocker.innerHTML = '<div class="spinner"></div><p style="color:#FFF;">กำลังตรวจสอบ...</p>';
-        try {
-            if (liff.isLoggedIn()) {
-                const friend = await liff.getFriendship();
-                if (friend.friendFlag) { blocker.style.display = 'none'; content.style.display = 'block'; if(showAlert) alert("✅ ขอบคุณที่เพิ่มเพื่อนครับ! คุณสามารถใช้งานหน้าร้านค้าได้แล้ว"); } 
-                else { blocker.style.display = 'flex'; content.style.display = 'none'; renderFriendBlocker(); if(showAlert) alert("⚠️ ระบบตรวจไม่พบความเป็นเพื่อน กรุณากดปุ่มเพิ่มเพื่อนและรอสักครู่ แล้วลองกดตรวจสอบอีกครั้งครับ"); }
-            }
-        } catch(e) { blocker.style.display = 'flex'; content.style.display = 'none'; renderFriendBlocker(); }
-    }
-
-    function renderFriendBlocker() {
-        // แก้ไขโลโก้ LINE ตรงนี้ให้โชว์รูปได้ปกติครับ
-        document.getElementById('partner-friend-blocker').innerHTML = `<img src="https://upload.wikimedia.org/wikipedia/commons/4/41/LINE_logo.svg" alt="LINE Official Account" style="width: 80px; margin-bottom: 25px;"><div class="friend-note"><span style="color:var(--primary); font-weight:600;">⚠️ สำคัญมาก</span><br>สำหรับร้านค้าจำเป็นต้องเพิ่มเพื่อนก่อน เพื่อรับรหัสผ่านในการใช้งานครับ</div><button class="btn-line-glow" style="width: auto; padding: 14px 24px; border:none; border-radius:12px; font-family:'Kanit'; font-weight:600; font-size:16px; cursor:pointer; animation: none;" onclick="window.location.href='https://lin.ee/5SBoptj'">➕ เพิ่มเพื่อน LINE OA ของเรา</button><button class="btn-outline" style="margin-top: 20px; font-size: 13px; border-color:var(--dark-muted); color:var(--text-muted);" onclick="checkFriendshipForPartner(true)">ฉันเพิ่มเพื่อนแล้ว ตรวจสอบอีกครั้ง</button>`;
-    }
-
     let map, service, infoWindow, currentCoords = { lat: 15.2287, lng: 104.8564 }, googlePlaces = [], currentPagination = null; let gpsMarker = null, activeMarker = null;
 
     function initMap() {
@@ -702,7 +641,7 @@
         }
     }
 
-    // ⚡ ฟังก์ชันคำนวณสถานะเปิด-ปิดอัจฉริยะ (VIP Custom Status)
+    // ⚡ ฟังก์ชันคำนวณสถานะเปิด-ปิดอัจฉริยะ (Custom Status)
     function getCustomStoreStatus(hoursObj) {
         if(!hoursObj) return null;
         const now = new Date(); const day = now.getDay(); 
@@ -760,7 +699,6 @@
                 let timeText = "ทางร้านไม่ได้ระบุเวลาเปิด-ปิด"; let isOpenNowHtml = "";
 
                 const store = (appData.registeredStores || []).find(s => s.name === place.name); const now = Date.now();
-                const isVIP = store && store.isVIP && (!store.vipExpireTimestamp || store.vipExpireTimestamp > now || store.vipAutoRenew);
                 const customStatus = (store && store.operatingHours) ? getCustomStoreStatus(store.operatingHours) : null;
 
                 if (customStatus) {
@@ -774,7 +712,6 @@
                     else if(isOpen === false) isOpenNowHtml = '<span style="background:#D9534F; color:#FFF; padding:3px 8px; border-radius:10px; font-size:11px; margin-left:6px;">ปิดแล้ว</span>';
                 }
 
-                // ⚡ โชว์ปุ่มคูปองและกิจกรรมในแผนที่ ถ้าเป็น VIP ให้กดดูได้
                 let extraHtml = "";
                 if(store && store.coupon && store.coupon.trim() !== "") extraHtml += `<button onclick="showCustomerDetail('coupon', '${store.coupon.replace(/'/g, "\\'")}', '${store.name.replace(/'/g, "\\'")}')" style="margin:8px 5px 0 0; font-size:12px; font-weight:bold; background:rgba(217, 83, 79, 0.1); border:1px solid #D9534F; color:#D9534F; padding:6px 12px; border-radius:12px; cursor:pointer;">🎟️ กดดูคูปอง</button>`;
                 if(store && store.event && store.event.trim() !== "") extraHtml += `<button onclick="showCustomerDetail('event', '${store.event.replace(/'/g, "\\'")}', '${store.name.replace(/'/g, "\\'")}')" style="margin:8px 0 0; font-size:12px; font-weight:bold; background:rgba(23, 162, 184, 0.1); border:1px solid #17a2b8; color:#17a2b8; padding:6px 12px; border-radius:12px; cursor:pointer;">🎉 ดูกิจกรรม</button>`;
@@ -790,16 +727,6 @@
                 infoWindow.setContent(contentStr); infoWindow.open(map, activeMarker);
             });
         }
-    }
-
-    function searchAndFocusStore(storeName) {
-        document.getElementById('searchBox').value = storeName; executeSearch('text'); window.scrollTo({top: document.getElementById('map').offsetTop - 20, behavior:'smooth'});
-        service.textSearch({ query: storeName, location: currentCoords, radius: 50000 }, (res, status) => {
-            if (status === "OK" && res.length > 0) {
-                map.panTo(res[0].geometry.location); map.setZoom(17);
-                if (activeMarker) activeMarker.setMap(null); activeMarker = new google.maps.Marker({ position: res[0].geometry.location, map: map, animation: google.maps.Animation.DROP });
-            }
-        });
     }
 
     function renderUI() {
@@ -871,6 +798,7 @@
             if (window.google && window.google.maps && window.google.maps.geometry) { distanceKm = (google.maps.geometry.spherical.computeDistanceBetween(originPoint, p.geometry.location) / 1000).toFixed(1); }
 
             let openStatusHtml = '<span class="status-tag" style="background:var(--bg-light); color:var(--text-muted); border:1px solid var(--border);">⚪ เวลา: ทางร้านไม่ได้ระบุ</span>'; 
+            
             const customStatus = (store && store.operatingHours) ? getCustomStoreStatus(store.operatingHours) : null;
 
             if (customStatus) {
@@ -896,7 +824,6 @@
             const hasLine = store && store.lineUrl && store.lineUrl.trim() !== ''; const hasFb = store && store.fbUrl && store.fbUrl.trim() !== '';
             const imgUrl = p.photos ? p.photos[0].getUrl({maxWidth:400}) : 'https://via.placeholder.com/400x200?text=Painaidee';
 
-            // ⚡ โชว์ Tag พิเศษที่หน้าร้าน และกดเพื่อดูรายละเอียดได้ทันที
             let extraTags = "";
             if(store && store.coupon && store.coupon.trim() !== "") extraTags += `<span onclick="showCustomerDetail('coupon', '${store.coupon.replace(/'/g, "\\'")}', '${store.name.replace(/'/g, "\\'")}'); event.stopPropagation();" style="background:rgba(217, 83, 79, 0.1); color:var(--danger); padding:4px 10px; border-radius:10px; font-size:11px; font-weight:bold; margin-right:5px; display:inline-block; margin-bottom:5px; cursor:pointer; border:1px solid rgba(217, 83, 79, 0.3); pointer-events:auto;">🎟️ กดดูคูปอง</span>`;
             if(store && store.event && store.event.trim() !== "") extraTags += `<span onclick="showCustomerDetail('event', '${store.event.replace(/'/g, "\\'")}', '${store.name.replace(/'/g, "\\'")}'); event.stopPropagation();" style="background:rgba(23, 162, 184, 0.1); color:var(--info); padding:4px 10px; border-radius:10px; font-size:11px; font-weight:bold; display:inline-block; margin-bottom:5px; cursor:pointer; border:1px solid rgba(23, 162, 184, 0.3); pointer-events:auto;">🎉 ดูกิจกรรม</span>`;
