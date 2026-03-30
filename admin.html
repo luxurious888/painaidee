@@ -42,9 +42,44 @@
         .admin-page { display: none; animation: fadeIn 0.4s ease; }
         .admin-page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ⚡ Image Modal CSS */
+        #imageViewerModal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:999999; flex-direction:column; justify-content:center; align-items:center; animation: fadeIn 0.3s ease; }
+        #imageViewerModal img { max-width:95%; max-height:85vh; object-fit:contain; border-radius:12px; box-shadow:0 0 30px rgba(0,0,0,0.8); }
+        .close-modal-btn { position:absolute; top:20px; right:20px; color:white; background:rgba(255,255,255,0.2); width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:24px; cursor:pointer; transition:0.3s; }
+        .close-modal-btn:hover { background:rgba(255,255,255,0.4); transform:scale(1.1); }
     </style>
 </head>
 <body class="p-4 md:p-8 text-sm md:text-base">
+
+<div id="imageViewerModal" onclick="this.style.display='none'">
+    <div class="close-modal-btn">×</div>
+    <img id="viewerImg" src="" onclick="event.stopPropagation()">
+</div>
+
+<div id="adminTimeModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:99999; flex-direction:column; justify-content:center; align-items:center;">
+    <div class="bg-[#1A1D23] p-6 rounded-xl border border-[#C5A059] w-[95%] max-w-md shadow-[0_0_30px_rgba(197,160,89,0.2)]">
+        <h3 class="text-xl font-bold gold-text mb-2">🕒 ตั้งค่าเวลาเปิด-ปิดร้าน</h3>
+        <p id="adminTimeStoreName" class="text-sm text-gray-300 mb-4 bg-black/30 p-2 rounded"></p>
+        
+        <div class="flex justify-between bg-[#2A2E36] p-3 rounded-lg mb-4 border border-gray-600">
+            <label class="text-[13px] text-[#C5A059] font-bold cursor-pointer flex items-center gap-1">
+                <input type="checkbox" id="adminApplyAll" onchange="adminToggleApplyAll()" class="w-4 h-4 accent-[#C5A059]"> เปิดทุกวัน
+            </label>
+            <label class="text-[13px] text-[#06C755] font-bold cursor-pointer flex items-center gap-1">
+                <input type="checkbox" id="adminOpen24" onchange="adminToggle24h()" class="w-4 h-4 accent-[#06C755]"> เปิด 24 ชม.
+            </label>
+        </div>
+
+        <div id="adminHoursGrid" class="flex flex-col gap-2 mb-6 max-h-[40vh] overflow-y-auto pr-2"></div>
+        
+        <input type="hidden" id="adminTimeStoreIndex">
+        <div class="flex gap-2">
+            <button class="btn-primary flex-1" onclick="adminSaveTime()">💾 บันทึกเวลา</button>
+            <button class="btn-danger flex-1" onclick="document.getElementById('adminTimeModal').style.display='none'">❌ ยกเลิก</button>
+        </div>
+    </div>
+</div>
 
 <div id="adminLoginOverlay" style="position: fixed; inset: 0; background: #121418; z-index: 99999; display: flex; flex-direction: column; align-items: center; justify-content: center;">
     <div class="bg-[#1A1D23] p-8 rounded-2xl border border-[#C5A059] shadow-[0_0_30px_rgba(197,160,89,0.15)] text-center max-w-sm w-[90%]">
@@ -74,6 +109,7 @@
     </div>
 
     <div id="page-dashboard" class="admin-page active">
+        
         <div class="card border-l-4 border-yellow-500 p-0 overflow-hidden">
             <details open>
                 <summary>👑 1. ตั้งค่าระบบ VIP (ราคา & บัญชี)</summary>
@@ -127,7 +163,7 @@
 
         <div class="card border-l-4 border-gray-400 p-0 overflow-hidden">
             <details>
-                <summary>🏬 5. จัดการสิทธิ์ร้านค้า (เปิดปิด VIP / ส่ง PIN)</summary>
+                <summary>🏬 5. จัดการสิทธิ์ร้านค้า (เปิดปิด VIP / จัดการเวลา & PIN)</summary>
                 <div class="p-5 bg-[#1A1D23]">
                     <div id="store-management-list" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
                 </div>
@@ -218,20 +254,14 @@
                     <div class="bg-[#1A1D23] p-4 rounded-lg border border-gray-600">
                         <label class="block text-[#FFD700] text-sm mb-2 font-bold">🎯 สมัคร VIP ครั้งแรก</label>
                         <div class="flex gap-2">
-                            <select id="vipFirstType" class="input-dark w-1/3 text-center font-bold">
-                                <option value="fixed">บาท (฿)</option>
-                                <option value="percent">เปอร์เซ็น (%)</option>
-                            </select>
+                            <select id="vipFirstType" class="input-dark w-1/3 text-center font-bold"><option value="fixed">บาท (฿)</option><option value="percent">เปอร์เซ็น (%)</option></select>
                             <input type="number" id="vipFirstVal" class="input-dark w-2/3 text-xl font-bold text-white py-2" placeholder="จำนวน">
                         </div>
                     </div>
                     <div class="bg-[#1A1D23] p-4 rounded-lg border border-gray-600">
                         <label class="block text-cyan-400 text-sm mb-2 font-bold">🔄 ต่ออายุ VIP เดือนถัดไป</label>
                         <div class="flex gap-2">
-                            <select id="vipRecurType" class="input-dark w-1/3 text-center font-bold">
-                                <option value="percent">เปอร์เซ็น (%)</option>
-                                <option value="fixed">บาท (฿)</option>
-                            </select>
+                            <select id="vipRecurType" class="input-dark w-1/3 text-center font-bold"><option value="percent">เปอร์เซ็น (%)</option><option value="fixed">บาท (฿)</option></select>
                             <input type="number" id="vipRecurVal" class="input-dark w-2/3 text-xl font-bold text-white py-2" placeholder="จำนวน">
                         </div>
                     </div>
@@ -242,20 +272,14 @@
                     <div class="bg-[#1A1D23] p-4 rounded-lg border border-gray-600">
                         <label class="block text-[#FFD700] text-sm mb-2 font-bold">🎯 ซื้อแพ็กเกจครั้งแรก</label>
                         <div class="flex gap-2">
-                            <select id="promoFirstType" class="input-dark w-1/3 text-center font-bold">
-                                <option value="fixed">บาท (฿)</option>
-                                <option value="percent">เปอร์เซ็น (%)</option>
-                            </select>
+                            <select id="promoFirstType" class="input-dark w-1/3 text-center font-bold"><option value="fixed">บาท (฿)</option><option value="percent">เปอร์เซ็น (%)</option></select>
                             <input type="number" id="promoFirstVal" class="input-dark w-2/3 text-xl font-bold text-white py-2" placeholder="จำนวน">
                         </div>
                     </div>
                     <div class="bg-[#1A1D23] p-4 rounded-lg border border-gray-600">
                         <label class="block text-cyan-400 text-sm mb-2 font-bold">🔄 ซื้อแพ็กเกจครั้งถัดไป</label>
                         <div class="flex gap-2">
-                            <select id="promoRecurType" class="input-dark w-1/3 text-center font-bold">
-                                <option value="percent">เปอร์เซ็น (%)</option>
-                                <option value="fixed">บาท (฿)</option>
-                            </select>
+                            <select id="promoRecurType" class="input-dark w-1/3 text-center font-bold"><option value="percent">เปอร์เซ็น (%)</option><option value="fixed">บาท (฿)</option></select>
                             <input type="number" id="promoRecurVal" class="input-dark w-2/3 text-xl font-bold text-white py-2" placeholder="จำนวน">
                         </div>
                     </div>
@@ -311,91 +335,18 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // ==========================================
-    // ⚡ 2. ข้อมูลตั้งต้น (Default Data)
-    // ==========================================
-    const defaultMainCats = [
-        { id: 'food', label: '🍽️ อาหาร & เครื่องดื่ม', keyword: 'ร้านอาหาร' },
-        { id: 'cafe', label: '☕ คาเฟ่ & เบเกอรี่', keyword: 'คาเฟ่' },
-        { id: 'nightlife', label: '🍻 นั่งชิล & ไนท์ไลฟ์', keyword: 'บาร์' },
-        { id: 'attraction', label: '📸 ที่เที่ยว & จุดเช็คอิน', keyword: 'สถานที่ท่องเที่ยว' },
-        { id: 'accommodation', label: '🏨 ที่พัก & แคมป์ปิ้ง', keyword: 'โรงแรม' },
-        { id: 'beauty_spa', label: '💆‍♀️ นวด & สปา', keyword: 'ร้านนวด' },
-        { id: 'shopping', label: '🛍️ ช้อปปิ้ง & ตลาด', keyword: 'ตลาด' },
-        { id: 'activity', label: '🎯 กิจกรรม & กีฬา', keyword: 'สปอร์ตคลับ' },
-        { id: 'health', label: '🏥 สุขภาพ & ยา', keyword: 'โรงพยาบาล' },
-        { id: 'car_service', label: '🚗 รถยนต์ & การเดินทาง', keyword: 'ปั๊มน้ำมัน' },
-        { id: 'emergency', label: '🚨 ฉุกเฉิน & บริการ', keyword: 'สถานีตำรวจ' }
-    ];
+    const defaultMainCats = [ { id: 'food', label: '🍽️ อาหาร & เครื่องดื่ม', keyword: 'ร้านอาหาร' }, { id: 'cafe', label: '☕ คาเฟ่ & เบเกอรี่', keyword: 'คาเฟ่' }, { id: 'nightlife', label: '🍻 นั่งชิล & ไนท์ไลฟ์', keyword: 'บาร์' }, { id: 'attraction', label: '📸 ที่เที่ยว & จุดเช็คอิน', keyword: 'สถานที่ท่องเที่ยว' }, { id: 'accommodation', label: '🏨 ที่พัก & แคมป์ปิ้ง', keyword: 'โรงแรม' }, { id: 'beauty_spa', label: '💆‍♀️ นวด & สปา', keyword: 'ร้านนวด' }, { id: 'shopping', label: '🛍️ ช้อปปิ้ง & ตลาด', keyword: 'ตลาด' }, { id: 'activity', label: '🎯 กิจกรรม & กีฬา', keyword: 'สปอร์ตคลับ' }, { id: 'health', label: '🏥 สุขภาพ & ยา', keyword: 'โรงพยาบาล' }, { id: 'car_service', label: '🚗 รถยนต์ & การเดินทาง', keyword: 'ปั๊มน้ำมัน' }, { id: 'emergency', label: '🚨 ฉุกเฉิน & บริการ', keyword: 'สถานีตำรวจ' } ];
+    const defaultCategories = [ { id: 101, group: 'food', label: 'หมูกระทะ / ชาบู / ปิ้งย่าง', keyword: 'หมูกระทะ ชาบู' }, { id: 102, group: 'food', label: 'ส้มตำ / อาหารอีสาน', keyword: 'ร้านส้มตำ' }, { id: 103, group: 'food', label: 'อาหารทะเล / ซีฟู้ด', keyword: 'ร้านอาหารทะเล' }, { id: 104, group: 'food', label: 'ข้าวต้มกุ๊ย / โต้รุ่ง', keyword: 'ร้านข้าวต้ม' }, { id: 105, group: 'food', label: 'ก๋วยเตี๋ยว / อาหารจานเดียว', keyword: 'ร้านก๋วยเตี๋ยว' }, { id: 106, group: 'food', label: 'อาหารนานาชาติ (ญี่ปุ่น/ฝรั่ง)', keyword: 'ร้านอาหารญี่ปุ่น' }, { id: 107, group: 'food', label: 'อาหารมังสวิรัติ / วีแกน', keyword: 'ร้านอาหารเจ' }, { id: 201, group: 'cafe', label: 'คาเฟ่ถ่ายรูปสวย', keyword: 'คาเฟ่ถ่ายรูป' }, { id: 202, group: 'cafe', label: 'กาแฟ Specialty', keyword: 'Specialty Coffee' }, { id: 203, group: 'cafe', label: 'เบเกอรี่ / ขนมหวาน', keyword: 'ร้านเบเกอรี่' }, { id: 204, group: 'cafe', label: 'คาเฟ่สัตว์เลี้ยง', keyword: 'คาเฟ่หมา แมว' }, { id: 301, group: 'nightlife', label: 'ร้านนั่งชิล / ดนตรีสด', keyword: 'ร้านนั่งชิล' }, { id: 302, group: 'nightlife', label: 'ผับ / คลับ / เต้น', keyword: 'ผับ' }, { id: 303, group: 'nightlife', label: 'บาร์คราฟต์เบียร์ / ค็อกเทล', keyword: 'คราฟต์เบียร์ บาร์' }, { id: 304, group: 'nightlife', label: 'คาราโอเกะ', keyword: 'ร้านคาราโอเกะ' }, { id: 401, group: 'attraction', label: 'วัด / สถานที่ศักดิ์สิทธิ์', keyword: 'วัด' }, { id: 402, group: 'attraction', label: 'ธรรมชาติ / น้ำตก / ภูเขา', keyword: 'อุทยานแห่งชาติ น้ำตก' }, { id: 403, group: 'attraction', label: 'โบสถ์ / มัสยิด / ศาลเจ้า', keyword: 'โบสถ์ มัสยิด' }, { id: 404, group: 'attraction', label: 'พิพิธภัณฑ์ / หอศิลป์', keyword: 'พิพิธภัณฑ์' }, { id: 405, group: 'attraction', label: 'สวนสัตว์ / ฟาร์ม', keyword: 'สวนสัตว์ ฟาร์ม' }, { id: 501, group: 'accommodation', label: 'โรงแรม / รีสอร์ท', keyword: 'โรงแรม รีสอร์ท' }, { id: 502, group: 'accommodation', label: 'ลานกางเต็นท์ / แคมป์ปิ้ง', keyword: 'ลานกางเต็นท์ แคมป์ปิ้ง' }, { id: 503, group: 'accommodation', label: 'พูลวิลล่า / บ้านพักส่วนตัว', keyword: 'พูลวิลล่า' }, { id: 504, group: 'accommodation', label: 'โฮสเทล / ที่พักราคาประหยัด', keyword: 'โฮสเทล' }, { id: 601, group: 'beauty_spa', label: 'นวดแผนไทย / นวดเท้า', keyword: 'ร้านนวดแผนไทย' }, { id: 602, group: 'beauty_spa', label: 'สปา / ออนเซ็น', keyword: 'สปา' }, { id: 603, group: 'beauty_spa', label: 'คลินิกความงาม / ศัลยกรรม', keyword: 'คลินิกความงาม' }, { id: 604, group: 'beauty_spa', label: 'ร้านทำผม / ทำเล็บ', keyword: 'ร้านทำผม ซาลอน' }, { id: 701, group: 'shopping', label: 'ตลาดนัดกลางคืน / ถนนคนเดิน', keyword: 'ถนนคนเดิน ตลาดนัด' }, { id: 702, group: 'shopping', label: 'ของฝาก / ของที่ระลึก', keyword: 'ร้านขายของฝาก' }, { id: 703, group: 'shopping', label: 'ห้างสรรพสินค้า', keyword: 'ห้างสรรพสินค้า' }, { id: 704, group: 'shopping', label: 'ตลาดสด / ตลาดเช้า', keyword: 'ตลาดสด' }, { id: 801, group: 'activity', label: 'โต๊ะสนุกเกอร์ / บิลเลียด', keyword: 'โต๊ะสนุกเกอร์' }, { id: 802, group: 'activity', label: 'ฟิตเนส / ยิม', keyword: 'ฟิตเนส' }, { id: 803, group: 'activity', label: 'สวนน้ำ / สวนสนุก', keyword: 'สวนน้ำ' }, { id: 901, group: 'health', label: 'โรงพยาบาล', keyword: 'โรงพยาบาล' }, { id: 902, group: 'health', label: 'คลินิกเวชกรรม', keyword: 'คลินิก' }, { id: 903, group: 'health', label: 'ร้านขายยา', keyword: 'ร้านขายยา' }, { id: 904, group: 'health', label: 'คลินิกทำฟัน', keyword: 'คลินิกทันตกรรม' }, { id: 905, group: 'health', label: 'คลินิกรักษาสัตว์', keyword: 'คลินิกรักษาสัตว์' }, { id: 1001, group: 'car_service', label: 'คาร์แคร์ / ล้างรถ', keyword: 'คาร์แคร์ ล้างรถ' }, { id: 1002, group: 'car_service', label: 'ประดับยนต์ / เครื่องเสียง / ติดฟิล์ม', keyword: 'ประดับยนต์ เครื่องเสียงรถยนต์ ติดฟิล์มรถยนต์' }, { id: 1003, group: 'car_service', label: 'ปั๊มน้ำมัน / จุดชาร์จ EV', keyword: 'ปั๊มน้ำมัน EV Station' }, { id: 1004, group: 'car_service', label: 'อู่ซ่อมรถ / ปะยาง', keyword: 'อู่ซ่อมรถ เปลี่ยนยาง' }, { id: 1005, group: 'car_service', label: 'สถานีขนส่ง / เช่ารถ', keyword: 'รถเช่า สถานีขนส่ง' }, { id: 1101, group: 'emergency', label: 'สถานีตำรวจ', keyword: 'สถานีตำรวจ' }, { id: 1102, group: 'emergency', label: 'ดับเพลิง / กู้ภัย', keyword: 'สถานีดับเพลิง กู้ภัย' }, { id: 1103, group: 'emergency', label: 'ตู้ ATM / ธนาคาร', keyword: 'ATM ธนาคาร' }, { id: 1104, group: 'emergency', label: 'บริการลากจูง / สไลด์ออน', keyword: 'รถลากจูง รถสไลด์' } ];
 
-    const defaultCategories = [
-        { id: 101, group: 'food', label: 'หมูกระทะ / ชาบู / ปิ้งย่าง', keyword: 'หมูกระทะ ชาบู' },
-        { id: 102, group: 'food', label: 'ส้มตำ / อาหารอีสาน', keyword: 'ร้านส้มตำ' },
-        { id: 103, group: 'food', label: 'อาหารทะเล / ซีฟู้ด', keyword: 'ร้านอาหารทะเล' },
-        { id: 104, group: 'food', label: 'ข้าวต้มกุ๊ย / โต้รุ่ง', keyword: 'ร้านข้าวต้ม' },
-        { id: 105, group: 'food', label: 'ก๋วยเตี๋ยว / อาหารจานเดียว', keyword: 'ร้านก๋วยเตี๋ยว' },
-        { id: 106, group: 'food', label: 'อาหารนานาชาติ (ญี่ปุ่น/ฝรั่ง)', keyword: 'ร้านอาหารญี่ปุ่น' },
-        { id: 107, group: 'food', label: 'อาหารมังสวิรัติ / วีแกน', keyword: 'ร้านอาหารเจ' },
-        { id: 201, group: 'cafe', label: 'คาเฟ่ถ่ายรูปสวย', keyword: 'คาเฟ่ถ่ายรูป' },
-        { id: 202, group: 'cafe', label: 'กาแฟ Specialty', keyword: 'Specialty Coffee' },
-        { id: 203, group: 'cafe', label: 'เบเกอรี่ / ขนมหวาน', keyword: 'ร้านเบเกอรี่' },
-        { id: 204, group: 'cafe', label: 'คาเฟ่สัตว์เลี้ยง', keyword: 'คาเฟ่หมา แมว' },
-        { id: 301, group: 'nightlife', label: 'ร้านนั่งชิล / ดนตรีสด', keyword: 'ร้านนั่งชิล' },
-        { id: 302, group: 'nightlife', label: 'ผับ / คลับ / เต้น', keyword: 'ผับ' },
-        { id: 303, group: 'nightlife', label: 'บาร์คราฟต์เบียร์ / ค็อกเทล', keyword: 'คราฟต์เบียร์ บาร์' },
-        { id: 304, group: 'nightlife', label: 'คาราโอเกะ', keyword: 'ร้านคาราโอเกะ' },
-        { id: 401, group: 'attraction', label: 'วัด / สถานที่ศักดิ์สิทธิ์', keyword: 'วัด' },
-        { id: 402, group: 'attraction', label: 'ธรรมชาติ / น้ำตก / ภูเขา', keyword: 'อุทยานแห่งชาติ น้ำตก' },
-        { id: 403, group: 'attraction', label: 'โบสถ์ / มัสยิด / ศาลเจ้า', keyword: 'โบสถ์ มัสยิด' },
-        { id: 404, group: 'attraction', label: 'พิพิธภัณฑ์ / หอศิลป์', keyword: 'พิพิธภัณฑ์' },
-        { id: 405, group: 'attraction', label: 'สวนสัตว์ / ฟาร์ม', keyword: 'สวนสัตว์ ฟาร์ม' },
-        { id: 501, group: 'accommodation', label: 'โรงแรม / รีสอร์ท', keyword: 'โรงแรม รีสอร์ท' },
-        { id: 502, group: 'accommodation', label: 'ลานกางเต็นท์ / แคมป์ปิ้ง', keyword: 'ลานกางเต็นท์ แคมป์ปิ้ง' },
-        { id: 503, group: 'accommodation', label: 'พูลวิลล่า / บ้านพักส่วนตัว', keyword: 'พูลวิลล่า' },
-        { id: 504, group: 'accommodation', label: 'โฮสเทล / ที่พักราคาประหยัด', keyword: 'โฮสเทล' },
-        { id: 601, group: 'beauty_spa', label: 'นวดแผนไทย / นวดเท้า', keyword: 'ร้านนวดแผนไทย' },
-        { id: 602, group: 'beauty_spa', label: 'สปา / ออนเซ็น', keyword: 'สปา' },
-        { id: 603, group: 'beauty_spa', label: 'คลินิกความงาม / ศัลยกรรม', keyword: 'คลินิกความงาม' },
-        { id: 604, group: 'beauty_spa', label: 'ร้านทำผม / ทำเล็บ', keyword: 'ร้านทำผม ซาลอน' },
-        { id: 701, group: 'shopping', label: 'ตลาดนัดกลางคืน / ถนนคนเดิน', keyword: 'ถนนคนเดิน ตลาดนัด' },
-        { id: 702, group: 'shopping', label: 'ของฝาก / ของที่ระลึก', keyword: 'ร้านขายของฝาก' },
-        { id: 703, group: 'shopping', label: 'ห้างสรรพสินค้า', keyword: 'ห้างสรรพสินค้า' },
-        { id: 704, group: 'shopping', label: 'ตลาดสด / ตลาดเช้า', keyword: 'ตลาดสด' },
-        { id: 801, group: 'activity', label: 'โต๊ะสนุกเกอร์ / บิลเลียด', keyword: 'โต๊ะสนุกเกอร์' },
-        { id: 802, group: 'activity', label: 'ฟิตเนส / ยิม', keyword: 'ฟิตเนส' },
-        { id: 803, group: 'activity', label: 'สวนน้ำ / สวนสนุก', keyword: 'สวนน้ำ' },
-        { id: 901, group: 'health', label: 'โรงพยาบาล', keyword: 'โรงพยาบาล' },
-        { id: 902, group: 'health', label: 'คลินิกเวชกรรม', keyword: 'คลินิก' },
-        { id: 903, group: 'health', label: 'ร้านขายยา', keyword: 'ร้านขายยา' },
-        { id: 904, group: 'health', label: 'คลินิกทำฟัน', keyword: 'คลินิกทันตกรรม' },
-        { id: 905, group: 'health', label: 'คลินิกรักษาสัตว์', keyword: 'คลินิกรักษาสัตว์' },
-        { id: 1001, group: 'car_service', label: 'คาร์แคร์ / ล้างรถ', keyword: 'คาร์แคร์ ล้างรถ' },
-        { id: 1002, group: 'car_service', label: 'ประดับยนต์ / เครื่องเสียง / ติดฟิล์ม', keyword: 'ประดับยนต์ เครื่องเสียงรถยนต์ ติดฟิล์มรถยนต์' },
-        { id: 1003, group: 'car_service', label: 'ปั๊มน้ำมัน / จุดชาร์จ EV', keyword: 'ปั๊มน้ำมัน EV Station' },
-        { id: 1004, group: 'car_service', label: 'อู่ซ่อมรถ / ปะยาง', keyword: 'อู่ซ่อมรถ เปลี่ยนยาง' },
-        { id: 1005, group: 'car_service', label: 'สถานีขนส่ง / เช่ารถ', keyword: 'รถเช่า สถานีขนส่ง' },
-        { id: 1101, group: 'emergency', label: 'สถานีตำรวจ', keyword: 'สถานีตำรวจ' },
-        { id: 1102, group: 'emergency', label: 'ดับเพลิง / กู้ภัย', keyword: 'สถานีดับเพลิง กู้ภัย' },
-        { id: 1103, group: 'emergency', label: 'ตู้ ATM / ธนาคาร', keyword: 'ATM ธนาคาร' },
-        { id: 1104, group: 'emergency', label: 'บริการลากจูง / สไลด์ออน', keyword: 'รถลากจูง รถสไลด์' }
-    ];
+    let appData = { registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], mainCategories: [], categories: [], closedReports: [], blacklistedPlaces: [], services: [], pendingVipRequests: [], vipSettings: { price: 500, bankAccount: 'กสิกรไทย 123-x-xxxxx-x ชื่อบัญชี' }, affiliateSettings: { vipFirstType: 'fixed', vipFirstVal: 100, vipRecurType: 'percent', vipRecurVal: 10, promoFirstType: 'fixed', promoFirstVal: 50, promoRecurType: 'percent', promoRecurVal: 5, minWithdrawal: 300 }, affiliateWallets: [], withdrawalRequests: [] };
 
-    let appData = { 
-        registrationRequests: [], registeredStores: [], pendingPromotions: [], 
-        activePromotions: [], mainCategories: [], categories: [], closedReports: [], 
-        blacklistedPlaces: [], services: [], pendingVipRequests: [], 
-        vipSettings: { price: 500, bankAccount: 'กสิกรไทย 123-x-xxxxx-x ชื่อบัญชี' }, 
-        affiliateSettings: { 
-            vipFirstType: 'fixed', vipFirstVal: 100, vipRecurType: 'percent', vipRecurVal: 10,
-            promoFirstType: 'fixed', promoFirstVal: 50, promoRecurType: 'percent', promoRecurVal: 5,
-            minWithdrawal: 300 
-        }, 
-        affiliateWallets: [], withdrawalRequests: [] 
-    };
+    // ⚡ ฟังก์ชันเปิดรูปเต็มจอ
+    function openImageModal(src) {
+        document.getElementById('viewerImg').src = src;
+        document.getElementById('imageViewerModal').style.display = 'flex';
+    }
+    function openImageTab(base64Str) { openImageModal(base64Str); }
 
-    // ==========================================
-    // ⚡ 3. ฟังก์ชันระบบจัดการ (Core Functions)
-    // ==========================================
     function formatDateTime(ms) {
         if (!ms) return '';
         const d = new Date(ms); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 16);
@@ -412,22 +363,13 @@
 
     function checkAdminLogin() {
         const pwd = document.getElementById('adminPasswordInput').value;
-        if (pwd === ADMIN_PASSWORD) {
-            sessionStorage.setItem('adminLoggedIn', 'true');
-            document.getElementById('adminLoginOverlay').style.display = 'none';
-            loadDataRealtime(); 
-        } else {
-            document.getElementById('loginErrorMsg').style.display = 'block';
-        }
+        if (pwd === ADMIN_PASSWORD) { sessionStorage.setItem('adminLoggedIn', 'true'); document.getElementById('adminLoginOverlay').style.display = 'none'; loadDataRealtime(); 
+        } else { document.getElementById('loginErrorMsg').style.display = 'block'; }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        if (sessionStorage.getItem('adminLoggedIn') === 'true') {
-            document.getElementById('adminLoginOverlay').style.display = 'none';
-            loadDataRealtime();
-        } else {
-            document.getElementById('adminLoginOverlay').style.display = 'flex';
-        }
+        if (sessionStorage.getItem('adminLoggedIn') === 'true') { document.getElementById('adminLoginOverlay').style.display = 'none'; loadDataRealtime();
+        } else { document.getElementById('adminLoginOverlay').style.display = 'flex'; }
     });
 
     let unsubscribe = null;
@@ -437,8 +379,6 @@
         
         unsubscribe = db.collection('painaidee').doc('systemData').onSnapshot((doc) => {
             if (doc.exists) { appData = { ...appData, ...doc.data() }; }
-            
-            // ตรวจสอบข้อมูลตั้งต้น
             if (!appData.mainCategories || appData.mainCategories.length === 0) appData.mainCategories = JSON.parse(JSON.stringify(defaultMainCats));
             if (!appData.categories || appData.categories.length === 0) appData.categories = JSON.parse(JSON.stringify(defaultCategories));
             if (!appData.vipSettings) appData.vipSettings = { price: 500, bankAccount: 'กสิกรไทย 123-4-56789-0 (ไปไหนดี)' };
@@ -465,19 +405,12 @@
             appData.registrationRequests = []; appData.registeredStores = []; appData.pendingPromotions = []; 
             appData.activePromotions = []; appData.closedReports = []; appData.pendingVipRequests = []; 
             appData.affiliateWallets = []; appData.withdrawalRequests = [];
-            
             appData.mainCategories = JSON.parse(JSON.stringify(defaultMainCats));
             appData.categories = JSON.parse(JSON.stringify(defaultCategories));
-            
-            await save();
-            alert("🧨 ล้างข้อมูลและโหลดหมวดหมู่ชุดใหญ่เสร็จสิ้น! ระบบเริ่มต้นใหม่แล้วครับ");
-            window.location.reload();
+            await save(); alert("🧨 ล้างข้อมูลและโหลดหมวดหมู่ชุดใหญ่เสร็จสิ้น! ระบบเริ่มต้นใหม่แล้วครับ"); window.location.reload();
         } else { if(confirmWord !== null) alert("❌ พิมพ์คำยืนยันไม่ถูกต้อง ยกเลิกการล้างข้อมูล"); }
     }
 
-    // ==========================================
-    // ⚡ 4. ฟังก์ชัน Render หน้าจอต่างๆ
-    // ==========================================
     function render() {
         document.getElementById('vipPriceSetting').value = appData.vipSettings.price; 
         document.getElementById('vipBankSetting').value = appData.vipSettings.bankAccount;
@@ -490,7 +423,7 @@
                 <div class="bg-[#2A2E36] p-4 rounded-xl border border-yellow-600 shadow-md">
                     <h3 class="text-lg font-bold gold-text mb-1">👑 ${r.storeName}</h3>
                     <p class="text-xs text-gray-400 mb-3">เวลาส่ง: ${r.requestDate}</p>
-                    <img src="${r.slipImage}" class="w-full h-32 object-cover rounded-lg mb-3 cursor-pointer border border-gray-600" onclick="openImageTab('${r.slipImage}')">
+                    <img src="${r.slipImage}" class="w-full h-32 object-cover rounded-lg mb-3 cursor-pointer border border-gray-600" onclick="openImageModal('${r.slipImage}')">
                     <div class="flex gap-2"><button class="btn-success flex-1 py-1" onclick="approveVipRequest(${i})">✅ อนุมัติ</button><button class="btn-danger flex-1 py-1" onclick="deleteItem('pendingVipRequests', ${i})">❌ ลบ</button></div>
                 </div>`).join('');
         }
@@ -529,27 +462,40 @@
             pendingPList.innerHTML = appData.pendingPromotions.map((p,i) => `
                 <div class="bg-[#2A2E36] p-4 rounded-xl border ${p.isUpdateOnly ? 'border-yellow-500' : 'border-cyan-500'} flex flex-col gap-3">
                     <div class="flex justify-between items-start">${p.isFreeRedeem ? '<span class="bg-purple-500 text-white px-2 py-1 rounded text-xs font-bold">🎁 ใช้สิทธิ์โปรโมทฟรี (VIP)</span>' : (p.isUpdateOnly ? '<span class="bg-yellow-500 text-black px-2 py-1 rounded text-xs font-bold">📝 ขอแก้ไขข้อมูล (ไม่เพิ่มวัน)</span>' : '<span class="bg-cyan-500 text-white px-2 py-1 rounded text-xs font-bold">🆕 ซื้อแพ็กเกจใหม่/ต่ออายุ</span>')}</div>
+                    
                     <div class="grid grid-cols-2 gap-2">
-                        <div><p class="text-xs text-gray-400 mb-1">รูปแบนเนอร์:</p><img src="${p.image}" class="w-full h-24 object-cover rounded-lg cursor-pointer border border-gray-600" onclick="openImageTab('${p.image}')"></div>
-                        ${p.slipImage ? `<div><p class="text-xs text-gray-400 mb-1">สลิปชำระเงิน:</p><img src="${p.slipImage}" class="w-full h-24 object-cover rounded-lg cursor-pointer border border-green-500" onclick="openImageTab('${p.slipImage}')"></div>` : '<div></div>'}
+                        <div class="relative w-full h-24 rounded-lg overflow-hidden border border-gray-600 cursor-pointer" onclick="openImageModal('${p.image}')">
+                            <img src="${p.image}" class="w-full h-full object-cover">
+                            ${p.images && p.images.length > 1 ? `<div class="absolute bottom-1 right-1 bg-black/70 text-white text-[10px] px-2 py-0.5 rounded-full">${p.images.length} รูป</div>` : ''}
+                        </div>
+                        ${p.slipImage ? `<div class="relative w-full h-24 rounded-lg overflow-hidden border border-green-500 cursor-pointer" onclick="openImageModal('${p.slipImage}')"><img src="${p.slipImage}" class="w-full h-full object-cover"></div>` : '<div></div>'}
                     </div>
+
                     <div class="grid grid-cols-2 gap-2"><input type="text" id="editPStore_${i}" class="input-dark text-sm" value="${p.storeName}"><input type="text" id="editPProv_${i}" class="input-dark text-sm" value="${p.province}"><input type="text" id="editPCat_${i}" class="input-dark text-sm" value="${p.category || ''}"><input type="text" id="editPServ_${i}" class="input-dark text-sm" value="${p.service || ''}" ${p.isUpdateOnly ? 'readonly style="opacity:0.5;"' : ''}></div>
                     <textarea id="editPDetail_${i}" class="input-dark text-sm" rows="2">${p.detail || ''}</textarea>
                     <div class="flex gap-2 mt-2"><button class="btn-success flex-1" onclick="approvePromotion(${i})">✅ อนุมัติ</button><button class="btn-danger flex-1" onclick="deleteItem('pendingPromotions', ${i})">❌ ลบ</button></div>
                 </div>`).join('');
         }
 
-        // 6. Active Promos
+        // 6. Active Promos (⚡ ระบบ Slider แบนเนอร์หน้าแอดมิน)
         const activePList = document.getElementById('active-promo-list'); const now = Date.now();
         if(appData.activePromotions.length === 0) { activePList.innerHTML = '<p class="text-gray-500 italic">ยังไม่มีแบนเนอร์ที่แสดงผล</p>'; }
         else {
             activePList.innerHTML = appData.activePromotions.map((p,i) => {
                 const isExpired = p.expireTimestamp && now > p.expireTimestamp;
+                let imgs = p.images && p.images.length > 0 ? p.images : [p.image];
+                let imgHtml = `<div class="promo-slider relative w-full h-32 rounded-lg overflow-hidden border border-gray-600 mt-4 cursor-pointer" onclick="openImageModal('${imgs[0]}')">`;
+                imgs.forEach((img, idx) => {
+                    imgHtml += `<img src="${img}" class="slide-item absolute inset-0 w-full h-full object-cover transition-opacity duration-700" style="opacity: ${idx===0?'1':'0'}" onclick="event.stopPropagation(); openImageModal('${img}')">`;
+                });
+                if(imgs.length > 1) imgHtml += `<div class="slide-indicator absolute bottom-2 right-2 bg-black/60 text-white text-[10px] px-2 py-1 rounded-full z-10">1/${imgs.length} 📸</div>`;
+                imgHtml += `</div>`;
+
                 return `
                 <div class="bg-[#2A2E36] p-4 rounded-xl border ${isExpired ? 'border-red-500 opacity-80' : 'border-green-500'} flex flex-col gap-3 relative">
-                    <div class="absolute top-2 right-2 text-xs font-bold px-2 py-1 rounded ${isExpired ? 'bg-red-500 text-white' : 'bg-green-500 text-white'}">${isExpired ? '⚠️ หมดอายุ' : '✅ แสดงผลอยู่'}</div>
-                    <img src="${p.image}" class="w-full h-32 object-cover rounded-lg border border-gray-600 mt-4 cursor-pointer" onclick="openImageTab('${p.image}')">
-                    <div class="grid grid-cols-2 gap-2"><input type="text" id="editAStore_${i}" class="input-dark font-bold text-[#C5A059]" value="${p.storeName}"><input type="text" id="editAProv_${i}" class="input-dark" value="${p.province}"><input type="text" id="editACat_${i}" class="input-dark text-sm" value="${p.category || ''}"><input type="datetime-local" id="editAExpire_${i}" class="input-dark text-sm" value="${formatDateTime(p.expireTimestamp)}"></div>
+                    <div class="absolute top-2 right-2 text-xs font-bold px-2 py-1 rounded ${isExpired ? 'bg-red-500 text-white' : 'bg-green-500 text-white'} z-20">${isExpired ? '⚠️ หมดอายุ' : '✅ แสดงผลอยู่'}</div>
+                    ${imgHtml}
+                    <div class="grid grid-cols-2 gap-2 mt-2"><input type="text" id="editAStore_${i}" class="input-dark font-bold text-[#C5A059]" value="${p.storeName}"><input type="text" id="editAProv_${i}" class="input-dark" value="${p.province}"><input type="text" id="editACat_${i}" class="input-dark text-sm" value="${p.category || ''}"><input type="datetime-local" id="editAExpire_${i}" class="input-dark text-sm" value="${formatDateTime(p.expireTimestamp)}"></div>
                     <textarea id="editADetail_${i}" class="input-dark text-sm" rows="2">${p.detail}</textarea>
                     <div class="flex flex-col gap-2 mt-2">
                         <div class="bg-[#1A1D23] p-2 rounded flex justify-between items-center border border-gray-700">
@@ -573,24 +519,26 @@
                 <div class="bg-[#2A2E36] p-4 rounded-xl border border-blue-500 flex flex-col justify-between">
                     <div><h3 class="text-xl font-bold text-white">${r.storeName}</h3><p class="text-sm text-gray-400 mt-1">📞 โทร: <span class="text-[#C5A059]">${r.phone || 'ไม่ระบุ'}</span></p>
                         ${r.refCode ? `<p class="text-sm font-bold mt-1 text-cyan-400">🤝 ผู้แนะนำ (Affiliate): ${r.refCode}</p>` : ''}
-                        <div class="flex flex-wrap gap-2 mt-3 mb-4">${r.storePhoto ? `<button class="bg-gray-700 px-3 py-1 rounded text-xs" onclick="openImageTab('${r.storePhoto}')">🖼️ รูปร้าน</button>` : ''}${r.idCard ? `<button class="bg-gray-700 px-3 py-1 rounded text-xs" onclick="openImageTab('${r.idCard}')">🆔 ปชช.</button>` : ''}${r.commercial ? `<button class="bg-gray-700 px-3 py-1 rounded text-xs" onclick="openImageTab('${r.commercial}')">📄 พาณิชย์</button>` : ''}</div>
+                        <div class="flex flex-wrap gap-2 mt-3 mb-4">${r.storePhoto ? `<button class="bg-gray-700 px-3 py-1 rounded text-xs" onclick="openImageModal('${r.storePhoto}')">🖼️ รูปร้าน</button>` : ''}${r.idCard ? `<button class="bg-gray-700 px-3 py-1 rounded text-xs" onclick="openImageModal('${r.idCard}')">🆔 ปชช.</button>` : ''}${r.commercial ? `<button class="bg-gray-700 px-3 py-1 rounded text-xs" onclick="openImageModal('${r.commercial}')">📄 พาณิชย์</button>` : ''}</div>
                     </div><div class="flex gap-2 mt-auto"><button class="btn-success flex-1 text-sm" onclick="approveStore(${i})">✅ อนุมัติ & ตั้ง PIN</button><button class="btn-danger flex-1 text-sm" onclick="deleteItem('registrationRequests', ${i})">❌ ลบ</button></div>
                 </div>`).join('');
         }
 
-        // 8. Store Management
+        // 8. Store Management (⚡ แก้ไข PIN & ตั้งเวลาได้)
         document.getElementById('store-management-list').innerHTML = appData.registeredStores.map((s,i) => `
             <div class="bg-[#242730] p-5 rounded-xl border border-gray-700 ${s.isVIP ? '!border-[#FFD700] shadow-[0_0_15px_rgba(255,215,0,0.1)]' : ''} relative flex flex-col h-full transition-all">
                 ${s.isVIP ? '<div class="absolute top-4 right-4 bg-[#FFD700] text-black text-[11px] px-3 py-1 rounded font-bold shadow">VIP</div>' : ''}
                 <h3 class="font-bold text-lg text-white mb-1 pr-12">${s.name}</h3>
                 <div class="bg-[#1A1D23] p-3 rounded-lg flex justify-between items-center my-3 border border-gray-800">
-                    <span class="text-gray-400 text-sm">🔑 PIN:</span><span class="text-[#FFD700] font-bold text-xl tracking-wider">${s.pin}</span>
+                    <span class="text-gray-400 text-sm">🔑 PIN:</span>
+                    <span class="text-[#FFD700] font-bold text-xl tracking-wider cursor-pointer hover:underline" onclick="editStorePin(${i})" title="คลิกเพื่อแก้ไข PIN">${s.pin}</span>
                 </div>
-                <div class="flex flex-col gap-3 mt-auto">
-                    <button class="w-full ${s.userId ? 'btn-info' : 'bg-gray-600 text-gray-300'} py-2 rounded-lg text-sm font-bold transition flex justify-center items-center gap-2" onclick="resendPinToStore(${i})">
-                        ${s.userId ? '📨 ส่ง PIN ทาง LINE อีกครั้ง' : '⚠️ ก๊อปปี้รหัส PIN (ข้อมูลเก่า)'}
-                    </button>
-                    ${!s.isVIP ? `<button class="w-full bg-[#453715] text-[#FFD700] py-2 rounded-lg text-sm font-bold transition" onclick="toggleVIP(${i})">👑 เปิดสิทธิ์ VIP</button>` : `<button class="w-full bg-[#4B1E25] text-[#FF5A5A] py-2 rounded-lg text-sm font-bold transition" onclick="toggleVIP(${i})">❌ ยกเลิก VIP</button>`}
+                <div class="flex flex-col gap-2 mt-auto">
+                    <div class="flex gap-2">
+                        <button class="flex-1 ${s.userId ? 'btn-info' : 'bg-gray-600 text-gray-300'} py-2 rounded-lg text-xs font-bold transition" onclick="resendPinToStore(${i})">${s.userId ? '📨 ส่งไลน์' : '⚠️ ก๊อป PIN'}</button>
+                        <button class="flex-1 bg-gray-600 hover:bg-gray-500 text-white py-2 rounded-lg text-xs font-bold transition" onclick="openAdminTimeModal(${i})">🕒 ตั้งเวลา</button>
+                    </div>
+                    ${!s.isVIP ? `<button class="w-full bg-[#453715] text-[#FFD700] py-2 rounded-lg text-sm font-bold transition mt-1" onclick="toggleVIP(${i})">👑 เปิดสิทธิ์ VIP</button>` : `<button class="w-full bg-[#4B1E25] text-[#FF5A5A] py-2 rounded-lg text-sm font-bold transition mt-1" onclick="toggleVIP(${i})">❌ ยกเลิก VIP</button>`}
                 </div>
             </div>
         `).join('');
@@ -606,6 +554,21 @@
         if (document.getElementById('page-affiliate').classList.contains('active')) renderAffiliate();
         if (document.getElementById('page-storeinfo').classList.contains('active')) renderStoreInfo();
     }
+
+    // ⚡ ระบบ Slider หน้าแอดมิน (ทำงานทุก 3.5 วิ)
+    setInterval(() => {
+        document.querySelectorAll('.promo-slider').forEach(slider => {
+            let imgs = slider.querySelectorAll('.slide-item');
+            if(imgs.length <= 1) return;
+            let activeIdx = Array.from(imgs).findIndex(img => img.style.opacity === '1');
+            if(activeIdx === -1) activeIdx = 0;
+            imgs[activeIdx].style.opacity = '0';
+            let nextIdx = (activeIdx + 1) % imgs.length;
+            imgs[nextIdx].style.opacity = '1';
+            let indicator = slider.querySelector('.slide-indicator');
+            if(indicator) indicator.innerText = `${nextIdx+1}/${imgs.length} 📸`;
+        });
+    }, 3500);
 
     // ==========================================
     // ⚡ 5. ฟังก์ชันย่อยการจัดการต่างๆ (Actions)
@@ -633,13 +596,11 @@
         } 
     }
 
-    // ⚡ ระบบคำนวณเงินใหม่ (แยก VIP กับ Promo)
     function addCommissionToWallet(store, packageAmount, type) {
         if (!store || !store.refCode || store.refCode.trim() === '') return;
         const refCode = store.refCode; 
         const set = appData.affiliateSettings || {};
 
-        // โค้ดรองรับข้อมูลเก่า
         if (set.firstTimeType && !set.vipFirstType) {
             set.vipFirstType = set.firstTimeType; set.vipFirstVal = set.firstTimeValue;
             set.vipRecurType = set.recurringType; set.vipRecurVal = set.recurringValue;
@@ -647,26 +608,20 @@
             set.promoRecurType = set.recurringType; set.promoRecurVal = set.recurringValue;
         }
 
-        let commAmount = 0;
-        let isFirstTime = false;
+        let commAmount = 0; let isFirstTime = false;
 
         if (type === 'vip') {
             if (!store.hasPaidVipComm) {
                 commAmount = set.vipFirstType === 'percent' ? (packageAmount * set.vipFirstVal / 100) : set.vipFirstVal;
                 store.hasPaidVipComm = true; store.hasPaidFirstComm = true; isFirstTime = true;
-            } else {
-                commAmount = set.vipRecurType === 'percent' ? (packageAmount * set.vipRecurVal / 100) : set.vipRecurVal;
-            }
+            } else { commAmount = set.vipRecurType === 'percent' ? (packageAmount * set.vipRecurVal / 100) : set.vipRecurVal; }
         } else if (type === 'promo') {
             if (!store.hasPaidPromoComm) {
                 commAmount = set.promoFirstType === 'percent' ? (packageAmount * set.promoFirstVal / 100) : set.promoFirstVal;
                 store.hasPaidPromoComm = true; store.hasPaidFirstComm = true; isFirstTime = true;
-            } else {
-                commAmount = set.promoRecurType === 'percent' ? (packageAmount * set.promoRecurVal / 100) : set.promoRecurVal;
-            }
+            } else { commAmount = set.promoRecurType === 'percent' ? (packageAmount * set.promoRecurVal / 100) : set.promoRecurVal; }
         }
 
-        // จัดการกรณีข้อมูลร้านค้าเก่าที่เคยจ่ายค่าแรกเข้าแบบรวมไปแล้ว ให้ถือว่าครั้งต่อไปเป็นการต่ออายุ
         if (!isFirstTime && !store.hasPaidVipComm && !store.hasPaidPromoComm && store.hasPaidFirstComm) {
             store.hasPaidVipComm = true; store.hasPaidPromoComm = true;
             if (type === 'vip') commAmount = set.vipRecurType === 'percent' ? (packageAmount * set.vipRecurVal / 100) : set.vipRecurVal;
@@ -684,7 +639,6 @@
     function renderAffiliate() {
         const affSet = appData.affiliateSettings || {};
         
-        // รองรับข้อมูลเก่า
         const vFT = affSet.vipFirstType || affSet.firstTimeType || 'fixed';
         const vFV = affSet.vipFirstVal !== undefined ? affSet.vipFirstVal : (affSet.firstTimeValue !== undefined ? affSet.firstTimeValue : 100);
         const vRT = affSet.vipRecurType || affSet.recurringType || 'percent';
@@ -797,22 +751,35 @@
             <div class="bg-[#1A1D23] p-3 rounded border border-gray-700 mt-1"><div class="flex justify-between items-center mb-1"><p class="text-xs text-gray-500">LINE User ID (สำหรับระบบยิงข้อความ):</p><span class="text-[10px] px-2 py-0.5 rounded-full font-bold ${s.userId ? 'bg-[#06C755]/20 text-[#06C755]' : 'bg-red-500/20 text-red-400'}">${s.userId ? '✅ เชื่อมต่อแล้ว' : '❌ ไม่มีข้อมูล'}</span></div><p class="text-xs text-[#06C755] font-mono break-all bg-black/30 p-2 rounded border border-[#06C755]/30 select-all">${s.userId || 'ไม่สามารถยิงข้อความหาลูกค้ารายนี้ได้ เนื่องจากเป็นข้อมูลเก่า'}</p></div>
             <p class="text-xs text-gray-400 mt-2 mb-1">เอกสารแนบตอนสมัคร:</p>
             <div class="flex flex-wrap gap-2">
-                ${s.storePhoto ? `<button class="bg-gray-700 hover:bg-gray-600 px-3 py-1.5 rounded-lg text-xs transition border border-gray-500" onclick="openImageTab('${s.storePhoto}')">🖼️ รูปร้าน</button>` : '<span class="text-xs text-gray-600 border border-gray-700 px-3 py-1.5 rounded-lg">❌ ไม่มีรูปร้าน</span>'}
-                ${s.idCard ? `<button class="bg-gray-700 hover:bg-gray-600 px-3 py-1.5 rounded-lg text-xs transition border border-gray-500" onclick="openImageTab('${s.idCard}')">🆔 ปชช.</button>` : '<span class="text-xs text-gray-600 border border-gray-700 px-3 py-1.5 rounded-lg">❌ ไม่มี ปชช.</span>'}
-                ${s.commercial ? `<button class="bg-gray-700 hover:bg-gray-600 px-3 py-1.5 rounded-lg text-xs transition border border-gray-500" onclick="openImageTab('${s.commercial}')">📄 พาณิชย์</button>` : ''}
+                ${s.storePhoto ? `<button class="bg-gray-700 hover:bg-gray-600 px-3 py-1.5 rounded-lg text-xs transition border border-gray-500" onclick="openImageModal('${s.storePhoto}')">🖼️ รูปร้าน</button>` : '<span class="text-xs text-gray-600 border border-gray-700 px-3 py-1.5 rounded-lg">❌ ไม่มีรูปร้าน</span>'}
+                ${s.idCard ? `<button class="bg-gray-700 hover:bg-gray-600 px-3 py-1.5 rounded-lg text-xs transition border border-gray-500" onclick="openImageModal('${s.idCard}')">🆔 ปชช.</button>` : '<span class="text-xs text-gray-600 border border-gray-700 px-3 py-1.5 rounded-lg">❌ ไม่มี ปชช.</span>'}
+                ${s.commercial ? `<button class="bg-gray-700 hover:bg-gray-600 px-3 py-1.5 rounded-lg text-xs transition border border-gray-500" onclick="openImageModal('${s.commercial}')">📄 พาณิชย์</button>` : ''}
             </div>
         </div>`).join('');
     }
 
+    // ⚡ ระบบป้องกันรหัส PIN ซ้ำ 100%
     async function approveStore(index) {
-        let r = appData.registrationRequests[index]; let defaultPin = Math.floor(100000 + Math.random() * 900000).toString();
+        let r = appData.registrationRequests[index]; 
+        
+        let defaultPin;
+        do {
+            defaultPin = Math.floor(100000 + Math.random() * 900000).toString();
+        } while(appData.registeredStores.some(s => s.pin === defaultPin));
+
         let customPin = prompt(`ตั้งรหัส PIN 6 หลัก สำหรับร้าน: ${r.storeName}\n\n(พิมพ์รหัสที่ต้องการ หรือกดยืนยันเพื่อใช้รหัสสุ่มด้านล่างนี้ได้เลย)`, defaultPin);
         if (customPin === null || customPin.trim() === "") return; 
+        customPin = customPin.trim();
+
+        if (appData.registeredStores.some(s => s.pin === customPin)) {
+            alert("❌ รหัส PIN นี้ซ้ำกับร้านอื่นในระบบครับ กรุณาตั้งใหม่!");
+            return approveStore(index); 
+        }
         
         const newStore = { 
-            name: r.storeName, pin: customPin.trim(), userId: r.userId, phone: r.phone || 'ไม่ระบุ', 
+            name: r.storeName, pin: customPin, userId: r.userId, phone: r.phone || 'ไม่ระบุ', 
             refCode: r.refCode || '', isVIP: false, freePromoDays: 0, hasPaidFirstComm: false, 
-            hasPaidVipComm: false, hasPaidPromoComm: false, // ⚡ เพิ่มฟิลด์แยกจ่าย
+            hasPaidVipComm: false, hasPaidPromoComm: false, 
             storePhoto: r.storePhoto || '', idCard: r.idCard || '', commercial: r.commercial || '' 
         };
         
@@ -823,6 +790,105 @@
             const lineMsg = `✅ ยินดีด้วย! อนุมัติร้านค้า ${newStore.name} เรียบร้อยแล้ว\n\n🔑 รหัส PIN จัดการร้านของคุณคือ: ${newStore.pin}\n\n🌐 เข้าใช้งานแอปได้เลยที่: https://liff.line.me/2009598846-wiCUeV35`;
             try { await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "SEND_LINE_PIN", targetUserId: newStore.userId, message: lineMsg }) }); alert("✅ ส่ง PIN เข้า LINE สำเร็จ!"); } catch(e) {}
         } else { prompt(`✅ อนุมัติร้านสำเร็จ!\nลูกค้าไม่ได้ผูก LINE ไว้ ให้ก๊อปปี้รหัสส่งให้ลูกค้า:`, newStore.pin); }
+    }
+
+    // ⚡ ฟังก์ชันสำหรับแก้ไข PIN ของร้านค้าเก่าโดยแอดมิน
+    async function editStorePin(index) {
+        let store = appData.registeredStores[index];
+        let newPin = prompt(`แก้ไขรหัส PIN 6 หลัก สำหรับร้าน: ${store.name}\n(รหัสเดิม: ${store.pin})`, store.pin);
+        if (newPin === null || newPin.trim() === "" || newPin.trim() === store.pin) return;
+        newPin = newPin.trim();
+
+        if (appData.registeredStores.some(s => s.pin === newPin)) {
+            alert("❌ รหัส PIN นี้ซ้ำกับร้านอื่นในระบบครับ กรุณาใช้รหัสอื่น!");
+            return;
+        }
+
+        store.pin = newPin;
+        await save();
+        alert("✅ เปลี่ยนรหัส PIN ให้ร้านนี้สำเร็จแล้วครับ!");
+    }
+
+    // ⚡ ฟังก์ชันสำหรับแอดมินแก้ไขเวลาเปิด-ปิดร้านค้า
+    function openAdminTimeModal(index) {
+        const store = appData.registeredStores[index];
+        document.getElementById('adminTimeStoreName').innerText = `ร้าน: ${store.name}`;
+        document.getElementById('adminTimeStoreIndex').value = index;
+        
+        const daysTH = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
+        let hoursHtml = '';
+        for(let i=0; i<7; i++) {
+            let d = store.operatingHours && store.operatingHours[i] ? store.operatingHours[i] : {open:'08:00', close:'17:00', isClosed: false};
+            hoursHtml += `
+            <div class="flex items-center gap-2 bg-[#2A2E36] p-2 rounded-lg">
+                <span class="w-14 text-xs text-white">${daysTH[i]}</span>
+                <input type="time" id="admin_open_${i}" value="${d.open}" class="bg-[#1A1D23] border border-gray-600 text-white rounded p-1 text-xs w-20" ${d.isClosed?'disabled':''}>
+                <span class="text-gray-500">-</span>
+                <input type="time" id="admin_close_${i}" value="${d.close}" class="bg-[#1A1D23] border border-gray-600 text-white rounded p-1 text-xs w-20" ${d.isClosed?'disabled':''}>
+                <label class="text-xs flex items-center gap-1 ml-auto text-red-400 font-bold cursor-pointer">
+                    <input type="checkbox" id="admin_closed_${i}" ${d.isClosed?'checked':''} onchange="adminToggleDayStatus(${i})" class="w-4 h-4 accent-red-500"> ปิด
+                </label>
+            </div>`;
+        }
+        document.getElementById('adminHoursGrid').innerHTML = hoursHtml;
+        document.getElementById('adminApplyAll').checked = false;
+        document.getElementById('adminOpen24').checked = false;
+        document.getElementById('adminTimeModal').style.display = 'flex';
+    }
+
+    function adminToggleDayStatus(i) {
+        const isClosed = document.getElementById(`admin_closed_${i}`).checked;
+        document.getElementById(`admin_open_${i}`).disabled = isClosed;
+        document.getElementById(`admin_close_${i}`).disabled = isClosed;
+    }
+
+    function adminToggleApplyAll() {
+        const isChecked = document.getElementById('adminApplyAll').checked;
+        if(isChecked) {
+            document.getElementById('adminOpen24').checked = false;
+            const openTime = document.getElementById('admin_open_1').value; // วันจันทร์
+            const closeTime = document.getElementById('admin_close_1').value;
+            const isClosed = document.getElementById('admin_closed_1').checked;
+            for(let i=0; i<7; i++) {
+                if(i !== 1) {
+                    document.getElementById(`admin_open_${i}`).value = openTime;
+                    document.getElementById(`admin_close_${i}`).value = closeTime;
+                    document.getElementById(`admin_closed_${i}`).checked = isClosed;
+                    adminToggleDayStatus(i);
+                }
+            }
+        }
+    }
+
+    function adminToggle24h() {
+        const isChecked = document.getElementById('adminOpen24').checked;
+        if(isChecked) document.getElementById('adminApplyAll').checked = false;
+        for(let i=0; i<7; i++) {
+            document.getElementById(`admin_closed_${i}`).checked = false;
+            adminToggleDayStatus(i);
+            if(isChecked) {
+                document.getElementById(`admin_open_${i}`).value = '00:00';
+                document.getElementById(`admin_close_${i}`).value = '23:59';
+            }
+        }
+    }
+
+    async function adminSaveTime() {
+        const idx = document.getElementById('adminTimeStoreIndex').value;
+        const store = appData.registeredStores[idx];
+        if(!store) return;
+        
+        store.operatingHours = {};
+        for(let i=0; i<7; i++) {
+            store.operatingHours[i] = {
+                open: document.getElementById(`admin_open_${i}`).value,
+                close: document.getElementById(`admin_close_${i}`).value,
+                isClosed: document.getElementById(`admin_closed_${i}`).checked
+            };
+        }
+        await save();
+        document.getElementById('adminTimeModal').style.display = 'none';
+        alert('💾 บันทึกเวลาให้ร้านค้าสำเร็จแล้ว!');
     }
 
     async function resendPinToStore(index) {
@@ -844,8 +910,6 @@
         if(store) { 
             store.isVIP = true; store.vipExpireTimestamp = Date.now() + (30 * 24 * 60 * 60 * 1000); store.vipAutoRenew = false; store.freePromoDays = 7; 
             const vipPrice = appData.vipSettings.price || 500; 
-            
-            // ⚡ แยกจ่ายคอมมิชชั่นของฝั่ง VIP
             addCommissionToWallet(store, vipPrice, 'vip');
             
             appData.pendingVipRequests.splice(index, 1); 
@@ -873,6 +937,7 @@
         if (p.isUpdateOnly && existingIndex !== -1) {
             appData.activePromotions[existingIndex].detail = p.detail; 
             appData.activePromotions[existingIndex].image = p.image; 
+            appData.activePromotions[existingIndex].images = p.images || [p.image]; // ⚡ อัปเดตรูปแบบ Array
             appData.activePromotions[existingIndex].category = p.category; 
             appData.activePromotions[existingIndex].province = p.province;
             isUpdateAlert = true; 
@@ -891,7 +956,6 @@
                 p.expireTimestamp = Date.now() + addMs; appData.activePromotions.unshift(p); 
             }
             
-            // ⚡ แยกจ่ายคอมมิชชั่นของฝั่ง Promo
             if(!p.isFreeRedeem && svc) { addCommissionToWallet(store, svc.price, 'promo'); }
             lineMsg = `🚀 แจ้งเตือนจาก แอดมินไปไหนดี\n\nแบนเนอร์โปรโมชั่นของร้าน ${p.storeName} ได้รับการอนุมัติและกำลังแสดงผลบนหน้าแอปแล้วครับ!\n(อายุการแสดงผลเพิ่มขึ้น ${addDays} วัน)`;
         }
@@ -981,13 +1045,6 @@
         if(confirm('🗑️ ยืนยันการลบข้อมูลนี้ใช่หรือไม่?')) { 
             appData[targetArray].splice(index, 1); 
             save(); 
-        } 
-    }
-
-    function openImageTab(base64Str) { 
-        const newWindow = window.open(); 
-        if (newWindow) { 
-            newWindow.document.write(`<html><body style="margin:0; background:#121418; display:flex; align-items:center; justify-content:center; height:100vh;"><img src="${base64Str}" style="max-width:95%; max-height:95vh; border-radius:12px;"></body></html>`); 
         } 
     }
 
