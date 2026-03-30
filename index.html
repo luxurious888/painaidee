@@ -92,7 +92,7 @@
         .promo-carousel::-webkit-scrollbar { display: none; }
         .promo-item { flex: 0 0 85%; max-width: 340px; scroll-snap-align: center; }
         
-        /* ⚡ CSS สำหรับ Image Modal และ Slider */
+        /* ⚡ CSS สำหรับ Image Modal, Slider และระบบล็อกสถิติ VIP */
         #imageViewerModal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:999999; flex-direction:column; justify-content:center; align-items:center; animation: fadeIn 0.3s ease; }
         #imageViewerModal img { max-width:95%; max-height:85vh; object-fit:contain; border-radius:12px; box-shadow:0 0 30px rgba(0,0,0,0.8); }
         .close-modal-btn { position:absolute; top:20px; right:20px; color:white; background:rgba(255,255,255,0.2); width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:24px; cursor:pointer; transition:0.3s; z-index: 10; }
@@ -101,12 +101,13 @@
         .slide-item { position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; transition:opacity 0.8s ease-in-out; cursor:pointer; }
         .slide-item:hover { filter: brightness(1.1); }
         .slide-indicator { position:absolute; bottom:8px; right:8px; background:rgba(0,0,0,0.6); color:#fff; font-size:11px; padding:3px 8px; border-radius:12px; z-index:10; font-weight:bold; letter-spacing: 1px; backdrop-filter: blur(4px); }
+        .vip-lock-box { background: rgba(255,255,255,0.05); border: 1px dashed #555; padding: 20px; border-radius: 12px; text-align: center; margin-top: 15px; }
     </style>
 </head>
 <body>
 
 <div id="imageViewerModal" onclick="this.style.display='none'">
-    <div class="close-modal-btn">&times;</div>
+    <div class="close-modal-btn">×</div>
     <img id="viewerImg" src="" onclick="event.stopPropagation()">
 </div>
 
@@ -290,77 +291,72 @@
 
                     <div id="vipUpdateSection" style="padding: 15px; border: 1px dashed var(--primary); border-radius: 12px; margin-bottom: 25px; background: rgba(197, 160, 89, 0.05); display: none;">
                         <div style="text-align: center; margin-bottom: 15px;"><span style="background: var(--line-green); color: white; padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: bold;">✅ สถานะ VIP ใช้งานได้</span></div>
+                        
+                        <div style="margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 15px;">
+                            <h4 style="margin: 0 0 10px 0; color: var(--primary-light); font-size: 16px;">📊 สถิติร้านค้า (30 วันล่าสุด)</h4>
+                            <div style="display: flex; justify-content: space-around; text-align: center; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px;">
+                                <div><p style="margin:0; font-size:11px; color:#999;">คนดูร้าน</p><p id="statViews" style="margin:0; font-size:24px; font-weight:bold; color:#FFF;">0</p></div>
+                                <div style="width:1px; background:var(--border);"></div>
+                                <div><p style="margin:0; font-size:11px; color:#999;">กดนำทาง</p><p id="statDirections" style="margin:0; font-size:24px; font-weight:bold; color:var(--info);">0</p></div>
+                            </div>
+                        </div>
+
                         <h4 style="margin: 0 0 5px 0; color: #FFD700; font-size: 16px;">🔗 ข้อมูลติดต่อพิเศษ (VIP Links)</h4>
                         <div class="form-group"><label style="font-size: 12px;">ลิงก์ LINE OA</label><input type="text" id="vipLineInput" placeholder="https://line.me/R/ti/p/..."></div>
                         <div class="form-group" style="margin-bottom: 10px;"><label style="font-size: 12px;">ลิงก์ Facebook Page</label><input type="text" id="vipFbInput" placeholder="https://m.me/..."></div>
                         <button class="btn-outline" style="width: 100%; border-color: var(--primary);" onclick="updateVipData()">💾 บันทึกข้อมูลลิงก์โซเชียล</button>
 
                         <div id="vipHoursSection" style="margin-top: 20px; border-top: 1px dashed var(--primary); padding-top: 15px;">
-                            <h4 style="margin: 0 0 10px 0; color: #FFD700; font-size: 16px; display: flex; align-items: center; justify-content: space-between;">
-                                ⏰ เวลาเปิด-ปิดร้าน 
-                                <span style="font-size: 11px; color: #FFF; background: #C5A059; padding: 2px 6px; border-radius: 10px; color: #000;">VIP Feature</span>
-                            </h4>
-                            <p style="font-size: 12px; color:var(--text-muted); margin-top: -5px; margin-bottom: 15px;">ระบุเพื่อโชว์สถานะ เปิด/ปิด บนการ์ดร้านค้า</p>
-                            
+                            <h4 style="margin: 0 0 10px 0; color: #FFD700; font-size: 16px;">⏰ เวลาเปิด-ปิดร้าน (คำนวณสถานะอัตโนมัติ)</h4>
                             <div style="display:flex; justify-content:space-between; margin-bottom:12px; background:rgba(197, 160, 89, 0.1); padding:10px; border-radius:8px; border:1px solid rgba(197,160,89,0.3);">
-                                <label style="color:#C5A059; font-size:13px; font-weight:bold; display:flex; align-items:center; gap:5px; cursor:pointer;">
-                                    <input type="checkbox" id="applyAllDays" onchange="toggleApplyAll()" style="width:16px; height:16px; accent-color:#C5A059;"> เปิดบริการทุกวัน
-                                </label>
-                                <label style="color:#06C755; font-size:13px; font-weight:bold; display:flex; align-items:center; gap:5px; cursor:pointer;">
-                                    <input type="checkbox" id="open24hAll" onchange="toggle24hAll()" style="width:16px; height:16px; accent-color:#06C755;"> เปิดตลอด 24 ชม.
-                                </label>
+                                <label style="color:#C5A059; font-size:13px; font-weight:bold; display:flex; align-items:center; gap:5px; cursor:pointer;"><input type="checkbox" id="applyAllDays" onchange="toggleApplyAll()" style="width:16px; height:16px;"> เปิดบริการทุกวัน</label>
+                                <label style="color:#06C755; font-size:13px; font-weight:bold; display:flex; align-items:center; gap:5px; cursor:pointer;"><input type="checkbox" id="open24hAll" onchange="toggle24hAll()" style="width:16px; height:16px;"> เปิดตลอด 24 ชม.</label>
                             </div>
-
                             <div id="hoursGrid" style="display: flex; flex-direction: column; gap: 8px;"></div>
                             <button class="btn-primary" style="width: 100%; margin-top: 12px;" onclick="saveOperatingHours()">💾 บันทึกเวลาเปิด-ปิด</button>
+                        </div>
 
-                            <div style="margin-top: 20px; border-top: 1px dashed var(--primary); padding-top: 15px;">
-    <h4 style="color: #FFD700; font-size: 16px; margin-bottom: 15px;">🎁 การตลาด & กิจกรรม</h4>
-    
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
-        <button class="btn-outline" style="font-size: 12px; padding: 10px;" onclick="openCouponEditor()">🎟️ จัดการคูปอง</button>
-        <button class="btn-outline" style="font-size: 12px; padding: 10px;" onclick="openEventEditor()">🎉 กิจกรรมวันนี้</button>
-    </div>
+                        <div style="margin-top: 20px; border-top: 1px dashed var(--primary); padding-top: 15px;">
+                            <h4 style="color: #FFD700; font-size: 16px; margin-bottom: 15px;">🎁 การตลาด & กิจกรรม</h4>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                <button class="btn-outline" style="font-size: 12px; padding: 10px;" onclick="alert('ฟีเจอร์คูปองส่วนลด กำลังจะเปิดให้ใช้งานเร็วๆ นี้ครับ!')">🎟️ จัดการคูปอง</button>
+                                <button class="btn-outline" style="font-size: 12px; padding: 10px;" onclick="alert('ฟีเจอร์จัดกิจกรรมร้านค้า กำลังจะเปิดให้ใช้งานเร็วๆ นี้ครับ!')">🎉 กิจกรรมวันนี้</button>
+                            </div>
+                        </div>
+                    </div>
 
-    <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; border: 1px solid var(--border);">
-        <h5 style="margin:0 0 10px 0; color:var(--primary-light); font-size: 13px;">📊 สถิติร้านค้า (30 วันล่าสุด)</h5>
-        <div style="display: flex; justify-content: space-around; text-align: center;">
-            <div><p style="margin:0; font-size:11px; color:#999;">คนดูร้าน</p><p id="statViews" style="margin:0; font-size:20px; font-weight:bold; color:#FFF;">0</p></div>
-            <div style="width:1px; background:var(--border);"></div>
-            <div><p style="margin:0; font-size:11px; color:#999;">กดนำทาง</p><p id="statDirections" style="margin:0; font-size:20px; font-weight:bold; color:var(--info);">0</p></div>
-        </div>
-    </div>
-</div>
+                    <div id="nonVipStatsBlock" class="vip-lock-box" style="display:none;">
+                        <div style="font-size: 30px; margin-bottom: 10px;">👑</div>
+                        <p style="font-size:14px; color:#ccc; margin-bottom:15px; line-height:1.5;">คุณสามารถอัปเกรดเป็น <span style="color:var(--primary); font-weight:bold;">VIP</span><br>เพื่อปลดล็อกข้อมูลสถิติผู้เข้าชม, ตั้งเวลาทำการแบบละเอียด, และเพิ่มความน่าเชื่อถือให้กับร้านของคุณ!</p>
+                        <button class="btn-outline" style="border-color:var(--primary); color:var(--primary);" onclick="document.getElementById('vipSubscribeSection').scrollIntoView({behavior: 'smooth'})">🚀 ดูรายละเอียดการอัปเกรด VIP</button>
+                    </div>
 
-                    <div id="buyPromoSection" style="padding: 20px; border: 2px solid var(--primary); border-radius: 16px; background: linear-gradient(180deg, rgba(197, 160, 89, 0.1) 0%, var(--surface) 100%); position: relative; overflow: hidden; margin-top: 30px;">
-                        <div style="position: absolute; top: 20px; right: -35px; background: #D9534F; color: white; padding: 5px 40px; transform: rotate(45deg); font-size: 12px; font-weight: bold; box-shadow: 0 2px 10px rgba(0,0,0,0.5);">HOT 🔥</div>
+                    <div id="buyPromoSection" style="padding: 20px; border: 2px solid var(--primary); border-radius: 16px; background: linear-gradient(180deg, rgba(197, 160, 89, 0.1) 0%, var(--surface) 100%); margin-top: 30px;">
                         <h4 id="buyPromoTitle" style="margin: 0 0 5px 0; color: var(--primary); font-size: 18px; text-align: center;">🚀 ดันยอดขายพุ่ง! พื้นที่โปรโมทหน้าแรก</h4>
-                        <div class="form-group"><label>📍 เลือกจังหวัดที่จะโปรโมท</label><select id="promoProvinceSelect"></select></div>
-                        <div class="form-group"><label>🏷️ หมวดหมู่ร้านค้า</label><select id="promoStoreCategory"></select></div>
-                        <div class="form-group"><label>💎 เลือกแพ็กเกจค่าบริการ</label><select id="promoServiceSelect"></select></div>
+                        <div class="form-group"><label>📍 จังหวัด</label><select id="promoProvinceSelect"></select></div>
+                        <div class="form-group"><label>🏷️ หมวดหมู่</label><select id="promoStoreCategory"></select></div>
+                        <div class="form-group"><label>💎 แพ็กเกจ</label><select id="promoServiceSelect"></select></div>
                         
                         <div class="form-group">
                             <label>🖼️ รูปภาพป้ายโฆษณา <span style="color:var(--primary-light); font-size:12px;">(แนวนอน 3:2, เลือกได้ 1-3 รูป)</span></label>
                             <input type="file" id="promoImageInput" accept="image/*" multiple>
                         </div>
 
-                        <div class="form-group"><label>📝 รายละเอียดโปรโมชั่น</label><textarea id="promoDetail" rows="3" placeholder="เช่น ลด 50% ทันทีเมื่อโชว์แอปนี้! หรือ มา 4 จ่าย 3 ด่วน..."></textarea></div>
-                        <div id="promoSlipArea" class="form-group"><label style="color:var(--line-green);">🧾 แนบสลิปชำระเงิน <span style="color:var(--danger);">*</span></label><input type="file" id="promoSlipInput" accept="image/*"></div>
-                        <button id="btnSubmitPromo" class="btn-primary promo-btn-hover" style="width: 100%; background: linear-gradient(135deg, #FFD700, #C5A059); color: #000; font-size: 16px; font-weight: 600; padding: 16px; margin-top: 10px; border: none; box-shadow: 0 6px 20px rgba(255, 215, 0, 0.3);" onclick="submitPromoWithPIN()">🚀 สั่งซื้อและส่งเรื่องอัปเดตข้อมูล</button>
+                        <div class="form-group"><label>📝 รายละเอียด</label><textarea id="promoDetail" rows="3" placeholder="ลด 50% ทันทีเมื่อโชว์แอปนี้!"></textarea></div>
+                        <div id="promoSlipArea" class="form-group"><label style="color:var(--line-green);">🧾 แนบสลิป <span style="color:var(--danger);">*</span></label><input type="file" id="promoSlipInput" accept="image/*"></div>
+                        <button id="btnSubmitPromo" class="btn-primary" style="width: 100%; margin-top: 10px;" onclick="submitPromoWithPIN()">🚀 สั่งซื้อและอัปเดตข้อมูล</button>
                     </div>
 
                     <div id="editPromoSection" style="display: none; padding: 20px; border: 2px solid var(--info); border-radius: 16px; background: linear-gradient(180deg, rgba(23, 162, 184, 0.1) 0%, var(--surface) 100%); margin-top: 30px;">
                         <h4 style="margin: 0 0 5px 0; color: var(--info); font-size: 18px; text-align: center;">📝 แก้ไขข้อมูลแบนเนอร์ (ฟรี)</h4>
-                        
                         <div class="form-group">
                             <label>🖼️ รูปภาพป้ายโฆษณาใหม่ <span style="color:var(--info); font-size:12px;">(เลือกได้ 1-3 รูป)</span></label>
                             <input type="file" id="editPromoImageInput" accept="image/*" multiple>
                         </div>
-
-                        <div class="form-group"><label>📝 แคปชั่น/รายละเอียดโปรโมชั่น</label><textarea id="editPromoDetailInput" rows="3"></textarea></div>
-                        <button id="btnEditPromo" class="btn-primary promo-btn-hover" style="width: 100%; background: var(--info); color: #FFF; font-size: 16px; font-weight: 600; padding: 16px; margin-top: 10px; border: none; box-shadow: 0 6px 20px rgba(23, 162, 184, 0.3);" onclick="submitEditPromo()">🔄 ส่งเรื่องขอแก้ไขข้อมูล</button>
+                        <div class="form-group"><label>📝 แคปชั่น/รายละเอียด</label><textarea id="editPromoDetailInput" rows="3"></textarea></div>
+                        <button id="btnEditPromo" class="btn-primary" style="background: var(--info); width: 100%;" onclick="submitEditPromo()">🔄 ส่งเรื่องขอแก้ไขข้อมูล</button>
                         <hr style="border-color: rgba(255,255,255,0.1); margin: 20px 0;">
-                        <h4 style="margin: 0 0 10px 0; color: #FFD700; text-align: center;">⏳ ต่ออายุพื้นที่โปรโมทแบนเนอร์</h4>
+                        <h4 style="margin: 0 0 10px 0; color: #FFD700; text-align: center;">⏳ ต่ออายุพื้นที่โปรโมท</h4>
                         <button class="btn-outline" style="width: 100%; border-color: #FFD700; color: #FFD700;" onclick="openRenewPromo()">➕ สั่งซื้อแพ็กเกจเพิ่ม / แนบสลิปใหม่</button>
                     </div>
                 </div>
@@ -432,7 +428,6 @@
                 renderUI(); updateWalletUI(); renderPromos();
                 if (googlePlaces.length > 0) renderCards(document.getElementById('searchBox').value || 'ร้านอาหาร');
                 
-                // ถ้าร้านเปิดหน้าแอดมินทิ้งไว้ ให้มันอัปเดตข้อมูลอัตโนมัติแบบเนียนๆ
                 if (document.getElementById('lockedFeatures') && document.getElementById('lockedFeatures').style.display === 'block') {
                     verifyStore(true);
                 }
@@ -457,6 +452,17 @@
         }
     }
 
+    // ⚡ เก็บสถิติ (วิว และ นำทาง)
+    async function trackAction(storeName, actionType) {
+        const store = appData.registeredStores.find(s => s.name === storeName);
+        if (!store) return;
+        if (!store.stats) store.stats = { views: 0, directions: 0 };
+        if (actionType === 'view') store.stats.views = (store.stats.views || 0) + 1;
+        if (actionType === 'dir') store.stats.directions = (store.stats.directions || 0) + 1;
+        await db.collection('painaidee').doc('systemData').set(appData);
+    }
+
+    // ⚡ รายชื่อจังหวัด 77 จังหวัด (ครบสมบูรณ์)
     const provinces = [
         {id:'bkk',name:'กรุงเทพมหานคร',lat:13.7563,lng:100.5018},{id:'krabi',name:'กระบี่',lat:8.0863,lng:98.9063},{id:'kanchanaburi',name:'กาญจนบุรี',lat:14.0159,lng:99.5336},
         {id:'kalasin',name:'กาฬสินธุ์',lat:16.4322,lng:103.5061},{id:'kamphaengphet',name:'กำแพงเพชร',lat:16.4828,lng:99.5227},{id:'khonkaen',name:'ขอนแก่น',lat:16.4322,lng:102.8236},
@@ -658,10 +664,10 @@
         }
     }
 
+    // ⚡ ฟังก์ชันคำนวณสถานะเปิด-ปิดอัจฉริยะ (VIP Custom Status)
     function getCustomStoreStatus(hoursObj) {
         if(!hoursObj) return null;
-        const now = new Date();
-        const day = now.getDay(); 
+        const now = new Date(); const day = now.getDay(); 
         const currentMinutes = now.getHours() * 60 + now.getMinutes();
         
         const todayHours = hoursObj[day];
@@ -704,15 +710,18 @@
 
             service.getDetails({ placeId: placeId, fields: ['name', 'opening_hours'] }, (details, status) => {
                 let timeText = "ทางร้านไม่ได้ระบุเวลาเปิด-ปิด"; let isOpenNowHtml = "";
+
                 const store = (appData.registeredStores || []).find(s => s.name === place.name); const now = Date.now();
                 const isVIP = store && store.isVIP && (!store.vipExpireTimestamp || store.vipExpireTimestamp > now || store.vipAutoRenew);
                 const customStatus = (isVIP && store.operatingHours) ? getCustomStoreStatus(store.operatingHours) : null;
 
-                if (customStatus) { timeText = customStatus.text; isOpenNowHtml = customStatus.label;
+                if (customStatus) {
+                    timeText = customStatus.text; isOpenNowHtml = customStatus.label;
                 } else if (status === google.maps.places.PlacesServiceStatus.OK && details.opening_hours) {
                     if (details.opening_hours.weekday_text) { const today = new Date().getDay(); const dIndex = today === 0 ? 6 : today - 1; timeText = details.opening_hours.weekday_text[dIndex]; }
                     let isOpen = undefined;
                     if (typeof details.opening_hours.isOpen === 'function') isOpen = details.opening_hours.isOpen(); else if ('open_now' in details.opening_hours) isOpen = details.opening_hours.open_now;
+
                     if(isOpen === true) isOpenNowHtml = '<span style="background:#06C755; color:#FFF; padding:3px 8px; border-radius:10px; font-size:11px; margin-left:6px;">เปิดอยู่</span>';
                     else if(isOpen === false) isOpenNowHtml = '<span style="background:#D9534F; color:#FFF; padding:3px 8px; border-radius:10px; font-size:11px; margin-left:6px;">ปิดแล้ว</span>';
                 }
@@ -804,26 +813,33 @@
             let openStatusHtml = '<span class="status-tag" style="background:var(--bg-light); color:var(--text-muted); border:1px solid var(--border);">⚪ เวลา: ทางร้านไม่ได้ระบุ</span>'; 
             const customStatus = (isVIP && store.operatingHours) ? getCustomStoreStatus(store.operatingHours) : null;
 
-            if (customStatus) { openStatusHtml = customStatus.html;
+            if (customStatus) {
+                openStatusHtml = customStatus.html;
             } else {
-                if (p.business_status === 'CLOSED_TEMPORARILY') { openStatusHtml = '<span class="status-tag" style="background:#FFF3F3; color:var(--danger); border:1px solid rgba(217,83,79,0.2);">🔴 ปิดชั่วคราว</span>'; } 
-                else if (p.business_status === 'CLOSED_PERMANENTLY') { openStatusHtml = '<span class="status-tag" style="background:#FFF3F3; color:var(--danger); border:1px solid rgba(217,83,79,0.2);">🔴 ปิดถาวร</span>'; } 
-                else if (p.opening_hours) { 
-                    let isOpen = undefined; if (typeof p.opening_hours.isOpen === 'function') isOpen = p.opening_hours.isOpen(); else if ('open_now' in p.opening_hours) isOpen = p.opening_hours.open_now; 
-                    if (isOpen === true) { openStatusHtml = '<span class="status-tag" style="background:#F4FBF4; color:#2E7D32; border:1px solid rgba(46,125,50,0.2);">🟢 เปิดอยู่ตอนนี้</span>'; } 
-                    else if (isOpen === false) { openStatusHtml = '<span class="status-tag" style="background:#FFF3F3; color:var(--danger); border:1px solid rgba(217,83,79,0.2);">🔴 ปิดแล้ว</span>'; } 
+                if (p.business_status === 'CLOSED_TEMPORARILY') { 
+                    openStatusHtml = '<span class="status-tag" style="background:#FFF3F3; color:var(--danger); border:1px solid rgba(217,83,79,0.2);">🔴 ปิดชั่วคราว</span>'; 
+                } else if (p.business_status === 'CLOSED_PERMANENTLY') { 
+                    openStatusHtml = '<span class="status-tag" style="background:#FFF3F3; color:var(--danger); border:1px solid rgba(217,83,79,0.2);">🔴 ปิดถาวร</span>'; 
+                } else if (p.opening_hours) { 
+                    let isOpen = undefined; 
+                    if (typeof p.opening_hours.isOpen === 'function') isOpen = p.opening_hours.isOpen(); 
+                    else if ('open_now' in p.opening_hours) isOpen = p.opening_hours.open_now; 
+                    
+                    if (isOpen === true) { 
+                        openStatusHtml = '<span class="status-tag" style="background:#F4FBF4; color:#2E7D32; border:1px solid rgba(46,125,50,0.2);">🟢 เปิดอยู่ตอนนี้</span>'; 
+                    } else if (isOpen === false) { 
+                        openStatusHtml = '<span class="status-tag" style="background:#FFF3F3; color:var(--danger); border:1px solid rgba(217,83,79,0.2);">🔴 ปิดแล้ว</span>'; 
+                    } 
                 }
             }
             
             const hasLine = isVIP && store && store.lineUrl && store.lineUrl.trim() !== ''; const hasFb = isVIP && store && store.fbUrl && store.fbUrl.trim() !== '';
             const imgUrl = p.photos ? p.photos[0].getUrl({maxWidth:400}) : 'https://via.placeholder.com/400x200?text=Painaidee';
 
-            return `<div class="place-card ${isVIP ? 'card-vip':''}" onclick="focusPlace('${p.place_id}')">
+            return `<div class="place-card ${isVIP ? 'card-vip':''}" onclick="focusPlace('${p.place_id}'); trackAction('${p.name}', 'view')">
                 ${isVIP?'<div class="vip-crown-badge">👑 VIP RECOMMEND</div>':''}
                 <div class="distance-badge">${distanceKm} กม.</div>
-                
                 <img src="${imgUrl}" class="main-img" onclick="event.stopPropagation(); openImageModal(this.src)">
-                
                 <div class="place-info">
                     <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; gap: 8px;">
                         <h3 style="margin:0; font-size: 16px; flex: 1; color:${isVIP?'#FFD700':'var(--text-gold)'}; font-weight:600; line-height:1.2;">${p.name}</h3>
@@ -832,7 +848,7 @@
                     <p style="font-size:13px; color:var(--text-muted); margin:0 0 10px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.vicinity}</p>
                     <div><span style="color:var(--primary); font-weight:600;">⭐ ${p.rating || 'ใหม่'}</span></div>
                     <div class="action-buttons">
-                        <button class="btn-action btn-nav" onclick="window.open('${navUrl}', '_blank'); event.stopPropagation();">นำทาง</button>
+                        <button class="btn-action btn-nav" onclick="window.open('${navUrl}', '_blank'); trackAction('${p.name}', 'dir'); event.stopPropagation();">นำทาง</button>
                         <button class="btn-action btn-call" onclick="callPlace('${p.place_id}', event)">โทร</button>
                         ${hasLine ? `<button class="btn-action btn-line" onclick="window.open('${store.lineUrl.startsWith('http') ? store.lineUrl : 'https://'+store.lineUrl}', '_blank'); event.stopPropagation();">LINE</button>` : ''}
                         ${hasFb ? `<button class="btn-action btn-fb" onclick="window.open('${store.fbUrl.startsWith('http') ? store.fbUrl : 'https://'+store.fbUrl}', '_blank'); event.stopPropagation();">FB</button>` : ''}
@@ -847,6 +863,7 @@
         list.innerHTML = html; renderPromos();
     }
 
+    // ⚡ ระบบแบนเนอร์โปรโมทอัจฉริยะ (ดึงเวลาแบบ VIP มาแสดง และแสดง Slider)
     function renderPromos() {
         let curProv = document.getElementById('provinceSelect').value; const now = Date.now();
         const activePromos = (appData.activePromotions || []).filter(p => { if (p.expireTimestamp && now > p.expireTimestamp && !p.autoRenew) return false; return true; }); 
@@ -866,6 +883,10 @@
                 if (store && store.isVIP && (!store.vipExpireTimestamp || store.vipExpireTimestamp > now || store.vipAutoRenew)) isVIP = true;
                 const hasLine = isVIP && store && store.lineUrl && store.lineUrl.trim() !== ''; const hasFb = isVIP && store && store.fbUrl && store.fbUrl.trim() !== '';
                 
+                // ⚡ โชว์เวลาเปิดปิดบนป้ายโปรโมท
+                let timeHtml = '<small style="color:#999;">⚪ ไม่ระบุเวลา</small>';
+                if(isVIP && store.operatingHours) { const customStatus = getCustomStoreStatus(store.operatingHours); if(customStatus) timeHtml = customStatus.html; }
+
                 // ⚡ ระบบ Slider รองรับหลายรูปภาพ
                 let imgs = p.images && p.images.length > 0 ? p.images : [p.image];
                 let sliderHtml = `<div class="promo-slider-container shine-effect">`;
@@ -878,15 +899,20 @@
                 return `
                 <div class="promo-item place-card" style="border:2px solid var(--primary); box-shadow: 0 0 20px rgba(197,160,89,0.2);">
                     <div style="position:absolute; top:12px; right:-28px; background:#D9534F; color:#FFF; padding:4px 30px; transform:rotate(45deg); font-size:11px; font-weight:800; z-index:20; box-shadow: 0 2px 5px rgba(0,0,0,0.3); pointer-events: none;">HOT 🔥</div>
-                    
-                    ${sliderHtml} <div style="padding:18px; display:flex; flex-direction:column; flex-grow:1;">
+                    ${sliderHtml} 
+                    <div style="padding:18px; display:flex; flex-direction:column; flex-grow:1;">
                         ${p.category ? `<span style="background:var(--primary); color:#000; padding:2px 10px; border-radius:12px; font-size:11px; font-weight:600; display:inline-block; margin-bottom:8px; align-self:flex-start;">📌 ${p.category}</span>` : ''}
-                        <h3 style="margin:0 0 8px 0; font-size:18px; color:#FFD700; font-weight:600; text-shadow:0 0 5px rgba(255,215,0,0.3);">✨ ${p.storeName}</h3>
+                        
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+                            <h3 style="margin:0; font-size:18px; color:#FFD700; font-weight:600; text-shadow:0 0 5px rgba(255,215,0,0.3); flex:1;">✨ ${p.storeName}</h3>
+                            <div style="flex-shrink: 0; transform: scale(0.9); transform-origin: right top;">${timeHtml}</div>
+                        </div>
+                        
                         <div style="background: rgba(197, 160, 89, 0.1); padding: 12px; border-radius: 8px; border: 1px dashed var(--primary); margin-bottom: 15px;"><p style="font-size:14px; color:var(--text-main); margin:0;">${p.detail}</p></div>
                         <div style="display:flex; gap:8px; margin-top:auto;">
                             ${hasLine ? `<button onclick="window.open('${store.lineUrl.startsWith('http') ? store.lineUrl : 'https://'+store.lineUrl}', '_blank')" class="promo-btn-hover" style="flex:1; background:var(--line-green); color:white; border:none; padding:10px; border-radius:8px; font-family:'Kanit'; font-weight:600; font-size:13px; cursor:pointer;">💬 LINE</button>` : ''}
                             ${hasFb ? `<button onclick="window.open('${store.fbUrl.startsWith('http') ? store.fbUrl : 'https://'+store.fbUrl}', '_blank')" class="promo-btn-hover" style="flex:1; background:var(--fb-blue); color:white; border:none; padding:10px; border-radius:8px; font-family:'Kanit'; font-weight:600; font-size:13px; cursor:pointer;">👍 FB</button>` : ''}
-                            <button onclick="searchAndFocusStore('${p.storeName}')" class="promo-btn-hover" style="flex:1; background:linear-gradient(135deg, #FFD700, #C5A059); color:#000; border:none; padding:10px; border-radius:8px; font-family:'Kanit'; font-weight:600; font-size:13px; cursor:pointer; box-shadow: 0 4px 10px rgba(197,160,89,0.2);">📍 ดูพิกัดร้าน</button>
+                            <button onclick="searchAndFocusStore('${p.storeName}'); trackAction('${p.storeName}', 'view')" class="promo-btn-hover" style="flex:1; background:linear-gradient(135deg, #FFD700, #C5A059); color:#000; border:none; padding:10px; border-radius:8px; font-family:'Kanit'; font-weight:600; font-size:13px; cursor:pointer; box-shadow: 0 4px 10px rgba(197,160,89,0.2);">📍 ดูพิกัดร้าน</button>
                         </div>
                     </div>
                 </div>`;
@@ -899,14 +925,11 @@
         document.querySelectorAll('.promo-slider-container').forEach(slider => {
             let imgs = slider.querySelectorAll('.slide-item');
             if(imgs.length <= 1) return;
-            
             let activeIdx = Array.from(imgs).findIndex(img => img.style.opacity === '1');
             if(activeIdx === -1) activeIdx = 0;
-            
             imgs[activeIdx].style.opacity = '0';
             let nextIdx = (activeIdx + 1) % imgs.length;
             imgs[nextIdx].style.opacity = '1';
-            
             let indicator = slider.querySelector('.slide-indicator');
             if(indicator) indicator.innerText = `${nextIdx + 1}/${imgs.length} 📸`;
         });
@@ -965,6 +988,60 @@
             alert("กำลังส่งรหัส PIN ไปยัง LINE ของคุณ... ⏳");
             try { await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "SEND_LINE_PIN", targetUserId: store.userId, message: `🔑 แจ้งเตือนจากระบบไปไหนดี\nรหัส PIN ของร้าน ${store.name} คือ: ${store.pin}` }) }); alert("✅ ส่งรหัส PIN ไปทาง LINE สำเร็จ กรุณาตรวจสอบในแชทครับ"); } catch(e) { alert("❌ เกิดข้อผิดพลาดในการส่ง LINE"); }
         } else if (store) { alert("⚠️ ร้านนี้ไม่ได้เชื่อมโยงกับระบบ LINE ไว้ กรุณาติดต่อแอดมินโดยตรงครับ"); } else { alert("❌ ไม่พบชื่อร้านนี้ในระบบ กรุณาตรวจสอบตัวสะกดอีกครั้งครับ"); }
+    }
+
+    // ⚡ ระบบจัดการร้านค้า (รวมการเช็ค VIP & Stats Lock)
+    function verifyStore(silent = false) {
+        const stores = appData.registeredStores || []; const store = stores.find(s => s.pin === document.getElementById('storePinInput').value);
+        if(store) { 
+            document.getElementById('lockedFeatures').style.display = 'block'; document.getElementById('storeVerifyCard').style.display = 'none'; 
+            const now = Date.now(); let isVIP = false;
+            if (store.isVIP && (!store.vipExpireTimestamp || store.vipExpireTimestamp > now || store.vipAutoRenew)) isVIP = true;
+
+            document.getElementById('displayVipPrice').innerText = appData.vipSettings?.price || 500; 
+            document.getElementById('displayBankAcc').innerText = appData.vipSettings?.bankAccount || 'รอแอดมินตั้งค่าบัญชี (ไปไหนดี)';
+
+            if(isVIP) {
+                // ร้านที่เป็น VIP ปลดล็อกทุกอย่าง
+                document.getElementById('vipUpdateSection').style.display = 'block'; 
+                document.getElementById('vipSubscribeSection').style.display = 'block';
+                document.getElementById('vipSubscribeTitle').innerHTML = '👑 ต่ออายุ VIP <span style="font-size:12px; color:#06C755;">(สถานะ: ใช้งานได้)</span>'; 
+                document.getElementById('nonVipStatsBlock').style.display = 'none'; // ซ่อนบล็อกแจ้งเตือน
+                
+                document.getElementById('statViews').innerText = store.stats ? store.stats.views || 0 : 0;
+                document.getElementById('statDirections').innerText = store.stats ? store.stats.directions || 0 : 0;
+
+                if(!silent) {
+                    document.getElementById('vipLineInput').value = store.lineUrl || ''; 
+                    document.getElementById('vipFbInput').value = store.fbUrl || '';
+                    renderHoursGrid(store);
+                }
+            } else {
+                // ร้านที่ไม่ใช่ VIP ล็อกการเข้าถึง
+                document.getElementById('vipUpdateSection').style.display = 'none'; 
+                document.getElementById('vipSubscribeSection').style.display = 'block'; 
+                document.getElementById('vipSubscribeTitle').innerHTML = '👑 สมัครสมาชิก VIP';
+                document.getElementById('nonVipStatsBlock').style.display = 'block'; // โชว์บล็อกแจ้งเตือนให้อัปเกรด
+            }
+
+            const activePromo = (appData.activePromotions || []).find(p => p.storeName === store.name); const hasFreePromo = store.freePromoDays && store.freePromoDays > 0; const promoTitle = document.getElementById('buyPromoTitle'); const slipArea = document.getElementById('promoSlipArea');
+
+            if (activePromo) {
+                document.getElementById('editPromoSection').style.display = 'block'; document.getElementById('buyPromoSection').style.display = 'none'; 
+                if(!silent) document.getElementById('editPromoDetailInput').value = activePromo.detail || '';
+            } else {
+                document.getElementById('editPromoSection').style.display = 'none'; document.getElementById('buyPromoSection').style.display = 'block';
+                if(hasFreePromo) {
+                    promoTitle.innerHTML = '🎁 สิทธิพิเศษ VIP: ฟรีพื้นที่โปรโมท 7 วัน!'; slipArea.style.display = 'none'; document.getElementById('promoServiceSelect').innerHTML = `<option value="ฟรี 7 วัน (สิทธิ์ VIP)">ใช้สิทธิ์โปรโมทฟรี 7 วัน</option>`;
+                } else {
+                    promoTitle.innerHTML = '🚀 ดันยอดขายพุ่ง! พื้นที่โปรโมทหน้าแรก'; slipArea.style.display = 'block'; 
+                    const sData = (appData.services && appData.services.length > 0) ? appData.services : []; document.getElementById('promoServiceSelect').innerHTML = sData.map(s => `<option value="${s.name} - ${s.price}฿">${s.name} - ${s.price}฿</option>`).join('');
+                }
+            }
+            if(!silent) alert("ยืนยันตัวตนสำเร็จ! ยินดีต้อนรับร้าน " + store.name); 
+        } else {
+            if(!silent) alert("รหัส PIN ไม่ถูกต้อง");
+        }
     }
 
     function renderHoursGrid(store) {
@@ -1039,48 +1116,6 @@
         }
         await saveToCloud();
         alert('💾 บันทึกเวลาเปิด-ปิดร้านเรียบร้อยแล้ว!\n(ระบบจะแสดงผลในหน้าแผนที่อัตโนมัติ)');
-    }
-
-    function verifyStore(silent = false) {
-        const stores = appData.registeredStores || []; const store = stores.find(s => s.pin === document.getElementById('storePinInput').value);
-        if(store) { 
-            document.getElementById('lockedFeatures').style.display = 'block'; document.getElementById('storeVerifyCard').style.display = 'none'; 
-            const now = Date.now(); let isVIP = false;
-            if (store.isVIP && (!store.vipExpireTimestamp || store.vipExpireTimestamp > now || store.vipAutoRenew)) isVIP = true;
-
-            document.getElementById('displayVipPrice').innerText = appData.vipSettings.price || 500; document.getElementById('displayBankAcc').innerText = appData.vipSettings.bankAccount || 'รอแอดมินตั้งค่าบัญชี (ไปไหนดี)';
-
-            if(isVIP) {
-                document.getElementById('vipUpdateSection').style.display = 'block'; document.getElementById('vipSubscribeSection').style.display = 'block';
-                document.getElementById('vipSubscribeTitle').innerHTML = '👑 ต่ออายุ VIP <span style="font-size:12px; color:#06C755;">(สถานะ: ใช้งานได้)</span>'; 
-                
-                if(!silent) {
-                    document.getElementById('vipLineInput').value = store.lineUrl || ''; 
-                    document.getElementById('vipFbInput').value = store.fbUrl || '';
-                    renderHoursGrid(store);
-                }
-            } else {
-                document.getElementById('vipUpdateSection').style.display = 'none'; document.getElementById('vipSubscribeSection').style.display = 'block'; document.getElementById('vipSubscribeTitle').innerHTML = '👑 สมัครสมาชิก VIP';
-            }
-
-            const activePromo = (appData.activePromotions || []).find(p => p.storeName === store.name); const hasFreePromo = store.freePromoDays && store.freePromoDays > 0; const promoTitle = document.getElementById('buyPromoTitle'); const slipArea = document.getElementById('promoSlipArea');
-
-            if (activePromo) {
-                document.getElementById('editPromoSection').style.display = 'block'; document.getElementById('buyPromoSection').style.display = 'none'; 
-                if(!silent) document.getElementById('editPromoDetailInput').value = activePromo.detail || '';
-            } else {
-                document.getElementById('editPromoSection').style.display = 'none'; document.getElementById('buyPromoSection').style.display = 'block';
-                if(hasFreePromo) {
-                    promoTitle.innerHTML = '🎁 สิทธิพิเศษ VIP: ฟรีพื้นที่โปรโมท 7 วัน!'; slipArea.style.display = 'none'; document.getElementById('promoServiceSelect').innerHTML = `<option value="ฟรี 7 วัน (สิทธิ์ VIP)">ใช้สิทธิ์โปรโมทฟรี 7 วัน</option>`;
-                } else {
-                    promoTitle.innerHTML = '🚀 ดันยอดขายพุ่ง! พื้นที่โปรโมทหน้าแรก'; slipArea.style.display = 'block'; 
-                    const sData = (appData.services && appData.services.length > 0) ? appData.services : []; document.getElementById('promoServiceSelect').innerHTML = sData.map(s => `<option value="${s.name} - ${s.price}฿">${s.name} - ${s.price}฿</option>`).join('');
-                }
-            }
-            if(!silent) alert("ยืนยันตัวตนสำเร็จ! ยินดีต้อนรับร้าน " + store.name); 
-        } else {
-            if(!silent) alert("รหัส PIN ไม่ถูกต้อง");
-        }
     }
 
     function openRenewPromo() {
