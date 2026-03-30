@@ -451,11 +451,20 @@
     }
 
     // ⚡ ระบบ Smart Login แก้ไขล่าสุด
+   // ⚡ ระบบ Smart Login (อยู่ใน LINE ล็อกอินเลย / อยู่ Chrome เตะเข้าแอป)
     function smartLogin(targetPage) {
-        let redirectUrl = window.location.href.split('?')[0];
-        if (targetPage) redirectUrl += '?page=' + targetPage;
-        // บังคับใช้ liff.login() เสมอ เพื่อให้ใช้ได้ทั้งมือถือและ PC อย่างถูกต้อง
-        liff.login({ redirectUri: redirectUrl });
+        // ดึง URL ลิงก์ปัจจุบัน (ตัดพวกพารามิเตอร์เก่าๆ ทิ้งให้หมด)
+        let baseUrl = window.location.href.split('?')[0];
+        let pageParam = targetPage ? '?page=' + targetPage : '';
+
+        if (liff.isInClient()) {
+            // ถ้าลูกค้าอยู่ในแอป LINE อยู่แล้ว ให้ล็อกอินทับหน้าเดิมได้เลย
+            liff.login({ redirectUri: baseUrl + pageParam });
+        } else {
+            // ถ้าลูกค้าเปิดผ่าน Chrome, Safari, เฟสบุ๊ค ให้เตะเข้าแอป LINE ทันที!
+            let liffUrl = 'https://liff.line.me/2009598846-wiCUeV35' + pageParam;
+            window.location.href = liffUrl;
+        }
     }
 
     const provinces = [
