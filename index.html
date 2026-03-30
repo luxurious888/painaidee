@@ -119,8 +119,8 @@
         </div>
 
         <div>
-            <button onclick="smartLogin('partner')" class="btn-line-glow" style="margin-bottom: 8px;">📱 เข้าสู่ระบบด้วย LINE</button>
-            <p style="font-size: 12.5px; color: rgba(255,255,255,0.7); margin: 0; line-height: 1.4;">* เหมาะสำหรับร้านค้า เพื่อลงทะเบียนและจัดการ<br>โปรโมชั่นหน้าร้านของคุณ</p>
+            <button onclick="smartLogin('')" class="btn-line-glow" style="margin-bottom: 8px;">📱 เข้าสู่ระบบด้วย LINE</button>
+            <p style="font-size: 12.5px; color: rgba(255,255,255,0.7); margin: 0; line-height: 1.4;">* เหมาะสำหรับร้านค้า และนักรีวิวเพื่อสร้างรายได้</p>
         </div>
     </div>
 </div>
@@ -322,6 +322,73 @@
     const db = firebase.firestore();
     const storage = firebase.storage();
 
+    // ⚡ หมวดหมู่ชุดใหญ่ 11 หมวดหลัก 40 หมวดย่อย (สำรองไว้ใช้ยัดเข้าระบบอัตโนมัติ)
+    const defaultMainCats = [
+        { id: 'food', label: '🍽️ อาหาร & เครื่องดื่ม', keyword: 'ร้านอาหาร' },
+        { id: 'cafe', label: '☕ คาเฟ่ & เบเกอรี่', keyword: 'คาเฟ่' },
+        { id: 'nightlife', label: '🍻 นั่งชิล & ไนท์ไลฟ์', keyword: 'บาร์' },
+        { id: 'attraction', label: '📸 ที่เที่ยว & จุดเช็คอิน', keyword: 'สถานที่ท่องเที่ยว' },
+        { id: 'accommodation', label: '🏨 ที่พัก & แคมป์ปิ้ง', keyword: 'โรงแรม' },
+        { id: 'beauty_spa', label: '💆‍♀️ นวด & สปา', keyword: 'ร้านนวด' },
+        { id: 'shopping', label: '🛍️ ช้อปปิ้ง & ตลาด', keyword: 'ตลาด' },
+        { id: 'activity', label: '🎯 กิจกรรม & กีฬา', keyword: 'สปอร์ตคลับ' },
+        { id: 'health', label: '🏥 สุขภาพ & ยา', keyword: 'โรงพยาบาล' },
+        { id: 'car_service', label: '🚗 รถยนต์ & การเดินทาง', keyword: 'ปั๊มน้ำมัน' },
+        { id: 'emergency', label: '🚨 ฉุกเฉิน & บริการ', keyword: 'สถานีตำรวจ' }
+    ];
+
+    const defaultCategories = [
+        { id: 101, group: 'food', label: 'หมูกระทะ / ชาบู / ปิ้งย่าง', keyword: 'หมูกระทะ ชาบู' },
+        { id: 102, group: 'food', label: 'ส้มตำ / อาหารอีสาน', keyword: 'ร้านส้มตำ' },
+        { id: 103, group: 'food', label: 'อาหารทะเล / ซีฟู้ด', keyword: 'ร้านอาหารทะเล' },
+        { id: 104, group: 'food', label: 'ข้าวต้มกุ๊ย / โต้รุ่ง', keyword: 'ร้านข้าวต้ม' },
+        { id: 105, group: 'food', label: 'ก๋วยเตี๋ยว / อาหารจานเดียว', keyword: 'ร้านก๋วยเตี๋ยว' },
+        { id: 106, group: 'food', label: 'อาหารนานาชาติ (ญี่ปุ่น/ฝรั่ง)', keyword: 'ร้านอาหารญี่ปุ่น' },
+        { id: 107, group: 'food', label: 'อาหารมังสวิรัติ / วีแกน', keyword: 'ร้านอาหารเจ' },
+        { id: 201, group: 'cafe', label: 'คาเฟ่ถ่ายรูปสวย', keyword: 'คาเฟ่ถ่ายรูป' },
+        { id: 202, group: 'cafe', label: 'กาแฟ Specialty', keyword: 'Specialty Coffee' },
+        { id: 203, group: 'cafe', label: 'เบเกอรี่ / ขนมหวาน', keyword: 'ร้านเบเกอรี่' },
+        { id: 204, group: 'cafe', label: 'คาเฟ่สัตว์เลี้ยง', keyword: 'คาเฟ่หมา แมว' },
+        { id: 301, group: 'nightlife', label: 'ร้านนั่งชิล / ดนตรีสด', keyword: 'ร้านนั่งชิล' },
+        { id: 302, group: 'nightlife', label: 'ผับ / คลับ / เต้น', keyword: 'ผับ' },
+        { id: 303, group: 'nightlife', label: 'บาร์คราฟต์เบียร์ / ค็อกเทล', keyword: 'คราฟต์เบียร์ บาร์' },
+        { id: 304, group: 'nightlife', label: 'คาราโอเกะ', keyword: 'ร้านคาราโอเกะ' },
+        { id: 401, group: 'attraction', label: 'วัด / สถานที่ศักดิ์สิทธิ์', keyword: 'วัด' },
+        { id: 402, group: 'attraction', label: 'ธรรมชาติ / น้ำตก / ภูเขา', keyword: 'อุทยานแห่งชาติ น้ำตก' },
+        { id: 403, group: 'attraction', label: 'โบสถ์ / มัสยิด / ศาลเจ้า', keyword: 'โบสถ์ มัสยิด' },
+        { id: 404, group: 'attraction', label: 'พิพิธภัณฑ์ / หอศิลป์', keyword: 'พิพิธภัณฑ์' },
+        { id: 405, group: 'attraction', label: 'สวนสัตว์ / ฟาร์ม', keyword: 'สวนสัตว์ ฟาร์ม' },
+        { id: 501, group: 'accommodation', label: 'โรงแรม / รีสอร์ท', keyword: 'โรงแรม รีสอร์ท' },
+        { id: 502, group: 'accommodation', label: 'ลานกางเต็นท์ / แคมป์ปิ้ง', keyword: 'ลานกางเต็นท์ แคมป์ปิ้ง' },
+        { id: 503, group: 'accommodation', label: 'พูลวิลล่า / บ้านพักส่วนตัว', keyword: 'พูลวิลล่า' },
+        { id: 504, group: 'accommodation', label: 'โฮสเทล / ที่พักราคาประหยัด', keyword: 'โฮสเทล' },
+        { id: 601, group: 'beauty_spa', label: 'นวดแผนไทย / นวดเท้า', keyword: 'ร้านนวดแผนไทย' },
+        { id: 602, group: 'beauty_spa', label: 'สปา / ออนเซ็น', keyword: 'สปา' },
+        { id: 603, group: 'beauty_spa', label: 'คลินิกความงาม / ศัลยกรรม', keyword: 'คลินิกความงาม' },
+        { id: 604, group: 'beauty_spa', label: 'ร้านทำผม / ทำเล็บ', keyword: 'ร้านทำผม ซาลอน' },
+        { id: 701, group: 'shopping', label: 'ตลาดนัดกลางคืน / ถนนคนเดิน', keyword: 'ถนนคนเดิน ตลาดนัด' },
+        { id: 702, group: 'shopping', label: 'ของฝาก / ของที่ระลึก', keyword: 'ร้านขายของฝาก' },
+        { id: 703, group: 'shopping', label: 'ห้างสรรพสินค้า', keyword: 'ห้างสรรพสินค้า' },
+        { id: 704, group: 'shopping', label: 'ตลาดสด / ตลาดเช้า', keyword: 'ตลาดสด' },
+        { id: 801, group: 'activity', label: 'โต๊ะสนุกเกอร์ / บิลเลียด', keyword: 'โต๊ะสนุกเกอร์' },
+        { id: 802, group: 'activity', label: 'ฟิตเนส / ยิม', keyword: 'ฟิตเนส' },
+        { id: 803, group: 'activity', label: 'สวนน้ำ / สวนสนุก', keyword: 'สวนน้ำ' },
+        { id: 901, group: 'health', label: 'โรงพยาบาล', keyword: 'โรงพยาบาล' },
+        { id: 902, group: 'health', label: 'คลินิกเวชกรรม', keyword: 'คลินิก' },
+        { id: 903, group: 'health', label: 'ร้านขายยา', keyword: 'ร้านขายยา' },
+        { id: 904, group: 'health', label: 'คลินิกทำฟัน', keyword: 'คลินิกทันตกรรม' },
+        { id: 905, group: 'health', label: 'คลินิกรักษาสัตว์', keyword: 'คลินิกรักษาสัตว์' },
+        { id: 1001, group: 'car_service', label: 'คาร์แคร์ / ล้างรถ', keyword: 'คาร์แคร์ ล้างรถ' },
+        { id: 1002, group: 'car_service', label: 'ประดับยนต์ / เครื่องเสียง / ติดฟิล์ม', keyword: 'ประดับยนต์ เครื่องเสียงรถยนต์ ติดฟิล์มรถยนต์' },
+        { id: 1003, group: 'car_service', label: 'ปั๊มน้ำมัน / จุดชาร์จ EV', keyword: 'ปั๊มน้ำมัน EV Station' },
+        { id: 1004, group: 'car_service', label: 'อู่ซ่อมรถ / ปะยาง', keyword: 'อู่ซ่อมรถ เปลี่ยนยาง' },
+        { id: 1005, group: 'car_service', label: 'สถานีขนส่ง / เช่ารถ', keyword: 'รถเช่า สถานีขนส่ง' },
+        { id: 1101, group: 'emergency', label: 'สถานีตำรวจ', keyword: 'สถานีตำรวจ' },
+        { id: 1102, group: 'emergency', label: 'ดับเพลิง / กู้ภัย', keyword: 'สถานีดับเพลิง กู้ภัย' },
+        { id: 1103, group: 'emergency', label: 'ตู้ ATM / ธนาคาร', keyword: 'ATM ธนาคาร' },
+        { id: 1104, group: 'emergency', label: 'บริการลากจูง / สไลด์ออน', keyword: 'รถลากจูง รถสไลด์' }
+    ];
+
     let appData = { registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], mainCategories: [], categories: [], closedReports: [], blacklistedPlaces: [], services: [], pendingVipRequests: [], affiliateWallets: [], withdrawalRequests: [] };
 
     const resizeImg = (file) => new Promise((resolve) => {
@@ -356,9 +423,19 @@
     function loadFromCloud() {
         return new Promise((resolve) => {
             unsubscribe = db.collection('painaidee').doc('systemData').onSnapshot((doc) => {
-                if (doc.exists) { appData = { ...appData, ...doc.data() }; } 
-                else { saveToCloud(); }
+                if (doc.exists) { 
+                    appData = { ...appData, ...doc.data() }; 
+                } else { 
+                    saveToCloud(); 
+                }
                 
+                // ⚡ สคริปต์บังคับอัปเดตหมวดหมู่: ถ้าของเดิมมีน้อยกว่า 11 ให้ยัดชุดใหม่ 40 หมวดลงไปเลย
+                if (!appData.mainCategories || appData.mainCategories.length < 11) {
+                    appData.mainCategories = JSON.parse(JSON.stringify(defaultMainCats));
+                    appData.categories = JSON.parse(JSON.stringify(defaultCategories));
+                    saveToCloud(); // เซฟทับขึ้นไปใหม่
+                }
+
                 ['registeredStores', 'activePromotions', 'mainCategories', 'categories', 'services', 'affiliateWallets', 'withdrawalRequests', 'registrationRequests', 'pendingPromotions', 'pendingVipRequests'].forEach(k => { if(!appData[k]) appData[k] = []; });
                 
                 renderUI(); updateWalletUI(); renderPromos();
@@ -373,17 +450,12 @@
         catch(e) { throw e; }
     }
 
-    // ⚡ ระบบ Smart Login 
+    // ⚡ ระบบ Smart Login แก้ไขล่าสุด
     function smartLogin(targetPage) {
-        if (liff.isInClient()) {
-            let redirectUrl = window.location.href.split('?')[0];
-            if (targetPage) redirectUrl += '?page=' + targetPage;
-            liff.login({ redirectUri: redirectUrl });
-        } else {
-            let liffUrl = 'https://liff.line.me/2009598846-wiCUeV35';
-            if (targetPage) liffUrl += '?page=' + targetPage;
-            window.location.href = liffUrl;
-        }
+        let redirectUrl = window.location.href.split('?')[0];
+        if (targetPage) redirectUrl += '?page=' + targetPage;
+        // บังคับใช้ liff.login() เสมอ เพื่อให้ใช้ได้ทั้งมือถือและ PC อย่างถูกต้อง
+        liff.login({ redirectUri: redirectUrl });
     }
 
     const provinces = [
@@ -420,8 +492,6 @@
     // ⚡ ระบบป้องกันการโหลดค้าง (Fail-Safe Timer)
     document.addEventListener('DOMContentLoaded', () => {
         initSystem();
-        
-        // ถ้าเกิน 5 วินาทีแล้วโหลดข้อมูลล้มเหลว หรือหน้ายังค้าง ให้บังคับเปิดทันที
         setTimeout(() => { 
             document.getElementById('loadingSpinner').style.display = 'none';
             if (!isAppReady) {
@@ -671,19 +741,29 @@
             const store = stores.find(s => s.name === p.name); let isVIP = false;
             if (store && store.isVIP && (!store.vipExpireTimestamp || store.vipExpireTimestamp > now || store.vipAutoRenew)) isVIP = true;
 
-            const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${p.geometry.location.lat()},${p.geometry.location.lng()}`; 
-            let distanceKm = "0.0";
+            const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${p.geometry.location.lat()},${p.geometry.location.lng()}`; let distanceKm = "0.0";
             if (window.google && window.google.maps && window.google.maps.geometry) { distanceKm = (google.maps.geometry.spherical.computeDistanceBetween(originPoint, p.geometry.location) / 1000).toFixed(1); }
 
-            let openStatusHtml = '<span class="status-tag" style="background:var(--bg-light); color:var(--text-muted); border:1px solid var(--border);">⚪ ไม่ระบุเวลา</span>'; 
-            if (p.business_status === 'CLOSED_TEMPORARILY') { openStatusHtml = '<span class="status-tag" style="background:#FFF3F3; color:var(--danger); border:1px solid rgba(217,83,79,0.2);">🔴 ปิดชั่วคราว</span>'; } 
-            else if (p.business_status === 'CLOSED_PERMANENTLY') { openStatusHtml = '<span class="status-tag" style="background:#FFF3F3; color:var(--danger); border:1px solid rgba(217,83,79,0.2);">🔴 ปิดถาวร</span>'; } 
-            else { 
-                let isOpen = undefined; if (p.opening_hours) { if (typeof p.opening_hours.isOpen === 'function') isOpen = p.opening_hours.isOpen(); else if ('open_now' in p.opening_hours) isOpen = p.opening_hours.open_now; } 
-                if (isOpen === true) { openStatusHtml = '<span class="status-tag" style="background:#F4FBF4; color:#2E7D32; border:1px solid rgba(46,125,50,0.2);">🟢 เปิดอยู่ตอนนี้</span>'; } 
-                else if (isOpen === false) { openStatusHtml = '<span class="status-tag" style="background:#FFF3F3; color:var(--danger); border:1px solid rgba(217,83,79,0.2);">🔴 ปิดแล้ว</span>'; } 
-                else if (p.business_status === 'OPERATIONAL') { openStatusHtml = '<span class="status-tag" style="background:#F4FBF4; color:#2E7D32; border:1px solid rgba(46,125,50,0.2);">🟢 เปิดให้บริการ</span>'; } 
-            } 
+            // ⚡ ระบบแสดงเวลาเปิด-ปิดร้าน
+            let openStatusHtml = '<span class="status-tag" style="background:var(--bg-light); color:var(--text-muted); border:1px solid var(--border);">⚪ เวลา: ทางร้านไม่ได้ระบุ</span>'; 
+            
+            if (p.business_status === 'CLOSED_TEMPORARILY') { 
+                openStatusHtml = '<span class="status-tag" style="background:#FFF3F3; color:var(--danger); border:1px solid rgba(217,83,79,0.2);">🔴 ปิดชั่วคราว</span>'; 
+            } else if (p.business_status === 'CLOSED_PERMANENTLY') { 
+                openStatusHtml = '<span class="status-tag" style="background:#FFF3F3; color:var(--danger); border:1px solid rgba(217,83,79,0.2);">🔴 ปิดถาวร</span>'; 
+            } else if (p.opening_hours) { 
+                let isOpen = undefined; 
+                if (typeof p.opening_hours.isOpen === 'function') isOpen = p.opening_hours.isOpen(); 
+                else if ('open_now' in p.opening_hours) isOpen = p.opening_hours.open_now; 
+                
+                if (isOpen === true) { 
+                    openStatusHtml = '<span class="status-tag" style="background:#F4FBF4; color:#2E7D32; border:1px solid rgba(46,125,50,0.2);">🟢 เปิดอยู่ตอนนี้</span>'; 
+                } else if (isOpen === false) { 
+                    openStatusHtml = '<span class="status-tag" style="background:#FFF3F3; color:var(--danger); border:1px solid rgba(217,83,79,0.2);">🔴 ปิดแล้ว</span>'; 
+                } 
+            } else if (p.business_status === 'OPERATIONAL') {
+                openStatusHtml = '<span class="status-tag" style="background:var(--bg-light); color:var(--text-muted); border:1px solid var(--border);">⚪ เวลา: ทางร้านไม่ได้ระบุ</span>';
+            }
             
             const hasLine = isVIP && store && store.lineUrl && store.lineUrl.trim() !== ''; const hasFb = isVIP && store && store.fbUrl && store.fbUrl.trim() !== '';
 
