@@ -27,7 +27,7 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         #map { width: 100%; height: 320px; border-radius: 16px; border: 1px solid var(--border); background: #eee; box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
         .search-area { background: var(--surface); padding: 25px; border-radius: 16px; margin-top: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); border: 1px solid var(--border); }
-        select, input[type="text"], input[type="password"], input[type="number"], input[type="file"], textarea { padding: 14px; border-radius: 10px; border: 1px solid var(--border); font-family: 'Kanit'; font-size: 15px; outline: none; box-sizing: border-box; width: 100%; background: var(--dark); color: var(--primary-light); transition: 0.3s; }
+        select, input[type="text"], input[type="password"], input[type="number"], input[type="file"], input[type="time"], textarea { padding: 14px; border-radius: 10px; border: 1px solid var(--border); font-family: 'Kanit'; font-size: 15px; outline: none; box-sizing: border-box; width: 100%; background: var(--dark); color: var(--primary-light); transition: 0.3s; }
         select:focus, input:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(197, 160, 89, 0.15); background: var(--dark-light); }
         .search-box-container { display: flex; gap: 12px; width: 100%; }
         .btn-primary { padding: 14px 24px; background: var(--primary); color: white; border: none; border-radius: 10px; font-family: 'Kanit'; font-weight: 500; font-size: 15px; cursor: pointer; transition: 0.3s; white-space: nowrap; width: 100%; box-shadow: 0 4px 10px rgba(197, 160, 89, 0.3); }
@@ -225,7 +225,7 @@
     </div>
 
     <div id="page-partner" class="page">
-        <div id="partner-friend-blocker" style="display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 50px 20px; background: var(--surface); border-radius: 16px; border: 1px solid var(--border);">
+        <div id="partner-friend-blocker" style="display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 50px 20px; background: var(--surface); border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
             <img src="https://official-static.line-scdn.net/branding/logo-vertical.png" alt="LINE Official Account" style="width: 100px; margin-bottom: 25px;">
             <div style="color: #FFF; font-size: 16px; font-weight: 400; line-height: 1.6; max-width: 300px; margin-bottom: 30px;"><span style="color:var(--primary); font-weight:600;">⚠️ สำหรับร้านค้า</span><br>กรุณาเข้าใช้งานผ่านแอป LINE<br>เพื่อรับรหัส PIN ในการจัดการร้านครับ</div>
             <button class="btn-line-glow" style="width: auto; padding: 14px 24px; animation: none;" onclick="smartLogin('partner')">📱 เปิดใช้งานผ่านแอป LINE</button>
@@ -277,6 +277,16 @@
                         <div class="form-group"><label style="font-size: 12px;">ลิงก์ LINE OA</label><input type="text" id="vipLineInput" placeholder="https://line.me/R/ti/p/..."></div>
                         <div class="form-group" style="margin-bottom: 10px;"><label style="font-size: 12px;">ลิงก์ Facebook Page</label><input type="text" id="vipFbInput" placeholder="https://m.me/..."></div>
                         <button class="btn-outline" style="width: 100%; border-color: var(--primary);" onclick="updateVipData()">💾 บันทึกข้อมูลลิงก์โซเชียล</button>
+
+                        <div id="vipHoursSection" style="margin-top: 20px; border-top: 1px dashed var(--primary); padding-top: 15px;">
+                            <h4 style="margin: 0 0 10px 0; color: #FFD700; font-size: 16px; display: flex; align-items: center; justify-content: space-between;">
+                                ⏰ เวลาเปิด-ปิดร้าน 
+                                <span style="font-size: 11px; color: #FFF; background: #C5A059; padding: 2px 6px; border-radius: 10px; color: #000;">VIP Feature</span>
+                            </h4>
+                            <p style="font-size: 12px; color:var(--text-muted); margin-top: -5px; margin-bottom: 15px;">ระบุเพื่อโชว์สถานะ เปิด/ปิด บนการ์ดร้านค้า</p>
+                            <div id="hoursGrid" style="display: flex; flex-direction: column; gap: 8px;"></div>
+                            <button class="btn-primary" style="width: 100%; margin-top: 12px;" onclick="saveOperatingHours()">💾 บันทึกเวลาเปิด-ปิด</button>
+                        </div>
                     </div>
 
                     <div id="buyPromoSection" style="padding: 20px; border: 2px solid var(--primary); border-radius: 16px; background: linear-gradient(180deg, rgba(197, 160, 89, 0.1) 0%, var(--surface) 100%); position: relative; overflow: hidden; margin-top: 30px;">
@@ -322,73 +332,6 @@
     const db = firebase.firestore();
     const storage = firebase.storage();
 
-    // ⚡ หมวดหมู่ชุดใหญ่ 11 หมวดหลัก 40 หมวดย่อย (สำรองไว้ใช้ยัดเข้าระบบอัตโนมัติ)
-    const defaultMainCats = [
-        { id: 'food', label: '🍽️ อาหาร & เครื่องดื่ม', keyword: 'ร้านอาหาร' },
-        { id: 'cafe', label: '☕ คาเฟ่ & เบเกอรี่', keyword: 'คาเฟ่' },
-        { id: 'nightlife', label: '🍻 นั่งชิล & ไนท์ไลฟ์', keyword: 'บาร์' },
-        { id: 'attraction', label: '📸 ที่เที่ยว & จุดเช็คอิน', keyword: 'สถานที่ท่องเที่ยว' },
-        { id: 'accommodation', label: '🏨 ที่พัก & แคมป์ปิ้ง', keyword: 'โรงแรม' },
-        { id: 'beauty_spa', label: '💆‍♀️ นวด & สปา', keyword: 'ร้านนวด' },
-        { id: 'shopping', label: '🛍️ ช้อปปิ้ง & ตลาด', keyword: 'ตลาด' },
-        { id: 'activity', label: '🎯 กิจกรรม & กีฬา', keyword: 'สปอร์ตคลับ' },
-        { id: 'health', label: '🏥 สุขภาพ & ยา', keyword: 'โรงพยาบาล' },
-        { id: 'car_service', label: '🚗 รถยนต์ & การเดินทาง', keyword: 'ปั๊มน้ำมัน' },
-        { id: 'emergency', label: '🚨 ฉุกเฉิน & บริการ', keyword: 'สถานีตำรวจ' }
-    ];
-
-    const defaultCategories = [
-        { id: 101, group: 'food', label: 'หมูกระทะ / ชาบู / ปิ้งย่าง', keyword: 'หมูกระทะ ชาบู' },
-        { id: 102, group: 'food', label: 'ส้มตำ / อาหารอีสาน', keyword: 'ร้านส้มตำ' },
-        { id: 103, group: 'food', label: 'อาหารทะเล / ซีฟู้ด', keyword: 'ร้านอาหารทะเล' },
-        { id: 104, group: 'food', label: 'ข้าวต้มกุ๊ย / โต้รุ่ง', keyword: 'ร้านข้าวต้ม' },
-        { id: 105, group: 'food', label: 'ก๋วยเตี๋ยว / อาหารจานเดียว', keyword: 'ร้านก๋วยเตี๋ยว' },
-        { id: 106, group: 'food', label: 'อาหารนานาชาติ (ญี่ปุ่น/ฝรั่ง)', keyword: 'ร้านอาหารญี่ปุ่น' },
-        { id: 107, group: 'food', label: 'อาหารมังสวิรัติ / วีแกน', keyword: 'ร้านอาหารเจ' },
-        { id: 201, group: 'cafe', label: 'คาเฟ่ถ่ายรูปสวย', keyword: 'คาเฟ่ถ่ายรูป' },
-        { id: 202, group: 'cafe', label: 'กาแฟ Specialty', keyword: 'Specialty Coffee' },
-        { id: 203, group: 'cafe', label: 'เบเกอรี่ / ขนมหวาน', keyword: 'ร้านเบเกอรี่' },
-        { id: 204, group: 'cafe', label: 'คาเฟ่สัตว์เลี้ยง', keyword: 'คาเฟ่หมา แมว' },
-        { id: 301, group: 'nightlife', label: 'ร้านนั่งชิล / ดนตรีสด', keyword: 'ร้านนั่งชิล' },
-        { id: 302, group: 'nightlife', label: 'ผับ / คลับ / เต้น', keyword: 'ผับ' },
-        { id: 303, group: 'nightlife', label: 'บาร์คราฟต์เบียร์ / ค็อกเทล', keyword: 'คราฟต์เบียร์ บาร์' },
-        { id: 304, group: 'nightlife', label: 'คาราโอเกะ', keyword: 'ร้านคาราโอเกะ' },
-        { id: 401, group: 'attraction', label: 'วัด / สถานที่ศักดิ์สิทธิ์', keyword: 'วัด' },
-        { id: 402, group: 'attraction', label: 'ธรรมชาติ / น้ำตก / ภูเขา', keyword: 'อุทยานแห่งชาติ น้ำตก' },
-        { id: 403, group: 'attraction', label: 'โบสถ์ / มัสยิด / ศาลเจ้า', keyword: 'โบสถ์ มัสยิด' },
-        { id: 404, group: 'attraction', label: 'พิพิธภัณฑ์ / หอศิลป์', keyword: 'พิพิธภัณฑ์' },
-        { id: 405, group: 'attraction', label: 'สวนสัตว์ / ฟาร์ม', keyword: 'สวนสัตว์ ฟาร์ม' },
-        { id: 501, group: 'accommodation', label: 'โรงแรม / รีสอร์ท', keyword: 'โรงแรม รีสอร์ท' },
-        { id: 502, group: 'accommodation', label: 'ลานกางเต็นท์ / แคมป์ปิ้ง', keyword: 'ลานกางเต็นท์ แคมป์ปิ้ง' },
-        { id: 503, group: 'accommodation', label: 'พูลวิลล่า / บ้านพักส่วนตัว', keyword: 'พูลวิลล่า' },
-        { id: 504, group: 'accommodation', label: 'โฮสเทล / ที่พักราคาประหยัด', keyword: 'โฮสเทล' },
-        { id: 601, group: 'beauty_spa', label: 'นวดแผนไทย / นวดเท้า', keyword: 'ร้านนวดแผนไทย' },
-        { id: 602, group: 'beauty_spa', label: 'สปา / ออนเซ็น', keyword: 'สปา' },
-        { id: 603, group: 'beauty_spa', label: 'คลินิกความงาม / ศัลยกรรม', keyword: 'คลินิกความงาม' },
-        { id: 604, group: 'beauty_spa', label: 'ร้านทำผม / ทำเล็บ', keyword: 'ร้านทำผม ซาลอน' },
-        { id: 701, group: 'shopping', label: 'ตลาดนัดกลางคืน / ถนนคนเดิน', keyword: 'ถนนคนเดิน ตลาดนัด' },
-        { id: 702, group: 'shopping', label: 'ของฝาก / ของที่ระลึก', keyword: 'ร้านขายของฝาก' },
-        { id: 703, group: 'shopping', label: 'ห้างสรรพสินค้า', keyword: 'ห้างสรรพสินค้า' },
-        { id: 704, group: 'shopping', label: 'ตลาดสด / ตลาดเช้า', keyword: 'ตลาดสด' },
-        { id: 801, group: 'activity', label: 'โต๊ะสนุกเกอร์ / บิลเลียด', keyword: 'โต๊ะสนุกเกอร์' },
-        { id: 802, group: 'activity', label: 'ฟิตเนส / ยิม', keyword: 'ฟิตเนส' },
-        { id: 803, group: 'activity', label: 'สวนน้ำ / สวนสนุก', keyword: 'สวนน้ำ' },
-        { id: 901, group: 'health', label: 'โรงพยาบาล', keyword: 'โรงพยาบาล' },
-        { id: 902, group: 'health', label: 'คลินิกเวชกรรม', keyword: 'คลินิก' },
-        { id: 903, group: 'health', label: 'ร้านขายยา', keyword: 'ร้านขายยา' },
-        { id: 904, group: 'health', label: 'คลินิกทำฟัน', keyword: 'คลินิกทันตกรรม' },
-        { id: 905, group: 'health', label: 'คลินิกรักษาสัตว์', keyword: 'คลินิกรักษาสัตว์' },
-        { id: 1001, group: 'car_service', label: 'คาร์แคร์ / ล้างรถ', keyword: 'คาร์แคร์ ล้างรถ' },
-        { id: 1002, group: 'car_service', label: 'ประดับยนต์ / เครื่องเสียง / ติดฟิล์ม', keyword: 'ประดับยนต์ เครื่องเสียงรถยนต์ ติดฟิล์มรถยนต์' },
-        { id: 1003, group: 'car_service', label: 'ปั๊มน้ำมัน / จุดชาร์จ EV', keyword: 'ปั๊มน้ำมัน EV Station' },
-        { id: 1004, group: 'car_service', label: 'อู่ซ่อมรถ / ปะยาง', keyword: 'อู่ซ่อมรถ เปลี่ยนยาง' },
-        { id: 1005, group: 'car_service', label: 'สถานีขนส่ง / เช่ารถ', keyword: 'รถเช่า สถานีขนส่ง' },
-        { id: 1101, group: 'emergency', label: 'สถานีตำรวจ', keyword: 'สถานีตำรวจ' },
-        { id: 1102, group: 'emergency', label: 'ดับเพลิง / กู้ภัย', keyword: 'สถานีดับเพลิง กู้ภัย' },
-        { id: 1103, group: 'emergency', label: 'ตู้ ATM / ธนาคาร', keyword: 'ATM ธนาคาร' },
-        { id: 1104, group: 'emergency', label: 'บริการลากจูง / สไลด์ออน', keyword: 'รถลากจูง รถสไลด์' }
-    ];
-
     let appData = { registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], mainCategories: [], categories: [], closedReports: [], blacklistedPlaces: [], services: [], pendingVipRequests: [], affiliateWallets: [], withdrawalRequests: [] };
 
     const resizeImg = (file) => new Promise((resolve) => {
@@ -428,14 +371,6 @@
                 } else { 
                     saveToCloud(); 
                 }
-                
-                // ⚡ สคริปต์บังคับอัปเดตหมวดหมู่: ถ้าของเดิมมีน้อยกว่า 11 ให้ยัดชุดใหม่ 40 หมวดลงไปเลย
-                if (!appData.mainCategories || appData.mainCategories.length < 11) {
-                    appData.mainCategories = JSON.parse(JSON.stringify(defaultMainCats));
-                    appData.categories = JSON.parse(JSON.stringify(defaultCategories));
-                    saveToCloud(); // เซฟทับขึ้นไปใหม่
-                }
-
                 ['registeredStores', 'activePromotions', 'mainCategories', 'categories', 'services', 'affiliateWallets', 'withdrawalRequests', 'registrationRequests', 'pendingPromotions', 'pendingVipRequests'].forEach(k => { if(!appData[k]) appData[k] = []; });
                 
                 renderUI(); updateWalletUI(); renderPromos();
@@ -450,18 +385,14 @@
         catch(e) { throw e; }
     }
 
-    // ⚡ ระบบ Smart Login แก้ไขล่าสุด
-   // ⚡ ระบบ Smart Login (อยู่ใน LINE ล็อกอินเลย / อยู่ Chrome เตะเข้าแอป)
+    // ⚡ ระบบ Smart Login (อยู่ใน LINE ล็อกอินเลย / อยู่ Chrome เตะเข้าแอป)
     function smartLogin(targetPage) {
-        // ดึง URL ลิงก์ปัจจุบัน (ตัดพวกพารามิเตอร์เก่าๆ ทิ้งให้หมด)
         let baseUrl = window.location.href.split('?')[0];
         let pageParam = targetPage ? '?page=' + targetPage : '';
 
         if (liff.isInClient()) {
-            // ถ้าลูกค้าอยู่ในแอป LINE อยู่แล้ว ให้ล็อกอินทับหน้าเดิมได้เลย
             liff.login({ redirectUri: baseUrl + pageParam });
         } else {
-            // ถ้าลูกค้าเปิดผ่าน Chrome, Safari, เฟสบุ๊ค ให้เตะเข้าแอป LINE ทันที!
             let liffUrl = 'https://liff.line.me/2009598846-wiCUeV35' + pageParam;
             window.location.href = liffUrl;
         }
@@ -498,14 +429,11 @@
 
     let isAppReady = false;
 
-    // ⚡ ระบบป้องกันการโหลดค้าง (Fail-Safe Timer)
     document.addEventListener('DOMContentLoaded', () => {
         initSystem();
         setTimeout(() => { 
             document.getElementById('loadingSpinner').style.display = 'none';
-            if (!isAppReady) {
-                document.getElementById('loginCard').style.display = 'block';
-            }
+            if (!isAppReady) { document.getElementById('loginCard').style.display = 'block'; }
         }, 5000);
     });
 
@@ -543,17 +471,15 @@
                 document.getElementById('loginOverlay').style.display = 'none'; document.getElementById('appContent').style.display = 'block';
                 updateWalletUI(); 
                 
-               // --- ส่วนที่ต้องหาและวางทับในฟังก์ชัน initSystem() ---
                 const savedRef = sessionStorage.getItem('savedRefCode');
                 if (savedRef && document.getElementById('regRefCode')) { if (savedRef.toUpperCase() !== myCode.toUpperCase()) { document.getElementById('regRefCode').value = savedRef; } }
 
-                // ⚡ ล็อกเป้าหมายการเด้งหน้า (มาทางไหน ให้อยู่หน้านั้น 100%)
+                // ⚡ ล็อกเป้าหมายการเด้งหน้า (มาทางไหน ให้อยู่หน้านั้น)
                 if (targetPage === 'partner') { 
                     setTimeout(() => { navigateToPartner(); }, 300); 
                 } else if (targetPage === 'affiliate') { 
                     setTimeout(() => { navigateToAffiliate(); }, 300); 
                 } else {
-                    // ถ้าล็อกอินจากหน้าแรก หรือไม่ระบุหน้า ให้บังคับกลับมาหน้าแรกเสมอ!
                     setTimeout(() => { switchPage('home'); }, 300); 
                 }
 
@@ -566,7 +492,7 @@
             console.error("LIFF Init Error:", err); isAppReady = true; document.getElementById('header-profile').innerHTML = `<div style="font-size: 50px; line-height: 100px; text-align: center;">👤</div>`; showLoginCard();
         }
     }
-            
+
     function updateWalletUI() {
         if(!window.myAffCode) return;
         const wallets = appData.affiliateWallets || []; const myWallet = wallets.find(w => w.refCode === window.myAffCode); const balance = myWallet ? myWallet.balance : 0;
@@ -619,7 +545,6 @@
     async function navigateToPartner() {
         if (!liff.isLoggedIn()) {
             const blocker = document.getElementById('partner-friend-blocker'); const content = document.getElementById('partner-actual-content'); switchPage('partner'); blocker.style.display = 'flex'; content.style.display = 'none';
-            blocker.innerHTML = `<img src="https://official-static.line-scdn.net/branding/logo-vertical.png" alt="LINE" style="width: 100px; margin-bottom: 25px;"><div style="color: #FFF; font-size: 16px; margin-bottom: 30px; text-align: center; line-height: 1.6;"><span style="color:var(--primary); font-weight:600; font-size: 18px;">⚠️ สำหรับร้านค้า</span><br>กรุณาเข้าใช้งานผ่านแอป LINE<br>เพื่อรับรหัส PIN ในการจัดการร้านครับ</div><button class="btn-line-glow" style="width: auto; padding: 14px 24px; border:none; border-radius:12px; font-family:'Kanit'; font-weight:600; font-size:16px; cursor:pointer;" onclick="smartLogin('partner')">📱 เปิดใช้งานผ่านแอป LINE</button>`;
             return;
         }
         switchPage('partner'); checkFriendshipForPartner(false); 
@@ -675,37 +600,82 @@
         }
     }
 
+    // ⚡ ฟังก์ชันคำนวณสถานะเปิด/ปิดร้านจากเวลาที่ VIP ตั้งค่าเอง
+    function getCustomStoreStatus(hoursObj) {
+        if(!hoursObj) return null;
+        const now = new Date();
+        const day = now.getDay(); 
+        const currentMinutes = now.getHours() * 60 + now.getMinutes();
+        
+        const todayHours = hoursObj[day];
+        if(!todayHours) return null;
+
+        const timeText = todayHours.isClosed ? 'ปิดทำการ' : `${todayHours.open} - ${todayHours.close}`;
+
+        if(todayHours.isClosed || !todayHours.open || !todayHours.close) {
+            return { html: '<span class="status-tag" style="background:#FFF3F3; color:var(--danger); border:1px solid rgba(217,83,79,0.2);">🔴 ปิดแล้ว</span>', text: timeText, isOpen: false, label: '<span style="background:#D9534F; color:#FFF; padding:3px 8px; border-radius:10px; font-size:11px; margin-left:6px;">ปิดแล้ว</span>' };
+        }
+
+        const [openH, openM] = todayHours.open.split(':').map(Number);
+        const [closeH, closeM] = todayHours.close.split(':').map(Number);
+        const openMins = openH * 60 + openM;
+        const closeMins = closeH * 60 + closeM;
+
+        let isOpen = false;
+        let minsToClose = 0;
+
+        if (closeMins < openMins) { 
+            // กรณีข้ามคืน เช่น 18:00 - 02:00
+            if (currentMinutes >= openMins) {
+                isOpen = true; minsToClose = (closeMins + 1440) - currentMinutes;
+            } else if (currentMinutes < closeMins) {
+                isOpen = true; minsToClose = closeMins - currentMinutes;
+            }
+        } else { 
+            // กรณีปกติ เช่น 08:00 - 17:00
+            if (currentMinutes >= openMins && currentMinutes < closeMins) {
+                isOpen = true; minsToClose = closeMins - currentMinutes;
+            }
+        }
+
+        if (isOpen) {
+            if (minsToClose <= 30) {
+                return { html: '<span class="status-tag" style="background:#FFF8E1; color:#F57C00; border:1px solid rgba(245,124,0,0.2);">🟠 กำลังจะปิด</span>', text: timeText, isOpen: true, label: '<span style="background:#F57C00; color:#FFF; padding:3px 8px; border-radius:10px; font-size:11px; margin-left:6px;">กำลังจะปิด</span>' };
+            } else {
+                return { html: '<span class="status-tag" style="background:#F4FBF4; color:#2E7D32; border:1px solid rgba(46,125,50,0.2);">🟢 เปิดอยู่ตอนนี้</span>', text: timeText, isOpen: true, label: '<span style="background:#06C755; color:#FFF; padding:3px 8px; border-radius:10px; font-size:11px; margin-left:6px;">เปิดอยู่</span>' };
+            }
+        } else {
+            return { html: '<span class="status-tag" style="background:#FFF3F3; color:var(--danger); border:1px solid rgba(217,83,79,0.2);">🔴 ปิดแล้ว</span>', text: timeText, isOpen: false, label: '<span style="background:#D9534F; color:#FFF; padding:3px 8px; border-radius:10px; font-size:11px; margin-left:6px;">ปิดแล้ว</span>' };
+        }
+    }
+
+    // ⚡ ฟังก์ชัน Popup บนแผนที่ (แอบไปดึงเวลาแบบละเอียดมาโชว์)
     function focusPlace(placeId) {
         const place = googlePlaces.find(p => p.place_id === placeId);
         if (place && place.geometry && place.geometry.location) {
             map.panTo(place.geometry.location); map.setZoom(17);
             if (activeMarker) activeMarker.setMap(null); activeMarker = new google.maps.Marker({ position: place.geometry.location, map: map, animation: google.maps.Animation.DROP });
             window.scrollTo({ top: document.getElementById('map').offsetTop - 20, behavior: 'smooth' });
-        }
-    }
 
-    function focusPlace(placeId) {
-        const place = googlePlaces.find(p => p.place_id === placeId);
-        if (place && place.geometry && place.geometry.location) {
-            map.panTo(place.geometry.location); map.setZoom(17);
-            if (activeMarker) activeMarker.setMap(null); 
-            activeMarker = new google.maps.Marker({ position: place.geometry.location, map: map, animation: google.maps.Animation.DROP });
-            window.scrollTo({ top: document.getElementById('map').offsetTop - 20, behavior: 'smooth' });
-
-            // ⚡ ดึงข้อมูล "เวลาเปิดปิดแบบละเอียด" เฉพาะร้านที่โดนคลิก (ประหยัด API และแอปโหลดไว)
             service.getDetails({ placeId: placeId, fields: ['name', 'opening_hours'] }, (details, status) => {
-                let timeText = "ไม่มีข้อมูลเวลาเปิด-ปิดจากระบบแผนที่";
+                let timeText = "ทางร้านไม่ได้ระบุเวลาเปิด-ปิด";
                 let isOpenNowHtml = "";
 
-                if (status === google.maps.places.PlacesServiceStatus.OK && details.opening_hours) {
-                    // ดึงเวลาเปิดปิดของ "วันนี้"
+                // ตรวจสอบว่าร้านนี้เป็น VIP และมี Custom Hours หรือไม่
+                const store = (appData.registeredStores || []).find(s => s.name === place.name);
+                const now = Date.now();
+                const isVIP = store && store.isVIP && (!store.vipExpireTimestamp || store.vipExpireTimestamp > now || store.vipAutoRenew);
+                const customStatus = (isVIP && store.operatingHours) ? getCustomStoreStatus(store.operatingHours) : null;
+
+                if (customStatus) {
+                    timeText = customStatus.text;
+                    isOpenNowHtml = customStatus.label;
+                } else if (status === google.maps.places.PlacesServiceStatus.OK && details.opening_hours) {
+                    // ถ้าไม่มี Custom Hours ให้ดึงของ Google Maps มาโชว์ (ถ้ามี)
                     if (details.opening_hours.weekday_text) {
-                        const today = new Date().getDay(); // 0 = อาทิตย์, 1 = จันทร์
-                        const dIndex = today === 0 ? 6 : today - 1; // Google Array เริ่มที่วันจันทร์
+                        const today = new Date().getDay(); const dIndex = today === 0 ? 6 : today - 1;
                         timeText = details.opening_hours.weekday_text[dIndex]; 
                     }
-                    
-                    // เช็คสถานะ เปิด/ปิด แบบ Real-time
                     let isOpen = undefined;
                     if (typeof details.opening_hours.isOpen === 'function') isOpen = details.opening_hours.isOpen();
                     else if ('open_now' in details.opening_hours) isOpen = details.opening_hours.open_now;
@@ -714,7 +684,6 @@
                     else if(isOpen === false) isOpenNowHtml = '<span style="background:#D9534F; color:#FFF; padding:3px 8px; border-radius:10px; font-size:11px; margin-left:6px;">ปิดแล้ว</span>';
                 }
 
-                // สร้างป้าย Popup บนแผนที่
                 const contentStr = `
                     <div style="padding: 10px; font-family: 'Kanit'; color: #333; min-width: 220px; text-align: left;">
                         <h4 style="margin: 0 0 8px 0; color: #C5A059; font-size: 16px; border-bottom: 1px solid #eee; padding-bottom: 5px; display: flex; align-items: center;">${place.name} ${isOpenNowHtml}</h4>
@@ -726,6 +695,16 @@
                 infoWindow.open(map, activeMarker);
             });
         }
+    }
+
+    function searchAndFocusStore(storeName) {
+        document.getElementById('searchBox').value = storeName; executeSearch('text'); window.scrollTo({top: document.getElementById('map').offsetTop - 20, behavior:'smooth'});
+        service.textSearch({ query: storeName, location: currentCoords, radius: 50000 }, (res, status) => {
+            if (status === "OK" && res.length > 0) {
+                map.panTo(res[0].geometry.location); map.setZoom(17);
+                if (activeMarker) activeMarker.setMap(null); activeMarker = new google.maps.Marker({ position: res[0].geometry.location, map: map, animation: google.maps.Animation.DROP });
+            }
+        });
     }
 
     function renderUI() {
@@ -792,28 +771,34 @@
             const store = stores.find(s => s.name === p.name); let isVIP = false;
             if (store && store.isVIP && (!store.vipExpireTimestamp || store.vipExpireTimestamp > now || store.vipAutoRenew)) isVIP = true;
 
-            const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${p.geometry.location.lat()},${p.geometry.location.lng()}`; let distanceKm = "0.0";
+            const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${p.geometry.location.lat()},${p.geometry.location.lng()}`; 
+            let distanceKm = "0.0";
             if (window.google && window.google.maps && window.google.maps.geometry) { distanceKm = (google.maps.geometry.spherical.computeDistanceBetween(originPoint, p.geometry.location) / 1000).toFixed(1); }
 
-            // ⚡ ระบบแสดงเวลาเปิด-ปิดร้าน
+            // ⚡ เช็คเวลาปิดเปิด (ให้ความสำคัญกับ Custom Hours ของ VIP ก่อน)
             let openStatusHtml = '<span class="status-tag" style="background:var(--bg-light); color:var(--text-muted); border:1px solid var(--border);">⚪ เวลา: ทางร้านไม่ได้ระบุ</span>'; 
             
-            if (p.business_status === 'CLOSED_TEMPORARILY') { 
-                openStatusHtml = '<span class="status-tag" style="background:#FFF3F3; color:var(--danger); border:1px solid rgba(217,83,79,0.2);">🔴 ปิดชั่วคราว</span>'; 
-            } else if (p.business_status === 'CLOSED_PERMANENTLY') { 
-                openStatusHtml = '<span class="status-tag" style="background:#FFF3F3; color:var(--danger); border:1px solid rgba(217,83,79,0.2);">🔴 ปิดถาวร</span>'; 
-            } else if (p.opening_hours) { 
-                let isOpen = undefined; 
-                if (typeof p.opening_hours.isOpen === 'function') isOpen = p.opening_hours.isOpen(); 
-                else if ('open_now' in p.opening_hours) isOpen = p.opening_hours.open_now; 
-                
-                if (isOpen === true) { 
-                    openStatusHtml = '<span class="status-tag" style="background:#F4FBF4; color:#2E7D32; border:1px solid rgba(46,125,50,0.2);">🟢 เปิดอยู่ตอนนี้</span>'; 
-                } else if (isOpen === false) { 
-                    openStatusHtml = '<span class="status-tag" style="background:#FFF3F3; color:var(--danger); border:1px solid rgba(217,83,79,0.2);">🔴 ปิดแล้ว</span>'; 
-                } 
-            } else if (p.business_status === 'OPERATIONAL') {
-                openStatusHtml = '<span class="status-tag" style="background:var(--bg-light); color:var(--text-muted); border:1px solid var(--border);">⚪ เวลา: ทางร้านไม่ได้ระบุ</span>';
+            const customStatus = (isVIP && store.operatingHours) ? getCustomStoreStatus(store.operatingHours) : null;
+
+            if (customStatus) {
+                openStatusHtml = customStatus.html;
+            } else {
+                // ถ้าไม่มีข้อมูล VIP ก็ใช้ของ Google
+                if (p.business_status === 'CLOSED_TEMPORARILY') { 
+                    openStatusHtml = '<span class="status-tag" style="background:#FFF3F3; color:var(--danger); border:1px solid rgba(217,83,79,0.2);">🔴 ปิดชั่วคราว</span>'; 
+                } else if (p.business_status === 'CLOSED_PERMANENTLY') { 
+                    openStatusHtml = '<span class="status-tag" style="background:#FFF3F3; color:var(--danger); border:1px solid rgba(217,83,79,0.2);">🔴 ปิดถาวร</span>'; 
+                } else if (p.opening_hours) { 
+                    let isOpen = undefined; 
+                    if (typeof p.opening_hours.isOpen === 'function') isOpen = p.opening_hours.isOpen(); 
+                    else if ('open_now' in p.opening_hours) isOpen = p.opening_hours.open_now; 
+                    
+                    if (isOpen === true) { 
+                        openStatusHtml = '<span class="status-tag" style="background:#F4FBF4; color:#2E7D32; border:1px solid rgba(46,125,50,0.2);">🟢 เปิดอยู่ตอนนี้</span>'; 
+                    } else if (isOpen === false) { 
+                        openStatusHtml = '<span class="status-tag" style="background:#FFF3F3; color:var(--danger); border:1px solid rgba(217,83,79,0.2);">🔴 ปิดแล้ว</span>'; 
+                    } 
+                }
             }
             
             const hasLine = isVIP && store && store.lineUrl && store.lineUrl.trim() !== ''; const hasFb = isVIP && store && store.fbUrl && store.fbUrl.trim() !== '';
@@ -942,6 +927,48 @@
         } else if (store) { alert("⚠️ ร้านนี้ไม่ได้เชื่อมโยงกับระบบ LINE ไว้ กรุณาติดต่อแอดมินโดยตรงครับ"); } else { alert("❌ ไม่พบชื่อร้านนี้ในระบบ กรุณาตรวจสอบตัวสะกดอีกครั้งครับ"); }
     }
 
+    // ⚡ ฟังก์ชันสร้างฟอร์มกรอกเวลาเปิด-ปิดร้าน
+    function renderHoursGrid(store) {
+        const daysTH = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
+        let hoursHtml = '';
+        for(let i=0; i<7; i++) {
+            let d = store.operatingHours && store.operatingHours[i] ? store.operatingHours[i] : {open:'08:00', close:'17:00', isClosed: false};
+            hoursHtml += `
+            <div style="display:flex; align-items:center; gap:5px; background:rgba(0,0,0,0.2); padding:8px; border-radius:8px;">
+                <span style="width:55px; font-size:13px; color:#FFF;">${daysTH[i]}</span>
+                <input type="time" id="open_${i}" value="${d.open}" class="input-dark" style="padding:5px; font-size:12px; width:80px;" ${d.isClosed?'disabled':''}>
+                <span style="color:#999;">-</span>
+                <input type="time" id="close_${i}" value="${d.close}" class="input-dark" style="padding:5px; font-size:12px; width:80px;" ${d.isClosed?'disabled':''}>
+                <label style="font-size:12px; display:flex; align-items:center; gap:4px; margin-left:auto; color:var(--danger); font-weight:500;">
+                    <input type="checkbox" id="closed_${i}" ${d.isClosed?'checked':''} onchange="toggleDayStatus(${i})" style="width:16px; height:16px;"> ปิด
+                </label>
+            </div>`;
+        }
+        document.getElementById('hoursGrid').innerHTML = hoursHtml;
+    }
+
+    function toggleDayStatus(dayIndex) {
+        const isClosed = document.getElementById(`closed_${dayIndex}`).checked;
+        document.getElementById(`open_${dayIndex}`).disabled = isClosed;
+        document.getElementById(`close_${dayIndex}`).disabled = isClosed;
+    }
+
+    async function saveOperatingHours() {
+        const store = appData.registeredStores.find(s => s.pin === document.getElementById('storePinInput').value);
+        if(!store) return;
+        
+        store.operatingHours = {};
+        for(let i=0; i<7; i++) {
+            store.operatingHours[i] = {
+                open: document.getElementById(`open_${i}`).value,
+                close: document.getElementById(`close_${i}`).value,
+                isClosed: document.getElementById(`closed_${i}`).checked
+            };
+        }
+        await saveToCloud();
+        alert('💾 บันทึกเวลาเปิด-ปิดร้านเรียบร้อยแล้ว!\n(ระบบจะแสดงผลในหน้านักล่าอัตโนมัติ)');
+    }
+
     function verifyStore() {
         const stores = appData.registeredStores || []; const store = stores.find(s => s.pin === document.getElementById('storePinInput').value);
         if(store) { 
@@ -953,7 +980,12 @@
 
             if(isVIP) {
                 document.getElementById('vipUpdateSection').style.display = 'block'; document.getElementById('vipSubscribeSection').style.display = 'block';
-                document.getElementById('vipSubscribeTitle').innerHTML = '👑 ต่ออายุ VIP <span style="font-size:12px; color:#06C755;">(สถานะ: ใช้งานได้)</span>'; document.getElementById('vipLineInput').value = store.lineUrl || ''; document.getElementById('vipFbInput').value = store.fbUrl || '';
+                document.getElementById('vipSubscribeTitle').innerHTML = '👑 ต่ออายุ VIP <span style="font-size:12px; color:#06C755;">(สถานะ: ใช้งานได้)</span>'; 
+                document.getElementById('vipLineInput').value = store.lineUrl || ''; 
+                document.getElementById('vipFbInput').value = store.fbUrl || '';
+                
+                // ⚡ สร้างฟอร์มเวลาเปิด-ปิดให้ VIP
+                renderHoursGrid(store);
             } else {
                 document.getElementById('vipUpdateSection').style.display = 'none'; document.getElementById('vipSubscribeSection').style.display = 'block'; document.getElementById('vipSubscribeTitle').innerHTML = '👑 สมัครสมาชิก VIP';
             }
