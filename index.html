@@ -313,8 +313,24 @@
 
                             <div id="hoursGrid" style="display: flex; flex-direction: column; gap: 8px;"></div>
                             <button class="btn-primary" style="width: 100%; margin-top: 12px;" onclick="saveOperatingHours()">💾 บันทึกเวลาเปิด-ปิด</button>
-                        </div>
-                    </div>
+
+                            <div style="margin-top: 20px; border-top: 1px dashed var(--primary); padding-top: 15px;">
+    <h4 style="color: #FFD700; font-size: 16px; margin-bottom: 15px;">🎁 การตลาด & กิจกรรม</h4>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+        <button class="btn-outline" style="font-size: 12px; padding: 10px;" onclick="openCouponEditor()">🎟️ จัดการคูปอง</button>
+        <button class="btn-outline" style="font-size: 12px; padding: 10px;" onclick="openEventEditor()">🎉 กิจกรรมวันนี้</button>
+    </div>
+
+    <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; border: 1px solid var(--border);">
+        <h5 style="margin:0 0 10px 0; color:var(--primary-light); font-size: 13px;">📊 สถิติร้านค้า (30 วันล่าสุด)</h5>
+        <div style="display: flex; justify-content: space-around; text-align: center;">
+            <div><p style="margin:0; font-size:11px; color:#999;">คนดูร้าน</p><p id="statViews" style="margin:0; font-size:20px; font-weight:bold; color:#FFF;">0</p></div>
+            <div style="width:1px; background:var(--border);"></div>
+            <div><p style="margin:0; font-size:11px; color:#999;">กดนำทาง</p><p id="statDirections" style="margin:0; font-size:20px; font-weight:bold; color:var(--info);">0</p></div>
+        </div>
+    </div>
+</div>
 
                     <div id="buyPromoSection" style="padding: 20px; border: 2px solid var(--primary); border-radius: 16px; background: linear-gradient(180deg, rgba(197, 160, 89, 0.1) 0%, var(--surface) 100%); position: relative; overflow: hidden; margin-top: 30px;">
                         <div style="position: absolute; top: 20px; right: -35px; background: #D9534F; color: white; padding: 5px 40px; transform: rotate(45deg); font-size: 12px; font-weight: bold; box-shadow: 0 2px 10px rgba(0,0,0,0.5);">HOT 🔥</div>
