@@ -753,9 +753,11 @@
     }
 
     // ⚡ ฟังก์ชันคำนวณสถานะเปิด-ปิดอัจฉริยะ (VIP Custom Status)
+   // ⚡ ฟังก์ชันคำนวณสถานะเปิด-ปิดอัจฉริยะ (VIP Custom Status)
     function getCustomStoreStatus(hoursObj) {
         if(!hoursObj) return null;
-        const now = new Date(); const day = now.getDay(); 
+        const now = new Date(); 
+        const day = now.getDay(); 
         const currentMinutes = now.getHours() * 60 + now.getMinutes();
         
         const todayHours = hoursObj[day];
@@ -770,21 +772,42 @@
         const [openH, openM] = todayHours.open.split(':').map(Number);
         const [closeH, closeM] = todayHours.close.split(':').map(Number);
         const openMins = openH * 60 + openM;
-        const closeMins = closeH * 60 + closeM;
+        let closeMins = closeH * 60 + closeM;
 
-        let isOpen = false; let minsToClose = 0;
+        let isOpen = false; 
+        let minsToClose = 0;
+        let minsToOpen = 0;
 
+        // ถ้าเวลาปิดน้อยกว่าเวลาเปิด (ร้านเปิดข้ามวัน เช่น 18:00 ถึง 02:00)
         if (closeMins < openMins) { 
-            if (currentMinutes >= openMins) { isOpen = true; minsToClose = (closeMins + 1440) - currentMinutes; } 
-            else if (currentMinutes < closeMins) { isOpen = true; minsToClose = closeMins - currentMinutes; }
-        } else { 
-            if (currentMinutes >= openMins && currentMinutes < closeMins) { isOpen = true; minsToClose = closeMins - currentMinutes; }
+            closeMins += 1440; // บวกเวลาเพิ่มไปอีก 1 วัน (24 ชม.)
         }
 
+        // จัดการกรณีที่ลูกค้าเปิดดูแอปตอนเลยเที่ยงคืนไปแล้ว
+        let evalMinutes = currentMinutes;
+        if (closeMins > 1440 && currentMinutes < (closeMins - 1440)) {
+             evalMinutes += 1440;
+        }
+
+        // เช็คว่าเปิดหรือปิดอยู่
+        if (evalMinutes >= openMins && evalMinutes < closeMins) { 
+            isOpen = true; 
+            minsToClose = closeMins - evalMinutes; 
+        } else if (evalMinutes < openMins) {
+            minsToOpen = openMins - evalMinutes;
+        }
+
+        // รีเทิร์นป้ายสถานะตามเงื่อนไขเวลา
         if (isOpen) {
-            if (minsToClose <= 30) { return { html: '<span class="status-tag" style="background:#FFF8E1; color:#F57C00; border:1px solid rgba(245,124,0,0.2);">🟠 กำลังจะปิด</span>', text: timeText, isOpen: true, label: '<span style="background:#F57C00; color:#FFF; padding:3px 8px; border-radius:10px; font-size:11px; margin-left:6px;">กำลังจะปิด</span>' }; } 
-            else { return { html: '<span class="status-tag" style="background:#F4FBF4; color:#2E7D32; border:1px solid rgba(46,125,50,0.2);">🟢 เปิดอยู่ตอนนี้</span>', text: timeText, isOpen: true, label: '<span style="background:#06C755; color:#FFF; padding:3px 8px; border-radius:10px; font-size:11px; margin-left:6px;">เปิดอยู่</span>' }; }
+            if (minsToClose <= 30) { 
+                return { html: '<span class="status-tag" style="background:#FFF8E1; color:#F57C00; border:1px solid rgba(245,124,0,0.2);">🟠 กำลังจะปิด</span>', text: timeText, isOpen: true, label: '<span style="background:#F57C00; color:#FFF; padding:3px 8px; border-radius:10px; font-size:11px; margin-left:6px;">กำลังจะปิด</span>' }; 
+            } else { 
+                return { html: '<span class="status-tag" style="background:#F4FBF4; color:#2E7D32; border:1px solid rgba(46,125,50,0.2);">🟢 เปิดอยู่ตอนนี้</span>', text: timeText, isOpen: true, label: '<span style="background:#06C755; color:#FFF; padding:3px 8px; border-radius:10px; font-size:11px; margin-left:6px;">เปิดอยู่</span>' }; 
+            }
         } else {
+            if (minsToOpen > 0 && minsToOpen <= 30) {
+                return { html: '<span class="status-tag" style="background:#E1F5FE; color:#17A2B8; border:1px solid rgba(23,162,184,0.2);">🔵 กำลังจะเปิด</span>', text: timeText, isOpen: false, label: '<span style="background:#17A2B8; color:#FFF; padding:3px 8px; border-radius:10px; font-size:11px; margin-left:6px;">กำลังจะเปิด</span>' };
+            }
             return { html: '<span class="status-tag" style="background:#FFF3F3; color:var(--danger); border:1px solid rgba(217,83,79,0.2);">🔴 ปิดแล้ว</span>', text: timeText, isOpen: false, label: '<span style="background:#D9534F; color:#FFF; padding:3px 8px; border-radius:10px; font-size:11px; margin-left:6px;">ปิดแล้ว</span>' };
         }
     }
