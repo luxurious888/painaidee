@@ -1,1 +1,195 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ตั้งค่าธีม & เอฟเฟกต์ - ไปไหนดี</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
 
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap');
+        
+        :root { --primary: #C5A059; --dark: #121418; --surface: #1A1D23; --text: #FFFFFF; }
+        body { font-family: 'Kanit', sans-serif; background-color: var(--dark); color: var(--text); padding: 20px; margin: 0; display: flex; justify-content: center; }
+        
+        .container { max-width: 600px; width: 100%; background: var(--surface); padding: 30px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid rgba(197, 160, 89, 0.2); }
+        h1 { color: var(--primary); text-align: center; margin-top: 0; border-bottom: 2px dashed var(--primary); padding-bottom: 15px; }
+        
+        .section-title { font-size: 18px; font-weight: 600; margin-top: 25px; margin-bottom: 15px; color: #DFBF8B; }
+        .form-group { margin-bottom: 20px; display: flex; flex-direction: column; gap: 8px; }
+        .form-row { display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; border: 1px solid #333; }
+        
+        label { font-size: 15px; font-weight: 500; }
+        input[type="color"] { width: 50px; height: 50px; border: none; border-radius: 8px; cursor: pointer; background: none; }
+        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        input[type="color"]::-webkit-color-swatch { border: 2px solid var(--primary); border-radius: 8px; }
+        
+        select, input[type="file"] { padding: 12px; border-radius: 8px; border: 1px solid #444; background: #121418; color: #FFF; font-family: 'Kanit'; width: 100%; box-sizing: border-box; }
+        
+        .btn-save { background: linear-gradient(135deg, #FFD700, #C5A059); color: #000; font-size: 18px; font-weight: 600; font-family: 'Kanit'; padding: 15px; border: none; border-radius: 12px; width: 100%; cursor: pointer; transition: 0.3s; margin-top: 20px; box-shadow: 0 5px 15px rgba(197, 160, 89, 0.3); }
+        .btn-save:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(197, 160, 89, 0.5); }
+        
+        #logoPreview { max-width: 150px; max-height: 150px; margin-top: 10px; border-radius: 12px; display: none; border: 2px dashed var(--primary); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🎨 ปรับแต่งธีม & เอฟเฟกต์แอป</h1>
+    
+    <div class="section-title">1. สีหลักของแอป (App Colors)</div>
+    <div class="form-row">
+        <label>สีพื้นหลังแอป (Background)</label>
+        <input type="color" id="bgColor" value="#121418">
+    </div>
+    <div class="form-row" style="margin-top: 10px;">
+        <label>สีหลัก/ปุ่มกด (Primary Color)</label>
+        <input type="color" id="primaryColor" value="#C5A059">
+    </div>
+
+    <div class="section-title">2. กรอบ VIP & โปรโมท (VIP Settings)</div>
+    <div class="form-row">
+        <label>สีกรอบ VIP</label>
+        <input type="color" id="vipBorderColor" value="#FFD700">
+    </div>
+    <div class="form-group" style="margin-top: 15px;">
+        <label>ลูกเล่น/เอฟเฟกต์ กรอบ VIP (Animation)</label>
+        <select id="vipEffect">
+            <option value="none">ไม่มีเอฟเฟกต์ (นิ่งๆ)</option>
+            <option value="glow">🌟 เรืองแสงกระพริบ (Pulse Glow)</option>
+            <option value="rainbow">🌈 สีรุ้งวิ่งวน (Rainbow Border)</option>
+            <option value="float">🎈 ลอยขึ้นลง (Floating)</option>
+        </select>
+    </div>
+
+    <div class="section-title">3. เปลี่ยนโลโก้แอป (App Logo)</div>
+    <div class="form-group">
+        <label style="font-size: 13px; color: #aaa;">อัปโหลดรูปภาพใหม่ (ถ้าไม่ต้องการเปลี่ยนให้เว้นว่างไว้)</label>
+        <input type="file" id="logoUpload" accept="image/*" onchange="previewLogo(event)">
+        <div style="text-align: center;">
+            <img id="logoPreview" src="" alt="Logo Preview">
+        </div>
+    </div>
+
+    <button class="btn-save" id="btnSave" onclick="saveThemeSettings()">💾 บันทึกการตั้งค่า</button>
+</div>
+
+<script>
+    // ตั้งค่า Firebase ตัวเดิมของคุณ
+    const firebaseConfig = {
+        apiKey: "AIzaSyBSFWKdLCjLWqzo2_mzUE95CyoiUv5TdnY",
+        authDomain: "painaid-88c53.firebaseapp.com",
+        projectId: "painaid-88c53",
+        storageBucket: "painaid-88c53.firebasestorage.app",
+        messagingSenderId: "229290700458",
+        appId: "1:229290700458:web:74a57d0be5df9326c5ead3"
+    };
+
+    let db, storage;
+    if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+    db = firebase.firestore(); storage = firebase.storage();
+
+    let currentLogoUrl = "";
+
+    // เมื่อเปิดหน้าเว็บ ให้ดึงข้อมูลเดิมมาแสดง
+    document.addEventListener('DOMContentLoaded', loadCurrentSettings);
+
+    async function loadCurrentSettings() {
+        try {
+            const doc = await db.collection('painaidee').doc('themeSettings').get();
+            if (doc.exists) {
+                const data = doc.data();
+                if(data.bgColor) document.getElementById('bgColor').value = data.bgColor;
+                if(data.primaryColor) document.getElementById('primaryColor').value = data.primaryColor;
+                if(data.vipBorderColor) document.getElementById('vipBorderColor').value = data.vipBorderColor;
+                if(data.vipEffect) document.getElementById('vipEffect').value = data.vipEffect;
+                if(data.logoUrl) {
+                    currentLogoUrl = data.logoUrl;
+                    const preview = document.getElementById('logoPreview');
+                    preview.src = currentLogoUrl;
+                    preview.style.display = 'inline-block';
+                }
+            }
+        } catch (error) {
+            console.error("Error loading settings:", error);
+        }
+    }
+
+    function previewLogo(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('logoPreview');
+                preview.src = e.target.result;
+                preview.style.display = 'inline-block';
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+
+    // ฟังก์ชันย่อขนาดรูปก่อนอัปโหลด
+    const resizeImg = (file) => new Promise((resolve) => {
+        if(!file) return resolve('');
+        const reader = new FileReader(); reader.readAsDataURL(file);
+        reader.onload = e => {
+            const img = new Image(); img.src = e.target.result;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width = img.width; let height = img.height; const max_size = 800; // ขนาดโลโก้ไม่ต้องใหญ่มาก
+                if (width > max_size || height > max_size) { if (width > height) { height = Math.round((height *= max_size / width)); width = max_size; } else { width = Math.round((width *= max_size / height)); height = max_size; } }
+                canvas.width = width; canvas.height = height; canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+                resolve(canvas.toDataURL('image/png', 0.9)); 
+            };
+            img.onerror = () => resolve('');
+        };
+        reader.onerror = () => resolve('');
+    });
+
+    async function saveThemeSettings() {
+        const btn = document.getElementById('btnSave');
+        btn.innerText = "กำลังบันทึก... ⏳";
+        btn.disabled = true;
+
+        try {
+            let finalLogoUrl = currentLogoUrl;
+            const logoFile = document.getElementById('logoUpload').files[0];
+            
+            // ถ้ามีการอัปโหลดรูปใหม่
+            if (logoFile) {
+                btn.innerText = "กำลังอัปโหลดโลโก้... 🚀";
+                const img64 = await resizeImg(logoFile);
+                const ref = storage.ref(`system/${Date.now()}_logo.png`);
+                await ref.putString(img64, 'data_url');
+                finalLogoUrl = await ref.getDownloadURL();
+            }
+
+            // รวบรวมข้อมูลทั้งหมด
+            const themeData = {
+                bgColor: document.getElementById('bgColor').value,
+                primaryColor: document.getElementById('primaryColor').value,
+                vipBorderColor: document.getElementById('vipBorderColor').value,
+                vipEffect: document.getElementById('vipEffect').value,
+                logoUrl: finalLogoUrl,
+                updatedAt: new Date().toLocaleString()
+            };
+
+            // บันทึกลง Firestore
+            await db.collection('painaidee').doc('themeSettings').set(themeData);
+            
+            alert("✅ บันทึกการตั้งค่าสำเร็จ! ข้อมูลจะถูกดึงไปใช้ในแอปหลักทันที");
+        } catch (error) {
+            console.error(error);
+            alert("❌ เกิดข้อผิดพลาดในการบันทึกข้อมูล");
+        } finally {
+            btn.innerText = "💾 บันทึกการตั้งค่า";
+            btn.disabled = false;
+        }
+    }
+</script>
+
+</body>
+</html>
