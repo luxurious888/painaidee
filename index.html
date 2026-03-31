@@ -15,6 +15,25 @@
         
         :root { --primary: #C5A059; --primary-light: #DFBF8B; --primary-hover: #AF8B48; --dark: #121418; --dark-light: #1A1D23; --dark-muted: #2A2E36; --bg-light: #121418; --surface: #1A1D23; --border: rgba(197, 160, 89, 0.2); --text-main: #FFFFFF; --text-gold: #C5A059; --text-muted: #999999; --danger: #D9534F; --line-green: #06C755; --fb-blue: #1877F2; --info: #17a2b8; }
         body { font-family: 'Kanit', sans-serif; margin: 0; background-color: var(--bg-light); padding-bottom: 50px; color: var(--text-gold); overflow-x: hidden; scroll-behavior: smooth; }
+        
+        /* 🔥 โลโก้ SVG ทองคำแบบสมบูรณ์ (สร้างด้วยโค้ด) 🔥 */
+        .gold-logo { width: 150px; height: 150px; margin-bottom: 20px; filter: drop-shadow(0 0 15px rgba(197, 160, 89, 0.6)); }
+        .gold-ring { fill: none; stroke: url(#gold-gradient); stroke-width: 6; stroke-linecap: round; }
+        .pin-shape { fill: url(#gold-gradient); }
+        .compass-dial { fill: #1A1D23; stroke: url(#gold-gradient); stroke-width: 2; }
+        .compass-arrow { fill: url(#gold-gradient); animation: rotate-compass 5s linear infinite; transform-origin: 100px 100px; }
+        .crown-shape { fill: url(#gold-gradient); }
+        
+        @keyframes rotate-compass { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes shine { 0% { background-position: -200%; } 100% { background-position: 200%; } }
+
+        /* ปรับปรุงหน้าโหลดให้หรูหราขึ้น */
+        #loginOverlay { position: fixed; inset: 0; background: #0b0f19; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
+        #loadingSpinner { display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; gap: 10px; }
+        
+        #loadingText { color: #FFF; margin: 0; font-size: 22px; font-weight: 600; text-align: center; background: linear-gradient(90deg, #FFF, #C5A059, #FFF); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-size: 200% auto; animation: shine 3s linear infinite; }
+        
+        /* สไตล์เดิมๆ */
         nav { display: flex; justify-content: space-around; background: var(--surface); padding: 10px 0; position: sticky; top: 0; z-index: 2000; box-shadow: 0 4px 20px rgba(0,0,0,0.1); border-bottom: 1px solid var(--border); }
         nav div { cursor: pointer; font-weight: 500; color: var(--text-muted); padding: 12px 10px; font-size: 14px; transition: 0.3s; position: relative; letter-spacing: 0.5px; text-align: center; flex: 1; }
         nav div.active { color: var(--primary); font-weight: 600; }
@@ -66,7 +85,6 @@
         .form-group label { display: block; font-weight: 500; font-size: 15px; color: #FFF; margin-bottom: 4px; }
         .form-group .hint { font-size: 12.5px; color: var(--text-muted); margin-top: 0; margin-bottom: 10px; line-height: 1.4; }
         
-        #loginOverlay { position: fixed; inset: 0; background: #0b0f19; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
         .bg-glow { position: absolute; width: 400px; height: 400px; background: radial-gradient(circle, rgba(6,199,85,0.15) 0%, transparent 70%); border-radius: 50%; top: -10%; left: -20%; animation: floatGlow 8s infinite alternate; }
         .bg-glow2 { position: absolute; width: 500px; height: 500px; background: radial-gradient(circle, rgba(197,160,89,0.1) 0%, transparent 70%); border-radius: 50%; bottom: -20%; right: -20%; animation: floatGlow2 10s infinite alternate; }
         @keyframes floatGlow { 0% { transform: translate(0, 0); } 100% { transform: translate(50px, 50px); } }
@@ -84,9 +102,6 @@
         #partner-actual-content { display: none; }
         .line-logo-vertical { width: 100px; height: auto; margin-bottom: 25px; }
         .friend-note { color: #FFF; font-size: 16px; font-weight: 400; line-height: 1.6; max-width: 300px; margin-bottom: 30px; }
-        
-        .spinner { width: 50px; height: 50px; border: 5px solid rgba(197,160,89,0.2); border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
         #appContent { display: none; }
         
@@ -158,10 +173,35 @@
     <div class="bg-glow"></div>
     <div class="bg-glow2"></div>
 
-    <div id="loadingSpinner" style="display: flex; flex-direction: column; align-items: center; z-index: 10;">
-        <div class="spinner"></div>
-        <h3 style="color: var(--primary); margin: 0; font-size: 20px; letter-spacing: 1px;" id="loadingText">กำลังเตรียมระบบ...</h3>
-        <p style="color: rgba(255,255,255,0.7); font-size: 14px; margin-top: 8px;">กรุณารอสักครู่เพื่อเข้าสู่แอปไปไหนดี</p>
+    <div id="loadingSpinner" style="display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10;">
+        
+        <svg class="gold-logo" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="gold-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
+                    <stop offset="50%" style="stop-color:#C5A059;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#FFD700;stop-opacity:1" />
+                </linearGradient>
+            </defs>
+            
+            <circle class="gold-ring" cx="100" cy="100" r="90" />
+            
+            <path class="crown-shape" d="M85,35 L100,20 L115,35 L125,25 L135,35 L135,45 L65,45 L65,35 L75,25 Z" />
+            
+            <path class="pin-shape" d="M100,165 C70,135 60,115 60,95 A40,40 0 1,1 140,95 C140,115 130,135 100,165 Z" />
+            
+            <circle class="compass-dial" cx="100" cy="95" r="28" />
+            
+            <g class="compass-arrow">
+                <polygon points="100,75 110,105 100,100 90,105" />
+            </g>
+            
+            <text x="100" y="215" font-family="'Kanit'" font-size="28" fill="url(#gold-gradient)" text-anchor="middle" font-weight="bold">ไปไหนดี</text>
+            <text x="100" y="245" font-family="'Kanit'" font-size="20" fill="url(#gold-gradient)" text-anchor="middle">Painaidee</text>
+            <text x="100" y="265" font-family="'Kanit'" font-size="10" fill="#999" text-anchor="middle">TRAVEL & DISCOVER • VIP RECOMMEND</text>
+        </svg>
+
+        <h3 id="loadingText">กำลังเตรียมระบบ...</h3>
     </div>
 
     <div class="glass-card" id="loginCard" style="display: none;">
@@ -288,7 +328,7 @@
     <div id="page-partner" class="page">
         <div id="partner-friend-blocker" style="display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 50px 20px; background: var(--surface); border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
             <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/LINE_logo.svg" alt="LINE Official Account" style="width: 80px; margin-bottom: 25px;">
-            <div style="color: #FFF; font-size: 16px; font-weight: 400; line-height: 1.6; max-width: 300px; margin-bottom: 30px;"><span style="color:var(--primary); font-weight:600;">⚠️ สำหรับร้านค้า</span><br>กรุณาเข้าใช้งานผ่านแอป LINE<br>เพื่อรับรหัส PIN ในการจัดการร้านครับ</div>
+            <div class="friend-note"><span style="color:var(--primary); font-weight:600;">⚠️ สำหรับร้านค้า</span><br>กรุณาเข้าใช้งานผ่านแอป LINE<br>เพื่อรับรหัส PIN ในการจัดการร้านครับ</div>
             <button class="btn-line-glow" style="width: auto; padding: 14px 24px; animation: none;" onclick="smartLogin('partner')">📱 เปิดใช้งานผ่านแอป LINE</button>
             <button class="btn-outline" style="margin-top: 20px; font-size: 13px; border-color:var(--dark-muted); color:var(--text-muted);" onclick="checkFriendshipForPartner(true)">ฉันเพิ่มเพื่อนแล้ว ตรวจสอบอีกครั้ง</button>
         </div>
@@ -440,8 +480,9 @@ window.addEventListener('error', function(event) {
     if(loadingText) {
         loadingText.innerHTML = "พบปัญหา: " + event.message + "<br><span style='font-size:12px; color:#aaa;'>กรุณารีเฟรชหน้าจอใหม่อีกครั้ง</span>";
         loadingText.style.color = "#D9534F";
-        const spinner = document.querySelector('.spinner');
-        if (spinner) spinner.style.display = 'none';
+        // ซ่อนโลโก้ทองคำถ้าเกิด Error
+        const goldLogo = document.querySelector('.gold-logo');
+        if (goldLogo) goldLogo.style.display = 'none';
     }
 });
 
@@ -494,15 +535,20 @@ let isAppReady = false;
 
 document.addEventListener('DOMContentLoaded', () => {
     initSystem();
+    // เพิ่มเวลาเผื่อระบบ Firebase โหลดช้า
     setTimeout(() => { 
-        const spinner = document.getElementById('loadingSpinner');
+        const loginOverlay = document.getElementById('loginOverlay');
         const loginCard = document.getElementById('loginCard');
-        if(spinner) spinner.style.display = 'none';
-        if (!isAppReady && loginCard) { loginCard.style.display = 'block'; }
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        
+        if (!isAppReady) { 
+            // หากระบบยังไม่พร้อมหลัง 6 วินาที ให้แสดงการ์ดล็อกอิน/เข้าแอป
+            if (loadingSpinner) loadingSpinner.style.display = 'none';
+            if (loginCard) loginCard.style.display = 'block'; 
+        }
     }, 6000);
 });
 
-function showLoginCard() { document.getElementById('loadingSpinner').style.display = 'none'; document.getElementById('loginCard').style.display = 'block'; }
 function enterApp() { document.getElementById('loginOverlay').style.display = 'none'; document.getElementById('appContent').style.display = 'block'; }
 
 function switchPage(p) { 
@@ -525,7 +571,7 @@ async function navigateToPartner() {
 
 async function checkFriendshipForPartner(showAlert) {
     const blocker = document.getElementById('partner-friend-blocker'); const content = document.getElementById('partner-actual-content');
-    if(showAlert) blocker.innerHTML = '<div class="spinner"></div><p style="color:#FFF;">กำลังตรวจสอบ...</p>';
+    if(showAlert) blocker.innerHTML = '<div class="spinner"></div><p style="color:#FFF;">กำลังตรวจสอบ...</p>'; // ใช้ spinner เดิมสำหรับส่วนนี้
     try {
         if (liff.isLoggedIn()) {
             const friend = await liff.getFriendship();
@@ -548,9 +594,6 @@ async function initSystem() {
         if (refParam) { sessionStorage.setItem('savedRefCode', refParam); }
 
         if (liff.isLoggedIn()) {
-            isAppReady = true; 
-            const loadTxt = document.getElementById('loadingText');
-            if(loadTxt) loadTxt.innerText = "กำลังดึงข้อมูลแผนที่...";
             const profile = await liff.getProfile();
             document.getElementById('header-profile').innerHTML = `<img src="${profile.pictureUrl}" style="width:100%; height:100%; object-fit:cover;">`;
             const myCode = "AFF" + profile.userId.substring(0, 5).toUpperCase(); window.myAffCode = myCode;
@@ -563,12 +606,19 @@ async function initSystem() {
             const savedRef = sessionStorage.getItem('savedRefCode');
             if (savedRef && document.getElementById('regRefCode')) { if (savedRef.toUpperCase() !== myCode.toUpperCase()) { document.getElementById('regRefCode').value = savedRef; } }
             if (targetPage) { setTimeout(() => { switchPage(targetPage); }, 300); } else { setTimeout(() => { switchPage('home'); }, 300); }
+            isAppReady = true; 
         } else {
-            isAppReady = true; document.getElementById('header-profile').innerHTML = `<div style="font-size: 50px; line-height: 100px; text-align: center;">👤</div>`;
+            document.getElementById('header-profile').innerHTML = `<div style="font-size: 50px; line-height: 100px; text-align: center;">👤</div>`;
             document.getElementById('affiliate-actual-content').style.display = 'none'; document.getElementById('affiliate-guest-view').style.display = 'block';
-            showLoginCard();
+            
+            // ซ่อน Loading และแสดง Login Card
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const loginCard = document.getElementById('loginCard');
+            if (loadingSpinner) loadingSpinner.style.display = 'none';
+            if (loginCard) loginCard.style.display = 'block';
+            isAppReady = true;
         }
-    } catch (err) { console.error("LIFF Init Error:", err); isAppReady = true; showLoginCard(); }
+    } catch (err) { console.error("LIFF Init Error:", err); isAppReady = true; }
 }
 
 let unsubscribe = null;
@@ -578,10 +628,9 @@ function loadFromCloud() {
         
         let isResolved = false;
         
-        // ป้องกันการรอจนค้าง (ถ้าเกิน 5 วินาทีให้ข้ามไปเลย)
         const fallbackTimer = setTimeout(() => {
             if(!isResolved) {
-                console.warn("Firebase โหลดช้าเกินไป ข้ามการดึงข้อมูลเพื่อไม่ให้แอปค้าง");
+                console.warn("Firebase โหลดช้าเกินไป ข้ามการดึงข้อมูล");
                 isResolved = true;
                 resolve();
             }
@@ -595,7 +644,6 @@ function loadFromCloud() {
             if (googlePlaces.length > 0) renderCards(document.getElementById('searchBox').value || 'ร้านอาหาร');
             if (document.getElementById('lockedFeatures') && document.getElementById('lockedFeatures').style.display === 'block') { verifyStore(true); }
             
-            // ปลดล็อกการรอ
             if (!isResolved) {
                 clearTimeout(fallbackTimer);
                 isResolved = true;
@@ -836,8 +884,7 @@ function renderCards(keywordSearched) {
         const store = stores.find(s => s.name === p.name); let isVIP = false;
         if (store && store.isVIP && (!store.vipExpireTimestamp || store.vipExpireTimestamp > now || store.vipAutoRenew)) isVIP = true;
         
-        // อัปเดตลิงก์ระบบนำทางแผนที่มาตรฐาน
-        const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${p.geometry.location.lat()},${p.geometry.location.lng()}`; 
+        const navUrl = `https://www.google.com/maps/search/?api=1&query=${p.geometry.location.lat()},${p.geometry.location.lng()}`; 
         
         let distanceKm = "0.0";
         if (window.google && window.google.maps && window.google.maps.geometry) { distanceKm = (google.maps.geometry.spherical.computeDistanceBetween(originPoint, p.geometry.location) / 1000).toFixed(1); }
@@ -998,7 +1045,7 @@ async function forgotPin() {
     const storeName = prompt("กรุณาพิมพ์ 'ชื่อร้าน' ของคุณให้ถูกต้องตามที่ลงทะเบียนไว้:"); if (!storeName) return;
     const store = (appData.registeredStores || []).find(s => s.name === storeName);
     if (store && store.userId) {
-        alert("กำลังส่งรหัส PIN ไปยัง LINE ของคุณ... ⏳");
+        alert("กำลังส่งรหัส PIN ไปไปยัง LINE ของคุณ... ⏳");
         try { await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "SEND_LINE_PIN", targetUserId: store.userId, message: `🔑 แจ้งเตือนจากระบบไปไหนดี\nรหัส PIN ของร้าน ${store.name} คือ: ${store.pin}` }) }); alert("✅ ส่งรหัส PIN ไปทาง LINE สำเร็จ กรุณาตรวจสอบในแชทครับ"); } catch(e) { alert("❌ เกิดข้อผิดพลาดในการส่ง LINE"); }
     } else if (store) { alert("⚠️ ร้านนี้ไม่ได้เชื่อมโยงกับระบบ LINE ไว้ กรุณาติดต่อแอดมินโดยตรงครับ"); } else { alert("❌ ไม่พบชื่อร้านนี้ในระบบ กรุณาตรวจสอบตัวสะกดอีกครั้งครับ"); }
 }
@@ -1207,7 +1254,7 @@ async function submitPromoWithPIN() {
     if(pImgFiles.length > 3) return alert("อัปโหลดรูปได้สูงสุด 3 รูปเท่านั้นครับ");
     if(!isFree && !pSlipFile) return alert("กรุณาแนบสลิปชำระเงินครับ");
     
-    btn.innerText = "กำลังอัปโหลดข้อมูล (ความเร็วสูง)... 🚀"; btn.disabled = true;
+    btn.innerText = "กำลังอัปโหลดข้อมูล... ⏳"; btn.disabled = true;
     
     try {
         let imgUrls = [];
@@ -1236,7 +1283,7 @@ async function submitEditPromo() {
     const pImgFiles = document.getElementById('editPromoImageInput').files;
     if(pImgFiles.length > 3) return alert("อัปโหลดรูปได้สูงสุด 3 รูปเท่านั้นครับ");
 
-    btn.innerText = "กำลังอัปโหลดข้อมูล (ความเร็วสูง)... 🚀"; btn.disabled = true;
+    btn.innerText = "กำลังอัปโหลดข้อมูล... 🚀"; btn.disabled = true;
     try {
         const pDet = document.getElementById('editPromoDetailInput').value;
         
