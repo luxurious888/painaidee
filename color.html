@@ -13,9 +13,13 @@
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap');
         
         :root { --primary: #C5A059; --dark: #121418; --surface: #1A1D23; --text: #FFFFFF; }
-        body { font-family: 'Kanit', sans-serif; background-color: var(--dark); color: var(--text); padding: 20px; margin: 0; display: flex; justify-content: center; }
+        body { font-family: 'Kanit', sans-serif; background-color: #0b0f19; color: var(--text); padding: 20px; margin: 0; }
         
-        .container { max-width: 600px; width: 100%; background: var(--surface); padding: 30px; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); border: 1px solid rgba(197, 160, 89, 0.2); margin-bottom: 50px; }
+        /* Layout หลัก แบ่ง 2 ฝั่ง */
+        .layout-wrapper { display: flex; flex-wrap: wrap; gap: 30px; justify-content: center; max-width: 1200px; margin: 0 auto; padding-bottom: 50px; }
+        
+        /* ฝั่งซ้าย: แผงตั้งค่า */
+        .container { flex: 1; min-width: 300px; max-width: 600px; background: var(--surface); padding: 30px; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); border: 1px solid rgba(197, 160, 89, 0.2); }
         h1 { color: var(--primary); text-align: center; margin-top: 0; border-bottom: 2px dashed var(--primary); padding-bottom: 15px; font-size: 24px; }
         
         .section-title { font-size: 16px; font-weight: 600; margin-top: 25px; margin-bottom: 15px; color: #DFBF8B; display: flex; align-items: center; gap: 8px; }
@@ -36,8 +40,6 @@
         .btn-reset { background: transparent; color: #aaa; font-size: 14px; font-weight: 500; font-family: 'Kanit'; padding: 12px; border: 1px solid #444; border-radius: 12px; width: 100%; cursor: pointer; transition: 0.3s; margin-top: 10px; }
         .btn-reset:hover { border-color: #D9534F; color: #D9534F; background: rgba(217, 83, 79, 0.1); }
         
-        #logoPreview { max-width: 150px; max-height: 150px; margin-top: 10px; border-radius: 12px; display: none; border: 2px dashed var(--primary); background: #000; padding: 10px; }
-
         /* ปุ่ม Preset Themes */
         .preset-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
         .btn-preset { padding: 10px; border-radius: 8px; border: 1px solid #444; font-family: 'Kanit'; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center; gap: 5px; }
@@ -48,86 +50,175 @@
         .preset-luxury { background: #121418; color: #FFD700; border-color: #C5A059; }
         .preset-vibrant { background: #2D1B4E; color: #00FF87; border-color: #FF6B6B; }
         .preset-playful { background: #003B46; color: #FF4081; border-color: #18FFFF; }
+
+        /* =========================================
+           📱 ฝั่งขวา: Mockup มือถือจำลอง (Preview)
+           ========================================= */
+        .preview-wrapper { display: flex; flex-direction: column; align-items: center; }
+        .preview-phone { width: 320px; height: 650px; background: var(--dark); border-radius: 36px; border: 8px solid #333; box-shadow: 0 20px 50px rgba(0,0,0,0.8); position: relative; overflow: hidden; display: flex; flex-direction: column; transition: background-color 0.4s ease; }
+        
+        /* ติ่งกล้องหน้าจอ */
+        .phone-notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 120px; height: 25px; background: #333; border-radius: 0 0 15px 15px; z-index: 100; }
+        
+        /* ภายในหน้าจอ */
+        .mock-header { padding: 40px 20px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); position: relative; }
+        .mock-profile { width: 60px; height: 60px; background: #555; border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 30px; transition: 0.3s; border: 2px solid transparent; }
+        .mock-app-name { font-size: 18px; font-weight: 600; color: #FFF; margin: 0; transition: color 0.3s; }
+        
+        .mock-body { flex: 1; padding: 20px; display: flex; flex-direction: column; gap: 20px; align-items: center; }
+        .mock-logo-container { width: 100px; height: 100px; display: flex; justify-content: center; align-items: center; }
+        .mock-logo-img { max-width: 100%; max-height: 100%; transition: 0.3s; }
+        
+        .mock-card { width: 100%; height: 180px; background: rgba(255,255,255,0.05); border-radius: 16px; border: 2px solid transparent; padding: 15px; box-sizing: border-box; display: flex; flex-direction: column; position: relative; transition: 0.3s; }
+        .mock-card-badge { position: absolute; top: 10px; left: -10px; background: #FFD700; color: #000; padding: 4px 12px; font-size: 10px; font-weight: bold; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+        .mock-card-img { width: 100%; height: 80px; background: rgba(0,0,0,0.5); border-radius: 8px; margin-bottom: 10px; margin-top: 15px; }
+        .mock-card-text { width: 70%; height: 10px; background: rgba(255,255,255,0.2); border-radius: 5px; margin-bottom: 8px; }
+        .mock-btn { margin-top: auto; padding: 10px; border-radius: 8px; border: none; font-family: 'Kanit'; font-weight: 600; color: #FFF; transition: 0.3s; }
+
+        /* =========================================
+           ✨ ชุด CSS Animations สำหรับ Preview (ดึงไปใช้ในแอปหลักได้)
+           ========================================= */
+        /* 👑 VIP Effects */
+        .vip-none { border-color: var(--prev-vip); }
+        .vip-glow { border-color: var(--prev-vip); animation: vipGlowAnim 2s infinite alternate; }
+        .vip-rainbow { animation: vipRainbowAnim 4s linear infinite; }
+        .vip-float { border-color: var(--prev-vip); animation: floatAnim 3s ease-in-out infinite; }
+        .vip-neon { border-color: var(--prev-vip); box-shadow: 0 0 10px var(--prev-vip), inset 0 0 10px var(--prev-vip); }
+        .vip-shake { border-color: var(--prev-vip); animation: shakeAnim 4s infinite; }
+        .vip-shimmer { border-color: var(--prev-vip); position: relative; overflow: hidden; }
+        .vip-shimmer::after { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(to right, transparent, rgba(255,255,255,0.3), transparent); transform: rotate(45deg); animation: shimmerAnim 3s infinite; }
+
+        @keyframes vipGlowAnim { 0% { box-shadow: 0 0 5px var(--prev-vip); } 100% { box-shadow: 0 0 25px var(--prev-vip); } }
+        @keyframes vipRainbowAnim { 0%{border-color:#ff0000;} 20%{border-color:#ff9900;} 40%{border-color:#33cc33;} 60%{border-color:#3399ff;} 80%{border-color:#cc33cc;} 100%{border-color:#ff0000;} }
+        @keyframes floatAnim { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+        @keyframes shakeAnim { 0%, 100% {transform: rotate(0deg);} 10%, 30%, 50%, 70%, 90% {transform: rotate(-2deg);} 20%, 40%, 60%, 80% {transform: rotate(2deg);} }
+        @keyframes shimmerAnim { 0% { left: -100%; top: -100%; } 100% { left: 100%; top: 100%; } }
+
+        /* 🖼️ Logo Effects */
+        .logo-none { }
+        .logo-shine { filter: drop-shadow(0 0 10px var(--prev-primary)); animation: logoPulse 3s infinite alternate; }
+        .logo-pulse { animation: logoPulseScale 1.5s infinite alternate ease-in-out; }
+        .logo-spin { animation: spinAnim 8s linear infinite; }
+        .logo-bounce { animation: bounceAnim 2s infinite ease-in-out; }
+        .logo-float { animation: floatAnim 4s ease-in-out infinite; }
+
+        @keyframes logoPulse { 0% { filter: drop-shadow(0 0 5px var(--prev-primary)); } 100% { filter: drop-shadow(0 0 25px var(--prev-primary)); } }
+        @keyframes logoPulseScale { 0% { transform: scale(1); } 100% { transform: scale(1.1); } }
+        @keyframes spinAnim { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes bounceAnim { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+
+        /* 👤 Profile Effects */
+        .prof-none { border-color: var(--prev-primary); }
+        .prof-glow-gold { border-color: #FFD700; box-shadow: 0 0 15px #FFD700; }
+        .prof-rainbow-spin { border: 3px solid transparent; background-image: linear-gradient(#555, #555), linear-gradient(90deg, red, yellow, green, blue, magenta); background-origin: border-box; background-clip: content-box, border-box; animation: spinAnim 4s linear infinite; }
+        .prof-pulse-ring { border-color: var(--prev-primary); animation: pulseRing 2s infinite; }
+        .prof-float { border-color: var(--prev-primary); animation: floatAnim 3s ease-in-out infinite; }
+
+        @keyframes pulseRing { 0% { box-shadow: 0 0 0 0 rgba(197, 160, 89, 0.7); } 100% { box-shadow: 0 0 0 15px rgba(197, 160, 89, 0); } }
+
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>🎨 ปรับแต่งธีม & เอฟเฟกต์แอป</h1>
+<div class="layout-wrapper">
+    <div class="container">
+        <h1>🎨 ปรับแต่งธีม & เอฟเฟกต์แอป</h1>
 
-    <div class="section-title">✨ ธีมสำเร็จรูป (Quick Presets)</div>
-    <div class="preset-grid">
-        <button class="btn-preset preset-aggressive" onclick="applyPreset('aggressive')">🔥 ดุดัน<br><span style="font-size:10px;font-weight:400;color:#aaa;">ดำ/แดง/ไฟ</span></button>
-        <button class="btn-preset preset-cool" onclick="applyPreset('cool')">🧊 เท่ ล้ำยุค<br><span style="font-size:10px;font-weight:400;color:#aaa;">กรมท่า/ฟ้านีออน</span></button>
-        <button class="btn-preset preset-luxury" onclick="applyPreset('luxury')">👑 เรียบหรู<br><span style="font-size:10px;font-weight:400;color:#aaa;">ชาร์โคล/ทอง</span></button>
-        <button class="btn-preset preset-vibrant" onclick="applyPreset('vibrant')">🌈 สดใส<br><span style="font-size:10px;font-weight:400;color:#aaa;">ม่วงเข้ม/ส้ม/รุ้ง</span></button>
-        <button class="btn-preset preset-playful" onclick="applyPreset('playful')">🎉 สนุกสนาน<br><span style="font-size:10px;font-weight:400;color:#aaa;">น้ำทะเล/ชมพูบับเบิ้ล</span></button>
-    </div>
-    <p style="font-size: 12px; color: #999; text-align: center; margin-top: -5px; margin-bottom: 25px;">* กดเลือกธีมด้านบนเพื่อเปลี่ยนค่าสีและเอฟเฟกต์อัตโนมัติ (แล้วค่อยกดบันทึก)</p>
-    
-    <div class="section-title">1. 🎨 สีหลักของแอป (App Colors)</div>
-    <div class="form-row">
-        <label>สีพื้นหลังแอป (Background)</label>
-        <input type="color" id="bgColor" value="#121418">
-    </div>
-    <div class="form-row">
-        <label>สีหลัก/ปุ่มกด (Primary Color)</label>
-        <input type="color" id="primaryColor" value="#C5A059">
+        <div class="section-title">✨ ธีมสำเร็จรูป (Quick Presets)</div>
+        <div class="preset-grid">
+            <button class="btn-preset preset-aggressive" onclick="applyPreset('aggressive')">🔥 ดุดัน</button>
+            <button class="btn-preset preset-cool" onclick="applyPreset('cool')">🧊 เท่ ล้ำยุค</button>
+            <button class="btn-preset preset-luxury" onclick="applyPreset('luxury')">👑 เรียบหรู</button>
+            <button class="btn-preset preset-vibrant" onclick="applyPreset('vibrant')">🌈 สดใส</button>
+            <button class="btn-preset preset-playful" onclick="applyPreset('playful')">🎉 สนุกสนาน</button>
+        </div>
+        
+        <div class="section-title">1. 🎨 สีหลักของแอป (App Colors)</div>
+        <div class="form-row">
+            <label>สีพื้นหลังแอป (Background)</label>
+            <input type="color" id="bgColor" value="#121418">
+        </div>
+        <div class="form-row">
+            <label>สีหลัก/ปุ่มกด (Primary Color)</label>
+            <input type="color" id="primaryColor" value="#C5A059">
+        </div>
+
+        <div class="section-title">2. 👑 กรอบ VIP & โปรโมท (VIP Settings)</div>
+        <div class="form-row">
+            <label>สีกรอบ VIP</label>
+            <input type="color" id="vipBorderColor" value="#FFD700">
+        </div>
+        <div class="form-group">
+            <label>ลูกเล่น/เอฟเฟกต์ การ์ด VIP (VIP Animation)</label>
+            <select id="vipEffect">
+                <option value="none">ไม่มีเอฟเฟกต์ (นิ่งๆ)</option>
+                <option value="glow">🌟 เรืองแสงกระพริบ (Pulse Glow)</option>
+                <option value="rainbow">🌈 สีรุ้งวิ่งวน (Rainbow Border)</option>
+                <option value="float">🎈 ลอยขึ้นลง (Floating)</option>
+                <option value="neon">💡 ขอบนีออนสว่าง (Neon Light)</option>
+                <option value="shake">📳 สั่นดึงดูดสายตา (Shake)</option>
+                <option value="shimmer">✨ ประกายแสงสะท้อน (Shimmer)</option>
+            </select>
+        </div>
+
+        <div class="section-title">3. 🖼️ โลโก้แอป (App Logo)</div>
+        <div class="form-group">
+            <label>เอฟเฟกต์ของโลโก้</label>
+            <select id="logoEffect">
+                <option value="shine">✨ แสงวิ่งพาดผ่าน (Shine)</option>
+                <option value="none">ไม่มีเอฟเฟกต์</option>
+                <option value="pulse">💗 เต้นเหมือนจังหวะหัวใจ (Pulse)</option>
+                <option value="spin">🌀 หมุนช้าๆ ตลอดเวลา (Spin)</option>
+                <option value="bounce">🏀 กระเด้งดึ๋งๆ (Bounce)</option>
+                <option value="float">☁️ ลอยเบาๆ (Float)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label style="font-size: 13px; color: #aaa;">อัปโหลดรูปภาพโลโก้ใหม่ (เว้นว่างเพื่อใช้โลโก้ทองเริ่มต้น)</label>
+            <input type="file" id="logoUpload" accept="image/*" onchange="previewLogo(event)">
+        </div>
+
+        <div class="section-title">4. 👤 รูปโปรไฟล์ลูกค้า (User Profile)</div>
+        <div class="form-group">
+            <label>เอฟเฟกต์รอบรูปโปรไฟล์</label>
+            <select id="profileEffect">
+                <option value="none">กรอบสีหลักปกติ (Default)</option>
+                <option value="glow-gold">🌟 ออร่าทองเรืองแสง (Gold Aura)</option>
+                <option value="rainbow-spin">🌈 กรอบสีรุ้งหมุนวน (Spinning Rainbow)</option>
+                <option value="pulse-ring">🌊 วงแหวนกระจายออก (Pulse Ring)</option>
+                <option value="float">🎈 ลอยเบาๆ (Floating Profile)</option>
+            </select>
+        </div>
+
+        <button class="btn-save" id="btnSave" onclick="saveThemeSettings()">💾 ยืนยันและบันทึกการตั้งค่า</button>
+        <button class="btn-reset" onclick="resetToDefault()">🔄 คืนค่าสีและเอฟเฟกต์ดั้งเดิม (Default)</button>
     </div>
 
-    <div class="section-title">2. 👑 กรอบ VIP & โปรโมท (VIP Settings)</div>
-    <div class="form-row">
-        <label>สีกรอบ VIP</label>
-        <input type="color" id="vipBorderColor" value="#FFD700">
-    </div>
-    <div class="form-group">
-        <label>ลูกเล่น/เอฟเฟกต์ การ์ด VIP (VIP Animation)</label>
-        <select id="vipEffect">
-            <option value="none">ไม่มีเอฟเฟกต์ (นิ่งๆ)</option>
-            <option value="glow">🌟 เรืองแสงกระพริบ (Pulse Glow)</option>
-            <option value="rainbow">🌈 สีรุ้งวิ่งวน (Rainbow Border)</option>
-            <option value="float">🎈 ลอยขึ้นลง (Floating)</option>
-            <option value="neon">💡 ขอบนีออนสว่าง (Neon Light)</option>
-            <option value="shake">📳 สั่นดึงดูดสายตา (Shake)</option>
-            <option value="shimmer">✨ ประกายแสงสะท้อน (Shimmer)</option>
-        </select>
-    </div>
+    <div class="preview-wrapper">
+        <h3 style="color: #DFBF8B; margin-top: 0; text-align: center;">📱 หน้าจอตัวอย่าง (Preview)</h3>
+        <div class="preview-phone" id="preview-phone">
+            <div class="phone-notch"></div>
+            
+            <div class="mock-header">
+                <div class="mock-profile" id="preview-profile">👤</div>
+                <h3 class="mock-app-name" id="preview-app-name">ไปไหนดี</h3>
+            </div>
+            
+            <div class="mock-body">
+                <div class="mock-logo-container">
+                    <img id="preview-logo-img" src="data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><circle cx='100' cy='100' r='90' fill='none' stroke='%23C5A059' stroke-width='6'/><path d='M100,165 C70,135 60,115 60,95 A40,40 0 1,1 140,95 C140,115 130,135 100,165 Z' fill='%23C5A059'/></svg>" class="mock-logo-img logo-shine">
+                </div>
 
-    <div class="section-title">3. 🖼️ โลโก้แอป (App Logo)</div>
-    <div class="form-group">
-        <label>เอฟเฟกต์ของโลโก้ (หน้าโหลดและหน้าแรก)</label>
-        <select id="logoEffect">
-            <option value="shine">✨ แสงวิ่งพาดผ่าน (Shine - ค่าเริ่มต้น)</option>
-            <option value="none">ไม่มีเอฟเฟกต์</option>
-            <option value="pulse">💗 เต้นเหมือนจังหวะหัวใจ (Pulse)</option>
-            <option value="spin">🌀 หมุนช้าๆ ตลอดเวลา (Spin)</option>
-            <option value="bounce">🏀 กระเด้งดึ๋งๆ (Bounce)</option>
-            <option value="float">☁️ ลอยเบาๆ (Float)</option>
-        </select>
-    </div>
-    <div class="form-group">
-        <label style="font-size: 13px; color: #aaa;">อัปโหลดรูปภาพโลโก้ใหม่ (ถ้าต้องการใช้โลโก้ SVG ทองคำเดิม ให้เว้นว่างไว้ หรือกดลบรูปออก)</label>
-        <input type="file" id="logoUpload" accept="image/*" onchange="previewLogo(event)">
-        <div style="display: flex; gap: 10px; align-items: center; margin-top: 10px;">
-            <img id="logoPreview" src="" alt="Logo Preview">
-            <button id="btnClearLogo" onclick="clearLogoPreview()" style="display:none; padding:8px 15px; background:#D9534F; color:#FFF; border:none; border-radius:8px; cursor:pointer; font-family:'Kanit';">🗑️ ลบรูป (กลับไปใช้โลโก้ทอง)</button>
+                <div class="mock-card" id="preview-vip-card">
+                    <div class="mock-card-badge" id="preview-vip-badge">👑 VIP RECOMMEND</div>
+                    <div class="mock-card-img"></div>
+                    <div class="mock-card-text"></div>
+                    <div class="mock-card-text" style="width: 40%;"></div>
+                    <button class="mock-btn" id="preview-btn-mock">📍 ดูพิกัดร้าน</button>
+                </div>
+            </div>
         </div>
     </div>
-
-    <div class="section-title">4. 👤 รูปโปรไฟล์ลูกค้า (User Profile)</div>
-    <div class="form-group">
-        <label>เอฟเฟกต์รอบรูปโปรไฟล์ (Profile Animation)</label>
-        <select id="profileEffect">
-            <option value="none">กรอบสีหลักปกติ (Default)</option>
-            <option value="glow-gold">🌟 ออร่าเรืองแสง (Aura Glow)</option>
-            <option value="rainbow-spin">🌈 กรอบสีรุ้งหมุนวน (Spinning Rainbow)</option>
-            <option value="pulse-ring">🌊 วงแหวนกระจายออก (Pulse Ring)</option>
-            <option value="float">🎈 ลอยเบาๆ (Floating Profile)</option>
-        </select>
-    </div>
-
-    <button class="btn-save" id="btnSave" onclick="saveThemeSettings()">💾 บันทึกการตั้งค่าใช้งานจริง</button>
-    <button class="btn-reset" onclick="resetToDefault()">🔄 คืนค่าสีและเอฟเฟกต์ดั้งเดิม (Default)</button>
 </div>
 
 <script>
@@ -146,6 +237,9 @@
     db = firebase.firestore(); storage = firebase.storage();
 
     let currentLogoUrl = "";
+    
+    // ตัวแปรเก็บโลโก้ตั้งต้น (SVG ทอง)
+    const defaultSvgLogo = "data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><circle cx='100' cy='100' r='90' fill='none' stroke='%23C5A059' stroke-width='6'/><path d='M100,165 C70,135 60,115 60,95 A40,40 0 1,1 140,95 C140,115 130,135 100,165 Z' fill='%23C5A059'/></svg>";
 
     // 🌟 ชุดข้อมูลค่าเริ่มต้น (Default Theme - เรียบหรู)
     const defaultTheme = {
@@ -157,22 +251,29 @@
     const themes = {
         aggressive: { bgColor: "#050505", primaryColor: "#D32F2F", vipBorderColor: "#FF3D00", vipEffect: "glow", logoEffect: "pulse", profileEffect: "pulse-ring" },
         cool: { bgColor: "#0A1128", primaryColor: "#00E5FF", vipBorderColor: "#D500F9", vipEffect: "neon", logoEffect: "float", profileEffect: "glow-gold" },
-        luxury: { bgColor: "#121418", primaryColor: "#C5A059", vipBorderColor: "#FFD700", vipEffect: "shimmer", logoEffect: "shine", profileEffect: "glow-gold" },
+        luxury: { bgColor: "#121418", primaryColor: "#C5A059", vipBorderColor: "#FFD700", vipEffect: "shimmer", logoEffect: "shine", profileEffect: "none" },
         vibrant: { bgColor: "#2D1B4E", primaryColor: "#FF6B6B", vipBorderColor: "#00FF87", vipEffect: "rainbow", logoEffect: "bounce", profileEffect: "rainbow-spin" },
         playful: { bgColor: "#003B46", primaryColor: "#FF4081", vipBorderColor: "#18FFFF", vipEffect: "shake", logoEffect: "spin", profileEffect: "pulse-ring" }
     };
 
-    // เมื่อเปิดหน้าเว็บ ให้ดึงข้อมูลเดิมมาแสดง
-    document.addEventListener('DOMContentLoaded', loadCurrentSettings);
+    // ติดตั้ง Event Listener ให้ดึงข้อมูลเมื่อเปิดหน้า และอัปเดต Preview เมื่อมีการแก้ค่า
+    document.addEventListener('DOMContentLoaded', () => {
+        loadCurrentSettings();
+        
+        // ผูก Event ให้ทุกช่องอัปเดต Preview ทันทีเมื่อมีการเปลี่ยนค่า
+        const inputs = ['bgColor', 'primaryColor', 'vipBorderColor', 'vipEffect', 'logoEffect', 'profileEffect'];
+        inputs.forEach(id => {
+            document.getElementById(id).addEventListener('input', updatePreviewRealtime);
+        });
+    });
 
     async function loadCurrentSettings() {
         try {
             const doc = await db.collection('painaidee').doc('themeSettings').get();
             if (doc.exists) {
-                const data = doc.data();
-                applyValuesToForm(data);
+                applyValuesToForm(doc.data());
             } else {
-                applyValuesToForm(defaultTheme); // ถ้ายังไม่มีข้อมูลเลย ให้ใช้ค่าเริ่มต้น
+                applyValuesToForm(defaultTheme);
             }
         } catch (error) {
             console.error("Error loading settings:", error);
@@ -180,7 +281,6 @@
         }
     }
 
-    // ฟังก์ชันยัดค่าลงฟอร์ม
     function applyValuesToForm(data) {
         document.getElementById('bgColor').value = data.bgColor || defaultTheme.bgColor;
         document.getElementById('primaryColor').value = data.primaryColor || defaultTheme.primaryColor;
@@ -192,34 +292,27 @@
         
         if (data.logoUrl !== undefined) {
             currentLogoUrl = data.logoUrl;
-            const preview = document.getElementById('logoPreview');
-            const btnClear = document.getElementById('btnClearLogo');
-            if(currentLogoUrl) {
-                preview.src = currentLogoUrl;
-                preview.style.display = 'inline-block';
-                btnClear.style.display = 'inline-block';
-            } else {
-                preview.src = "";
-                preview.style.display = 'none';
-                btnClear.style.display = 'none';
+            if(!document.getElementById('logoUpload').files[0]) {
+                // ถ้ามีรูปในฐานข้อมูล และไม่ได้กำลังอัปโหลดใหม่ ให้โชว์รูปฐานข้อมูล
+                document.getElementById('preview-logo-img').src = currentLogoUrl || defaultSvgLogo;
             }
         }
+        updatePreviewRealtime(); // อัปเดตหน้าจอตัวอย่างทันที
     }
 
-    // ฟังก์ชันเวลากดปุ่มธีมสำเร็จรูป
     function applyPreset(themeName) {
         if(themes[themeName]) {
-            // ไม่ยุ่งกับ logoUrl ของเดิม แค่เปลี่ยนสีกับเอฟเฟกต์
             applyValuesToForm({ ...themes[themeName], logoUrl: currentLogoUrl });
         }
     }
 
-    // ฟังก์ชันคืนค่าเริ่มต้น
     function resetToDefault() {
         if(confirm("⚠️ ยืนยันการล้างค่าสีและเอฟเฟกต์ทั้งหมด กลับไปเป็นแบบ 'เรียบหรู (Default)' ของระบบ?")) {
             applyValuesToForm(defaultTheme);
             document.getElementById('logoUpload').value = ""; 
-            alert("คืนค่าเรียบร้อยแล้ว กรุณากด 'บันทึกการตั้งค่า' เพื่อยืนยันอีกครั้งครับ");
+            currentLogoUrl = "";
+            document.getElementById('preview-logo-img').src = defaultSvgLogo;
+            alert("คืนค่าเรียบร้อยแล้ว กรุณากด 'บันทึก' เพื่อยืนยันอีกครั้งครับ");
         }
     }
 
@@ -228,21 +321,41 @@
         if (file) {
             const reader = new FileReader();
             reader.onload = function(e) {
-                const preview = document.getElementById('logoPreview');
-                preview.src = e.target.result;
-                preview.style.display = 'inline-block';
-                document.getElementById('btnClearLogo').style.display = 'inline-block';
+                document.getElementById('preview-logo-img').src = e.target.result;
             }
             reader.readAsDataURL(file);
         }
     }
 
-    function clearLogoPreview() {
-        currentLogoUrl = "";
-        document.getElementById('logoUpload').value = "";
-        document.getElementById('logoPreview').style.display = 'none';
-        document.getElementById('logoPreview').src = "";
-        document.getElementById('btnClearLogo').style.display = 'none';
+    // 🌟 พระเอกของหน้านี้: ฟังก์ชันอัปเดตหน้าจอมือถือจำลอง 🌟
+    function updatePreviewRealtime() {
+        const phone = document.getElementById('preview-phone');
+        const appName = document.getElementById('preview-app-name');
+        const btnMock = document.getElementById('preview-btn-mock');
+        const vipBadge = document.getElementById('preview-vip-badge');
+        
+        const vipCard = document.getElementById('preview-vip-card');
+        const logoImg = document.getElementById('preview-logo-img');
+        const profile = document.getElementById('preview-profile');
+
+        const bgColor = document.getElementById('bgColor').value;
+        const primaryColor = document.getElementById('primaryColor').value;
+        const vipColor = document.getElementById('vipBorderColor').value;
+
+        // อัปเดตสี
+        phone.style.backgroundColor = bgColor;
+        appName.style.color = primaryColor;
+        btnMock.style.backgroundColor = primaryColor;
+        vipBadge.style.backgroundColor = vipColor;
+        
+        // ส่งค่าตัวแปร CSS ไปให้ Animation ใช้
+        phone.style.setProperty('--prev-primary', primaryColor);
+        phone.style.setProperty('--prev-vip', vipColor);
+
+        // อัปเดต CSS Class สำหรับ Effects
+        vipCard.className = 'mock-card vip-' + document.getElementById('vipEffect').value;
+        logoImg.className = 'mock-logo-img logo-' + document.getElementById('logoEffect').value;
+        profile.className = 'mock-profile prof-' + document.getElementById('profileEffect').value;
     }
 
     // ฟังก์ชันย่อขนาดรูปก่อนอัปโหลด
@@ -253,7 +366,7 @@
             const img = new Image(); img.src = e.target.result;
             img.onload = () => {
                 const canvas = document.createElement('canvas');
-                let width = img.width; let height = img.height; const max_size = 800; // โลโก้ไม่ต้องใหญ่
+                let width = img.width; let height = img.height; const max_size = 800;
                 if (width > max_size || height > max_size) { if (width > height) { height = Math.round((height *= max_size / width)); width = max_size; } else { width = Math.round((width *= max_size / height)); height = max_size; } }
                 canvas.width = width; canvas.height = height; canvas.getContext('2d').drawImage(img, 0, 0, width, height);
                 resolve(canvas.toDataURL('image/png', 0.9)); 
@@ -272,7 +385,6 @@
             let finalLogoUrl = currentLogoUrl;
             const logoFile = document.getElementById('logoUpload').files[0];
             
-            // ถ้ามีการอัปโหลดรูปใหม่
             if (logoFile) {
                 btn.innerText = "กำลังอัปโหลดโลโก้... 🚀";
                 const img64 = await resizeImg(logoFile);
@@ -281,7 +393,6 @@
                 finalLogoUrl = await ref.getDownloadURL();
             }
 
-            // รวบรวมข้อมูลทั้งหมด
             const themeData = {
                 bgColor: document.getElementById('bgColor').value,
                 primaryColor: document.getElementById('primaryColor').value,
@@ -293,15 +404,13 @@
                 updatedAt: new Date().toLocaleString()
             };
 
-            // บันทึกลง Firestore
             await db.collection('painaidee').doc('themeSettings').set(themeData);
-            
             alert("✅ บันทึกการตั้งค่าสำเร็จ! ข้อมูลจะถูกดึงไปใช้ในแอปหลักทันที");
         } catch (error) {
             console.error(error);
             alert("❌ เกิดข้อผิดพลาดในการบันทึกข้อมูล");
         } finally {
-            btn.innerText = "💾 บันทึกการตั้งค่าใช้งานจริง";
+            btn.innerText = "💾 ยืนยันและบันทึกการตั้งค่า";
             btn.disabled = false;
         }
     }
