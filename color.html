@@ -40,6 +40,8 @@
         .btn-reset { background: transparent; color: #aaa; font-size: 14px; font-weight: 500; font-family: 'Kanit'; padding: 12px; border: 1px solid #444; border-radius: 12px; width: 100%; cursor: pointer; transition: 0.3s; margin-top: 10px; }
         .btn-reset:hover { border-color: #D9534F; color: #D9534F; background: rgba(217, 83, 79, 0.1); }
         
+        #logoPreview { max-width: 150px; max-height: 150px; margin-top: 10px; border-radius: 12px; display: none; border: 2px dashed var(--primary); background: #000; padding: 10px; }
+
         /* ปุ่ม Preset Themes */
         .preset-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
         .btn-preset { padding: 10px; border-radius: 8px; border: 1px solid #444; font-family: 'Kanit'; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center; gap: 5px; }
@@ -57,28 +59,25 @@
         .preview-wrapper { display: flex; flex-direction: column; align-items: center; }
         .preview-phone { width: 320px; height: 650px; background: var(--dark); border-radius: 36px; border: 8px solid #333; box-shadow: 0 20px 50px rgba(0,0,0,0.8); position: relative; overflow: hidden; display: flex; flex-direction: column; transition: background-color 0.4s ease; }
         
-        /* ติ่งกล้องหน้าจอ */
         .phone-notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 120px; height: 25px; background: #333; border-radius: 0 0 15px 15px; z-index: 100; }
         
-        /* ภายในหน้าจอ */
         .mock-header { padding: 40px 20px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); position: relative; }
         .mock-profile { width: 60px; height: 60px; background: #555; border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 30px; transition: 0.3s; border: 2px solid transparent; }
         .mock-app-name { font-size: 18px; font-weight: 600; color: #FFF; margin: 0; transition: color 0.3s; }
         
-        .mock-body { flex: 1; padding: 20px; display: flex; flex-direction: column; gap: 20px; align-items: center; }
-        .mock-logo-container { width: 100px; height: 100px; display: flex; justify-content: center; align-items: center; }
+        .mock-body { flex: 1; padding: 20px; display: flex; flex-direction: column; gap: 20px; align-items: center; justify-content: center; }
+        .mock-logo-container { width: 120px; height: 160px; display: flex; justify-content: center; align-items: center; }
         .mock-logo-img { max-width: 100%; max-height: 100%; transition: 0.3s; }
         
-        .mock-card { width: 100%; height: 180px; background: rgba(255,255,255,0.05); border-radius: 16px; border: 2px solid transparent; padding: 15px; box-sizing: border-box; display: flex; flex-direction: column; position: relative; transition: 0.3s; }
+        .mock-card { width: 100%; height: 180px; background: rgba(255,255,255,0.05); border-radius: 16px; border: 2px solid transparent; padding: 15px; box-sizing: border-box; display: flex; flex-direction: column; position: relative; transition: 0.3s; margin-top: auto; }
         .mock-card-badge { position: absolute; top: 10px; left: -10px; background: #FFD700; color: #000; padding: 4px 12px; font-size: 10px; font-weight: bold; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
         .mock-card-img { width: 100%; height: 80px; background: rgba(0,0,0,0.5); border-radius: 8px; margin-bottom: 10px; margin-top: 15px; }
         .mock-card-text { width: 70%; height: 10px; background: rgba(255,255,255,0.2); border-radius: 5px; margin-bottom: 8px; }
         .mock-btn { margin-top: auto; padding: 10px; border-radius: 8px; border: none; font-family: 'Kanit'; font-weight: 600; color: #FFF; transition: 0.3s; }
 
         /* =========================================
-           ✨ ชุด CSS Animations สำหรับ Preview (ดึงไปใช้ในแอปหลักได้)
+           ✨ ชุด CSS Animations สำหรับ Preview 
            ========================================= */
-        /* 👑 VIP Effects */
         .vip-none { border-color: var(--prev-vip); }
         .vip-glow { border-color: var(--prev-vip); animation: vipGlowAnim 2s infinite alternate; }
         .vip-rainbow { animation: vipRainbowAnim 4s linear infinite; }
@@ -94,20 +93,18 @@
         @keyframes shakeAnim { 0%, 100% {transform: rotate(0deg);} 10%, 30%, 50%, 70%, 90% {transform: rotate(-2deg);} 20%, 40%, 60%, 80% {transform: rotate(2deg);} }
         @keyframes shimmerAnim { 0% { left: -100%; top: -100%; } 100% { left: 100%; top: 100%; } }
 
-        /* 🖼️ Logo Effects */
-        .logo-none { }
-        .logo-shine { filter: drop-shadow(0 0 10px var(--prev-primary)); animation: logoPulse 3s infinite alternate; }
+        .logo-none { filter: drop-shadow(0 0 5px var(--prev-primary)); }
+        .logo-shine { filter: drop-shadow(0 0 15px var(--prev-primary)); animation: logoPulse 3s infinite alternate; }
         .logo-pulse { animation: logoPulseScale 1.5s infinite alternate ease-in-out; }
         .logo-spin { animation: spinAnim 8s linear infinite; }
         .logo-bounce { animation: bounceAnim 2s infinite ease-in-out; }
-        .logo-float { animation: floatAnim 4s ease-in-out infinite; }
+        .logo-float { animation: floatAnim 4s ease-in-out infinite; filter: drop-shadow(0 0 10px var(--prev-primary)); }
 
         @keyframes logoPulse { 0% { filter: drop-shadow(0 0 5px var(--prev-primary)); } 100% { filter: drop-shadow(0 0 25px var(--prev-primary)); } }
         @keyframes logoPulseScale { 0% { transform: scale(1); } 100% { transform: scale(1.1); } }
         @keyframes spinAnim { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes bounceAnim { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
 
-        /* 👤 Profile Effects */
         .prof-none { border-color: var(--prev-primary); }
         .prof-glow-gold { border-color: #FFD700; box-shadow: 0 0 15px #FFD700; }
         .prof-rainbow-spin { border: 3px solid transparent; background-image: linear-gradient(#555, #555), linear-gradient(90deg, red, yellow, green, blue, magenta); background-origin: border-box; background-clip: content-box, border-box; animation: spinAnim 4s linear infinite; }
@@ -126,12 +123,13 @@
 
         <div class="section-title">✨ ธีมสำเร็จรูป (Quick Presets)</div>
         <div class="preset-grid">
-            <button class="btn-preset preset-aggressive" onclick="applyPreset('aggressive')">🔥 ดุดัน</button>
-            <button class="btn-preset preset-cool" onclick="applyPreset('cool')">🧊 เท่ ล้ำยุค</button>
-            <button class="btn-preset preset-luxury" onclick="applyPreset('luxury')">👑 เรียบหรู</button>
-            <button class="btn-preset preset-vibrant" onclick="applyPreset('vibrant')">🌈 สดใส</button>
-            <button class="btn-preset preset-playful" onclick="applyPreset('playful')">🎉 สนุกสนาน</button>
+            <button class="btn-preset preset-aggressive" onclick="applyPreset('aggressive')">🔥 ดุดัน<br><span style="font-size:10px;font-weight:400;color:#aaa;">ดำ/แดง/ไฟ</span></button>
+            <button class="btn-preset preset-cool" onclick="applyPreset('cool')">🧊 เท่ ล้ำยุค<br><span style="font-size:10px;font-weight:400;color:#aaa;">กรมท่า/ฟ้านีออน</span></button>
+            <button class="btn-preset preset-luxury" onclick="applyPreset('luxury')">👑 เรียบหรู<br><span style="font-size:10px;font-weight:400;color:#aaa;">ชาร์โคล/ทอง</span></button>
+            <button class="btn-preset preset-vibrant" onclick="applyPreset('vibrant')">🌈 สดใส<br><span style="font-size:10px;font-weight:400;color:#aaa;">ม่วงเข้ม/ส้ม/รุ้ง</span></button>
+            <button class="btn-preset preset-playful" onclick="applyPreset('playful')">🎉 สนุกสนาน<br><span style="font-size:10px;font-weight:400;color:#aaa;">น้ำทะเล/ชมพูบับเบิ้ล</span></button>
         </div>
+        <p style="font-size: 12px; color: #999; text-align: center; margin-top: -5px; margin-bottom: 25px;">* กดเลือกธีมด้านบนเพื่อเปลี่ยนค่าสีและเอฟเฟกต์อัตโนมัติ (แล้วค่อยกดบันทึก)</p>
         
         <div class="section-title">1. 🎨 สีหลักของแอป (App Colors)</div>
         <div class="form-row">
@@ -163,9 +161,9 @@
 
         <div class="section-title">3. 🖼️ โลโก้แอป (App Logo)</div>
         <div class="form-group">
-            <label>เอฟเฟกต์ของโลโก้</label>
+            <label>เอฟเฟกต์ของโลโก้ (หน้าโหลดและหน้าแรก)</label>
             <select id="logoEffect">
-                <option value="shine">✨ แสงวิ่งพาดผ่าน (Shine)</option>
+                <option value="shine">✨ แสงวิ่งพาดผ่าน (Shine - ค่าเริ่มต้น)</option>
                 <option value="none">ไม่มีเอฟเฟกต์</option>
                 <option value="pulse">💗 เต้นเหมือนจังหวะหัวใจ (Pulse)</option>
                 <option value="spin">🌀 หมุนช้าๆ ตลอดเวลา (Spin)</option>
@@ -174,23 +172,27 @@
             </select>
         </div>
         <div class="form-group">
-            <label style="font-size: 13px; color: #aaa;">อัปโหลดรูปภาพโลโก้ใหม่ (เว้นว่างเพื่อใช้โลโก้ทองเริ่มต้น)</label>
+            <label style="font-size: 13px; color: #aaa;">อัปโหลดรูปภาพโลโก้ใหม่ (ถ้าต้องการใช้โลโก้ SVG ทองคำเดิม ให้เว้นว่างไว้ หรือกดลบรูปออก)</label>
             <input type="file" id="logoUpload" accept="image/*" onchange="previewLogo(event)">
+            <div style="display: flex; gap: 10px; align-items: center; margin-top: 10px;">
+                <img id="logoPreview" src="" alt="Logo Preview">
+                <button id="btnClearLogo" onclick="clearLogoPreview()" style="display:none; padding:8px 15px; background:#D9534F; color:#FFF; border:none; border-radius:8px; cursor:pointer; font-family:'Kanit';">🗑️ ลบรูป</button>
+            </div>
         </div>
 
         <div class="section-title">4. 👤 รูปโปรไฟล์ลูกค้า (User Profile)</div>
         <div class="form-group">
-            <label>เอฟเฟกต์รอบรูปโปรไฟล์</label>
+            <label>เอฟเฟกต์รอบรูปโปรไฟล์ (Profile Animation)</label>
             <select id="profileEffect">
                 <option value="none">กรอบสีหลักปกติ (Default)</option>
-                <option value="glow-gold">🌟 ออร่าทองเรืองแสง (Gold Aura)</option>
+                <option value="glow-gold">🌟 ออร่าเรืองแสง (Aura Glow)</option>
                 <option value="rainbow-spin">🌈 กรอบสีรุ้งหมุนวน (Spinning Rainbow)</option>
                 <option value="pulse-ring">🌊 วงแหวนกระจายออก (Pulse Ring)</option>
                 <option value="float">🎈 ลอยเบาๆ (Floating Profile)</option>
             </select>
         </div>
 
-        <button class="btn-save" id="btnSave" onclick="saveThemeSettings()">💾 ยืนยันและบันทึกการตั้งค่า</button>
+        <button class="btn-save" id="btnSave" onclick="saveThemeSettings()">💾 บันทึกการตั้งค่าใช้งานจริง</button>
         <button class="btn-reset" onclick="resetToDefault()">🔄 คืนค่าสีและเอฟเฟกต์ดั้งเดิม (Default)</button>
     </div>
 
@@ -206,7 +208,7 @@
             
             <div class="mock-body">
                 <div class="mock-logo-container">
-                    <img id="preview-logo-img" src="data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><circle cx='100' cy='100' r='90' fill='none' stroke='%23C5A059' stroke-width='6'/><path d='M100,165 C70,135 60,115 60,95 A40,40 0 1,1 140,95 C140,115 130,135 100,165 Z' fill='%23C5A059'/></svg>" class="mock-logo-img logo-shine">
+                    <img id="preview-logo-img" src="data:image/svg+xml;utf8,<svg viewBox='0 0 200 280' xmlns='http://www.w3.org/2000/svg'><circle cx='100' cy='100' r='90' fill='none' stroke='%23C5A059' stroke-width='6'/><path d='M85,35 L100,20 L115,35 L125,25 L135,35 L135,45 L65,45 L65,35 L75,25 Z' fill='%23C5A059'/><path d='M100,165 C70,135 60,115 60,95 A40,40 0 1,1 140,95 C140,115 130,135 100,165 Z' fill='%23C5A059'/><circle cx='100' cy='95' r='28' fill='%231A1D23' stroke='%23C5A059' stroke-width='2'/><polygon points='100,75 110,105 100,100 90,105' fill='%23C5A059'/><text x='100' y='220' font-family='sans-serif' font-size='28' fill='%23C5A059' text-anchor='middle' font-weight='bold'>ไปไหนดี</text><text x='100' y='250' font-family='sans-serif' font-size='20' fill='%23C5A059' text-anchor='middle'>Painaidee</text><text x='100' y='270' font-family='sans-serif' font-size='10' fill='%23999' text-anchor='middle'>TRAVEL &amp; DISCOVER • VIP</text></svg>" class="mock-logo-img logo-shine">
                 </div>
 
                 <div class="mock-card" id="preview-vip-card">
@@ -238,8 +240,8 @@
 
     let currentLogoUrl = "";
     
-    // ตัวแปรเก็บโลโก้ตั้งต้น (SVG ทอง)
-    const defaultSvgLogo = "data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><circle cx='100' cy='100' r='90' fill='none' stroke='%23C5A059' stroke-width='6'/><path d='M100,165 C70,135 60,115 60,95 A40,40 0 1,1 140,95 C140,115 130,135 100,165 Z' fill='%23C5A059'/></svg>";
+    // โลโก้ SVG ทองคำแบบสมบูรณ์ (แก้ไข ViewBox แล้ว)
+    const defaultSvgLogo = "data:image/svg+xml;utf8,<svg viewBox='0 0 200 280' xmlns='http://www.w3.org/2000/svg'><circle cx='100' cy='100' r='90' fill='none' stroke='%23C5A059' stroke-width='6'/><path d='M85,35 L100,20 L115,35 L125,25 L135,35 L135,45 L65,45 L65,35 L75,25 Z' fill='%23C5A059'/><path d='M100,165 C70,135 60,115 60,95 A40,40 0 1,1 140,95 C140,115 130,135 100,165 Z' fill='%23C5A059'/><circle cx='100' cy='95' r='28' fill='%231A1D23' stroke='%23C5A059' stroke-width='2'/><polygon points='100,75 110,105 100,100 90,105' fill='%23C5A059'/><text x='100' y='220' font-family='sans-serif' font-size='28' fill='%23C5A059' text-anchor='middle' font-weight='bold'>ไปไหนดี</text><text x='100' y='250' font-family='sans-serif' font-size='20' fill='%23C5A059' text-anchor='middle'>Painaidee</text><text x='100' y='270' font-family='sans-serif' font-size='10' fill='%23999' text-anchor='middle'>TRAVEL &amp; DISCOVER • VIP</text></svg>";
 
     // 🌟 ชุดข้อมูลค่าเริ่มต้น (Default Theme - เรียบหรู)
     const defaultTheme = {
@@ -256,36 +258,23 @@
         playful: { bgColor: "#003B46", primaryColor: "#FF4081", vipBorderColor: "#18FFFF", vipEffect: "shake", logoEffect: "spin", profileEffect: "pulse-ring" }
     };
 
-    // ติดตั้ง Event Listener ให้ดึงข้อมูลเมื่อเปิดหน้า และอัปเดต Preview เมื่อมีการแก้ค่า
     document.addEventListener('DOMContentLoaded', () => {
         loadCurrentSettings();
-        
-        // ผูก Event ให้ทุกช่องอัปเดต Preview ทันทีเมื่อมีการเปลี่ยนค่า
         const inputs = ['bgColor', 'primaryColor', 'vipBorderColor', 'vipEffect', 'logoEffect', 'profileEffect'];
-        inputs.forEach(id => {
-            document.getElementById(id).addEventListener('input', updatePreviewRealtime);
-        });
+        inputs.forEach(id => { document.getElementById(id).addEventListener('input', updatePreviewRealtime); });
     });
 
     async function loadCurrentSettings() {
         try {
             const doc = await db.collection('painaidee').doc('themeSettings').get();
-            if (doc.exists) {
-                applyValuesToForm(doc.data());
-            } else {
-                applyValuesToForm(defaultTheme);
-            }
-        } catch (error) {
-            console.error("Error loading settings:", error);
-            applyValuesToForm(defaultTheme);
-        }
+            if (doc.exists) { applyValuesToForm(doc.data()); } else { applyValuesToForm(defaultTheme); }
+        } catch (error) { console.error(error); applyValuesToForm(defaultTheme); }
     }
 
     function applyValuesToForm(data) {
         document.getElementById('bgColor').value = data.bgColor || defaultTheme.bgColor;
         document.getElementById('primaryColor').value = data.primaryColor || defaultTheme.primaryColor;
         document.getElementById('vipBorderColor').value = data.vipBorderColor || defaultTheme.vipBorderColor;
-        
         document.getElementById('vipEffect').value = data.vipEffect || defaultTheme.vipEffect;
         document.getElementById('logoEffect').value = data.logoEffect || defaultTheme.logoEffect;
         document.getElementById('profileEffect').value = data.profileEffect || defaultTheme.profileEffect;
@@ -293,17 +282,19 @@
         if (data.logoUrl !== undefined) {
             currentLogoUrl = data.logoUrl;
             if(!document.getElementById('logoUpload').files[0]) {
-                // ถ้ามีรูปในฐานข้อมูล และไม่ได้กำลังอัปโหลดใหม่ ให้โชว์รูปฐานข้อมูล
                 document.getElementById('preview-logo-img').src = currentLogoUrl || defaultSvgLogo;
+                if(currentLogoUrl) {
+                    document.getElementById('logoPreview').src = currentLogoUrl;
+                    document.getElementById('logoPreview').style.display = 'inline-block';
+                    document.getElementById('btnClearLogo').style.display = 'inline-block';
+                }
             }
         }
-        updatePreviewRealtime(); // อัปเดตหน้าจอตัวอย่างทันที
+        updatePreviewRealtime();
     }
 
     function applyPreset(themeName) {
-        if(themes[themeName]) {
-            applyValuesToForm({ ...themes[themeName], logoUrl: currentLogoUrl });
-        }
+        if(themes[themeName]) { applyValuesToForm({ ...themes[themeName], logoUrl: currentLogoUrl }); }
     }
 
     function resetToDefault() {
@@ -312,6 +303,8 @@
             document.getElementById('logoUpload').value = ""; 
             currentLogoUrl = "";
             document.getElementById('preview-logo-img').src = defaultSvgLogo;
+            document.getElementById('logoPreview').style.display = 'none';
+            document.getElementById('btnClearLogo').style.display = 'none';
             alert("คืนค่าเรียบร้อยแล้ว กรุณากด 'บันทึก' เพื่อยืนยันอีกครั้งครับ");
         }
     }
@@ -322,12 +315,22 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 document.getElementById('preview-logo-img').src = e.target.result;
+                document.getElementById('logoPreview').src = e.target.result;
+                document.getElementById('logoPreview').style.display = 'inline-block';
+                document.getElementById('btnClearLogo').style.display = 'inline-block';
             }
             reader.readAsDataURL(file);
         }
     }
 
-    // 🌟 พระเอกของหน้านี้: ฟังก์ชันอัปเดตหน้าจอมือถือจำลอง 🌟
+    function clearLogoPreview() {
+        currentLogoUrl = "";
+        document.getElementById('logoUpload').value = "";
+        document.getElementById('logoPreview').style.display = 'none';
+        document.getElementById('btnClearLogo').style.display = 'none';
+        document.getElementById('preview-logo-img').src = defaultSvgLogo;
+    }
+
     function updatePreviewRealtime() {
         const phone = document.getElementById('preview-phone');
         const appName = document.getElementById('preview-app-name');
@@ -342,23 +345,19 @@
         const primaryColor = document.getElementById('primaryColor').value;
         const vipColor = document.getElementById('vipBorderColor').value;
 
-        // อัปเดตสี
         phone.style.backgroundColor = bgColor;
         appName.style.color = primaryColor;
         btnMock.style.backgroundColor = primaryColor;
         vipBadge.style.backgroundColor = vipColor;
         
-        // ส่งค่าตัวแปร CSS ไปให้ Animation ใช้
         phone.style.setProperty('--prev-primary', primaryColor);
         phone.style.setProperty('--prev-vip', vipColor);
 
-        // อัปเดต CSS Class สำหรับ Effects
         vipCard.className = 'mock-card vip-' + document.getElementById('vipEffect').value;
         logoImg.className = 'mock-logo-img logo-' + document.getElementById('logoEffect').value;
         profile.className = 'mock-profile prof-' + document.getElementById('profileEffect').value;
     }
 
-    // ฟังก์ชันย่อขนาดรูปก่อนอัปโหลด
     const resizeImg = (file) => new Promise((resolve) => {
         if(!file) return resolve('');
         const reader = new FileReader(); reader.readAsDataURL(file);
