@@ -433,6 +433,7 @@
     </div>
 </div>
 
+<script>
 // ⚡ ระบบดักจับ Error บนหน้าจอ (กันแอปค้าง)
 window.addEventListener('error', function(event) {
     const loadingText = document.getElementById('loadingText');
@@ -835,8 +836,7 @@ function renderCards(keywordSearched) {
         const store = stores.find(s => s.name === p.name); let isVIP = false;
         if (store && store.isVIP && (!store.vipExpireTimestamp || store.vipExpireTimestamp > now || store.vipAutoRenew)) isVIP = true;
         
-        // ลิงก์นำทาง Google Maps ที่ถูกต้อง 100%
-        const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${p.geometry.location.lat()},${p.geometry.location.lng()}`; 
+        const navUrl = `https://www.google.com/maps/search/?api=1&query=${p.geometry.location.lat()},${p.geometry.location.lng()}`; 
         
         let distanceKm = "0.0";
         if (window.google && window.google.maps && window.google.maps.geometry) { distanceKm = (google.maps.geometry.spherical.computeDistanceBetween(originPoint, p.geometry.location) / 1000).toFixed(1); }
@@ -1271,5 +1271,3 @@ function sharePlace(name, lat, lng, event) {
     if (navigator.share) { navigator.share({ title: 'แอปไปไหนดี', text: `ลองดูร้าน "${name}" สิ! น่าสนใจมากเลย 📍 ดูพิกัดได้ที่นี่: `, url: mapUrl }).catch(err => console.log('Share failed:', err));
     } else { navigator.clipboard.writeText(mapUrl).then(() => { alert('คัดลอกลิงก์พิกัดเรียบร้อยแล้ว! สามารถนำไปวาง (Paste) ส่งให้เพื่อนได้เลยครับ'); }); }
 }
-
-                </script>
