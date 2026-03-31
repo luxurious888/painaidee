@@ -37,12 +37,33 @@
         .btn-reset:hover { border-color: #D9534F; color: #D9534F; background: rgba(217, 83, 79, 0.1); }
         
         #logoPreview { max-width: 150px; max-height: 150px; margin-top: 10px; border-radius: 12px; display: none; border: 2px dashed var(--primary); background: #000; padding: 10px; }
+
+        /* ปุ่ม Preset Themes */
+        .preset-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+        .btn-preset { padding: 10px; border-radius: 8px; border: 1px solid #444; font-family: 'Kanit'; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .btn-preset:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        
+        .preset-aggressive { background: #050505; color: #D32F2F; border-color: #D32F2F; }
+        .preset-cool { background: #0A1128; color: #00E5FF; border-color: #00E5FF; }
+        .preset-luxury { background: #121418; color: #FFD700; border-color: #C5A059; }
+        .preset-vibrant { background: #2D1B4E; color: #00FF87; border-color: #FF6B6B; }
+        .preset-playful { background: #003B46; color: #FF4081; border-color: #18FFFF; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1>🎨 ปรับแต่งธีม & เอฟเฟกต์แอป</h1>
+
+    <div class="section-title">✨ ธีมสำเร็จรูป (Quick Presets)</div>
+    <div class="preset-grid">
+        <button class="btn-preset preset-aggressive" onclick="applyPreset('aggressive')">🔥 ดุดัน<br><span style="font-size:10px;font-weight:400;color:#aaa;">ดำ/แดง/ไฟ</span></button>
+        <button class="btn-preset preset-cool" onclick="applyPreset('cool')">🧊 เท่ ล้ำยุค<br><span style="font-size:10px;font-weight:400;color:#aaa;">กรมท่า/ฟ้านีออน</span></button>
+        <button class="btn-preset preset-luxury" onclick="applyPreset('luxury')">👑 เรียบหรู<br><span style="font-size:10px;font-weight:400;color:#aaa;">ชาร์โคล/ทอง</span></button>
+        <button class="btn-preset preset-vibrant" onclick="applyPreset('vibrant')">🌈 สดใส<br><span style="font-size:10px;font-weight:400;color:#aaa;">ม่วงเข้ม/ส้ม/รุ้ง</span></button>
+        <button class="btn-preset preset-playful" onclick="applyPreset('playful')">🎉 สนุกสนาน<br><span style="font-size:10px;font-weight:400;color:#aaa;">น้ำทะเล/ชมพูบับเบิ้ล</span></button>
+    </div>
+    <p style="font-size: 12px; color: #999; text-align: center; margin-top: -5px; margin-bottom: 25px;">* กดเลือกธีมด้านบนเพื่อเปลี่ยนค่าสีและเอฟเฟกต์อัตโนมัติ (แล้วค่อยกดบันทึก)</p>
     
     <div class="section-title">1. 🎨 สีหลักของแอป (App Colors)</div>
     <div class="form-row">
@@ -97,8 +118,8 @@
     <div class="form-group">
         <label>เอฟเฟกต์รอบรูปโปรไฟล์ (Profile Animation)</label>
         <select id="profileEffect">
-            <option value="none">กรอบสีทองปกติ (Default)</option>
-            <option value="glow-gold">🌟 ออร่าสีทองเรืองแสง (Gold Aura)</option>
+            <option value="none">กรอบสีหลักปกติ (Default)</option>
+            <option value="glow-gold">🌟 ออร่าเรืองแสง (Aura Glow)</option>
             <option value="rainbow-spin">🌈 กรอบสีรุ้งหมุนวน (Spinning Rainbow)</option>
             <option value="pulse-ring">🌊 วงแหวนกระจายออก (Pulse Ring)</option>
             <option value="float">🎈 ลอยเบาๆ (Floating Profile)</option>
@@ -126,15 +147,19 @@
 
     let currentLogoUrl = "";
 
-    // 🌟 ชุดข้อมูลค่าเริ่มต้น (Default Theme)
+    // 🌟 ชุดข้อมูลค่าเริ่มต้น (Default Theme - เรียบหรู)
     const defaultTheme = {
-        bgColor: "#121418",
-        primaryColor: "#C5A059",
-        vipBorderColor: "#FFD700",
-        vipEffect: "none",
-        logoEffect: "shine",
-        profileEffect: "none",
-        logoUrl: ""
+        bgColor: "#121418", primaryColor: "#C5A059", vipBorderColor: "#FFD700",
+        vipEffect: "shimmer", logoEffect: "shine", profileEffect: "none", logoUrl: ""
+    };
+
+    // 🌟 คลังธีมสำเร็จรูป (Presets)
+    const themes = {
+        aggressive: { bgColor: "#050505", primaryColor: "#D32F2F", vipBorderColor: "#FF3D00", vipEffect: "glow", logoEffect: "pulse", profileEffect: "pulse-ring" },
+        cool: { bgColor: "#0A1128", primaryColor: "#00E5FF", vipBorderColor: "#D500F9", vipEffect: "neon", logoEffect: "float", profileEffect: "glow-gold" },
+        luxury: { bgColor: "#121418", primaryColor: "#C5A059", vipBorderColor: "#FFD700", vipEffect: "shimmer", logoEffect: "shine", profileEffect: "glow-gold" },
+        vibrant: { bgColor: "#2D1B4E", primaryColor: "#FF6B6B", vipBorderColor: "#00FF87", vipEffect: "rainbow", logoEffect: "bounce", profileEffect: "rainbow-spin" },
+        playful: { bgColor: "#003B46", primaryColor: "#FF4081", vipBorderColor: "#18FFFF", vipEffect: "shake", logoEffect: "spin", profileEffect: "pulse-ring" }
     };
 
     // เมื่อเปิดหน้าเว็บ ให้ดึงข้อมูลเดิมมาแสดง
@@ -165,26 +190,35 @@
         document.getElementById('logoEffect').value = data.logoEffect || defaultTheme.logoEffect;
         document.getElementById('profileEffect').value = data.profileEffect || defaultTheme.profileEffect;
         
-        currentLogoUrl = data.logoUrl || "";
-        const preview = document.getElementById('logoPreview');
-        const btnClear = document.getElementById('btnClearLogo');
-        
-        if(currentLogoUrl) {
-            preview.src = currentLogoUrl;
-            preview.style.display = 'inline-block';
-            btnClear.style.display = 'inline-block';
-        } else {
-            preview.src = "";
-            preview.style.display = 'none';
-            btnClear.style.display = 'none';
+        if (data.logoUrl !== undefined) {
+            currentLogoUrl = data.logoUrl;
+            const preview = document.getElementById('logoPreview');
+            const btnClear = document.getElementById('btnClearLogo');
+            if(currentLogoUrl) {
+                preview.src = currentLogoUrl;
+                preview.style.display = 'inline-block';
+                btnClear.style.display = 'inline-block';
+            } else {
+                preview.src = "";
+                preview.style.display = 'none';
+                btnClear.style.display = 'none';
+            }
+        }
+    }
+
+    // ฟังก์ชันเวลากดปุ่มธีมสำเร็จรูป
+    function applyPreset(themeName) {
+        if(themes[themeName]) {
+            // ไม่ยุ่งกับ logoUrl ของเดิม แค่เปลี่ยนสีกับเอฟเฟกต์
+            applyValuesToForm({ ...themes[themeName], logoUrl: currentLogoUrl });
         }
     }
 
     // ฟังก์ชันคืนค่าเริ่มต้น
     function resetToDefault() {
-        if(confirm("⚠️ ยืนยันการล้างค่าสีและเอฟเฟกต์ทั้งหมด กลับไปเป็นแบบดั้งเดิมของระบบ?")) {
+        if(confirm("⚠️ ยืนยันการล้างค่าสีและเอฟเฟกต์ทั้งหมด กลับไปเป็นแบบ 'เรียบหรู (Default)' ของระบบ?")) {
             applyValuesToForm(defaultTheme);
-            document.getElementById('logoUpload').value = ""; // เคลียร์ไฟล์ที่เพิ่งเลือก
+            document.getElementById('logoUpload').value = ""; 
             alert("คืนค่าเรียบร้อยแล้ว กรุณากด 'บันทึกการตั้งค่า' เพื่อยืนยันอีกครั้งครับ");
         }
     }
