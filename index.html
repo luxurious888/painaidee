@@ -433,14 +433,7 @@
     </div>
 </div>
 
-<script src="script.js"></script>
-
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD7Qqf1Z9KQBuvipDzgIc5laJLz9SiOBH8&libraries=places,geometry&callback=initMap" async defer></script>
-
-</body>
-</html>
-
-    // ⚡ ระบบดักจับ Error บนหน้าจอ (กันแอปค้าง)
+// ⚡ ระบบดักจับ Error บนหน้าจอ (กันแอปค้าง)
 window.addEventListener('error', function(event) {
     const loadingText = document.getElementById('loadingText');
     if(loadingText) {
@@ -1273,10 +1266,10 @@ function callPlace(placeId, event) {
 
 function sharePlace(name, lat, lng, event) {
     event.stopPropagation(); 
-    
-    // ลิงก์แผนที่แชร์ที่สมบูรณ์แบบ
     const mapUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`; 
     
     if (navigator.share) { navigator.share({ title: 'แอปไปไหนดี', text: `ลองดูร้าน "${name}" สิ! น่าสนใจมากเลย 📍 ดูพิกัดได้ที่นี่: `, url: mapUrl }).catch(err => console.log('Share failed:', err));
     } else { navigator.clipboard.writeText(mapUrl).then(() => { alert('คัดลอกลิงก์พิกัดเรียบร้อยแล้ว! สามารถนำไปวาง (Paste) ส่งให้เพื่อนได้เลยครับ'); }); }
 }
+
+                </script>
