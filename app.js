@@ -262,11 +262,17 @@ function loadFromCloud() {
             }
         });
 
+        // โหลดของรางวัลและค่าแต้มหมุนกงล้อจากแอดมิน
         db.collection('painaidee').doc('wheelSettings').onSnapshot((doc) => {
-            if (doc.exists) wheelRewards = doc.data().rewards || [];
+            if (doc.exists) {
+                wheelRewards = doc.data().rewards || [];
+                wheelSpinCost = doc.data().spinCost || 50;
+                
+                // อัปเดตตัวเลขโชว์ให้ลูกค้าดูในหน้าต่างกงล้อ
+                const costDisplay = document.getElementById('display-spin-cost');
+                if(costDisplay) costDisplay.innerText = wheelSpinCost;
+            }
         });
-    });
-}
 
 async function saveToCloud() { try { if(db) await db.collection('painaidee').doc('systemData').set(appData); return true; } catch(e) { throw e; } }
 
