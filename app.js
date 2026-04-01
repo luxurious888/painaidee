@@ -200,22 +200,24 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function enterApp() {
-    document.getElementById('loginOverlay').style.display = 'none';
-    document.getElementById('appContent').style.display   = 'block';
-
-    // Trigger แผนที่ใหม่เพราะ div ซ่อนอยู่ตอน initMap ทำงาน
-    setTimeout(() => {
-        if (map) {
-            google.maps.event.trigger(map, 'resize');
-            map.setCenter(currentCoords);
-        }
-    }, 100);
+    const overlay = document.getElementById('loginOverlay');
+    const app     = document.getElementById('appContent');
+    if (overlay) overlay.style.display = 'none';
+    if (app)     app.style.display     = 'block';
 
     // ใส่ icon guest ถ้ายังไม่มีรูป
     const pf = document.getElementById('header-profile');
     if (pf && pf.innerHTML.trim() === '') {
         pf.innerHTML = '<div style="font-size:50px; line-height:100px; text-align:center;">👤</div>';
     }
+
+    // Trigger แผนที่ render ใหม่ เพราะ div ซ่อนอยู่ตอน initMap ทำงาน
+    setTimeout(() => {
+        if (typeof map !== 'undefined' && map) {
+            google.maps.event.trigger(map, 'resize');
+            map.setCenter(currentCoords);
+        }
+    }, 150);
 }
 
 function switchPage(p) {
@@ -410,9 +412,6 @@ async function initSystem() {
                 refInput.value = savedRef;
             }
 
-            // Force ปิด loading overlay และแสดงแอปเสมอ
-            document.getElementById('loginOverlay').style.display = 'none';
-            document.getElementById('appContent').style.display   = 'block';
             setTimeout(() => switchPage(targetPage || 'home'), 300);
         } else {
             // Guest mode
