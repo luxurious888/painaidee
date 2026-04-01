@@ -369,7 +369,11 @@ async function initSystem() {
                 style="width:100%; height:100%; object-fit:cover;">`;
 
             myLineUid = profile.userId;
-            await loadUserPoints(myLineUid);
+            // ใส่ timeout 5 วิ ป้องกันค้างถ้า Firestore ตอบช้า
+            await Promise.race([
+                loadUserPoints(myLineUid),
+                new Promise(resolve => setTimeout(resolve, 5000))
+            ]);
 
             const myCode = 'AFF' + profile.userId.substring(0, 5).toUpperCase();
             window.myAffCode = myCode;
@@ -392,6 +396,9 @@ async function initSystem() {
                 refInput.value = savedRef;
             }
 
+            // Force ปิด loading overlay และแสดงแอปเสมอ
+            document.getElementById('loginOverlay').style.display = 'none';
+            document.getElementById('appContent').style.display   = 'block';
             setTimeout(() => switchPage(targetPage || 'home'), 300);
         } else {
             // Guest mode
