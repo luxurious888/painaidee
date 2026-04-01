@@ -3,47 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ตั้งค่าระบบแต้ม (Points) - ไปไหนดี</title>
+    <title>ตั้งค่าแต้ม & กงล้อ - ไปไหนดี</title>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap');
-        body { font-family: 'Kanit', sans-serif; background: #121418; color: #FFF; padding: 20px; display: flex; justify-content: center; }
-        .container { background: #1A1D23; padding: 30px; border-radius: 16px; width: 100%; max-width: 500px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid rgba(197, 160, 89, 0.2); }
-        h2 { color: #06C755; text-align: center; margin-top: 0; border-bottom: 1px dashed #06C755; padding-bottom: 15px; }
-        .form-row { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; margin-bottom: 10px; border: 1px solid #333; }
+        body { font-family: 'Kanit', sans-serif; background: #121418; color: #FFF; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .container { background: #1A1D23; padding: 30px; border-radius: 16px; width: 100%; max-width: 600px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid rgba(197, 160, 89, 0.2); margin-bottom: 20px; }
+        h2 { color: #C5A059; text-align: center; margin-top: 0; border-bottom: 1px dashed #C5A059; padding-bottom: 15px; }
+        .form-row { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 12px; border-radius: 10px; margin-bottom: 10px; border: 1px solid #333; gap: 10px; }
         label { font-size: 14px; font-weight: 500; color: #eee; flex: 1; }
-        input[type="number"] { width: 80px; padding: 8px; border-radius: 8px; border: 1px solid #555; background: #121418; color: #FFF; text-align: center; font-family: 'Kanit'; font-size: 16px; outline: none; }
-        input[type="number"]:focus { border-color: #06C755; }
-        .section-title { font-size: 13px; color: #aaa; margin: 20px 0 10px; }
-        .btn-save { background: linear-gradient(90deg, #06C755, #05A044); color: #FFF; font-size: 16px; font-weight: 600; font-family: 'Kanit'; padding: 15px; border: none; border-radius: 12px; width: 100%; cursor: pointer; transition: 0.3s; margin-top: 20px; }
-        .btn-save:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(6, 199, 85, 0.4); }
+        input { padding: 8px; border-radius: 8px; border: 1px solid #555; background: #121418; color: #FFF; font-family: 'Kanit'; outline: none; }
+        input[type="number"] { width: 70px; text-align: center; }
+        input[type="text"] { flex: 2; }
+        .section-title { font-size: 15px; color: #C5A059; margin: 25px 0 15px; font-weight: bold; display: flex; align-items: center; gap: 10px; }
+        .btn-save { background: linear-gradient(135deg, #FFD700, #C5A059); color: #000; font-size: 16px; font-weight: 600; padding: 15px; border: none; border-radius: 12px; width: 100%; cursor: pointer; transition: 0.3s; margin-top: 20px; }
+        .btn-add { background: #06C755; color: #FFF; border: none; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+        .btn-del { background: #D9534F; color: #FFF; border: none; padding: 5px 10px; border-radius: 6px; cursor: pointer; }
+        .total-percent { text-align: right; font-size: 14px; margin-top: 5px; color: #aaa; }
+        .status-ok { color: #06C755; } .status-err { color: #D9534F; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>🪙 ตั้งค่าการแจกแต้มรายวัน</h2>
+    <h2>🪙 ตั้งค่าการแจกแต้ม</h2>
+    <div class="form-row"><label>เช็คอินรายวัน</label><input type="number" id="checkInPoints"></div>
+    <div class="form-row"><label>ดูร้านค้า (ต่อร้าน/ลิมิตต่อวัน)</label><input type="number" id="viewPoints"> <input type="number" id="viewLimit"></div>
+    <div class="form-row"><label>นำทาง (ต่อครั้ง/ลิมิตต่อวัน)</label><input type="number" id="dirPoints"> <input type="number" id="dirLimit"></div>
+    <div class="form-row"><label>แชร์ร้าน (ต่อครั้ง/ลิมิตต่อวัน)</label><input type="number" id="sharePoints"> <input type="number" id="shareLimit"></div>
+</div>
 
-    <div class="section-title">✨ แต้มล็อกอิน (Daily Check-in)</div>
-    <div class="form-row">
-        <label>แต้มที่ได้จากการกดเช็คอิน (ต่อวัน)</label>
-        <input type="number" id="checkInPoints" value="10">
-    </div>
-
-    <div class="section-title">👀 การส่องร้านค้า (นับเฉพาะการกดร้านที่ไม่ซ้ำกัน)</div>
-    <div class="form-row"><label>แต้มที่ได้ ต่อการดู 1 ร้าน</label><input type="number" id="viewPoints" value="1"></div>
-    <div class="form-row"><label>ลิมิตแจกแต้มสูงสุด (ครั้ง/วัน)</label><input type="number" id="viewLimit" value="10"></div>
-
-    <div class="section-title">📍 การกดปุ่ม "นำทาง" (นับเฉพาะการกดร้านที่ไม่ซ้ำกัน)</div>
-    <div class="form-row"><label>แต้มที่ได้ ต่อการกด 1 ครั้ง</label><input type="number" id="dirPoints" value="5"></div>
-    <div class="form-row"><label>ลิมิตแจกแต้มสูงสุด (ครั้ง/วัน)</label><input type="number" id="dirLimit" value="2"></div>
-
-    <div class="section-title">📢 การกดปุ่ม "แชร์" (นับเฉพาะการกดร้านที่ไม่ซ้ำกัน)</div>
-    <div class="form-row"><label>แต้มที่ได้ ต่อการกด 1 ครั้ง</label><input type="number" id="sharePoints" value="5"></div>
-    <div class="form-row"><label>ลิมิตแจกแต้มสูงสุด (ครั้ง/วัน)</label><input type="number" id="shareLimit" value="2"></div>
-
-    <button class="btn-save" onclick="savePointSettings()">💾 บันทึกการตั้งค่าแต้ม</button>
+<div class="container">
+    <h2>🎡 ตั้งค่าของรางวัลกงล้อ (รวมต้องได้ 100%)</h2>
+    <div id="reward-list">
+        </div>
+    <div class="total-percent" id="total-percent-display">รวม: 0%</div>
+    <button class="btn-add" style="margin-top: 10px;" onclick="addRewardRow('', 0)">➕ เพิ่มช่องรางวัล</button>
+    
+    <button class="btn-save" onclick="saveAllSettings()">💾 บันทึกการตั้งค่าทั้งหมด</button>
 </div>
 
 <script>
@@ -54,28 +52,77 @@
     };
     firebase.initializeApp(firebaseConfig); const db = firebase.firestore();
 
-    db.collection('painaidee').doc('pointSettings').get().then(doc => {
-        if(doc.exists) {
-            const d = doc.data();
-            document.getElementById('checkInPoints').value = d.checkIn || 10;
-            document.getElementById('viewPoints').value = d.view || 1; document.getElementById('viewLimit').value = d.viewLimit || 10;
-            document.getElementById('dirPoints').value = d.dir || 5; document.getElementById('dirLimit').value = d.dirLimit || 2;
-            document.getElementById('sharePoints').value = d.share || 5; document.getElementById('shareLimit').value = d.shareLimit || 2;
+    // ดึงข้อมูลเดิมมาแสดง
+    async function loadSettings() {
+        // ดึงแต้ม
+        const pDoc = await db.collection('painaidee').doc('pointSettings').get();
+        if(pDoc.exists) {
+            const d = pDoc.data();
+            document.getElementById('checkInPoints').value = d.checkIn;
+            document.getElementById('viewPoints').value = d.view; document.getElementById('viewLimit').value = d.viewLimit;
+            document.getElementById('dirPoints').value = d.dir; document.getElementById('dirLimit').value = d.dirLimit;
+            document.getElementById('sharePoints').value = d.share; document.getElementById('shareLimit').value = d.shareLimit;
         }
-    });
 
-    async function savePointSettings() {
-        const data = {
+        // ดึงกงล้อ
+        const wDoc = await db.collection('painaidee').doc('wheelSettings').get();
+        if(wDoc.exists && wDoc.data().rewards) {
+            wDoc.data().rewards.forEach(r => addRewardRow(r.name, r.chance));
+        } else {
+            addRewardRow('กินเกลือ (ไม่ได้อะไรเลย)', 50);
+            addRewardRow('ได้แต้มคืน 20 แต้ม', 50);
+        }
+        calculateTotal();
+    }
+
+    function addRewardRow(name, chance) {
+        const div = document.createElement('div');
+        div.className = 'form-row reward-item';
+        div.innerHTML = `
+            <input type="text" class="r-name" placeholder="ชื่อรางวัล เช่น ส่วนลด 10%" value="${name}">
+            <input type="number" class="r-chance" placeholder="%" value="${chance}" onchange="calculateTotal()"> 
+            <span style="font-size:12px; color:#666;">%</span>
+            <button class="btn-del" onclick="this.parentElement.remove(); calculateTotal();">✕</button>
+        `;
+        document.getElementById('reward-list').appendChild(div);
+        calculateTotal();
+    }
+
+    function calculateTotal() {
+        let total = 0;
+        document.querySelectorAll('.r-chance').forEach(input => total += parseInt(input.value || 0));
+        const display = document.getElementById('total-percent-display');
+        display.innerText = `รวม: ${total}%`;
+        display.className = (total === 100) ? 'total-percent status-ok' : 'total-percent status-err';
+        return total;
+    }
+
+    async function saveAllSettings() {
+        if(calculateTotal() !== 100) return alert("❌ ผลรวมเปอร์เซ็นต์ต้องเท่ากับ 100% พอดีครับ");
+
+        const pointData = {
             checkIn: parseInt(document.getElementById('checkInPoints').value),
             view: parseInt(document.getElementById('viewPoints').value), viewLimit: parseInt(document.getElementById('viewLimit').value),
             dir: parseInt(document.getElementById('dirPoints').value), dirLimit: parseInt(document.getElementById('dirLimit').value),
             share: parseInt(document.getElementById('sharePoints').value), shareLimit: parseInt(document.getElementById('shareLimit').value)
         };
+
+        const rewards = [];
+        document.querySelectorAll('.reward-item').forEach(el => {
+            rewards.push({
+                name: el.querySelector('.r-name').value,
+                chance: parseInt(el.querySelector('.r-chance').value)
+            });
+        });
+
         try {
-            await db.collection('painaidee').doc('pointSettings').set(data);
-            alert("✅ บันทึกการตั้งค่าแต้มสำเร็จ! ข้อมูลจะถูกใช้งานในแอปทันที");
-        } catch(e) { alert("❌ เกิดข้อผิดพลาด"); }
+            await db.collection('painaidee').doc('pointSettings').set(pointData);
+            await db.collection('painaidee').doc('wheelSettings').set({ rewards: rewards });
+            alert("✅ บันทึกข้อมูลสำเร็จแล้ว!");
+        } catch(e) { alert("เกิดข้อผิดพลาด"); }
     }
+
+    loadSettings();
 </script>
 </body>
 </html>
