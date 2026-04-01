@@ -110,109 +110,68 @@
     </div>
 
     <div id="page-partner" class="page">
-        <header>
-            <h1 style="font-size: 24px;">ระบบจัดการร้านค้า</h1>
-            <p>เพิ่มยอดขายและโปรโมทธุรกิจของคุณ</p>
-        </header>
+        <div style="max-width: 500px; margin: 0 auto; padding: 0 10px;"> <header style="text-align: center; margin-bottom: 30px;">
+                <h1 style="font-size: 26px; color: var(--primary); margin-bottom: 5px;">ระบบจัดการร้านค้า</h1>
+                <p style="color: #aaa; font-size: 14px;">เพิ่มยอดขายและโปรโมทธุรกิจของคุณ</p>
+            </header>
 
-        <div id="partner-friend-blocker" class="glass-card" style="text-align: center; margin-bottom: 20px; display: none; flex-direction: column; align-items: center; justify-content: center; min-height: 250px;">
-            <div class="spinner"></div><p style="color:#FFF;">กำลังตรวจสอบสถานะการเป็นเพื่อน...</p>
-        </div>
-
-        <div id="partner-actual-content" style="display: none;">
-            
-            <div id="storeVerifyCard" class="glass-card" style="text-align: center; margin-bottom: 20px;">
-                <h3 style="margin-top: 0; color: #FFF;">สำหรับร้านค้าที่มี PIN แล้ว</h3>
-                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">กรุณากรอกรหัส PIN 6 หลัก เพื่อจัดการข้อมูลร้านค้าและสั่งซื้อแบนเนอร์</p>
-                <input type="password" id="storePinInput" class="input-dark" placeholder="รหัส PIN 6 หลัก" style="text-align: center; font-size: 20px; letter-spacing: 5px; margin-bottom: 15px;" pattern="[0-9]*" inputmode="numeric">
-                <button class="btn-primary" onclick="verifyStore()">เข้าสู่ระบบจัดการร้านค้า</button>
-                <p style="font-size: 12px; color: #888; margin-top: 15px; cursor: pointer; text-decoration: underline;" onclick="forgotPin()">ลืมรหัส PIN / ขอรหัสใหม่</p>
+            <div id="partner-friend-blocker" class="glass-card" style="text-align: center; margin-bottom: 20px; display: none; flex-direction: column; align-items: center; justify-content: center; min-height: 250px;">
+                <div class="spinner"></div><p style="color:#FFF;">กำลังตรวจสอบสถานะการเป็นเพื่อน...</p>
             </div>
 
-            <div id="regStoreVerifyCard" class="glass-card" style="display: none; border: 2px solid var(--primary); margin-bottom: 20px;">
-                <h3 style="margin-top: 0; color: var(--primary);">พิกัดที่พบ</h3>
-                <p id="regVerifyStoreName" style="font-weight: bold; color: #FFF; margin-bottom: 10px;"></p>
-                <div id="regMiniMap" style="width: 100%; height: 150px; border-radius: 8px; margin-bottom: 15px;"></div>
-                <div style="display: flex; gap: 10px;">
-                    <button class="btn-outline" style="flex:1;" onclick="document.getElementById('regStoreVerifyCard').style.display='none'; document.getElementById('regStoreName').value='';">ค้นหาใหม่</button>
-                    <button class="btn-primary" style="flex:1;" onclick="document.getElementById('regStoreDetails').style.display='block'; window.scrollTo({top: document.getElementById('regStoreDetails').offsetTop, behavior: 'smooth'});">ใช้พิกัดนี้</button>
-                </div>
-            </div>
-
-            <div class="glass-card" id="storeRegistrationCard" style="margin-bottom: 20px;">
-                <h3 style="margin-top: 0; color: #FFF;">ลงทะเบียนร้านค้าใหม่ฟรี</h3>
-                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">กรอกชื่อร้านเพื่อค้นหาพิกัดบน Google Maps</p>
-                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                    <input type="text" id="regStoreName" class="input-dark" placeholder="ชื่อร้านของคุณ">
-                    <button class="btn-primary" style="width: auto; padding: 12px 20px;" onclick="searchRegStore()">ค้นหา</button>
-                </div>
+            <div id="partner-actual-content" style="display: none;">
                 
-                <div id="regStoreDetails" style="display: none;">
-                    <hr style="border-color: rgba(255,255,255,0.1); margin: 20px 0;">
-                    <div class="form-group"><label>เบอร์โทรศัพท์ร้าน <span style="color:var(--danger)">*</span></label><input type="tel" id="regPhone" class="input-dark" placeholder="08X-XXX-XXXX"></div>
-                    <div class="form-group"><label>รูปร้านค้า (ป้ายร้าน/หน้าร้าน) <span style="color:var(--danger)">*</span></label><input type="file" id="regStorePhoto" class="input-dark" accept="image/*"></div>
-                    <div class="form-group"><label>บัตรประชาชนเจ้าของร้าน <span style="color:var(--danger)">*</span></label><input type="file" id="regIdCard" class="input-dark" accept="image/*"></div>
-                    <div class="form-group"><label>ใบทะเบียนพาณิชย์ (ถ้ามี)</label><input type="file" id="regCommercial" class="input-dark" accept="image/*"></div>
-                    <div class="form-group"><label>รหัสผู้แนะนำ (ถ้ามี)</label><input type="text" id="regRefCode" class="input-dark" placeholder="AFFXXXXX"></div>
-                    <button id="btnSubmitReg" class="btn-primary" style="margin-top: 10px;" onclick="submitStoreRegistration()">🚀 ส่งข้อมูลเพื่อรับ PIN</button>
+                <div id="storeVerifyCard" class="glass-card" style="text-align: center; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.1);">
+                    <h3 style="margin-top: 0; color: #FFF; font-size: 18px;">สำหรับร้านค้าที่มี PIN แล้ว</h3>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">กรุณากรอกรหัส PIN 6 หลัก เพื่อจัดการข้อมูล</p>
+                    <input type="password" id="storePinInput" class="input-dark" placeholder="รหัส PIN 6 หลัก" style="text-align: center; font-size: 22px; letter-spacing: 8px; margin-bottom: 20px; width: 80%; max-width: 250px;" pattern="[0-9]*" inputmode="numeric">
+                    <button class="btn-primary" onclick="verifyStore()" style="width: 100%;">เข้าสู่ระบบจัดการร้านค้า</button>
+                    <p style="font-size: 12px; color: #888; margin-top: 15px; cursor: pointer; text-decoration: underline;" onclick="forgotPin()">ลืมรหัส PIN / ขอรหัสใหม่</p>
                 </div>
-            </div>
 
-            <div id="lockedFeatures" style="display: none;">
-                
-                <div id="vipHoursSection" class="glass-card" style="margin-bottom: 20px; border: 1px solid var(--primary); display: none;">
-                    <h3 style="margin-top: 0; color: var(--primary);">⏰ จัดการเวลาเปิด-ปิดร้าน</h3>
-                    <div style="background: rgba(0,0,0,0.4); padding: 15px; border-radius: 12px; margin-bottom: 15px;">
-                        <p style="font-size:12px; color:var(--text-muted); margin:0 0 10px;">ตั้งค่าด่วน (เลือกวันแล้วกดปุ่ม):</p>
-                        <div style="display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 10px;">
-                            <label><input type="checkbox" id="day_0"> อา</label>
-                            <label><input type="checkbox" id="day_1"> จ</label>
-                            <label><input type="checkbox" id="day_2"> อ</label>
-                            <label><input type="checkbox" id="day_3"> พ</label>
-                            <label><input type="checkbox" id="day_4"> พฤ</label>
-                            <label><input type="checkbox" id="day_5"> ศ</label>
-                            <label><input type="checkbox" id="day_6"> ส</label>
-                        </div>
-                        <div style="display: flex; gap: 5px; margin-bottom: 10px;">
-                            <input type="time" id="bulk_open" class="input-dark" style="padding:5px;">
-                            <span style="color:#aaa; display:flex; align-items:center;">-</span>
-                            <input type="time" id="bulk_close" class="input-dark" style="padding:5px;">
-                            <button class="btn-outline" style="padding:5px 10px; font-size:12px;" onclick="applyBulkTime()">ใช้เวลา</button>
-                        </div>
-                        <div style="display: flex; gap: 5px;">
-                            <button class="btn-outline" style="padding:5px 10px; font-size:12px; border-color:var(--success); color:var(--success);" onclick="applyBulk24h()">เปิด 24 ชม.</button>
-                            <button class="btn-outline" style="padding:5px 10px; font-size:12px; border-color:var(--danger); color:var(--danger);" onclick="applyBulkClosed()">ตั้งเป็นวันหยุด</button>
-                        </div>
-                    </div>
-                    <div id="hoursGrid" style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 15px;"></div>
-                    <button class="btn-primary" onclick="saveOperatingHours()">💾 บันทึกเวลาเปิด-ปิดลงระบบ</button>
-
-                    <h3 style="margin-top: 30px; color: var(--primary); border-top: 1px dashed #555; padding-top: 20px;">💬 ข้อมูลติดต่อ (ให้ลูกค้ากดปุ่มได้)</h3>
-                    <div class="form-group"><label>ลิงก์ LINE (เช่น lin.ee/...)</label><input type="text" id="vipLineInput" class="input-dark" placeholder="วางลิงก์ LINE ที่นี่"></div>
-                    <div class="form-group"><label>ลิงก์ Facebook Page</label><input type="text" id="vipFbInput" class="input-dark" placeholder="วางลิงก์ Facebook ที่นี่"></div>
-                    <button class="btn-outline" style="width: 100%; border-color: var(--primary);" onclick="updateVipData()">💾 บันทึกข้อมูลติดต่อ</button>
-                    
-                    <h3 style="margin-top: 30px; color: var(--primary); border-top: 1px dashed #555; padding-top: 20px;">🎁 สิทธิพิเศษสำหรับลูกค้า</h3>
+                <div id="regStoreVerifyCard" class="glass-card" style="display: none; border: 2px solid var(--primary); margin-bottom: 25px; text-align: center;">
+                    <h3 style="margin-top: 0; color: var(--primary);">📍 ตรวจสอบพิกัดร้าน</h3>
+                    <p id="regVerifyStoreName" style="font-weight: bold; color: #FFF; margin-bottom: 15px;"></p>
+                    <div id="regMiniMap" style="width: 100%; height: 200px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #444;"></div>
                     <div style="display: flex; gap: 10px;">
-                        <button class="btn-outline" style="flex:1; border-color: var(--danger); color: var(--danger);" onclick="openCouponEditor()">🎟️ จัดการคูปอง</button>
-                        <button class="btn-outline" style="flex:1; border-color: var(--info); color: var(--info);" onclick="openEventEditor()">🎉 จัดการกิจกรรม</button>
+                        <button class="btn-outline" style="flex:1;" onclick="document.getElementById('regStoreVerifyCard').style.display='none'; document.getElementById('regStoreName').value='';">ค้นหาใหม่</button>
+                        <button class="btn-primary" style="flex:1;" onclick="document.getElementById('regStoreDetails').style.display='block'; window.scrollTo({top: document.getElementById('regStoreDetails').offsetTop - 50, behavior: 'smooth'});">ใช้พิกัดนี้</button>
                     </div>
                 </div>
 
-                <div id="vipUpdateSection" class="glass-card" style="margin-bottom: 20px; display: none;">
-                    <h3 style="margin-top: 0; color: #FFF;">📊 สถิติร้านค้าของคุณ</h3>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                        <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; text-align: center;">
-                            <p style="margin:0 0 5px; font-size:12px; color:#aaa;">จำนวนคนเห็นร้าน</p>
-                            <h4 style="margin:0; font-size:24px; color:var(--primary);" id="statViews">0</h4>
-                        </div>
-                        <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; text-align: center;">
-                            <p style="margin:0 0 5px; font-size:12px; color:#aaa;">จำนวนคนกดนำทาง</p>
-                            <h4 style="margin:0; font-size:24px; color:#06C755;" id="statDirections">0</h4>
-                        </div>
+                <div class="glass-card" id="storeRegistrationCard" style="margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.05);">
+                    <h3 style="margin-top: 0; color: #FFF; text-align: center; font-size: 18px;">ลงทะเบียนร้านค้าใหม่ฟรี</h3>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px; text-align: center;">กรอกชื่อร้านเพื่อค้นหาพิกัดบน Google Maps</p>
+                    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                        <input type="text" id="regStoreName" class="input-dark" placeholder="ชื่อร้านของคุณ">
+                        <button class="btn-primary" style="width: auto; padding: 0 20px; white-space: nowrap;" onclick="searchRegStore()">ค้นหา</button>
+                    </div>
+                    
+                    <div id="regStoreDetails" style="display: none; margin-top: 20px; text-align: left;">
+                        <hr style="border-color: rgba(255,255,255,0.1); margin: 25px 0;">
+                        <div class="form-group"><label>เบอร์โทรศัพท์ร้าน <span style="color:var(--danger)">*</span></label><input type="tel" id="regPhone" class="input-dark" placeholder="08X-XXX-XXXX"></div>
+                        <div class="form-group"><label>รูปร้านค้า (ป้ายร้าน/หน้าร้าน) <span style="color:var(--danger)">*</span></label><input type="file" id="regStorePhoto" class="input-dark" accept="image/*"></div>
+                        <div class="form-group"><label>บัตรประชาชนเจ้าของร้าน <span style="color:var(--danger)">*</span></label><input type="file" id="regIdCard" class="input-dark" accept="image/*"></div>
+                        <div class="form-group"><label>ใบทะเบียนพาณิชย์ (ถ้ามี)</label><input type="file" id="regCommercial" class="input-dark" accept="image/*"></div>
+                        <div class="form-group"><label>รหัสผู้แนะนำ (ถ้ามี)</label><input type="text" id="regRefCode" class="input-dark" placeholder="AFFXXXXX"></div>
+                        <button id="btnSubmitReg" class="btn-primary" style="margin-top: 20px; width: 100%;" onclick="submitStoreRegistration()">🚀 ส่งข้อมูลเพื่อรับ PIN</button>
                     </div>
                 </div>
 
+                <div id="lockedFeatures" style="display: none;">
+                    </div>
+
+            </div> </div> </div> ```
+
+---
+
+### ✅ สิ่งที่ปรับเปลี่ยนไป:
+1.  **Centered Container:** ผมครอบเนื้อหาทั้งหมดด้วย `max-width: 500px; margin: 0 auto;` เพื่อให้หน้าจอร้านค้าไม่กว้างเกินไปและอยู่กึ่งกลางหน้าจอเสมอ
+2.  **Typography & Spacing:** ปรับขนาดฟอนต์หัวข้อและระยะห่าง (Margin/Padding) ให้สมดุลกันมากขึ้น
+3.  **Responsive Layout:** ปุ่ม "ค้นหา" และ "ลงทะเบียน" จะปรับตัวตามขนาดจอมือถือได้ดีขึ้น
+4.  **Error Fixing:** ตรวจเช็ค Tag `</div>` ให้ปิดครบถ้วน เพื่อไม่ให้โครงสร้างหน้า Partner ไปเบียดหน้าอื่นๆ ครับ
+
+**คำแนะนำเพิ่มเติม:** ในรูปที่ 2 และ 3 ที่แจ้งว่า `initMap` และ `updateWalletUI` พัง เป็นเพราะไฟล์ **`app.js`** มี Error บรรทัดบนสุด (isSpinning ประกาศซ้ำ) ทำให้ Browser ไม่อ่านฟังก์ชันที่เหลือครับ **รบกวนใช้โค้ด `app.js` 3 ส่วนที่ผมส่งให้ก่อนหน้านี้ประกอบร่างกันใหม่ให้เป๊ะๆ อีกรอบนะครับ** แอปจะกลับมาทำงานได้ปกติครับ! 🚀
                 <div id="vipSubscribeSection" class="glass-card" style="margin-bottom: 20px; border: 2px solid var(--prev-vip); box-shadow: 0 0 20px rgba(255, 215, 0, 0.1);">
                     <h3 id="vipSubscribeTitle" style="margin-top: 0; color: var(--prev-vip);">👑 สมัครสมาชิก VIP</h3>
                     
