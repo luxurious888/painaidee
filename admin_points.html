@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ตั้งค่าระบบแต้ม (Points) - ไปไหนดี</title>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap');
+        body { font-family: 'Kanit', sans-serif; background: #121418; color: #FFF; padding: 20px; display: flex; justify-content: center; }
+        .container { background: #1A1D23; padding: 30px; border-radius: 16px; width: 100%; max-width: 500px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid rgba(197, 160, 89, 0.2); }
+        h2 { color: #06C755; text-align: center; margin-top: 0; border-bottom: 1px dashed #06C755; padding-bottom: 15px; }
+        .form-row { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; margin-bottom: 10px; border: 1px solid #333; }
+        label { font-size: 14px; font-weight: 500; color: #eee; flex: 1; }
+        input[type="number"] { width: 80px; padding: 8px; border-radius: 8px; border: 1px solid #555; background: #121418; color: #FFF; text-align: center; font-family: 'Kanit'; font-size: 16px; outline: none; }
+        input[type="number"]:focus { border-color: #06C755; }
+        .section-title { font-size: 13px; color: #aaa; margin: 20px 0 10px; }
+        .btn-save { background: linear-gradient(90deg, #06C755, #05A044); color: #FFF; font-size: 16px; font-weight: 600; font-family: 'Kanit'; padding: 15px; border: none; border-radius: 12px; width: 100%; cursor: pointer; transition: 0.3s; margin-top: 20px; }
+        .btn-save:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(6, 199, 85, 0.4); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🪙 ตั้งค่าการแจกแต้มรายวัน</h2>
+
+    <div class="section-title">✨ แต้มล็อกอิน (Daily Check-in)</div>
+    <div class="form-row">
+        <label>แต้มที่ได้จากการกดเช็คอิน (ต่อวัน)</label>
+        <input type="number" id="checkInPoints" value="10">
+    </div>
+
+    <div class="section-title">👀 การส่องร้านค้า (นับเฉพาะการกดร้านที่ไม่ซ้ำกัน)</div>
+    <div class="form-row"><label>แต้มที่ได้ ต่อการดู 1 ร้าน</label><input type="number" id="viewPoints" value="1"></div>
+    <div class="form-row"><label>ลิมิตแจกแต้มสูงสุด (ครั้ง/วัน)</label><input type="number" id="viewLimit" value="10"></div>
+
+    <div class="section-title">📍 การกดปุ่ม "นำทาง" (นับเฉพาะการกดร้านที่ไม่ซ้ำกัน)</div>
+    <div class="form-row"><label>แต้มที่ได้ ต่อการกด 1 ครั้ง</label><input type="number" id="dirPoints" value="5"></div>
+    <div class="form-row"><label>ลิมิตแจกแต้มสูงสุด (ครั้ง/วัน)</label><input type="number" id="dirLimit" value="2"></div>
+
+    <div class="section-title">📢 การกดปุ่ม "แชร์" (นับเฉพาะการกดร้านที่ไม่ซ้ำกัน)</div>
+    <div class="form-row"><label>แต้มที่ได้ ต่อการกด 1 ครั้ง</label><input type="number" id="sharePoints" value="5"></div>
+    <div class="form-row"><label>ลิมิตแจกแต้มสูงสุด (ครั้ง/วัน)</label><input type="number" id="shareLimit" value="2"></div>
+
+    <button class="btn-save" onclick="savePointSettings()">💾 บันทึกการตั้งค่าแต้ม</button>
+</div>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyBSFWKdLCjLWqzo2_mzUE95CyoiUv5TdnY", authDomain: "painaid-88c53.firebaseapp.com",
+        projectId: "painaid-88c53", storageBucket: "painaid-88c53.firebasestorage.app",
+        messagingSenderId: "229290700458", appId: "1:229290700458:web:74a57d0be5df9326c5ead3"
+    };
+    firebase.initializeApp(firebaseConfig); const db = firebase.firestore();
+
+    db.collection('painaidee').doc('pointSettings').get().then(doc => {
+        if(doc.exists) {
+            const d = doc.data();
+            document.getElementById('checkInPoints').value = d.checkIn || 10;
+            document.getElementById('viewPoints').value = d.view || 1; document.getElementById('viewLimit').value = d.viewLimit || 10;
+            document.getElementById('dirPoints').value = d.dir || 5; document.getElementById('dirLimit').value = d.dirLimit || 2;
+            document.getElementById('sharePoints').value = d.share || 5; document.getElementById('shareLimit').value = d.shareLimit || 2;
+        }
+    });
+
+    async function savePointSettings() {
+        const data = {
+            checkIn: parseInt(document.getElementById('checkInPoints').value),
+            view: parseInt(document.getElementById('viewPoints').value), viewLimit: parseInt(document.getElementById('viewLimit').value),
+            dir: parseInt(document.getElementById('dirPoints').value), dirLimit: parseInt(document.getElementById('dirLimit').value),
+            share: parseInt(document.getElementById('sharePoints').value), shareLimit: parseInt(document.getElementById('shareLimit').value)
+        };
+        try {
+            await db.collection('painaidee').doc('pointSettings').set(data);
+            alert("✅ บันทึกการตั้งค่าแต้มสำเร็จ! ข้อมูลจะถูกใช้งานในแอปทันที");
+        } catch(e) { alert("❌ เกิดข้อผิดพลาด"); }
+    }
+</script>
+</body>
+</html>
