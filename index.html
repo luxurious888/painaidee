@@ -218,7 +218,7 @@
 
             <div id="lockedFeatures" style="display: none;">
                 
-                <div id="vipHoursSection" class="glass-card" style="margin-bottom: 20px; border: 1px solid var(--primary);">
+                <div id="vipHoursSection" class="glass-card" style="margin-bottom: 20px; border: 1px solid var(--primary); display: none;">
                     <h3 style="margin-top: 0; color: var(--primary);">⏰ จัดการเวลาเปิด-ปิดร้าน</h3>
                     <div style="background: rgba(0,0,0,0.4); padding: 15px; border-radius: 12px; margin-bottom: 15px;">
                         <p style="font-size:12px; color:var(--text-muted); margin:0 0 10px;">ตั้งค่าด่วน (เลือกวันแล้วกดปุ่ม):</p>
@@ -257,7 +257,7 @@
                     </div>
                 </div>
 
-                <div id="vipUpdateSection" class="glass-card" style="margin-bottom: 20px;">
+                <div id="vipUpdateSection" class="glass-card" style="margin-bottom: 20px; display: none;">
                     <h3 style="margin-top: 0; color: #FFF;">📊 สถิติร้านค้าของคุณ</h3>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                         <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; text-align: center;">
@@ -279,12 +279,53 @@
                         <ul style="margin: 0; padding-left: 20px; font-size: 13px; color: #ddd; line-height: 1.6;">
                             <li><span style="color:var(--primary);">ดันอันดับการค้นหา</span> ร้านจะอยู่บนสุดเสมอ</li>
                             <li><span style="color:var(--danger);">กรอบสีทองพิเศษ</span> โดดเด่นกว่าร้านปกติ 10 เท่า</li>
-                            <li><span style="color:var(--info);">ปุ่ม LINE / Facebook</span> ลูกค้าทักแชทได้ทันที</li>
-                            <li><span style="color:#06C755;">ระบบคูปอง/กิจกรรม</span> แจ้งโปรโมชั่นให้ลูกค้าเห็นง่ายๆ</li>
+                            <li><span style="color:var(--info);">ระบบข้อมูลติดต่อ</span> แสดงปุ่ม LINE / Facebook ให้ลูกค้ากดทักได้ทันที</li>
+                            <li><span style="color:#06C755;">จัดการเวลาทำการ</span> โชว์สถานะ เปิด-ปิด แบบ Real-time</li>
+                            <li><span style="color:#FF9800;">ระบบคูปอง/กิจกรรม</span> แจ้งโปรโมชั่นให้ลูกค้าเห็นง่ายๆ</li>
                             <li>ดูสถิติคนเข้าชมร้านและการนำทางได้</li>
                             <li><span style="color:var(--primary); font-weight:bold;">รับสิทธิ์ลงแบนเนอร์โปรโมท ฟรี 7 วัน!</span></li>
                         </ul>
                     </div>
+
+                    <button id="btnShowRenewVip" class="btn-primary" style="display:none; background: linear-gradient(135deg, #FFD700, #C5A059); color: #000; font-weight: bold;" onclick="document.getElementById('vipPaymentArea').style.display='block'; this.style.display='none';">🔄 ต่ออายุ VIP</button>
+
+                    <div id="vipPaymentArea">
+                        <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 15px;">
+                            <p style="margin: 0 0 5px; color: var(--text-muted); font-size: 13px;">ค่าบริการรายปี (ต่ออายุอัตโนมัติปีถัดไป 199฿)</p>
+                            <h2 style="margin: 0; color: #FFF; font-size: 32px;"><span id="displayVipPrice">500</span><span style="font-size: 16px;"> ฿ / ปี</span></h2>
+                            <div style="margin-top: 15px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                                <p style="margin: 0 0 5px; font-size: 12px; color: #aaa;">โอนเงินเข้าบัญชี</p>
+                                <p style="margin: 0; font-size: 15px; font-weight: bold; color: var(--primary);" id="displayBankAcc">รอแอดมินตั้งค่าบัญชี</p>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>แนบสลิปโอนเงิน <span style="color:var(--danger)">*</span></label>
+                            <input type="file" id="vipSlipInput" class="input-dark" accept="image/*">
+                        </div>
+                        <button id="btnSubmitVip" class="btn-primary" style="background: linear-gradient(135deg, #FFD700, #C5A059); color: #000; font-weight: bold;" onclick="submitVipRequest()">ส่งสลิป</button>
+                    </div>
+                </div>
+
+                <div id="buyPromoSection" class="glass-card" style="margin-bottom: 20px;">
+                    <h3 id="buyPromoTitle" style="margin-top: 0; color: #FFF;">🚀 สั่งซื้อแบนเนอร์โปรโมท</h3>
+                    <div class="form-group"><label>จังหวัดที่จะแสดง</label><select id="promoProvinceSelect" class="input-dark"></select></div>
+                    <div class="form-group"><label>หมวดหมู่ร้านค้า</label><select id="promoStoreCategory" class="input-dark"></select></div>
+                    <div class="form-group"><label>แพ็กเกจระยะเวลา</label><select id="promoServiceSelect" class="input-dark"></select></div>
+                    <div class="form-group"><label>คำอธิบายโปรโมชั่น</label><input type="text" id="promoDetail" class="input-dark" placeholder="เช่น ลด 50% วันนี้เท่านั้น!"></div>
+                    <div class="form-group"><label>รูปป้ายโปรโมท (สัดส่วน 16:9) สูงสุด 3 รูป</label><input type="file" id="promoImageInput" class="input-dark" accept="image/*" multiple></div>
+                    <div class="form-group" id="promoSlipArea"><label>สลิปโอนเงิน (ดูเลขบัญชีที่ด้านบน)</label><input type="file" id="promoSlipInput" class="input-dark" accept="image/*"></div>
+                    <button id="btnSubmitPromo" class="btn-primary" onclick="submitPromoWithPIN()">🚀 สั่งซื้อและส่งเรื่องตรวจสอบ</button>
+                </div>
+
+                <div id="editPromoSection" class="glass-card" style="margin-bottom: 20px; display: none; border: 1px solid var(--info);">
+                    <h3 style="margin-top: 0; color: var(--info);">📝 แก้ไขแบนเนอร์ที่กำลังแสดงผล (ฟรี)</h3>
+                    <div class="form-group"><label>คำอธิบายโปรโมชั่น</label><input type="text" id="editPromoDetailInput" class="input-dark"></div>
+                    <div class="form-group"><label>รูปป้ายโปรโมทใหม่ (ไม่เกิน 3 รูป) <br><span style="font-size:11px; color:#888;">*ถ้าไม่เลือกรูปใหม่ จะใช้รูปเดิม</span></label><input type="file" id="editPromoImageInput" class="input-dark" accept="image/*" multiple></div>
+                    <button id="btnEditPromo" class="btn-outline" style="border-color: var(--info); color: var(--info); margin-bottom: 10px;" onclick="submitEditPromo()">🔄 อัปเดตข้อมูลแบนเนอร์</button>
+                    <button class="btn-primary" onclick="openRenewPromo()">แพ็กเกจหมดอายุ? ต่ออายุที่นี่</button>
+                </div>
+            </div>
 
                     <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 15px;">
                         <p style="margin: 0 0 5px; color: var(--text-muted); font-size: 13px;">ค่าบริการรายปี (ต่ออายุอัตโนมัติปีถัดไป 199฿)</p>
