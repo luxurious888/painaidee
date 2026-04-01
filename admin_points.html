@@ -20,7 +20,7 @@
         .admin-nav div:hover { color: #FFF; background: rgba(255,255,255,0.05); }
         .admin-nav div.active { color: var(--primary); font-weight: 600; border-bottom: 3px solid var(--primary); }
         
-        /* 📌 คอนเทนต์ในแท็บ (แก้ปัญหาไม่ยอมแยกหน้าแล้วครับ) */
+        /* 📌 คอนเทนต์ในแท็บ */
         .tab-pane { display: none; animation: fadeIn 0.4s ease; padding: 30px 20px; }
         .tab-pane.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -85,7 +85,17 @@
 <div id="tab-wheel" class="tab-pane">
     <div class="container">
         <h2 style="color: #FFD700;">🎡 ของรางวัลกงล้อเสี่ยงโชค</h2>
-        <p style="color: #aaa; font-size: 13px; text-align: center; margin-top: -10px; margin-bottom: 20px;">
+
+        <div style="font-size: 14px; color: #FFD700; margin: 20px 0 10px; font-weight: bold;">🪙 ค่าใช้จ่ายในการหมุน</div>
+        <div class="form-row" style="border-color: var(--primary);">
+            <label style="color: var(--primary);">แต้มที่ต้องใช้หมุนกงล้อ (ต่อ 1 ครั้ง)</label>
+            <input type="number" id="spinCost" value="50" style="border-color: var(--primary); color: var(--primary); font-weight: bold;">
+        </div>
+
+        <hr style="border-color: rgba(255,255,255,0.1); margin: 20px 0;">
+
+        <div style="font-size: 14px; color: #FFD700; margin: 20px 0 10px; font-weight: bold;">🎁 รายการของรางวัล</div>
+        <p style="color: #aaa; font-size: 12px; margin-top: -5px; margin-bottom: 15px;">
             กำหนดของรางวัลและโอกาสได้รับ (เปอร์เซ็นต์รวมกันต้องได้ 100% พอดี)<br>
             <span style="color: var(--primary);">* ถ้ารางวัลคือแต้ม ให้พิมพ์คำว่า "แต้ม" เข้าไปในชื่อรางวัลด้วย ระบบจะจ่ายแต้มให้อัตโนมัติ</span>
         </p>
@@ -138,18 +148,26 @@
                 document.getElementById('sharePoints').value = d.share || 5; document.getElementById('shareLimit').value = d.shareLimit || 2;
             }
 
-            // 2. โหลดข้อมูลของรางวัล
+            // 2. โหลดข้อมูลของรางวัลและค่าแต้มที่ใช้หมุน
             const wDoc = await db.collection('painaidee').doc('wheelSettings').get();
-            if(wDoc.exists && wDoc.data().rewards && wDoc.data().rewards.length > 0) {
-                wDoc.data().rewards.forEach(r => addRewardRow(r.name, r.chance));
+            if(wDoc.exists) {
+                document.getElementById('spinCost').value = wDoc.data().spinCost || 50;
+                if(wDoc.data().rewards && wDoc.data().rewards.length > 0) {
+                    wDoc.data().rewards.forEach(r => addRewardRow(r.name, r.chance));
+                } else {
+                    addDefaultRewards();
+                }
             } else {
-                // ค่าเริ่มต้นถ้ายังไม่เคยตั้งค่า
-                addRewardRow('กินเกลือ (ไม่ได้อะไรเลย)', 50);
-                addRewardRow('ได้แต้มคืน 20 แต้ม', 40);
-                addRewardRow('ส่วนลด 10% ร้าน... (แคปจอ)', 10);
+                addDefaultRewards();
             }
             calculateTotal();
         } catch(e) { console.error("โหลดข้อมูลผิดพลาด", e); }
+    }
+
+    function addDefaultRewards() {
+        addRewardRow('กินเกลือ (ไม่ได้อะไรเลย)', 50);
+        addRewardRow('ได้แต้มคืน 20 แต้ม', 40);
+        addRewardRow('ส่วนลด 10% ร้าน... (แคปจอ)', 10);
     }
 
     // ==========================================
@@ -222,9 +240,11 @@
             });
         });
 
+        const spinCostVal = parseInt(document.getElementById('spinCost').value) || 50;
+
         try {
-            await db.collection('painaidee').doc('wheelSettings').set({ rewards: rewards }, { merge: true });
-            alert("✅ บันทึกของรางวัลกงล้อสำเร็จแล้ว! ข้อมูลจะอัปเดตในแอปทันที");
+            await db.collection('painaidee').doc('wheelSettings').set({ spinCost: spinCostVal, rewards: rewards }, { merge: true });
+            alert("✅ บันทึกของรางวัลกงล้อและค่าใช้จ่ายสำเร็จแล้ว! ข้อมูลจะอัปเดตในแอปทันที");
         } catch(e) { alert("❌ เกิดข้อผิดพลาด"); }
         finally { btn.innerText = "💾 บันทึกการตั้งค่ากงล้อ"; btn.disabled = false; }
     }
