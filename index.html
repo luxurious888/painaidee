@@ -11,6 +11,31 @@
     <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 
     <link rel="stylesheet" href="style.css">
+
+    <style>
+        .center-wrapper {
+            width: 100%;
+            max-width: 550px;
+            margin: 0 auto !important;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .center-wrapper > * {
+            width: 100%;
+        }
+        .glass-card {
+            width: 100%;
+            box-sizing: border-box;
+            margin-left: auto !important;
+            margin-right: auto !important;
+        }
+        /* บังคับโลโก้ให้กึ่งกลางเสมอ ป้องกันบั๊กหาย */
+        .gold-logo, .custom-logo-img {
+            display: block !important;
+            margin: 0 auto 10px auto !important;
+        }
+    </style>
 </head>
 <body>
 
@@ -33,7 +58,7 @@
     <div class="bg-glow"></div><div class="bg-glow2"></div>
     <div id="loadingSpinner">
         <div style="text-align: center; position: relative;">
-            <svg class="gold-logo logo-shine" viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg" style="width: 150px; height: 210px; margin: 0 auto 10px auto; display: block;">
+            <svg class="gold-logo logo-shine" viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg" style="width: 150px; height: 210px;">
                 <defs><linearGradient id="gold-gradient" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FFD700"/><stop offset="50%" stop-color="#C5A059"/><stop offset="100%" stop-color="#FFD700"/></linearGradient></defs>
                 <circle cx="100" cy="100" r="90" fill="none" stroke="url(#gold-gradient)" stroke-width="6"/>
                 <path d="M85,35 L100,20 L115,35 L125,25 L135,35 L135,45 L65,45 L65,35 L75,25 Z" fill="url(#gold-gradient)"/>
@@ -47,7 +72,7 @@
         <h3 id="loadingText">กำลังเตรียมระบบ...</h3>
     </div>
 
-    <div class="glass-card" id="loginCard" style="display: none;">
+    <div class="glass-card" id="loginCard" style="display: none; width: 90%; max-width: 350px; margin: 0 auto;">
         <h2 style="color: #FFF; margin: 0 0 20px 0; font-size: 22px; font-weight: 600;">เลือกรูปแบบการใช้งาน</h2>
         <div style="margin-bottom: 20px;"><button onclick="enterApp()" class="btn-enter-glow" style="margin-bottom: 8px;">🚀 เข้าใช้งานทั่วไป</button></div>
         <div style="display: flex; align-items: center; margin-bottom: 20px;"><div style="flex: 1; height: 1px; background: rgba(255,255,255,0.2);"></div><span style="color: rgba(255,255,255,0.5); padding: 0 10px; font-size: 12px;">หรือ</span><div style="flex: 1; height: 1px; background: rgba(255,255,255,0.2);"></div></div>
@@ -90,44 +115,47 @@
     </div>
 
     <div id="page-affiliate" class="page">
-        <header><h1 style="font-size: 24px;">แนะนำเพื่อนสร้างรายได้</h1><p>รับค่าคอมมิชชั่น 20% จากทุกยอดการสั่งซื้อของร้านค้า</p></header>
-        <div id="affiliate-guest-view" class="glass-card" style="text-align: center; margin-bottom: 20px;">
-            <p style="color: #FFF; font-size: 15px; margin-bottom: 15px;">คุณต้องเข้าสู่ระบบด้วย LINE เพื่อรับรหัสแนะนำ และเริ่มสร้างรายได้กับเรา</p>
-            <button class="btn-line-glow" onclick="smartLogin('affiliate')">📱 ล็อกอินด้วย LINE เพื่อสร้างรายได้</button>
-        </div>
-        <div id="affiliate-actual-content" style="display: none;">
-            <div class="glass-card" style="text-align: center; margin-bottom: 20px; background: linear-gradient(135deg, rgba(197, 160, 89, 0.1), rgba(0,0,0,0.5)); border-color: var(--primary);">
-                <p style="margin: 0 0 5px 0; color: var(--text-muted); font-size: 13px;">รหัสแนะนำของคุณคือ</p>
-                <div style="font-size: 32px; font-weight: 800; color: var(--primary); letter-spacing: 2px; margin-bottom: 10px; text-shadow: 0 2px 10px rgba(197,160,89,0.3);" id="myAffiliateCode">...</div>
-                <div style="display: flex; gap: 10px;"><button class="btn-outline" style="flex: 1;" onclick="copyHeaderAffCode()">📋 คัดลอกรหัส</button><button class="btn-primary" style="flex: 1;" onclick="copyAffLink()">🔗 คัดลอกลิงก์</button></div>
+        <div class="center-wrapper">
+            <header><h1 style="font-size: 24px;">แนะนำเพื่อนสร้างรายได้</h1><p>รับค่าคอมมิชชั่น 20% จากทุกยอดการสั่งซื้อของร้านค้า</p></header>
+            
+            <div id="affiliate-guest-view" class="glass-card" style="text-align: center; margin-bottom: 20px;">
+                <p style="color: #FFF; font-size: 15px; margin-bottom: 15px;">คุณต้องเข้าสู่ระบบด้วย LINE เพื่อรับรหัสแนะนำ และเริ่มสร้างรายได้กับเรา</p>
+                <button class="btn-line-glow" onclick="smartLogin('affiliate')">📱 ล็อกอินด้วย LINE เพื่อสร้างรายได้</button>
             </div>
-            <div class="glass-card" style="margin-bottom: 20px;">
-                <h3 style="margin-top: 0; color: #FFF; font-size: 16px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">ยอดเงินสะสมของคุณ</h3>
-                <div style="text-align: center; padding: 20px 0;"><div style="font-size: 40px; font-weight: bold; color: #06C755; margin-bottom: 5px;" id="aff-page-balance">0 ฿</div><p style="font-size: 12px; color: var(--text-muted); margin: 0 0 15px 0;" id="aff-min-text">*(ถอนขั้นต่ำ 300 บาท)*</p><button id="btn-page-withdraw" class="btn-outline" style="width: 100%; border-color: #555; color: #888; cursor: not-allowed;" onclick="requestWithdraw()" disabled>ถอนเงินเข้าบัญชี</button></div>
+            
+            <div id="affiliate-actual-content" style="display: none; width: 100%;">
+                <div class="glass-card" style="text-align: center; margin-bottom: 20px; background: linear-gradient(135deg, rgba(197, 160, 89, 0.1), rgba(0,0,0,0.5)); border-color: var(--primary);">
+                    <p style="margin: 0 0 5px 0; color: var(--text-muted); font-size: 13px;">รหัสแนะนำของคุณคือ</p>
+                    <div style="font-size: 32px; font-weight: 800; color: var(--primary); letter-spacing: 2px; margin-bottom: 10px; text-shadow: 0 2px 10px rgba(197,160,89,0.3);" id="myAffiliateCode">...</div>
+                    <div style="display: flex; gap: 10px;"><button class="btn-outline" style="flex: 1;" onclick="copyHeaderAffCode()">📋 คัดลอกรหัส</button><button class="btn-primary" style="flex: 1;" onclick="copyAffLink()">🔗 คัดลอกลิงก์</button></div>
+                </div>
+                <div class="glass-card" style="margin-bottom: 20px;">
+                    <h3 style="margin-top: 0; color: #FFF; font-size: 16px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">ยอดเงินสะสมของคุณ</h3>
+                    <div style="text-align: center; padding: 20px 0;"><div style="font-size: 40px; font-weight: bold; color: #06C755; margin-bottom: 5px;" id="aff-page-balance">0 ฿</div><p style="font-size: 12px; color: var(--text-muted); margin: 0 0 15px 0;" id="aff-min-text">*(ถอนขั้นต่ำ 300 บาท)*</p><button id="btn-page-withdraw" class="btn-outline" style="width: 100%; border-color: #555; color: #888; cursor: not-allowed;" onclick="requestWithdraw()" disabled>ถอนเงินเข้าบัญชี</button></div>
+                </div>
+                <div class="glass-card"><h3 style="margin-top: 0; color: #FFF; font-size: 16px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">ร้านค้าที่คุณแนะนำ</h3><div id="affiliate-history-list"></div></div>
             </div>
-            <div class="glass-card"><h3 style="margin-top: 0; color: #FFF; font-size: 16px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">ร้านค้าที่คุณแนะนำ</h3><div id="affiliate-history-list"></div></div>
         </div>
-    </div>
+        </div>
 
     <div id="page-partner" class="page">
-        <header>
-            <h1 style="font-size: 24px;">ระบบจัดการร้านค้า</h1>
-            <p>เพิ่มยอดขายและโปรโมทธุรกิจของคุณ</p>
-        </header>
+        <div class="center-wrapper">
+            <header>
+                <h1 style="font-size: 24px;">ระบบจัดการร้านค้า</h1>
+                <p>เพิ่มยอดขายและโปรโมทธุรกิจของคุณ</p>
+            </header>
 
-        <div style="max-width: 550px; margin: 0 auto;">
-            
             <div id="partner-friend-blocker" class="glass-card" style="text-align: center; margin-bottom: 20px; display: none; flex-direction: column; align-items: center; justify-content: center; min-height: 250px;">
                 <div class="spinner"></div><p style="color:#FFF;">กำลังตรวจสอบสถานะการเป็นเพื่อน...</p>
             </div>
 
-            <div id="partner-actual-content" style="display: none;">
+            <div id="partner-actual-content" style="display: none; width: 100%;">
                 
                 <div id="storeVerifyCard" class="glass-card" style="text-align: center; margin-bottom: 20px;">
                     <h3 style="margin-top: 0; color: #FFF;">ยืนยันตัวตนเจ้าของร้าน</h3>
                     <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">กรุณากรอกรหัส PIN 6 หลัก เพื่อเข้าสู่ระบบจัดการ</p>
-                    <input type="password" id="storePinInput" class="input-dark" placeholder="รหัส PIN 6 หลัก" style="text-align: center; font-size: 20px; letter-spacing: 5px; margin-bottom: 15px;" pattern="[0-9]*" inputmode="numeric">
-                    <button class="btn-primary" onclick="verifyStore()">เข้าสู่ระบบจัดการร้านค้า</button>
+                    <input type="password" id="storePinInput" class="input-dark" placeholder="รหัส PIN 6 หลัก" style="text-align: center; font-size: 20px; letter-spacing: 5px; margin-bottom: 15px; max-width: 250px; margin-left: auto; margin-right: auto; display: block;" pattern="[0-9]*" inputmode="numeric">
+                    <button class="btn-primary" style="width: 100%;" onclick="verifyStore()">เข้าสู่ระบบจัดการร้านค้า</button>
                     <p style="font-size: 12px; color: #888; margin-top: 15px; cursor: pointer; text-decoration: underline;" onclick="forgotPin()">ลืมรหัส PIN / ขอรหัสใหม่</p>
                 </div>
 
@@ -160,10 +188,10 @@
                     </div>
                 </div>
 
-                <div id="lockedFeatures" style="display: none;">
+                <div id="lockedFeatures" style="display: none; width: 100%;">
                     
-                    <div style="text-align: right; margin-bottom: 15px;">
-                        <button onclick="logoutStore()" style="background: rgba(0,0,0,0.5); border: 1px solid #555; color: #aaa; padding: 6px 15px; border-radius: 8px; font-family: 'Kanit'; cursor: pointer; font-size: 13px;">🔄 สลับร้านค้า / กรอก PIN อื่น</button>
+                    <div style="text-align: right; margin-bottom: 15px; width: 100%;">
+                        <button onclick="logoutStore()" style="background: rgba(0,0,0,0.5); border: 1px solid #555; color: #aaa; padding: 8px 15px; border-radius: 8px; font-family: 'Kanit'; cursor: pointer; font-size: 13px;">🔄 สลับร้านค้า / กรอก PIN อื่น</button>
                     </div>
 
                     <div id="vipUpdateSection" class="glass-card" style="margin-bottom: 20px;">
@@ -220,8 +248,8 @@
                     </div>
 
                     <div id="vipSubscribeSection" class="glass-card" style="margin-bottom: 20px; border: 2px solid var(--prev-vip); box-shadow: 0 0 20px rgba(255, 215, 0, 0.1);">
-                        <h3 id="vipSubscribeTitle" style="margin-top: 0; color: var(--prev-vip);">👑 สมัครสมาชิก VIP</h3>
-                        <p id="vipExpiryDisplay" style="margin: -10px 0 15px 0; font-size: 13px; color: #FFD700;"></p>
+                        <h3 id="vipSubscribeTitle" style="margin-top: 0; color: var(--prev-vip); text-align: center;">👑 สมัครสมาชิก VIP</h3>
+                        <p id="vipExpiryDisplay" style="margin: -10px 0 15px 0; font-size: 13px; color: #FFD700; text-align: center;"></p>
                         
                         <div id="nonVipStatsBlock" style="background: rgba(0,0,0,0.5); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px dashed var(--prev-vip);">
                             <p style="margin: 0 0 10px; font-size: 14px; font-weight: bold; color: #FFF;">สิ่งที่ร้าน VIP จะได้รับ:</p>
@@ -268,7 +296,7 @@
 
                     <div id="editPromoSection" class="glass-card" style="margin-bottom: 20px; display: none; border: 1px solid var(--info);">
                         <h3 style="margin-top: 0; color: var(--info);">📝 แก้ไขแบนเนอร์ที่กำลังแสดงผล</h3>
-                        <p id="promoExpiryDisplay" style="margin: -10px 0 15px 0; font-size: 13px; color: #17a2b8;"></p>
+                        <p id="promoExpiryDisplay" style="margin: -10px 0 15px 0; font-size: 13px; color: #17a2b8; text-align: center;"></p>
 
                         <div class="form-group"><label>คำอธิบายโปรโมชั่น</label><input type="text" id="editPromoDetailInput" class="input-dark"></div>
                         <div class="form-group"><label>รูปป้ายใหม่ (ไม่เกิน 3 รูป) <br><span style="font-size:11px; color:#888;">*ถ้าไม่เลือกรูปใหม่ จะใช้รูปเดิม</span></label><input type="file" id="editPromoImageInput" class="input-dark" accept="image/*" multiple></div>
@@ -332,7 +360,7 @@
     <span style="font-size: 24px;">🪙</span> <span id="point-toast-text" style="font-size: 15px;">+1 แต้ม</span>
 </div>
 
-<script src="app.js?v=20"></script>
+<script src="app.js?v=25"></script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD7Qqf1Z9KQBuvipDzgIc5laJLz9SiOBH8&libraries=places,geometry&callback=initMap" async defer></script>
 </body>
 </html>
