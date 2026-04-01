@@ -785,9 +785,13 @@ function verifyStore(silent = false) {
         document.getElementById('displayBankAcc').innerText = appData.vipSettings?.bankAccount || 'รอแอดมินตั้งค่าบัญชี (ไปไหนดี)';
 
         if(isVIP) {
-            document.getElementById('vipUpdateSection').style.display = 'block'; document.getElementById('vipSubscribeSection').style.display = 'block';
-            document.getElementById('vipSubscribeTitle').innerHTML = '👑 ต่ออายุ VIP <span style="font-size:12px; color:#06C755;">(สถานะ: ใช้งานได้)</span>'; 
-            document.getElementById('nonVipStatsBlock').style.display = 'none'; 
+            document.getElementById('vipHoursSection').style.display = 'block'; // โชว์ โซนเวลา โซเชียล คูปอง
+            document.getElementById('vipUpdateSection').style.display = 'block'; // โชว์ สถิติ
+            document.getElementById('vipSubscribeTitle').innerHTML = '👑 สถานะ: <span style="color:#06C755;">เป็น VIP แล้ว</span>'; 
+            document.getElementById('nonVipStatsBlock').style.display = 'none'; // ซ่อนข้อความสิทธิประโยชน์
+            
+            document.getElementById('btnShowRenewVip').style.display = 'block'; // โชว์ปุ่มต่ออายุ
+            document.getElementById('vipPaymentArea').style.display = 'none'; // ซ่อนฟอร์มโอนเงินไปก่อน
             
             if(db) db.collection('storeStats').doc(store.name).get().then(doc => {
                 let d = doc.exists ? doc.data() : { views: 0, directions: 0 };
@@ -801,8 +805,13 @@ function verifyStore(silent = false) {
                 renderHoursGrid(store);
             }
         } else {
-            document.getElementById('vipUpdateSection').style.display = 'none'; document.getElementById('vipSubscribeSection').style.display = 'block'; 
-            document.getElementById('vipSubscribeTitle').innerHTML = '👑 สมัครสมาชิก VIP'; document.getElementById('nonVipStatsBlock').style.display = 'block'; 
+            document.getElementById('vipHoursSection').style.display = 'none'; // ซ่อน โซนเวลา โซเชียล คูปอง
+            document.getElementById('vipUpdateSection').style.display = 'none'; // ซ่อน สถิติ
+            document.getElementById('vipSubscribeTitle').innerHTML = '👑 สมัครสมาชิก VIP'; 
+            document.getElementById('nonVipStatsBlock').style.display = 'block'; // โชว์ข้อความโปรโมท VIP
+            
+            document.getElementById('btnShowRenewVip').style.display = 'none'; // ซ่อนปุ่มต่ออายุ
+            document.getElementById('vipPaymentArea').style.display = 'block'; // โชว์ฟอร์มโอนเงิน
         }
 
         const activePromo = (appData.activePromotions || []).find(p => p.storeName === store.name); const hasFreePromo = store.freePromoDays && store.freePromoDays > 0; const promoTitle = document.getElementById('buyPromoTitle'); const slipArea = document.getElementById('promoSlipArea');
@@ -824,7 +833,6 @@ function verifyStore(silent = false) {
         if(!silent) alert("รหัส PIN ไม่ถูกต้อง");
     }
 }
-
 function renderHoursGrid(store) {
     const daysTH = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์']; let hoursHtml = '';
     for(let i=0; i<7; i++) {
