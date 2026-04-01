@@ -391,7 +391,8 @@ async function spinWheel() {
     if(isSpinning) return;
     if(!myLineUid) return alert("กรุณาล็อคอินด้วย LINE ก่อนเพื่อร่วมสนุกครับ!");
     if(wheelRewards.length === 0) return alert("แอดมินยังไม่ได้ตั้งค่าของรางวัลครับ");
-    if(userCurrentPoints < 50) return alert(`แต้มของคุณไม่พอครับ 😢\n(มีอยู่ ${userCurrentPoints} แต้ม / ต้องใช้ 50 แต้ม)\n\nอย่าลืมกดเช็คอินรายวัน หรือหาสะสมจากการส่องร้านค้านะครับ!`);
+    // 🌟 เปลี่ยนเลข 50 เป็นตัวแปร wheelSpinCost
+    if(userCurrentPoints < wheelSpinCost) return alert(`แต้มของคุณไม่พอครับ 😢\n(มีอยู่ ${userCurrentPoints} แต้ม / ต้องใช้ ${wheelSpinCost} แต้ม)\n\nอย่าลืมกดเช็คอินรายวัน หรือหาสะสมจากการส่องร้านค้านะครับ!`);
 
     isSpinning = true;
     const btn = document.getElementById('btn-spin-wheel');
@@ -399,9 +400,11 @@ async function spinWheel() {
     btn.innerText = "กำลังลุ้น... 🎡";
     btn.disabled = true;
 
+    // ตัดแต้มจาก Firebase ทันทีที่กดหมุน ป้องกันการโกง
     try {
         const userRef = db.collection('userPoints').doc(myLineUid);
-        userCurrentPoints -= 50;
+        // 🌟 เปลี่ยนเลข 50 เป็นตัวแปร wheelSpinCost
+        userCurrentPoints -= wheelSpinCost;
         await userRef.update({ points: userCurrentPoints });
         document.getElementById('user-points-display').innerText = userCurrentPoints;
     } catch(e) {
@@ -409,13 +412,19 @@ async function spinWheel() {
         isSpinning = false; btn.innerText = "🎯 กดหมุนเลย!"; btn.disabled = false; return;
     }
 
+    // คำนวณเปอร์เซ็นต์ (Weighted Random)
     let randomNumber = Math.random() * 100;
-    let selectedPrizeIndex = 0; let cumulativeChance = 0;
+    let selectedPrizeIndex = 0;
+    let cumulativeChance = 0;
+
     for (let i = 0; i < wheelRewards.length; i++) {
         cumulativeChance += wheelRewards[i].chance;
-        if (randomNumber <= cumulativeChance) { selectedPrizeIndex = i; break; }
+        if (randomNumber <= cumulativeChance) {
+            selectedPrizeIndex = i; break;
+        }
     }
 
+    // วาดสีกงล้อและคำนวณองศาให้หมุนไปตกช่องที่สุ่มได้เป๊ะๆ
     const segmentDegree = 360 / wheelRewards.length;
     let colors = ['#D9534F', '#17a2b8', '#06C755', '#FFD700', '#9C27B0', '#FF9800', '#3F51B5', '#E91E63'];
     let gradientParts = wheelRewards.map((r, idx) => `${colors[idx % colors.length]} ${idx * segmentDegree}deg ${(idx + 1) * segmentDegree}deg`).join(', ');
@@ -424,19 +433,27 @@ async function spinWheel() {
     const targetDegree = 3600 + (360 - (selectedPrizeIndex * segmentDegree)) - (segmentDegree / 2);
     wheel.style.transform = `rotate(${targetDegree}deg)`;
 
+    // โชว์ผลลัพธ์
     setTimeout(() => {
-        isSpinning = false; btn.innerText = "🎯 หมุนอีกครั้ง (50 แต้ม)"; btn.disabled = false;
+        isSpinning = false;
+        // 🌟 เปลี่ยนเลข 50 เป็นตัวแปร wheelSpinCost
+        btn.innerText = `🎯 หมุนอีกครั้ง (${wheelSpinCost} แต้ม)`;
+        btn.disabled = false;
+        
         const prize = wheelRewards[selectedPrizeIndex];
         alert(`🎉 ยินดีด้วยครับ!\nคุณได้รับ: "${prize.name}"`);
         
+        // ถ้ารางวัลมีคำว่า "แต้ม" ให้บวกแต้มคืนอัตโนมัติ
         if(prize.name.includes("แต้ม")) {
             let bonus = parseInt(prize.name.replace(/[^0-9]/g, '')) || 0;
             if(bonus > 0) earnPoints('wheel_bonus', bonus); 
         }
         
+        // รีเซ็ตกงล้อเตรียมหมุนรอบใหม่ (หลอกตาให้กลับไปจุดเริ่มต้นโดยไม่ขยับ)
         wheel.style.transition = 'none';
         wheel.style.transform = `rotate(${targetDegree % 360}deg)`;
         setTimeout(() => { wheel.style.transition = 'transform 4s cubic-bezier(0.25, 0.1, 0.15, 1)'; }, 50);
+
     }, 4000); 
 }
 
