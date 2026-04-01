@@ -131,6 +131,36 @@
                     <p style="font-size: 12px; color: #888; margin-top: 15px; cursor: pointer; text-decoration: underline;" onclick="forgotPin()">ลืมรหัส PIN / ขอรหัสใหม่</p>
                 </div>
 
+                <div class="glass-card" id="storeRegistrationCard" style="margin-bottom: 25px; width: 100%;">
+                    <h3 style="margin-top: 0; color: #FFF; text-align: center; font-size: 16px;">ยังไม่ได้ลงทะเบียนร้านค้า?</h3>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px; text-align: center;">กรอกชื่อร้านเพื่อค้นหาพิกัดบน Google Maps</p>
+                    
+                    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                        <input type="text" id="regStoreName" class="input-dark" placeholder="ชื่อร้านของคุณ">
+                        <button class="btn-primary" style="width: auto; padding: 0 25px; white-space: nowrap;" onclick="searchRegStore()">ค้นหาพิกัด</button>
+                    </div>
+
+                    <div id="regStoreVerifyCard" style="display: none; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; border: 2px solid var(--primary); margin-top: 15px; text-align: center;">
+                        <h4 style="margin-top: 0; color: var(--primary);">📍 พิกัดที่พบ</h4>
+                        <p id="regVerifyStoreName" style="font-weight: bold; color: #FFF; margin-bottom: 10px;"></p>
+                        <div id="regMiniMap" style="width: 100%; height: 150px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #444;"></div>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn-outline" style="flex:1;" onclick="document.getElementById('regStoreVerifyCard').style.display='none'; document.getElementById('regStoreName').value='';">ค้นหาใหม่</button>
+                            <button class="btn-primary" style="flex:1;" onclick="document.getElementById('regStoreDetails').style.display='block'; window.scrollTo({top: document.getElementById('regStoreDetails').offsetTop, behavior: 'smooth'});">ใช้พิกัดนี้</button>
+                        </div>
+                    </div>
+                    
+                    <div id="regStoreDetails" style="display: none; margin-top: 20px; text-align: left;">
+                        <hr style="border-color: rgba(255,255,255,0.1); margin-bottom: 20px;">
+                        <div class="form-group"><label>เบอร์โทรศัพท์ร้าน <span style="color:var(--danger)">*</span></label><input type="tel" id="regPhone" class="input-dark" placeholder="08X-XXX-XXXX"></div>
+                        <div class="form-group"><label>รูปร้านค้า (ป้ายร้าน) <span style="color:var(--danger)">*</span></label><input type="file" id="regStorePhoto" class="input-dark" accept="image/*"></div>
+                        <div class="form-group"><label>บัตรประชาชนเจ้าของ <span style="color:var(--danger)">*</span></label><input type="file" id="regIdCard" class="input-dark" accept="image/*"></div>
+                        <div class="form-group"><label>ใบทะเบียนพาณิชย์ (ถ้ามี)</label><input type="file" id="regCommercial" class="input-dark" accept="image/*"></div>
+                        <div class="form-group"><label>รหัสผู้แนะนำ (ถ้ามี)</label><input type="text" id="regRefCode" class="input-dark" placeholder="AFFXXXXX"></div>
+                        <button id="btnSubmitReg" class="btn-primary" style="margin-top: 15px; width: 100%;" onclick="submitStoreRegistration()">🚀 ส่งข้อมูลเพื่อรับ PIN</button>
+                    </div>
+                </div>
+
                 <div id="lockedFeatures" style="display: none; width: 100%;">
                     
                     <div id="vipUpdateSection" class="glass-card" style="margin-bottom: 20px; display: none; width: 100%;">
@@ -148,105 +178,98 @@
                     </div>
 
                     <div id="vipHoursSection" class="glass-card" style="margin-bottom: 20px; border: 1px solid var(--primary); display: none; width: 100%;">
+                        <h3 style="margin-top: 0; color: var(--primary);">⏰ จัดการเวลาเปิด-ปิดร้าน</h3>
+                        <div style="background: rgba(0,0,0,0.4); padding: 15px; border-radius: 12px; margin-bottom: 15px;">
+                            <p style="font-size:12px; color:var(--text-muted); margin:0 0 10px;">ตั้งค่าด่วน (เลือกวันแล้วกดปุ่ม):</p>
+                            <div style="display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 10px;">
+                                <label><input type="checkbox" id="day_0"> อา</label>
+                                <label><input type="checkbox" id="day_1"> จ</label>
+                                <label><input type="checkbox" id="day_2"> อ</label>
+                                <label><input type="checkbox" id="day_3"> พ</label>
+                                <label><input type="checkbox" id="day_4"> พฤ</label>
+                                <label><input type="checkbox" id="day_5"> ศ</label>
+                                <label><input type="checkbox" id="day_6"> ส</label>
+                            </div>
+                            <div style="display: flex; gap: 5px; margin-bottom: 10px;">
+                                <input type="time" id="bulk_open" class="input-dark" style="padding:5px;">
+                                <span style="color:#aaa; display:flex; align-items:center;">-</span>
+                                <input type="time" id="bulk_close" class="input-dark" style="padding:5px;">
+                                <button class="btn-outline" style="padding:5px 10px; font-size:12px;" onclick="applyBulkTime()">ใช้เวลา</button>
+                            </div>
+                            <div style="display: flex; gap: 5px;">
+                                <button class="btn-outline" style="padding:5px 10px; font-size:12px; border-color:var(--success); color:var(--success);" onclick="applyBulk24h()">เปิด 24 ชม.</button>
+                                <button class="btn-outline" style="padding:5px 10px; font-size:12px; border-color:var(--danger); color:var(--danger);" onclick="applyBulkClosed()">ตั้งเป็นวันหยุด</button>
+                            </div>
                         </div>
+                        <div id="hoursGrid" style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 15px;"></div>
+                        <button class="btn-primary" onclick="saveOperatingHours()">💾 บันทึกเวลาเปิด-ปิดลงระบบ</button>
 
-                    <div id="vipSubscribeSection" class="glass-card" style="margin-bottom: 20px; border: 2px solid var(--prev-vip); width: 100%;">
+                        <h3 style="margin-top: 30px; color: var(--primary); border-top: 1px dashed #555; padding-top: 20px;">💬 ข้อมูลติดต่อ</h3>
+                        <div class="form-group"><label>ลิงก์ LINE (เช่น lin.ee/...)</label><input type="text" id="vipLineInput" class="input-dark" placeholder="วางลิงก์ LINE ที่นี่"></div>
+                        <div class="form-group"><label>ลิงก์ Facebook Page</label><input type="text" id="vipFbInput" class="input-dark" placeholder="วางลิงก์ Facebook ที่นี่"></div>
+                        <button class="btn-outline" style="width: 100%; border-color: var(--primary);" onclick="updateVipData()">💾 บันทึกข้อมูลติดต่อ</button>
+                        
+                        <h3 style="margin-top: 30px; color: var(--primary); border-top: 1px dashed #555; padding-top: 20px;">🎁 สิทธิพิเศษสำหรับลูกค้า</h3>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn-outline" style="flex:1; border-color: var(--danger); color: var(--danger);" onclick="openCouponEditor()">🎟️ จัดการคูปอง</button>
+                            <button class="btn-outline" style="flex:1; border-color: var(--info); color: var(--info);" onclick="openEventEditor()">🎉 จัดการกิจกรรม</button>
+                        </div>
+                    </div>
+
+                    <div id="vipSubscribeSection" class="glass-card" style="margin-bottom: 20px; border: 2px solid var(--prev-vip); box-shadow: 0 0 20px rgba(255, 215, 0, 0.1); width: 100%;">
                         <h3 id="vipSubscribeTitle" style="margin-top: 0; color: var(--prev-vip); text-align: center;">👑 สมัครสมาชิก VIP</h3>
                         
                         <div id="nonVipStatsBlock" style="background: rgba(0,0,0,0.5); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px dashed var(--prev-vip);">
                             <p style="margin: 0 0 10px; font-size: 14px; font-weight: bold; color: #FFF;">สิทธิพิเศษระดับ VIP:</p>
                             <ul style="margin: 0; padding-left: 20px; font-size: 13px; color: #ddd; line-height: 1.6;">
-                                <li>ร้านอยู่บนสุดของการค้นหา</li>
-                                <li>กรอบสีทองพิเศษ โดดเด่นกว่าใคร</li>
-                                <li>แสดงปุ่ม LINE / Facebook ให้ลูกค้ากดทัก</li>
-                                <li>จัดการเวลา เปิด-ปิด และ คูปองกิจกรรมได้</li>
-                                <li>รับสิทธิ์ลงแบนเนอร์โปรโมท ฟรี 7 วัน!</li>
+                                <li><span style="color:var(--primary);">ดันอันดับการค้นหา</span> ร้านจะอยู่บนสุดเสมอ</li>
+                                <li><span style="color:var(--danger);">กรอบสีทองพิเศษ</span> โดดเด่นกว่าร้านปกติ 10 เท่า</li>
+                                <li><span style="color:var(--info);">ระบบข้อมูลติดต่อ</span> ลูกค้ากด LINE/FB ได้ทันที</li>
+                                <li><span style="color:#06C755;">ระบบเวลา/คูปอง</span> แสดงเวลาเปิดปิดและโปรโมชั่น</li>
+                                <li>ดูสถิติคนเข้าชมร้านและการนำทางได้</li>
+                                <li><span style="color:var(--primary); font-weight:bold;">รับสิทธิ์โปรโมท ฟรี 7 วัน!</span></li>
                             </ul>
                         </div>
 
-                        <button id="btnShowRenewVip" class="btn-primary" style="display:none; background: var(--prev-vip); color: #000;" onclick="document.getElementById('vipPaymentArea').style.display='block'; this.style.display='none';">🔄 ต่ออายุสมาชิก VIP</button>
+                        <button id="btnShowRenewVip" class="btn-primary" style="display:none; background: linear-gradient(135deg, #FFD700, #C5A059); color: #000; font-weight: bold;" onclick="document.getElementById('vipPaymentArea').style.display='block'; this.style.display='none';">🔄 ต่ออายุ VIP</button>
 
                         <div id="vipPaymentArea" style="width: 100%;">
                             <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 15px;">
+                                <p style="margin: 0 0 5px; color: var(--text-muted); font-size: 13px;">ค่าบริการรายปี (ต่ออายุปีถัดไป 199฿)</p>
                                 <h2 style="margin: 0; color: #FFF; font-size: 32px;"><span id="displayVipPrice">500</span><span style="font-size: 16px;"> ฿ / ปี</span></h2>
-                                <p style="margin: 10px 0 0; font-size: 14px; font-weight: bold; color: var(--primary);" id="displayBankAcc">กำลังโหลดเลขบัญชี...</p>
+                                <div style="margin-top: 15px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                                    <p style="margin: 0 0 5px; font-size: 12px; color: #aaa;">โอนเงินเข้าบัญชี</p>
+                                    <p style="margin: 0; font-size: 15px; font-weight: bold; color: var(--primary);" id="displayBankAcc">รอแอดมินตั้งค่าบัญชี</p>
+                                </div>
                             </div>
-                            <div class="form-group"><label>แนบสลิปโอนเงิน</label><input type="file" id="vipSlipInput" class="input-dark" accept="image/*"></div>
-                            <button id="btnSubmitVip" class="btn-primary" onclick="submitVipRequest()">ส่งหลักฐานการชำระเงิน</button>
+                            <div class="form-group"><label>แนบสลิปโอนเงิน <span style="color:var(--danger)">*</span></label><input type="file" id="vipSlipInput" class="input-dark" accept="image/*"></div>
+                            <button id="btnSubmitVip" class="btn-primary" style="background: linear-gradient(135deg, #FFD700, #C5A059); color: #000; font-weight: bold;" onclick="submitVipRequest()">ส่งสลิป</button>
                         </div>
                     </div>
 
                     <div id="buyPromoSection" class="glass-card" style="margin-bottom: 20px; width: 100%;">
-                        </div>
+                        <h3 id="buyPromoTitle" style="margin-top: 0; color: #FFF;">🚀 สั่งซื้อแบนเนอร์โปรโมท</h3>
+                        <div class="form-group"><label>จังหวัดที่จะแสดง</label><select id="promoProvinceSelect" class="input-dark"></select></div>
+                        <div class="form-group"><label>หมวดหมู่ร้านค้า</label><select id="promoStoreCategory" class="input-dark"></select></div>
+                        <div class="form-group"><label>แพ็กเกจระยะเวลา</label><select id="promoServiceSelect" class="input-dark"></select></div>
+                        <div class="form-group"><label>คำอธิบายโปรโมชั่น</label><input type="text" id="promoDetail" class="input-dark" placeholder="เช่น ลด 50% วันนี้เท่านั้น!"></div>
+                        <div class="form-group"><label>รูปป้าย (สัดส่วน 16:9) สูงสุด 3 รูป</label><input type="file" id="promoImageInput" class="input-dark" accept="image/*" multiple></div>
+                        <div class="form-group" id="promoSlipArea"><label>สลิปโอนเงิน</label><input type="file" id="promoSlipInput" class="input-dark" accept="image/*"></div>
+                        <button id="btnSubmitPromo" class="btn-primary" onclick="submitPromoWithPIN()">🚀 สั่งซื้อและส่งเรื่องตรวจสอบ</button>
+                    </div>
 
                     <div id="editPromoSection" class="glass-card" style="margin-bottom: 20px; display: none; border: 1px solid var(--info); width: 100%;">
-                        </div>
-
-                </div> <div class="glass-card" id="storeRegistrationCard" style="margin-bottom: 25px; width: 100%;">
-                    <h3 style="margin-top: 0; color: #FFF; text-align: center; font-size: 16px;">ยังไม่ได้ลงทะเบียนร้านค้า?</h3>
-                    <button class="btn-outline" style="width: 100%; border-color: var(--primary); color: var(--primary);" onclick="document.getElementById('regStoreForm').style.display='block'; this.style.display='none';">ลงทะเบียนร้านค้าใหม่ฟรี</button>
-                    <div id="regStoreForm" style="display:none; margin-top: 20px;">
-                        </div>
-                </div>
-
-            </div> </div> </div>
-
-                <div id="vipSubscribeSection" class="glass-card" style="margin-bottom: 20px; border: 2px solid var(--prev-vip); box-shadow: 0 0 20px rgba(255, 215, 0, 0.1);">
-                    <h3 id="vipSubscribeTitle" style="margin-top: 0; color: var(--prev-vip);">👑 สมัครสมาชิก VIP</h3>
-                    
-                    <div id="nonVipStatsBlock" style="background: rgba(0,0,0,0.5); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px dashed var(--prev-vip);">
-                        <p style="margin: 0 0 10px; font-size: 14px; font-weight: bold; color: #FFF;">สิ่งที่ร้าน VIP จะได้รับ:</p>
-                        <ul style="margin: 0; padding-left: 20px; font-size: 13px; color: #ddd; line-height: 1.6;">
-                            <li><span style="color:var(--primary);">ดันอันดับการค้นหา</span> ร้านจะอยู่บนสุดเสมอ</li>
-                            <li><span style="color:var(--danger);">กรอบสีทองพิเศษ</span> โดดเด่นกว่าร้านปกติ 10 เท่า</li>
-                            <li><span style="color:var(--info);">ระบบข้อมูลติดต่อ</span> แสดงปุ่ม LINE / Facebook ให้ลูกค้ากดทักได้ทันที</li>
-                            <li><span style="color:#06C755;">จัดการเวลาทำการ</span> โชว์สถานะ เปิด-ปิด แบบ Real-time</li>
-                            <li><span style="color:#FF9800;">ระบบคูปอง/กิจกรรม</span> แจ้งโปรโมชั่นให้ลูกค้าเห็นง่ายๆ</li>
-                            <li>ดูสถิติคนเข้าชมร้านและการนำทางได้</li>
-                            <li><span style="color:var(--primary); font-weight:bold;">รับสิทธิ์ลงแบนเนอร์โปรโมท ฟรี 7 วัน!</span></li>
-                        </ul>
+                        <h3 style="margin-top: 0; color: var(--info);">📝 แก้ไขแบนเนอร์ที่กำลังแสดงผล (ฟรี)</h3>
+                        <div class="form-group"><label>คำอธิบายโปรโมชั่น</label><input type="text" id="editPromoDetailInput" class="input-dark"></div>
+                        <div class="form-group"><label>รูปป้ายใหม่ (ไม่เกิน 3 รูป)<br><span style="font-size:11px; color:#888;">*ถ้าไม่เลือกรูปใหม่ จะใช้รูปเดิม</span></label><input type="file" id="editPromoImageInput" class="input-dark" accept="image/*" multiple></div>
+                        <button id="btnEditPromo" class="btn-outline" style="border-color: var(--info); color: var(--info); margin-bottom: 10px; width: 100%;" onclick="submitEditPromo()">🔄 อัปเดตข้อมูลแบนเนอร์</button>
+                        <button class="btn-primary" style="width: 100%;" onclick="openRenewPromo()">แพ็กเกจหมดอายุ? ต่ออายุที่นี่</button>
                     </div>
 
-                    <button id="btnShowRenewVip" class="btn-primary" style="display:none; background: linear-gradient(135deg, #FFD700, #C5A059); color: #000; font-weight: bold;" onclick="document.getElementById('vipPaymentArea').style.display='block'; this.style.display='none';">🔄 ต่ออายุ VIP</button>
+                </div> </div> </div>
+    </div> </div>
 
-                    <div id="vipPaymentArea">
-                        <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 15px;">
-                            <p style="margin: 0 0 5px; color: var(--text-muted); font-size: 13px;">ค่าบริการรายปี (ต่ออายุอัตโนมัติปีถัดไป 199฿)</p>
-                            <h2 style="margin: 0; color: #FFF; font-size: 32px;"><span id="displayVipPrice">500</span><span style="font-size: 16px;"> ฿ / ปี</span></h2>
-                            <div style="margin-top: 15px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px;">
-                                <p style="margin: 0 0 5px; font-size: 12px; color: #aaa;">โอนเงินเข้าบัญชี</p>
-                                <p style="margin: 0; font-size: 15px; font-weight: bold; color: var(--primary);" id="displayBankAcc">รอแอดมินตั้งค่าบัญชี</p>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>แนบสลิปโอนเงิน <span style="color:var(--danger)">*</span></label>
-                            <input type="file" id="vipSlipInput" class="input-dark" accept="image/*">
-                        </div>
-                        <button id="btnSubmitVip" class="btn-primary" style="background: linear-gradient(135deg, #FFD700, #C5A059); color: #000; font-weight: bold;" onclick="submitVipRequest()">ส่งสลิป</button>
-                    </div>
-                </div>
-
-                <div id="buyPromoSection" class="glass-card" style="margin-bottom: 20px;">
-                    <h3 id="buyPromoTitle" style="margin-top: 0; color: #FFF;">🚀 สั่งซื้อแบนเนอร์โปรโมท</h3>
-                    <div class="form-group"><label>จังหวัดที่จะแสดง</label><select id="promoProvinceSelect" class="input-dark"></select></div>
-                    <div class="form-group"><label>หมวดหมู่ร้านค้า</label><select id="promoStoreCategory" class="input-dark"></select></div>
-                    <div class="form-group"><label>แพ็กเกจระยะเวลา</label><select id="promoServiceSelect" class="input-dark"></select></div>
-                    <div class="form-group"><label>คำอธิบายโปรโมชั่น</label><input type="text" id="promoDetail" class="input-dark" placeholder="เช่น ลด 50% วันนี้เท่านั้น!"></div>
-                    <div class="form-group"><label>รูปป้ายโปรโมท (สัดส่วน 16:9) สูงสุด 3 รูป</label><input type="file" id="promoImageInput" class="input-dark" accept="image/*" multiple></div>
-                    <div class="form-group" id="promoSlipArea"><label>สลิปโอนเงิน (ดูเลขบัญชีที่ด้านบน)</label><input type="file" id="promoSlipInput" class="input-dark" accept="image/*"></div>
-                    <button id="btnSubmitPromo" class="btn-primary" onclick="submitPromoWithPIN()">🚀 สั่งซื้อและส่งเรื่องตรวจสอบ</button>
-                </div>
-
-                <div id="editPromoSection" class="glass-card" style="margin-bottom: 20px; display: none; border: 1px solid var(--info);">
-                    <h3 style="margin-top: 0; color: var(--info);">📝 แก้ไขแบนเนอร์ที่กำลังแสดงผล (ฟรี)</h3>
-                    <div class="form-group"><label>คำอธิบายโปรโมชั่น</label><input type="text" id="editPromoDetailInput" class="input-dark"></div>
-                    <div class="form-group"><label>รูปป้ายโปรโมทใหม่ (ไม่เกิน 3 รูป) <br><span style="font-size:11px; color:#888;">*ถ้าไม่เลือกรูปใหม่ จะใช้รูปเดิม</span></label><input type="file" id="editPromoImageInput" class="input-dark" accept="image/*" multiple></div>
-                    <button id="btnEditPromo" class="btn-outline" style="border-color: var(--info); color: var(--info); margin-bottom: 10px;" onclick="submitEditPromo()">🔄 อัปเดตข้อมูลแบนเนอร์</button>
-                    <button class="btn-primary" onclick="openRenewPromo()">แพ็กเกจหมดอายุ? ต่ออายุที่นี่</button>
-                </div>
-
-            </div> </div> </div> </div> <div id="luckyWheelModal" class="feature-modal" style="z-index: 999999;">
+<div id="luckyWheelModal" class="feature-modal" style="z-index: 999999;">
     <div class="feature-modal-content" style="text-align: center; background: linear-gradient(135deg, var(--dark), var(--surface)); border-width: 2px; max-width: 320px;">
         <h2 style="margin-top: 0; color: var(--primary); font-size: 22px;">🎁 ศูนย์รวมรางวัล</h2>
         <button class="btn-outline" style="width: 100%; border-color: #17a2b8; color: #17a2b8; margin-bottom: 15px; font-weight: bold; background: rgba(23, 162, 184, 0.1);" onclick="openMyRewards()">🎟️ กระเป๋ารางวัลของฉัน</button>
@@ -299,7 +322,7 @@
     <span style="font-size: 24px;">🪙</span> <span id="point-toast-text" style="font-size: 15px;">+1 แต้ม</span>
 </div>
 
-<script src="app.js?v=12"></script>
+<script src="app.js?v=15"></script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD7Qqf1Z9KQBuvipDzgIc5laJLz9SiOBH8&libraries=places,geometry&callback=initMap" async defer></script>
 </body>
 </html>
