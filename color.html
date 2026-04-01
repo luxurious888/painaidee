@@ -3,417 +3,689 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ตั้งค่าธีม & เอฟเฟกต์ - ไปไหนดี</title>
-    
+    <title>ตั้งค่าธีม & ออกแบบโพสต์ - ไปไหนดี</title>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
-
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap');
-        
-        :root { --primary: #C5A059; --dark: #121418; --surface: #1A1D23; --text: #FFFFFF; }
-        body { font-family: 'Kanit', sans-serif; background-color: #0b0f19; color: var(--text); padding: 20px; margin: 0; }
-        
-        /* Layout หลัก แบ่ง 2 ฝั่ง */
-        .layout-wrapper { display: flex; flex-wrap: wrap; gap: 30px; justify-content: center; max-width: 1200px; margin: 0 auto; padding-bottom: 50px; }
-        
-        /* ฝั่งซ้าย: แผงตั้งค่า */
-        .container { flex: 1; min-width: 300px; max-width: 600px; background: var(--surface); padding: 30px; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); border: 1px solid rgba(197, 160, 89, 0.2); }
-        h1 { color: var(--primary); text-align: center; margin-top: 0; border-bottom: 2px dashed var(--primary); padding-bottom: 15px; font-size: 24px; }
-        
-        .section-title { font-size: 16px; font-weight: 600; margin-top: 25px; margin-bottom: 15px; color: #DFBF8B; display: flex; align-items: center; gap: 8px; }
-        .form-group { margin-bottom: 20px; display: flex; flex-direction: column; gap: 8px; }
-        .form-row { display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; border: 1px solid #333; margin-bottom: 10px; }
-        
-        label { font-size: 14px; font-weight: 500; color: #eee; }
-        input[type="color"] { width: 50px; height: 50px; border: none; border-radius: 8px; cursor: pointer; background: none; }
-        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
-        input[type="color"]::-webkit-color-swatch { border: 2px solid var(--primary); border-radius: 8px; }
-        
-        select, input[type="file"] { padding: 12px; border-radius: 8px; border: 1px solid #444; background: #121418; color: #FFF; font-family: 'Kanit'; width: 100%; box-sizing: border-box; font-size: 14px; outline: none; transition: 0.3s; }
-        select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.2); }
-        
-        .btn-save { background: linear-gradient(135deg, #FFD700, #C5A059); color: #000; font-size: 16px; font-weight: 600; font-family: 'Kanit'; padding: 15px; border: none; border-radius: 12px; width: 100%; cursor: pointer; transition: 0.3s; margin-top: 20px; box-shadow: 0 5px 15px rgba(197, 160, 89, 0.3); }
-        .btn-save:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(197, 160, 89, 0.5); }
-        
-        .btn-reset { background: transparent; color: #aaa; font-size: 14px; font-weight: 500; font-family: 'Kanit'; padding: 12px; border: 1px solid #444; border-radius: 12px; width: 100%; cursor: pointer; transition: 0.3s; margin-top: 10px; }
-        .btn-reset:hover { border-color: #D9534F; color: #D9534F; background: rgba(217, 83, 79, 0.1); }
-        
-        #logoPreview { max-width: 150px; max-height: 150px; margin-top: 10px; border-radius: 12px; display: none; border: 2px dashed var(--primary); background: #000; padding: 10px; }
-
-        /* ปุ่ม Preset Themes */
-        .preset-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
-        .btn-preset { padding: 10px; border-radius: 8px; border: 1px solid #444; font-family: 'Kanit'; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center; gap: 5px; }
-        .btn-preset:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        
-        .preset-aggressive { background: #050505; color: #D32F2F; border-color: #D32F2F; }
-        .preset-cool { background: #0A1128; color: #00E5FF; border-color: #00E5FF; }
-        .preset-luxury { background: #121418; color: #FFD700; border-color: #C5A059; }
-        .preset-vibrant { background: #2D1B4E; color: #00FF87; border-color: #FF6B6B; }
-        .preset-playful { background: #003B46; color: #FF4081; border-color: #18FFFF; }
-
-        /* =========================================
-           📱 ฝั่งขวา: Mockup มือถือจำลอง (Preview)
-           ========================================= */
-        .preview-wrapper { display: flex; flex-direction: column; align-items: center; }
-        .preview-phone { width: 320px; height: 650px; background: var(--dark); border-radius: 36px; border: 8px solid #333; box-shadow: 0 20px 50px rgba(0,0,0,0.8); position: relative; overflow: hidden; display: flex; flex-direction: column; transition: background-color 0.4s ease; }
-        
-        .phone-notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 120px; height: 25px; background: #333; border-radius: 0 0 15px 15px; z-index: 100; }
-        
-        .mock-header { padding: 40px 20px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); position: relative; }
-        .mock-profile { width: 60px; height: 60px; background: #555; border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 30px; transition: 0.3s; border: 2px solid transparent; }
-        .mock-app-name { font-size: 18px; font-weight: 600; color: #FFF; margin: 0; transition: color 0.3s; }
-        
-        .mock-body { flex: 1; padding: 20px; display: flex; flex-direction: column; gap: 20px; align-items: center; justify-content: center; }
-        .mock-logo-container { width: 120px; height: 160px; display: flex; justify-content: center; align-items: center; }
-        .mock-logo-img { max-width: 100%; max-height: 100%; transition: 0.3s; }
-        
-        .mock-card { width: 100%; height: 180px; background: rgba(255,255,255,0.05); border-radius: 16px; border: 2px solid transparent; padding: 15px; box-sizing: border-box; display: flex; flex-direction: column; position: relative; transition: 0.3s; margin-top: auto; }
-        .mock-card-badge { position: absolute; top: 10px; left: -10px; background: #FFD700; color: #000; padding: 4px 12px; font-size: 10px; font-weight: bold; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
-        .mock-card-img { width: 100%; height: 80px; background: rgba(0,0,0,0.5); border-radius: 8px; margin-bottom: 10px; margin-top: 15px; }
-        .mock-card-text { width: 70%; height: 10px; background: rgba(255,255,255,0.2); border-radius: 5px; margin-bottom: 8px; }
-        .mock-btn { margin-top: auto; padding: 10px; border-radius: 8px; border: none; font-family: 'Kanit'; font-weight: 600; color: #FFF; transition: 0.3s; }
-
-        /* =========================================
-           ✨ ชุด CSS Animations สำหรับ Preview 
-           ========================================= */
-        .vip-none { border-color: var(--prev-vip); }
-        .vip-glow { border-color: var(--prev-vip); animation: vipGlowAnim 2s infinite alternate; }
-        .vip-rainbow { animation: vipRainbowAnim 4s linear infinite; }
-        .vip-float { border-color: var(--prev-vip); animation: floatAnim 3s ease-in-out infinite; }
-        .vip-neon { border-color: var(--prev-vip); box-shadow: 0 0 10px var(--prev-vip), inset 0 0 10px var(--prev-vip); }
-        .vip-shake { border-color: var(--prev-vip); animation: shakeAnim 4s infinite; }
-        .vip-shimmer { border-color: var(--prev-vip); position: relative; overflow: hidden; }
-        .vip-shimmer::after { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(to right, transparent, rgba(255,255,255,0.3), transparent); transform: rotate(45deg); animation: shimmerAnim 3s infinite; }
-
-        @keyframes vipGlowAnim { 0% { box-shadow: 0 0 5px var(--prev-vip); } 100% { box-shadow: 0 0 25px var(--prev-vip); } }
-        @keyframes vipRainbowAnim { 0%{border-color:#ff0000;} 20%{border-color:#ff9900;} 40%{border-color:#33cc33;} 60%{border-color:#3399ff;} 80%{border-color:#cc33cc;} 100%{border-color:#ff0000;} }
-        @keyframes floatAnim { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-        @keyframes shakeAnim { 0%, 100% {transform: rotate(0deg);} 10%, 30%, 50%, 70%, 90% {transform: rotate(-2deg);} 20%, 40%, 60%, 80% {transform: rotate(2deg);} }
-        @keyframes shimmerAnim { 0% { left: -100%; top: -100%; } 100% { left: 100%; top: 100%; } }
-
-        .logo-none { filter: drop-shadow(0 0 5px var(--prev-primary)); }
-        .logo-shine { filter: drop-shadow(0 0 15px var(--prev-primary)); animation: logoPulse 3s infinite alternate; }
-        .logo-pulse { animation: logoPulseScale 1.5s infinite alternate ease-in-out; }
-        .logo-spin { animation: spinAnim 8s linear infinite; }
-        .logo-bounce { animation: bounceAnim 2s infinite ease-in-out; }
-        .logo-float { animation: floatAnim 4s ease-in-out infinite; filter: drop-shadow(0 0 10px var(--prev-primary)); }
-
-        @keyframes logoPulse { 0% { filter: drop-shadow(0 0 5px var(--prev-primary)); } 100% { filter: drop-shadow(0 0 25px var(--prev-primary)); } }
-        @keyframes logoPulseScale { 0% { transform: scale(1); } 100% { transform: scale(1.1); } }
-        @keyframes spinAnim { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        @keyframes bounceAnim { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
-
-        .prof-none { border-color: var(--prev-primary); }
-        .prof-glow-gold { border-color: #FFD700; box-shadow: 0 0 15px #FFD700; }
-        .prof-rainbow-spin { border: 3px solid transparent; background-image: linear-gradient(#555, #555), linear-gradient(90deg, red, yellow, green, blue, magenta); background-origin: border-box; background-clip: content-box, border-box; animation: spinAnim 4s linear infinite; }
-        .prof-pulse-ring { border-color: var(--prev-primary); animation: pulseRing 2s infinite; }
-        .prof-float { border-color: var(--prev-primary); animation: floatAnim 3s ease-in-out infinite; }
-
-        @keyframes pulseRing { 0% { box-shadow: 0 0 0 0 rgba(197, 160, 89, 0.7); } 100% { box-shadow: 0 0 0 15px rgba(197, 160, 89, 0); } }
-
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap');
+        :root{--primary:#C5A059;--dark:#121418;--surface:#1A1D23;--text:#FFF;--prev-primary:#C5A059;--prev-vip:#FFD700;}
+        *{box-sizing:border-box;margin:0;padding:0;}
+        body{font-family:'Kanit',sans-serif;background:#0b0f19;color:#FFF;min-height:100vh;}
+        .tab-nav{display:flex;background:#0d1117;border-bottom:2px solid #222;position:sticky;top:0;z-index:100;}
+        .tab-btn{flex:1;padding:16px;text-align:center;cursor:pointer;font-family:'Kanit';font-size:15px;font-weight:600;color:#888;border:none;background:none;transition:.3s;border-bottom:3px solid transparent;}
+        .tab-btn.active{color:var(--primary);border-bottom-color:var(--primary);}
+        .tab-content{display:none;padding:25px;}
+        .tab-content.active{display:block;}
+        .layout-wrapper{display:flex;flex-wrap:wrap;gap:25px;justify-content:center;max-width:1300px;margin:0 auto;}
+        .panel{flex:1;min-width:300px;max-width:620px;background:#1A1D23;padding:25px;border-radius:16px;border:1px solid rgba(197,160,89,.2);}
+        h2{color:var(--primary);margin-bottom:20px;font-size:22px;border-bottom:2px dashed var(--primary);padding-bottom:12px;}
+        .section-title{font-size:15px;font-weight:600;margin:22px 0 12px;color:#DFBF8B;display:flex;align-items:center;gap:8px;}
+        .form-group{margin-bottom:16px;display:flex;flex-direction:column;gap:7px;}
+        .form-row{display:flex;align-items:center;justify-content:space-between;background:rgba(0,0,0,.3);padding:12px 15px;border-radius:10px;border:1px solid #333;margin-bottom:8px;}
+        label{font-size:13px;font-weight:500;color:#ddd;}
+        input[type=color]{width:46px;height:46px;border:none;border-radius:8px;cursor:pointer;background:none;}
+        input[type=color]::-webkit-color-swatch-wrapper{padding:0;}
+        input[type=color]::-webkit-color-swatch{border:2px solid var(--primary);border-radius:6px;}
+        select,input[type=text],input[type=file],textarea{padding:11px;border-radius:8px;border:1px solid #444;background:#121418;color:#FFF;font-family:'Kanit';width:100%;font-size:14px;outline:none;transition:.3s;}
+        select:focus,input[type=text]:focus,textarea:focus{border-color:var(--primary);}
+        .btn-primary{background:linear-gradient(135deg,#FFD700,#C5A059);color:#000;font-size:15px;font-weight:700;font-family:'Kanit';padding:14px;border:none;border-radius:12px;width:100%;cursor:pointer;transition:.3s;margin-top:15px;}
+        .btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(197,160,89,.4);}
+        .btn-secondary{background:transparent;color:#aaa;font-size:13px;font-family:'Kanit';padding:11px;border:1px solid #444;border-radius:10px;width:100%;cursor:pointer;transition:.3s;margin-top:8px;}
+        .btn-secondary:hover{border-color:#D9534F;color:#D9534F;}
+        .btn-tool{padding:9px 14px;border-radius:8px;border:1px solid #444;background:#121418;color:#FFF;font-family:'Kanit';font-size:13px;cursor:pointer;transition:.2s;margin-top:6px;margin-right:6px;}
+        .btn-tool:hover{border-color:var(--primary);color:var(--primary);}
+        .preset-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:15px;}
+        @media(max-width:500px){.preset-grid{grid-template-columns:repeat(2,1fr);}}
+        .btn-preset{padding:10px 6px;border-radius:10px;border:1px solid #444;font-family:'Kanit';font-size:12px;font-weight:600;cursor:pointer;transition:.3s;display:flex;flex-direction:column;align-items:center;gap:3px;line-height:1.4;}
+        .btn-preset:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.6);}
+        .btn-preset span{font-size:10px;font-weight:400;opacity:.65;}
+        .preview-wrapper{display:flex;flex-direction:column;align-items:center;position:sticky;top:80px;}
+        .preview-phone{width:295px;height:610px;background:var(--dark);border-radius:36px;border:8px solid #333;box-shadow:0 20px 50px rgba(0,0,0,.8);position:relative;overflow:hidden;display:flex;flex-direction:column;transition:background-color .4s;}
+        .phone-notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:110px;height:22px;background:#333;border-radius:0 0 14px 14px;z-index:100;}
+        .mock-header{padding:35px 18px 18px;text-align:center;border-bottom:1px solid rgba(255,255,255,.1);}
+        .mock-profile{width:55px;height:55px;background:#555;border-radius:50%;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;font-size:26px;border:2px solid transparent;}
+        .mock-app-name{font-size:16px;font-weight:600;color:#FFF;}
+        .mock-body{flex:1;padding:16px;display:flex;flex-direction:column;gap:16px;align-items:center;justify-content:center;}
+        .mock-logo-container{width:110px;height:145px;display:flex;justify-content:center;align-items:center;}
+        .mock-logo-img{max-width:100%;max-height:100%;}
+        .mock-card{width:100%;background:rgba(255,255,255,.05);border-radius:14px;border:2px solid transparent;padding:12px;display:flex;flex-direction:column;position:relative;overflow:hidden;}
+        .mock-card-badge{position:absolute;top:8px;left:-8px;background:#FFD700;color:#000;padding:3px 10px;font-size:9px;font-weight:700;border-radius:8px;}
+        .mock-card-img{width:100%;height:65px;background:rgba(0,0,0,.5);border-radius:8px;margin:16px 0 8px;}
+        .mock-card-text{height:9px;background:rgba(255,255,255,.2);border-radius:4px;margin-bottom:6px;}
+        .mock-btn{padding:8px;border-radius:7px;border:none;font-family:'Kanit';font-weight:600;color:#FFF;font-size:12px;margin-top:4px;}
+        /* Animations */
+        .vip-none{border-color:var(--prev-vip);}
+        .vip-glow{border-color:var(--prev-vip);animation:vipGlow 2s infinite alternate;}
+        .vip-rainbow{animation:vipRainbow 4s linear infinite;}
+        .vip-float{border-color:var(--prev-vip);animation:floatUp 3s ease-in-out infinite;}
+        .vip-neon{border-color:var(--prev-vip);box-shadow:0 0 10px var(--prev-vip),inset 0 0 10px var(--prev-vip);}
+        .vip-shake{border-color:var(--prev-vip);animation:shake 4s infinite;}
+        .vip-shimmer{border-color:var(--prev-vip);position:relative;overflow:hidden;}
+        .vip-shimmer::after{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:linear-gradient(to right,transparent,rgba(255,255,255,.3),transparent);transform:rotate(45deg);animation:shimmer 3s infinite;}
+        .vip-pulse{border-color:var(--prev-vip);animation:pulseBorder 1.5s infinite;}
+        .vip-fire{border-color:#FF6B00;box-shadow:0 0 15px #FF6B00,0 0 30px #FF3D00;animation:fireGlow 1s infinite alternate;}
+        .vip-ice{border-color:#00E5FF;box-shadow:0 0 15px #00E5FF;animation:iceGlow 2s infinite alternate;}
+        .vip-gold{border-color:#FFD700;animation:goldShine 3s infinite;}
+        @keyframes vipGlow{0%{box-shadow:0 0 5px var(--prev-vip);}100%{box-shadow:0 0 25px var(--prev-vip);}}
+        @keyframes vipRainbow{0%{border-color:#f00;}20%{border-color:#f90;}40%{border-color:#3c3;}60%{border-color:#39f;}80%{border-color:#c3c;}100%{border-color:#f00;}}
+        @keyframes floatUp{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+        @keyframes shake{0%,100%{transform:rotate(0);}10%,30%,50%,70%,90%{transform:rotate(-2deg);}20%,40%,60%,80%{transform:rotate(2deg);}}
+        @keyframes shimmer{0%{left:-100%;top:-100%;}100%{left:100%;top:100%;}}
+        @keyframes pulseBorder{0%,100%{box-shadow:0 0 0 0 var(--prev-vip);}50%{box-shadow:0 0 0 6px transparent;}}
+        @keyframes fireGlow{0%{box-shadow:0 0 10px #FF6B00,0 0 20px #FF3D00;}100%{box-shadow:0 0 20px #FF6B00,0 0 40px #FF3D00;}}
+        @keyframes iceGlow{0%{box-shadow:0 0 8px #00E5FF;}100%{box-shadow:0 0 25px #00E5FF,0 0 40px #0088FF;}}
+        @keyframes goldShine{0%,100%{box-shadow:0 0 10px rgba(255,215,0,.3);}50%{box-shadow:0 0 25px rgba(255,215,0,.8);}}
+        .logo-none{filter:drop-shadow(0 0 5px var(--prev-primary));}
+        .logo-shine{filter:drop-shadow(0 0 15px var(--prev-primary));animation:logoPulse 3s infinite alternate;}
+        .logo-pulse{animation:logoScale 1.5s infinite alternate ease-in-out;}
+        .logo-spin{animation:spin 8s linear infinite;}
+        .logo-bounce{animation:bounce 2s infinite ease-in-out;}
+        .logo-float{animation:floatUp 4s ease-in-out infinite;filter:drop-shadow(0 0 10px var(--prev-primary));}
+        .logo-glitch{animation:glitch .5s infinite;}
+        .logo-swing{animation:swing 3s ease-in-out infinite;}
+        @keyframes logoPulse{0%{filter:drop-shadow(0 0 5px var(--prev-primary));}100%{filter:drop-shadow(0 0 25px var(--prev-primary));}}
+        @keyframes logoScale{0%{transform:scale(1);}100%{transform:scale(1.1);}}
+        @keyframes spin{from{transform:rotate(0);}to{transform:rotate(360deg);}}
+        @keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-15px);}}
+        @keyframes glitch{0%,100%{transform:translate(0);}20%{transform:translate(-2px,2px);}40%{transform:translate(2px,-2px);}60%{transform:translate(-1px,1px);}80%{transform:translate(1px,-1px);}}
+        @keyframes swing{0%,100%{transform:rotate(-5deg);}50%{transform:rotate(5deg);}}
+        .prof-none{border-color:var(--prev-primary);}
+        .prof-glow-gold{border-color:#FFD700;box-shadow:0 0 15px #FFD700;}
+        .prof-rainbow-spin{border:3px solid transparent;background-image:linear-gradient(#555,#555),linear-gradient(90deg,red,yellow,green,blue,magenta);background-origin:border-box;background-clip:content-box,border-box;animation:spin 4s linear infinite;}
+        .prof-pulse-ring{border-color:var(--prev-primary);animation:pulseRing 2s infinite;}
+        .prof-float{border-color:var(--prev-primary);animation:floatUp 3s ease-in-out infinite;}
+        .prof-neon-blue{border-color:#00E5FF;box-shadow:0 0 12px #00E5FF;}
+        .prof-fire{border-color:#FF6B00;box-shadow:0 0 12px #FF6B00;animation:fireGlow 1s infinite alternate;}
+        @keyframes pulseRing{0%{box-shadow:0 0 0 0 rgba(197,160,89,.7);}100%{box-shadow:0 0 0 12px rgba(197,160,89,0);}}
+        /* Promo */
+        .promo-canvas-wrapper{display:flex;flex-direction:column;align-items:center;gap:12px;flex:1;min-width:300px;padding:20px 0;}
+        #promoCanvas{border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.8);max-width:100%;}
+        .template-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+        .btn-template{padding:10px 6px;border-radius:8px;border:1px solid #333;background:#121418;color:#ddd;font-family:'Kanit';font-size:12px;font-weight:600;cursor:pointer;transition:.2s;text-align:center;}
+        .btn-template:hover{border-color:var(--primary);color:var(--primary);}
+        .range-group{display:flex;align-items:center;gap:10px;}
+        .range-group input[type=range]{flex:1;accent-color:var(--primary);}
+        #logoPreview{max-width:120px;max-height:120px;margin-top:8px;border-radius:10px;display:none;border:2px dashed var(--primary);background:#000;padding:8px;}
     </style>
 </head>
 <body>
 
+<div class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('theme')">🎨 ธีมแอป</button>
+    <button class="tab-btn"        onclick="switchTab('promo')">🖼️ ออกแบบโพสต์</button>
+</div>
+
+<!-- TAB 1: ธีม -->
+<div id="tab-theme" class="tab-content active">
 <div class="layout-wrapper">
-    <div class="container">
-        <h1>🎨 ปรับแต่งธีม & เอฟเฟกต์แอป</h1>
+<div class="panel">
+    <h2>🎨 ปรับแต่งธีม & เอฟเฟกต์แอป</h2>
 
-        <div class="section-title">✨ ธีมสำเร็จรูป (Quick Presets)</div>
-        <div class="preset-grid">
-            <button class="btn-preset preset-aggressive" onclick="applyPreset('aggressive')">🔥 ดุดัน<br><span style="font-size:10px;font-weight:400;color:#aaa;">ดำ/แดง/ไฟ</span></button>
-            <button class="btn-preset preset-cool" onclick="applyPreset('cool')">🧊 เท่ ล้ำยุค<br><span style="font-size:10px;font-weight:400;color:#aaa;">กรมท่า/ฟ้านีออน</span></button>
-            <button class="btn-preset preset-luxury" onclick="applyPreset('luxury')">👑 เรียบหรู<br><span style="font-size:10px;font-weight:400;color:#aaa;">ชาร์โคล/ทอง</span></button>
-            <button class="btn-preset preset-vibrant" onclick="applyPreset('vibrant')">🌈 สดใส<br><span style="font-size:10px;font-weight:400;color:#aaa;">ม่วงเข้ม/ส้ม/รุ้ง</span></button>
-            <button class="btn-preset preset-playful" onclick="applyPreset('playful')">🎉 สนุกสนาน<br><span style="font-size:10px;font-weight:400;color:#aaa;">น้ำทะเล/ชมพูบับเบิ้ล</span></button>
-        </div>
-        <p style="font-size: 12px; color: #999; text-align: center; margin-top: -5px; margin-bottom: 25px;">* กดเลือกธีมด้านบนเพื่อเปลี่ยนค่าสีและเอฟเฟกต์อัตโนมัติ (แล้วค่อยกดบันทึก)</p>
-        
-        <div class="section-title">1. 🎨 สีหลักของแอป (App Colors)</div>
-        <div class="form-row">
-            <label>สีพื้นหลังแอป (Background)</label>
-            <input type="color" id="bgColor" value="#121418">
-        </div>
-        <div class="form-row">
-            <label>สีหลัก/ปุ่มกด (Primary Color)</label>
-            <input type="color" id="primaryColor" value="#C5A059">
-        </div>
+    <div class="section-title">✨ ธีมสำเร็จรูป (20 ธีม)</div>
+    <div class="preset-grid" id="presetGrid"></div>
+    <p style="font-size:11px;color:#F57C00;margin-bottom:18px;">⚠️ การเลือกธีมจะล้างโลโก้ custom ออก หากต้องการเก็บไว้ให้อัพโหลดใหม่หลังเลือกธีม</p>
 
-        <div class="section-title">2. 👑 กรอบ VIP & โปรโมท (VIP Settings)</div>
-        <div class="form-row">
-            <label>สีกรอบ VIP</label>
-            <input type="color" id="vipBorderColor" value="#FFD700">
-        </div>
-        <div class="form-group">
-            <label>ลูกเล่น/เอฟเฟกต์ การ์ด VIP (VIP Animation)</label>
-            <select id="vipEffect">
-                <option value="none">ไม่มีเอฟเฟกต์ (นิ่งๆ)</option>
-                <option value="glow">🌟 เรืองแสงกระพริบ (Pulse Glow)</option>
-                <option value="rainbow">🌈 สีรุ้งวิ่งวน (Rainbow Border)</option>
-                <option value="float">🎈 ลอยขึ้นลง (Floating)</option>
-                <option value="neon">💡 ขอบนีออนสว่าง (Neon Light)</option>
-                <option value="shake">📳 สั่นดึงดูดสายตา (Shake)</option>
-                <option value="shimmer">✨ ประกายแสงสะท้อน (Shimmer)</option>
-            </select>
-        </div>
-
-        <div class="section-title">3. 🖼️ โลโก้แอป (App Logo)</div>
-        <div class="form-group">
-            <label>เอฟเฟกต์ของโลโก้ (หน้าโหลดและหน้าแรก)</label>
-            <select id="logoEffect">
-                <option value="shine">✨ แสงวิ่งพาดผ่าน (Shine - ค่าเริ่มต้น)</option>
-                <option value="none">ไม่มีเอฟเฟกต์</option>
-                <option value="pulse">💗 เต้นเหมือนจังหวะหัวใจ (Pulse)</option>
-                <option value="spin">🌀 หมุนช้าๆ ตลอดเวลา (Spin)</option>
-                <option value="bounce">🏀 กระเด้งดึ๋งๆ (Bounce)</option>
-                <option value="float">☁️ ลอยเบาๆ (Float)</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label style="font-size: 13px; color: #aaa;">อัปโหลดรูปภาพโลโก้ใหม่ (ถ้าต้องการใช้โลโก้ SVG ทองคำเดิม ให้เว้นว่างไว้ หรือกดลบรูปออก)</label>
-            <input type="file" id="logoUpload" accept="image/*" onchange="previewLogo(event)">
-            <div style="display: flex; gap: 10px; align-items: center; margin-top: 10px;">
-                <img id="logoPreview" src="" alt="Logo Preview">
-                <button id="btnClearLogo" onclick="clearLogoPreview()" style="display:none; padding:8px 15px; background:#D9534F; color:#FFF; border:none; border-radius:8px; cursor:pointer; font-family:'Kanit';">🗑️ ลบรูป</button>
-            </div>
-        </div>
-
-        <div class="section-title">4. 👤 รูปโปรไฟล์ลูกค้า (User Profile)</div>
-        <div class="form-group">
-            <label>เอฟเฟกต์รอบรูปโปรไฟล์ (Profile Animation)</label>
-            <select id="profileEffect">
-                <option value="none">กรอบสีหลักปกติ (Default)</option>
-                <option value="glow-gold">🌟 ออร่าเรืองแสง (Aura Glow)</option>
-                <option value="rainbow-spin">🌈 กรอบสีรุ้งหมุนวน (Spinning Rainbow)</option>
-                <option value="pulse-ring">🌊 วงแหวนกระจายออก (Pulse Ring)</option>
-                <option value="float">🎈 ลอยเบาๆ (Floating Profile)</option>
-            </select>
-        </div>
-
-        <button class="btn-save" id="btnSave" onclick="saveThemeSettings()">💾 บันทึกการตั้งค่าใช้งานจริง</button>
-        <button class="btn-reset" onclick="resetToDefault()">🔄 คืนค่าสีและเอฟเฟกต์ดั้งเดิม (Default)</button>
+    <div class="section-title">1. 🎨 สีหลักของแอป</div>
+    <div class="form-row">
+        <label>สีพื้นหลัง (Background)</label>
+        <input type="color" id="bgColor" value="#121418">
+    </div>
+    <div class="form-row">
+        <label>สีหลัก / ปุ่มกด (Primary)</label>
+        <input type="color" id="primaryColor" value="#C5A059">
     </div>
 
-    <div class="preview-wrapper">
-        <h3 style="color: #DFBF8B; margin-top: 0; text-align: center;">📱 หน้าจอตัวอย่าง (Preview)</h3>
-        <div class="preview-phone" id="preview-phone">
-            <div class="phone-notch"></div>
-            
-            <div class="mock-header">
-                <div class="mock-profile" id="preview-profile">👤</div>
-                <h3 class="mock-app-name" id="preview-app-name">ไปไหนดี</h3>
-            </div>
-            
-            <div class="mock-body">
-                <div class="mock-logo-container">
-                    <img id="preview-logo-img" src="data:image/svg+xml;utf8,<svg viewBox='0 0 200 280' xmlns='http://www.w3.org/2000/svg'><circle cx='100' cy='100' r='90' fill='none' stroke='%23C5A059' stroke-width='6'/><path d='M85,35 L100,20 L115,35 L125,25 L135,35 L135,45 L65,45 L65,35 L75,25 Z' fill='%23C5A059'/><path d='M100,165 C70,135 60,115 60,95 A40,40 0 1,1 140,95 C140,115 130,135 100,165 Z' fill='%23C5A059'/><circle cx='100' cy='95' r='28' fill='%231A1D23' stroke='%23C5A059' stroke-width='2'/><polygon points='100,75 110,105 100,100 90,105' fill='%23C5A059'/><text x='100' y='220' font-family='sans-serif' font-size='28' fill='%23C5A059' text-anchor='middle' font-weight='bold'>ไปไหนดี</text><text x='100' y='250' font-family='sans-serif' font-size='20' fill='%23C5A059' text-anchor='middle'>Painaidee</text><text x='100' y='270' font-family='sans-serif' font-size='10' fill='%23999' text-anchor='middle'>TRAVEL &amp; DISCOVER • VIP</text></svg>" class="mock-logo-img logo-shine">
-                </div>
+    <div class="section-title">2. 👑 กรอบ VIP</div>
+    <div class="form-row">
+        <label>สีกรอบ VIP</label>
+        <input type="color" id="vipBorderColor" value="#FFD700">
+    </div>
+    <div class="form-group">
+        <label>เอฟเฟกต์การ์ด VIP</label>
+        <select id="vipEffect">
+            <option value="none">ไม่มีเอฟเฟกต์</option>
+            <option value="glow">🌟 เรืองแสงกระพริบ</option>
+            <option value="rainbow">🌈 สีรุ้งวิ่งวน</option>
+            <option value="float">🎈 ลอยขึ้นลง</option>
+            <option value="neon">💡 ขอบนีออน</option>
+            <option value="shake">📳 สั่นดึงดูดสายตา</option>
+            <option value="shimmer">✨ ประกายสะท้อน</option>
+            <option value="pulse">💗 เต้นเป็นจังหวะ</option>
+            <option value="fire">🔥 ไฟลุก</option>
+            <option value="ice">🧊 น้ำแข็งเรืองแสง</option>
+            <option value="gold">👑 ทองประกาย</option>
+        </select>
+    </div>
 
-                <div class="mock-card" id="preview-vip-card">
-                    <div class="mock-card-badge" id="preview-vip-badge">👑 VIP RECOMMEND</div>
-                    <div class="mock-card-img"></div>
-                    <div class="mock-card-text"></div>
-                    <div class="mock-card-text" style="width: 40%;"></div>
-                    <button class="mock-btn" id="preview-btn-mock">📍 ดูพิกัดร้าน</button>
-                </div>
+    <div class="section-title">3. 🖼️ โลโก้แอป</div>
+    <div class="form-group">
+        <label>เอฟเฟกต์โลโก้</label>
+        <select id="logoEffect">
+            <option value="shine">✨ แสงวิ่งพาดผ่าน (Shine)</option>
+            <option value="none">ไม่มีเอฟเฟกต์</option>
+            <option value="pulse">💗 เต้นเป็นจังหวะ</option>
+            <option value="spin">🌀 หมุนช้าๆ</option>
+            <option value="bounce">🏀 กระเด้ง</option>
+            <option value="float">☁️ ลอยเบาๆ</option>
+            <option value="glitch">⚡ Glitch Effect</option>
+            <option value="swing">🌊 แกว่งซ้ายขวา</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label style="color:#aaa;font-size:12px;">อัปโหลดโลโก้ใหม่ (เว้นว่างเพื่อใช้โลโก้ SVG เดิม)</label>
+        <input type="file" id="logoUpload" accept="image/*" onchange="previewLogo(event)">
+        <div style="display:flex;gap:10px;align-items:center;margin-top:8px;">
+            <img id="logoPreview" src="" alt="Logo Preview">
+            <button id="btnClearLogo" onclick="clearLogoPreview()" style="display:none;padding:7px 14px;background:#D9534F;color:#FFF;border:none;border-radius:8px;cursor:pointer;font-family:'Kanit';font-size:13px;">🗑️ ลบรูป</button>
+        </div>
+    </div>
+
+    <div class="section-title">4. 👤 โปรไฟล์ผู้ใช้</div>
+    <div class="form-group">
+        <label>เอฟเฟกต์รูปโปรไฟล์</label>
+        <select id="profileEffect">
+            <option value="none">กรอบปกติ</option>
+            <option value="glow-gold">🌟 ออร่าเรืองแสง</option>
+            <option value="rainbow-spin">🌈 กรอบรุ้งหมุนวน</option>
+            <option value="pulse-ring">🌊 วงแหวนกระจาย</option>
+            <option value="float">🎈 ลอยเบาๆ</option>
+            <option value="neon-blue">💡 นีออนฟ้า</option>
+            <option value="fire">🔥 ไฟลุก</option>
+        </select>
+    </div>
+
+    <button class="btn-primary" id="btnSave" onclick="saveThemeSettings()">💾 บันทึกการตั้งค่า</button>
+    <button class="btn-secondary" onclick="resetToDefault()">🔄 คืนค่าเริ่มต้น</button>
+</div>
+
+<div class="preview-wrapper">
+    <h3 style="color:#DFBF8B;text-align:center;margin-bottom:12px;">📱 ตัวอย่างหน้าจอ</h3>
+    <div class="preview-phone" id="preview-phone">
+        <div class="phone-notch"></div>
+        <div class="mock-header">
+            <div class="mock-profile prof-none" id="preview-profile">👤</div>
+            <div class="mock-app-name" id="preview-app-name">ไปไหนดี</div>
+        </div>
+        <div class="mock-body">
+            <div class="mock-logo-container">
+                <img id="preview-logo-img" src="" class="mock-logo-img logo-shine">
+            </div>
+            <div class="mock-card vip-none" id="preview-vip-card">
+                <div class="mock-card-badge" id="preview-vip-badge">👑 VIP</div>
+                <div class="mock-card-img"></div>
+                <div class="mock-card-text" style="width:70%;"></div>
+                <div class="mock-card-text" style="width:40%;"></div>
+                <button class="mock-btn" id="preview-btn-mock">📍 ดูพิกัดร้าน</button>
             </div>
         </div>
     </div>
 </div>
+</div>
+</div>
+
+<!-- TAB 2: ออกแบบโพสต์ -->
+<div id="tab-promo" class="tab-content">
+<div class="layout-wrapper">
+
+<div class="panel">
+    <h2>🖼️ ออกแบบโพสต์โปรโมท</h2>
+
+    <div class="section-title">📐 เทมเพลตสำเร็จรูป</div>
+    <div class="template-grid" id="templateGrid"></div>
+
+    <div class="section-title">📏 ขนาดโพสต์</div>
+    <div class="form-group">
+        <select id="canvasSize" onchange="resizeCanvas()">
+            <option value="1080x1080">1:1 — Instagram/Facebook (1080×1080)</option>
+            <option value="1080x1920">9:16 — Story/Reels (1080×1920)</option>
+            <option value="1200x630" selected>1.9:1 — Banner แนวนอน (1200×630)</option>
+            <option value="1080x566">16:9 — YouTube Thumbnail (1080×566)</option>
+        </select>
+    </div>
+
+    <div class="section-title">🖼️ รูปพื้นหลัง</div>
+    <div class="form-group">
+        <input type="file" id="bgImageInput" accept="image/*" onchange="loadBgImage(event)">
+        <div>
+            <button class="btn-tool" onclick="clearBgImage()">🗑️ ลบรูป</button>
+            <button class="btn-tool" onclick="toggleBgOverlay()">🌑 สลับ Overlay</button>
+        </div>
+    </div>
+
+    <div class="section-title">✍️ ข้อความ</div>
+    <div class="form-group">
+        <label>ข้อความหลัก (ชื่อร้าน / หัวข้อ)</label>
+        <input type="text" id="textMain" value="ร้านอาหารอร่อยๆ" oninput="drawCanvas()">
+    </div>
+    <div class="form-group">
+        <label>ข้อความรอง (โปรโมชั่น)</label>
+        <input type="text" id="textSub" value="ลด 50% วันนี้เท่านั้น!" oninput="drawCanvas()">
+    </div>
+    <div class="form-group">
+        <label>ข้อความล่าง (เบอร์/ที่อยู่)</label>
+        <input type="text" id="textBottom" value="📍 ใจกลางเมือง | 📞 08X-XXX-XXXX" oninput="drawCanvas()">
+    </div>
+    <div class="form-row">
+        <label>สีข้อความหลัก</label>
+        <input type="color" id="textMainColor" value="#FFD700" oninput="drawCanvas()">
+    </div>
+    <div class="form-row">
+        <label>สีข้อความรอง</label>
+        <input type="color" id="textSubColor" value="#FFFFFF" oninput="drawCanvas()">
+    </div>
+    <div class="form-group">
+        <label>ขนาดตัวอักษรหลัก</label>
+        <div class="range-group">
+            <input type="range" id="fontSizeMain" min="24" max="90" value="52" oninput="syncRange('fontSizeMain'); drawCanvas()">
+            <span id="fontSizeMainVal" style="color:#aaa;min-width:28px;">52</span>
+        </div>
+    </div>
+
+    <div class="section-title">🎨 ตกแต่งพื้นหลัง</div>
+    <div class="form-row">
+        <label>สีพื้นหลัง (ถ้าไม่มีรูป)</label>
+        <input type="color" id="canvasBgColor" value="#121418" oninput="drawCanvas()">
+    </div>
+    <div class="form-row">
+        <label>สีแถบ Gradient ล่าง</label>
+        <input type="color" id="gradientColor" value="#C5A059" oninput="drawCanvas()">
+    </div>
+    <div class="form-group">
+        <label>ความมืดของ Overlay (0=ใส / 95=มืดมาก)</label>
+        <div class="range-group">
+            <input type="range" id="overlayOpacity" min="0" max="95" value="55" oninput="syncRange('overlayOpacity'); drawCanvas()">
+            <span id="overlayOpacityVal" style="color:#aaa;min-width:28px;">55</span>
+        </div>
+    </div>
+
+    <div class="section-title">🏷️ ป้ายและโลโก้ร้าน</div>
+    <div class="form-group">
+        <label>ข้อความป้าย (Badge)</label>
+        <input type="text" id="badgeText" value="HOT 🔥" oninput="drawCanvas()">
+    </div>
+    <div class="form-row">
+        <label>สีป้าย</label>
+        <input type="color" id="badgeColor" value="#D9534F" oninput="drawCanvas()">
+    </div>
+    <div class="form-group">
+        <label>โลโก้/ตราร้าน (มุมขวาบน)</label>
+        <input type="file" id="logoStampInput" accept="image/*" onchange="loadLogoStamp(event)">
+        <button class="btn-tool" onclick="clearLogoStamp()">🗑️ ลบโลโก้</button>
+    </div>
+
+    <button class="btn-primary" onclick="downloadPromo()">⬇️ ดาวน์โหลดรูปโพสต์ (ความละเอียดสูง)</button>
+</div>
+
+<div class="promo-canvas-wrapper">
+    <h3 style="color:#DFBF8B;text-align:center;margin-bottom:12px;">🖼️ ตัวอย่างโพสต์</h3>
+    <canvas id="promoCanvas" width="600" height="315"></canvas>
+    <p style="font-size:11px;color:#666;text-align:center;margin-top:8px;">* รูปที่ดาวน์โหลดจะมีความละเอียดสูงกว่าตัวอย่างครับ</p>
+</div>
+
+</div>
+</div>
 
 <script>
-    // ตั้งค่า Firebase ตัวเดิมของคุณ
-    const firebaseConfig = {
-        apiKey: "AIzaSyBSFWKdLCjLWqzo2_mzUE95CyoiUv5TdnY",
-        authDomain: "painaid-88c53.firebaseapp.com",
-        projectId: "painaid-88c53",
-        storageBucket: "painaid-88c53.firebasestorage.app",
-        messagingSenderId: "229290700458",
-        appId: "1:229290700458:web:74a57d0be5df9326c5ead3"
+// ── Firebase ──
+const firebaseConfig={apiKey:"AIzaSyBSFWKdLCjLWqzo2_mzUE95CyoiUv5TdnY",authDomain:"painaid-88c53.firebaseapp.com",projectId:"painaid-88c53",storageBucket:"painaid-88c53.firebasestorage.app",messagingSenderId:"229290700458",appId:"1:229290700458:web:74a57d0be5df9326c5ead3"};
+if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);
+const db=firebase.firestore(),storage=firebase.storage();
+
+function switchTab(name){
+    document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(el=>el.classList.remove('active'));
+    document.getElementById('tab-'+name).classList.add('active');
+    document.querySelectorAll('.tab-btn')[name==='theme'?0:1].classList.add('active');
+    if(name==='promo')drawCanvas();
+}
+
+// ── 20 Preset Themes ──
+const themes=[
+    {name:'👑 เรียบหรู',   sub:'ชาร์โคล/ทอง',     bg:'#121418',primary:'#C5A059',vip:'#FFD700',ve:'shimmer', le:'shine', pe:'none'},
+    {name:'🔥 ดุดัน',      sub:'ดำ/แดงไฟ',         bg:'#050505',primary:'#D32F2F',vip:'#FF3D00',ve:'fire',    le:'pulse', pe:'fire'},
+    {name:'🧊 ล้ำยุค',     sub:'กรมท่า/ฟ้านีออน',  bg:'#0A1128',primary:'#00E5FF',vip:'#D500F9',ve:'neon',    le:'float', pe:'neon-blue'},
+    {name:'🌈 สดใส',       sub:'ม่วง/ส้ม/รุ้ง',    bg:'#2D1B4E',primary:'#FF6B6B',vip:'#00FF87',ve:'rainbow', le:'bounce',pe:'rainbow-spin'},
+    {name:'🎉 สนุกสนาน',   sub:'เขียว/ชมพู',       bg:'#003B46',primary:'#FF4081',vip:'#18FFFF',ve:'shake',   le:'spin',  pe:'pulse-ring'},
+    {name:'🌙 กลางคืน',    sub:'ดำ/ม่วงลึก',       bg:'#0D0D1A',primary:'#9C27B0',vip:'#E040FB',ve:'glow',    le:'float', pe:'glow-gold'},
+    {name:'🌊 ทะเล',       sub:'น้ำเงิน/ฟ้า',      bg:'#0A1929',primary:'#00BCD4',vip:'#00E5FF',ve:'ice',     le:'swing', pe:'neon-blue'},
+    {name:'🌺 ซากุระ',     sub:'ชมพูอ่อน/ขาว',     bg:'#1A0A14',primary:'#F48FB1',vip:'#FCE4EC',ve:'float',   le:'pulse', pe:'pulse-ring'},
+    {name:'🍀 ธรรมชาติ',   sub:'เขียว/น้ำตาล',     bg:'#0A1A0A',primary:'#66BB6A',vip:'#A5D6A7',ve:'shimmer', le:'float', pe:'none'},
+    {name:'⚡ พลังงาน',    sub:'เหลือง/ส้ม',       bg:'#1A1200',primary:'#FFD600',vip:'#FF6D00',ve:'pulse',   le:'glitch',pe:'glow-gold'},
+    {name:'🖤 Dark Mode',   sub:'เทาเข้ม/ขาว',      bg:'#121212',primary:'#EEEEEE',vip:'#BDBDBD',ve:'shimmer', le:'shine', pe:'none'},
+    {name:'🌅 พระอาทิตย์',  sub:'ส้ม/เหลือง/แดง',   bg:'#1A0A00',primary:'#FF7043',vip:'#FFAB40',ve:'fire',    le:'pulse', pe:'glow-gold'},
+    {name:'💎 เพชร',        sub:'ฟ้าใส/เงิน',       bg:'#0D1B2A',primary:'#B0BEC5',vip:'#E0F7FA',ve:'ice',     le:'spin',  pe:'rainbow-spin'},
+    {name:'🍷 ไวน์',        sub:'แดงเข้ม/ทอง',      bg:'#1A0008',primary:'#C62828',vip:'#D4AF37',ve:'gold',    le:'float', pe:'glow-gold'},
+    {name:'🌌 อวกาศ',       sub:'ดำ/ม่วง/ดาว',      bg:'#000010',primary:'#7C4DFF',vip:'#E040FB',ve:'rainbow', le:'glitch',pe:'rainbow-spin'},
+    {name:'🎃 ฮาโลวีน',    sub:'ส้ม/ดำ',           bg:'#0D0500',primary:'#FF6D00',vip:'#FF9100',ve:'shake',   le:'glitch',pe:'fire'},
+    {name:'🎄 คริสมาส',    sub:'เขียว/แดง/ทอง',    bg:'#001A00',primary:'#4CAF50',vip:'#F44336',ve:'shimmer', le:'bounce',pe:'glow-gold'},
+    {name:'🌸 พาสเทล',     sub:'ชมพู/ม่วง/ฟ้า',    bg:'#1A0F1A',primary:'#CE93D8',vip:'#80DEEA',ve:'float',   le:'swing', pe:'pulse-ring'},
+    {name:'🏆 แชมป์',      sub:'ทอง/เงิน/ทองแดง',  bg:'#0D0A00',primary:'#FFC107',vip:'#FFD700',ve:'gold',    le:'shine', pe:'glow-gold'},
+    {name:'🤍 มินิมอล',    sub:'ขาว/เทา',          bg:'#F0F0F0',primary:'#424242',vip:'#9E9E9E',ve:'none',    le:'none',  pe:'none'},
+];
+
+function buildPresetGrid(){
+    document.getElementById('presetGrid').innerHTML=themes.map((t,i)=>
+        `<button class="btn-preset" onclick="applyPreset(${i})" style="background:${t.bg};color:${t.primary};border-color:${t.vip};">${t.name}<span>${t.sub}</span></button>`
+    ).join('');
+}
+
+let currentLogoUrl='';
+const defaultSvg=`data:image/svg+xml;utf8,<svg viewBox='0 0 200 280' xmlns='http://www.w3.org/2000/svg'><circle cx='100' cy='100' r='90' fill='none' stroke='%23C5A059' stroke-width='6'/><path d='M85,35 L100,20 L115,35 L125,25 L135,35 L135,45 L65,45 L65,35 L75,25 Z' fill='%23C5A059'/><path d='M100,165 C70,135 60,115 60,95 A40,40 0 1,1 140,95 C140,115 130,135 100,165 Z' fill='%23C5A059'/><circle cx='100' cy='95' r='28' fill='%231A1D23' stroke='%23C5A059' stroke-width='2'/><polygon points='100,75 110,105 100,100 90,105' fill='%23C5A059'/><text x='100' y='220' font-family='sans-serif' font-size='28' fill='%23C5A059' text-anchor='middle' font-weight='bold'>ไปไหนดี</text><text x='100' y='250' font-family='sans-serif' font-size='20' fill='%23C5A059' text-anchor='middle'>Painaidee</text></svg>`;
+const defaultTheme={bgColor:'#121418',primaryColor:'#C5A059',vipBorderColor:'#FFD700',vipEffect:'shimmer',logoEffect:'shine',profileEffect:'none',logoUrl:''};
+
+document.addEventListener('DOMContentLoaded',()=>{
+    buildPresetGrid();
+    buildTemplateGrid();
+    document.getElementById('preview-logo-img').src=defaultSvg;
+    loadCurrentSettings();
+    ['bgColor','primaryColor','vipBorderColor','vipEffect','logoEffect','profileEffect']
+        .forEach(id=>document.getElementById(id).addEventListener('input',updatePreview));
+    resizeCanvas();
+});
+
+function syncRange(id){document.getElementById(id+'Val').innerText=document.getElementById(id).value;}
+
+function applyPreset(i){
+    const t=themes[i];
+    if(currentLogoUrl||document.getElementById('logoUpload').files[0]){
+        if(!confirm('⚠️ การเลือกธีมจะล้างโลโก้ที่อัพโหลดออก ดำเนินการต่อไหม?'))return;
+    }
+    currentLogoUrl='';
+    document.getElementById('logoUpload').value='';
+    document.getElementById('logoPreview').style.display='none';
+    document.getElementById('btnClearLogo').style.display='none';
+    document.getElementById('preview-logo-img').src=defaultSvg;
+    applyValuesToForm({bgColor:t.bg,primaryColor:t.primary,vipBorderColor:t.vip,vipEffect:t.ve,logoEffect:t.le,profileEffect:t.pe,logoUrl:''});
+}
+
+async function loadCurrentSettings(){
+    try{const doc=await db.collection('painaidee').doc('themeSettings').get();applyValuesToForm(doc.exists?doc.data():defaultTheme);}
+    catch(e){applyValuesToForm(defaultTheme);}
+}
+
+function applyValuesToForm(d){
+    document.getElementById('bgColor').value        =d.bgColor        ||defaultTheme.bgColor;
+    document.getElementById('primaryColor').value   =d.primaryColor   ||defaultTheme.primaryColor;
+    document.getElementById('vipBorderColor').value =d.vipBorderColor ||defaultTheme.vipBorderColor;
+    document.getElementById('vipEffect').value      =d.vipEffect      ||defaultTheme.vipEffect;
+    document.getElementById('logoEffect').value     =d.logoEffect     ||defaultTheme.logoEffect;
+    document.getElementById('profileEffect').value  =d.profileEffect  ||defaultTheme.profileEffect;
+    currentLogoUrl=d.logoUrl||'';
+    const prev=document.getElementById('preview-logo-img');
+    const lpv=document.getElementById('logoPreview');
+    const clr=document.getElementById('btnClearLogo');
+    if(currentLogoUrl){prev.src=currentLogoUrl;lpv.src=currentLogoUrl;lpv.style.display='inline-block';clr.style.display='inline-block';}
+    else{prev.src=defaultSvg;lpv.style.display='none';clr.style.display='none';}
+    updatePreview();
+}
+
+function resetToDefault(){
+    if(!confirm('⚠️ คืนค่าเริ่มต้นทั้งหมด?'))return;
+    currentLogoUrl='';
+    document.getElementById('logoUpload').value='';
+    document.getElementById('logoPreview').style.display='none';
+    document.getElementById('btnClearLogo').style.display='none';
+    document.getElementById('preview-logo-img').src=defaultSvg;
+    applyValuesToForm(defaultTheme);
+    alert('คืนค่าเรียบร้อย กรุณากดบันทึกเพื่อยืนยัน');
+}
+
+function previewLogo(event){
+    const file=event.target.files[0];if(!file)return;
+    const reader=new FileReader();
+    reader.onload=e=>{
+        document.getElementById('preview-logo-img').src=e.target.result;
+        document.getElementById('logoPreview').src=e.target.result;
+        document.getElementById('logoPreview').style.display='inline-block';
+        document.getElementById('btnClearLogo').style.display='inline-block';
     };
+    reader.readAsDataURL(file);
+}
 
-    let db, storage;
-    if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-    db = firebase.firestore(); storage = firebase.storage();
+function clearLogoPreview(){
+    currentLogoUrl='';
+    document.getElementById('logoUpload').value='';
+    document.getElementById('logoPreview').style.display='none';
+    document.getElementById('btnClearLogo').style.display='none';
+    document.getElementById('preview-logo-img').src=defaultSvg;
+}
 
-    let currentLogoUrl = "";
-    
-    // โลโก้ SVG ทองคำแบบสมบูรณ์ (แก้ไข ViewBox แล้ว)
-    const defaultSvgLogo = "data:image/svg+xml;utf8,<svg viewBox='0 0 200 280' xmlns='http://www.w3.org/2000/svg'><circle cx='100' cy='100' r='90' fill='none' stroke='%23C5A059' stroke-width='6'/><path d='M85,35 L100,20 L115,35 L125,25 L135,35 L135,45 L65,45 L65,35 L75,25 Z' fill='%23C5A059'/><path d='M100,165 C70,135 60,115 60,95 A40,40 0 1,1 140,95 C140,115 130,135 100,165 Z' fill='%23C5A059'/><circle cx='100' cy='95' r='28' fill='%231A1D23' stroke='%23C5A059' stroke-width='2'/><polygon points='100,75 110,105 100,100 90,105' fill='%23C5A059'/><text x='100' y='220' font-family='sans-serif' font-size='28' fill='%23C5A059' text-anchor='middle' font-weight='bold'>ไปไหนดี</text><text x='100' y='250' font-family='sans-serif' font-size='20' fill='%23C5A059' text-anchor='middle'>Painaidee</text><text x='100' y='270' font-family='sans-serif' font-size='10' fill='%23999' text-anchor='middle'>TRAVEL &amp; DISCOVER • VIP</text></svg>";
+// ✅ set CSS Variable ที่ :root เพื่อให้ animation เห็นสีถูกต้อง
+function updatePreview(){
+    const primary=document.getElementById('primaryColor').value;
+    const vip=document.getElementById('vipBorderColor').value;
+    const bg=document.getElementById('bgColor').value;
+    document.documentElement.style.setProperty('--prev-primary',primary);
+    document.documentElement.style.setProperty('--prev-vip',vip);
+    document.getElementById('preview-phone').style.backgroundColor=bg;
+    document.getElementById('preview-app-name').style.color=primary;
+    document.getElementById('preview-btn-mock').style.backgroundColor=primary;
+    document.getElementById('preview-vip-badge').style.backgroundColor=vip;
+    document.getElementById('preview-vip-card').className='mock-card vip-'+document.getElementById('vipEffect').value;
+    document.getElementById('preview-logo-img').className='mock-logo-img logo-'+document.getElementById('logoEffect').value;
+    document.getElementById('preview-profile').className='mock-profile prof-'+document.getElementById('profileEffect').value;
+}
 
-    // 🌟 ชุดข้อมูลค่าเริ่มต้น (Default Theme - เรียบหรู)
-    const defaultTheme = {
-        bgColor: "#121418", primaryColor: "#C5A059", vipBorderColor: "#FFD700",
-        vipEffect: "shimmer", logoEffect: "shine", profileEffect: "none", logoUrl: ""
-    };
-
-    // 🌟 คลังธีมสำเร็จรูป (Presets)
-    const themes = {
-        aggressive: { bgColor: "#050505", primaryColor: "#D32F2F", vipBorderColor: "#FF3D00", vipEffect: "glow", logoEffect: "pulse", profileEffect: "pulse-ring" },
-        cool: { bgColor: "#0A1128", primaryColor: "#00E5FF", vipBorderColor: "#D500F9", vipEffect: "neon", logoEffect: "float", profileEffect: "glow-gold" },
-        luxury: { bgColor: "#121418", primaryColor: "#C5A059", vipBorderColor: "#FFD700", vipEffect: "shimmer", logoEffect: "shine", profileEffect: "none" },
-        vibrant: { bgColor: "#2D1B4E", primaryColor: "#FF6B6B", vipBorderColor: "#00FF87", vipEffect: "rainbow", logoEffect: "bounce", profileEffect: "rainbow-spin" },
-        playful: { bgColor: "#003B46", primaryColor: "#FF4081", vipBorderColor: "#18FFFF", vipEffect: "shake", logoEffect: "spin", profileEffect: "pulse-ring" }
-    };
-
-    document.addEventListener('DOMContentLoaded', () => {
-        loadCurrentSettings();
-        const inputs = ['bgColor', 'primaryColor', 'vipBorderColor', 'vipEffect', 'logoEffect', 'profileEffect'];
-        inputs.forEach(id => { document.getElementById(id).addEventListener('input', updatePreviewRealtime); });
-    });
-
-    async function loadCurrentSettings() {
-        try {
-            const doc = await db.collection('painaidee').doc('themeSettings').get();
-            if (doc.exists) { applyValuesToForm(doc.data()); } else { applyValuesToForm(defaultTheme); }
-        } catch (error) { console.error(error); applyValuesToForm(defaultTheme); }
-    }
-
-    function applyValuesToForm(data) {
-        document.getElementById('bgColor').value = data.bgColor || defaultTheme.bgColor;
-        document.getElementById('primaryColor').value = data.primaryColor || defaultTheme.primaryColor;
-        document.getElementById('vipBorderColor').value = data.vipBorderColor || defaultTheme.vipBorderColor;
-        document.getElementById('vipEffect').value = data.vipEffect || defaultTheme.vipEffect;
-        document.getElementById('logoEffect').value = data.logoEffect || defaultTheme.logoEffect;
-        document.getElementById('profileEffect').value = data.profileEffect || defaultTheme.profileEffect;
-        
-        if (data.logoUrl !== undefined) {
-            currentLogoUrl = data.logoUrl;
-            if(!document.getElementById('logoUpload').files[0]) {
-                document.getElementById('preview-logo-img').src = currentLogoUrl || defaultSvgLogo;
-                if(currentLogoUrl) {
-                    document.getElementById('logoPreview').src = currentLogoUrl;
-                    document.getElementById('logoPreview').style.display = 'inline-block';
-                    document.getElementById('btnClearLogo').style.display = 'inline-block';
-                }
-            }
-        }
-        updatePreviewRealtime();
-    }
-
-    function applyPreset(themeName) {
-        if(themes[themeName]) { applyValuesToForm({ ...themes[themeName], logoUrl: currentLogoUrl }); }
-    }
-
-    function resetToDefault() {
-        if(confirm("⚠️ ยืนยันการล้างค่าสีและเอฟเฟกต์ทั้งหมด กลับไปเป็นแบบ 'เรียบหรู (Default)' ของระบบ?")) {
-            applyValuesToForm(defaultTheme);
-            document.getElementById('logoUpload').value = ""; 
-            currentLogoUrl = "";
-            document.getElementById('preview-logo-img').src = defaultSvgLogo;
-            document.getElementById('logoPreview').style.display = 'none';
-            document.getElementById('btnClearLogo').style.display = 'none';
-            alert("คืนค่าเรียบร้อยแล้ว กรุณากด 'บันทึก' เพื่อยืนยันอีกครั้งครับ");
-        }
-    }
-
-    function previewLogo(event) {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById('preview-logo-img').src = e.target.result;
-                document.getElementById('logoPreview').src = e.target.result;
-                document.getElementById('logoPreview').style.display = 'inline-block';
-                document.getElementById('btnClearLogo').style.display = 'inline-block';
-            }
-            reader.readAsDataURL(file);
-        }
-    }
-
-    function clearLogoPreview() {
-        currentLogoUrl = "";
-        document.getElementById('logoUpload').value = "";
-        document.getElementById('logoPreview').style.display = 'none';
-        document.getElementById('btnClearLogo').style.display = 'none';
-        document.getElementById('preview-logo-img').src = defaultSvgLogo;
-    }
-
-    function updatePreviewRealtime() {
-        const phone = document.getElementById('preview-phone');
-        const appName = document.getElementById('preview-app-name');
-        const btnMock = document.getElementById('preview-btn-mock');
-        const vipBadge = document.getElementById('preview-vip-badge');
-        
-        const vipCard = document.getElementById('preview-vip-card');
-        const logoImg = document.getElementById('preview-logo-img');
-        const profile = document.getElementById('preview-profile');
-
-        const bgColor = document.getElementById('bgColor').value;
-        const primaryColor = document.getElementById('primaryColor').value;
-        const vipColor = document.getElementById('vipBorderColor').value;
-
-        phone.style.backgroundColor = bgColor;
-        appName.style.color = primaryColor;
-        btnMock.style.backgroundColor = primaryColor;
-        vipBadge.style.backgroundColor = vipColor;
-        
-        phone.style.setProperty('--prev-primary', primaryColor);
-        phone.style.setProperty('--prev-vip', vipColor);
-
-        vipCard.className = 'mock-card vip-' + document.getElementById('vipEffect').value;
-        logoImg.className = 'mock-logo-img logo-' + document.getElementById('logoEffect').value;
-        profile.className = 'mock-profile prof-' + document.getElementById('profileEffect').value;
-    }
-
-    const resizeImg = (file) => new Promise((resolve) => {
-        if(!file) return resolve('');
-        const reader = new FileReader(); reader.readAsDataURL(file);
-        reader.onload = e => {
-            const img = new Image(); img.src = e.target.result;
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                let width = img.width; let height = img.height; const max_size = 800;
-                if (width > max_size || height > max_size) { if (width > height) { height = Math.round((height *= max_size / width)); width = max_size; } else { width = Math.round((width *= max_size / height)); height = max_size; } }
-                canvas.width = width; canvas.height = height; canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-                resolve(canvas.toDataURL('image/png', 0.9)); 
-            };
-            img.onerror = () => resolve('');
+const resizeImgFn=(file)=>new Promise(resolve=>{
+    if(!file)return resolve('');
+    const reader=new FileReader();reader.readAsDataURL(file);
+    reader.onload=e=>{
+        const img=new Image();img.src=e.target.result;
+        img.onload=()=>{
+            const c=document.createElement('canvas');
+            let w=img.width,h=img.height,m=800;
+            if(w>m||h>m){if(w>h){h=Math.round(h*m/w);w=m;}else{w=Math.round(w*m/h);h=m;}}
+            c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);
+            resolve(c.toDataURL('image/png',.9));
         };
-        reader.onerror = () => resolve('');
-    });
+    };
+});
 
-    async function saveThemeSettings() {
-        const btn = document.getElementById('btnSave');
-        btn.innerText = "กำลังบันทึก... ⏳";
-        btn.disabled = true;
-
-        try {
-            let finalLogoUrl = currentLogoUrl;
-            const logoFile = document.getElementById('logoUpload').files[0];
-            
-            if (logoFile) {
-                btn.innerText = "กำลังอัปโหลดโลโก้... 🚀";
-                const img64 = await resizeImg(logoFile);
-                const ref = storage.ref(`system/${Date.now()}_logo.png`);
-                await ref.putString(img64, 'data_url');
-                finalLogoUrl = await ref.getDownloadURL();
-            }
-
-            const themeData = {
-                bgColor: document.getElementById('bgColor').value,
-                primaryColor: document.getElementById('primaryColor').value,
-                vipBorderColor: document.getElementById('vipBorderColor').value,
-                vipEffect: document.getElementById('vipEffect').value,
-                logoEffect: document.getElementById('logoEffect').value,
-                profileEffect: document.getElementById('profileEffect').value,
-                logoUrl: finalLogoUrl,
-                updatedAt: new Date().toLocaleString()
-            };
-
-            await db.collection('painaidee').doc('themeSettings').set(themeData);
-            alert("✅ บันทึกการตั้งค่าสำเร็จ! ข้อมูลจะถูกดึงไปใช้ในแอปหลักทันที");
-        } catch (error) {
-            console.error(error);
-            alert("❌ เกิดข้อผิดพลาดในการบันทึกข้อมูล");
-        } finally {
-            btn.innerText = "💾 ยืนยันและบันทึกการตั้งค่า";
-            btn.disabled = false;
+async function saveThemeSettings(){
+    const btn=document.getElementById('btnSave');
+    btn.innerText='กำลังบันทึก... ⏳';btn.disabled=true;
+    try{
+        let finalLogoUrl=currentLogoUrl;
+        const logoFile=document.getElementById('logoUpload').files[0];
+        if(logoFile){
+            btn.innerText='กำลังอัปโหลดโลโก้... 🚀';
+            const img64=await resizeImgFn(logoFile);
+            const ref=storage.ref(`system/${Date.now()}_logo.png`);
+            await ref.putString(img64,'data_url');
+            finalLogoUrl=await ref.getDownloadURL();
         }
-    }
-</script>
+        await db.collection('painaidee').doc('themeSettings').set({
+            bgColor:document.getElementById('bgColor').value,
+            primaryColor:document.getElementById('primaryColor').value,
+            vipBorderColor:document.getElementById('vipBorderColor').value,
+            vipEffect:document.getElementById('vipEffect').value,
+            logoEffect:document.getElementById('logoEffect').value,
+            profileEffect:document.getElementById('profileEffect').value,
+            logoUrl:finalLogoUrl,
+            updatedAt:new Date().toLocaleString()
+        });
+        currentLogoUrl=finalLogoUrl;
+        alert('✅ บันทึกสำเร็จ! แอปหลักจะอัพเดตทันที');
+    }catch(e){alert('❌ เกิดข้อผิดพลาด: '+e.message);}
+    finally{btn.innerText='💾 บันทึกการตั้งค่า';btn.disabled=false;}
+}
 
+// ══════════════════════════════════════════
+// Promo Designer
+// ══════════════════════════════════════════
+let bgImage=null,logoStamp=null,showOverlay=true;
+const canvasSizes={'1080x1080':{w:1080,h:1080},'1080x1920':{w:1080,h:1920},'1200x630':{w:1200,h:630},'1080x566':{w:1080,h:566}};
+
+const templates=[
+    {name:'🔥 ลดราคา',  bg:'#1A0000',gc:'#D32F2F',tm:'⚡ ลดแรงส่งท้ายปี!',   ts:'สูงสุด 70% เฉพาะวันนี้',      tb:'📞 กดสั่งได้เลยที่ LINE ด้านล่าง',badge:'HOT🔥',bc:'#D32F2F'},
+    {name:'👑 VIP',     bg:'#0D0A00',gc:'#FFD700',tm:'👑 สมาชิก VIP เท่านั้น',ts:'รับสิทธิพิเศษสุดเอ็กซ์คลูซีฟ',tb:'📲 สมัครวันนี้ รับโบนัสทันที',   badge:'VIP✨',bc:'#C5A059'},
+    {name:'🆕 เปิดใหม่',bg:'#001A00',gc:'#4CAF50',tm:'🎉 เปิดตัวแล้ว!',       ts:'มาลองก่อนใคร รับฟรีทันที',    tb:'⏰ เปิดทุกวัน 10:00–22:00 น.',    badge:'NEW!',bc:'#4CAF50'},
+    {name:'🎊 เทศกาล',  bg:'#1A001A',gc:'#E040FB',tm:'🎊 สุขสันต์วันหยุด!',   ts:'ส่วนลดพิเศษเฉลิมฉลอง',        tb:'📍 จำกัดจำนวน / ด่วน!',           badge:'SALE',bc:'#9C27B0'},
+    {name:'🍽️ อาหาร',  bg:'#0D0500',gc:'#FF6D00',tm:'🍽️ เมนูใหม่มาแล้ว!',  ts:'อร่อยถูกใจ ต้องลอง!',          tb:'⏰ สั่งได้ 11:00–21:00 น.',        badge:'MENU',bc:'#FF6D00'},
+    {name:'📍 พิกัด',   bg:'#0A1929',gc:'#00BCD4',tm:'📍 หาเราเจอได้ที่นี่',  ts:'ใกล้คุณกว่าที่คิด',            tb:'🗺️ ค้นหาชื่อร้านบน Google Maps',  badge:'MAP',bc:'#00BCD4'},
+    {name:'💬 รีวิว',   bg:'#0A0A1A',gc:'#7C4DFF',tm:'⭐⭐⭐⭐⭐ รีวิวดีเยี่ยม',ts:'ลูกค้ากว่า 1,000 คนไว้วางใจ', tb:'📲 กดติดตามเพื่อไม่พลาดโปรฯ',    badge:'5★',bc:'#7C4DFF'},
+    {name:'🎁 ของขวัญ', bg:'#1A0A00',gc:'#FF7043',tm:'🎁 ของขวัญสุดพิเศษ',    ts:'เหมาะสำหรับทุกโอกาส',          tb:'📦 ส่งฟรีทุกออเดอร์ ไม่มีขั้นต่ำ',badge:'FREE',bc:'#FF7043'},
+    {name:'🏪 ร้านค้า', bg:'#0D0D0D',gc:'#C5A059',tm:'🏪 ไปไหนดี VIP ร้านค้า',ts:'ลงทะเบียนแล้วรับสิทธิ์ทันที',  tb:'📱 เข้าแอปไปไหนดี แล้วค้นหาเรา',  badge:'VIP',bc:'#C5A059'},
+];
+
+function buildTemplateGrid(){
+    document.getElementById('templateGrid').innerHTML=templates.map((t,i)=>
+        `<button class="btn-template" onclick="applyTemplate(${i})">${t.name}</button>`
+    ).join('');
+}
+
+function applyTemplate(i){
+    const t=templates[i];
+    document.getElementById('canvasBgColor').value=t.bg;
+    document.getElementById('gradientColor').value=t.gc;
+    document.getElementById('textMain').value=t.tm;
+    document.getElementById('textSub').value=t.ts;
+    document.getElementById('textBottom').value=t.tb;
+    document.getElementById('badgeText').value=t.badge;
+    document.getElementById('badgeColor').value=t.bc;
+    drawCanvas();
+}
+
+function loadBgImage(event){
+    const file=event.target.files[0];if(!file)return;
+    const reader=new FileReader();
+    reader.onload=e=>{bgImage=new Image();bgImage.onload=drawCanvas;bgImage.src=e.target.result;};
+    reader.readAsDataURL(file);
+}
+function clearBgImage(){bgImage=null;document.getElementById('bgImageInput').value='';drawCanvas();}
+function toggleBgOverlay(){showOverlay=!showOverlay;drawCanvas();}
+function loadLogoStamp(event){
+    const file=event.target.files[0];if(!file)return;
+    const reader=new FileReader();
+    reader.onload=e=>{logoStamp=new Image();logoStamp.onload=drawCanvas;logoStamp.src=e.target.result;};
+    reader.readAsDataURL(file);
+}
+function clearLogoStamp(){logoStamp=null;document.getElementById('logoStampInput').value='';drawCanvas();}
+
+function resizeCanvas(){
+    const key=document.getElementById('canvasSize').value;
+    const sz=canvasSizes[key];
+    const canvas=document.getElementById('promoCanvas');
+    const maxW=Math.min(sz.w,600);
+    canvas.width=maxW;
+    canvas.height=Math.round(sz.h*maxW/sz.w);
+    canvas.dataset.realW=sz.w;
+    canvas.dataset.realH=sz.h;
+    drawCanvas();
+}
+
+function drawCanvas(){
+    const canvas=document.getElementById('promoCanvas');
+    const ctx=canvas.getContext('2d');
+    const W=canvas.width,H=canvas.height;
+
+    // พื้นหลัง
+    if(bgImage){ctx.drawImage(bgImage,0,0,W,H);}
+    else{ctx.fillStyle=document.getElementById('canvasBgColor').value;ctx.fillRect(0,0,W,H);}
+
+    // Overlay
+    if(showOverlay){
+        const op=parseInt(document.getElementById('overlayOpacity').value)/100;
+        ctx.fillStyle=`rgba(0,0,0,${op})`;ctx.fillRect(0,0,W,H);
+    }
+
+    // Gradient accent
+    const gc=document.getElementById('gradientColor').value;
+    const grad=ctx.createLinearGradient(0,H*.5,0,H);
+    grad.addColorStop(0,gc+'00');grad.addColorStop(1,gc+'BB');
+    ctx.fillStyle=grad;ctx.fillRect(0,H*.5,W,H*.5);
+
+    // เส้นขอบซ้าย
+    ctx.fillStyle=gc;ctx.fillRect(0,0,Math.max(6,W*.006),H);
+
+    // Badge
+    const badgeText=document.getElementById('badgeText').value.trim();
+    if(badgeText){
+        const bc=document.getElementById('badgeColor').value;
+        const bfs=Math.round(H*.05);
+        ctx.font=`700 ${bfs}px Kanit,sans-serif`;
+        const bw=ctx.measureText(badgeText).width+bfs*1.4;
+        const bh=bfs*1.6;
+        const bx=W*.05,by=H*.06;
+        ctx.fillStyle=bc;
+        roundRect(ctx,bx,by,bw,bh,bh/2);ctx.fill();
+        ctx.fillStyle='#FFF';ctx.textBaseline='middle';
+        ctx.fillText(badgeText,bx+bfs*.7,by+bh/2);
+    }
+
+    // ข้อความหลัก
+    const fMain=parseInt(document.getElementById('fontSizeMain').value);
+    const fs=Math.round(fMain*W/600);
+    ctx.font=`700 ${fs}px Kanit,sans-serif`;
+    ctx.fillStyle=document.getElementById('textMainColor').value;
+    ctx.textBaseline='alphabetic';ctx.textAlign='left';
+    wrapText(ctx,document.getElementById('textMain').value,W*.07,H*.45,W*.86,fs*1.28);
+
+    // ข้อความรอง
+    const fSub=Math.round(fs*.52);
+    ctx.font=`500 ${fSub}px Kanit,sans-serif`;
+    ctx.fillStyle=document.getElementById('textSubColor').value;
+    wrapText(ctx,document.getElementById('textSub').value,W*.07,H*.61,W*.86,fSub*1.35);
+
+    // ข้อความล่าง
+    const fBot=Math.round(fSub*.85);
+    ctx.font=`400 ${fBot}px Kanit,sans-serif`;
+    ctx.fillStyle='rgba(255,255,255,0.72)';
+    ctx.fillText(document.getElementById('textBottom').value,W*.07,H*.91);
+
+    // โลโก้ stamp
+    if(logoStamp){
+        const lSize=Math.round(H*.15);
+        ctx.save();ctx.globalAlpha=.88;
+        ctx.drawImage(logoStamp,W-lSize-W*.04,H*.04,lSize,lSize);
+        ctx.restore();
+    }
+
+    // Watermark
+    ctx.font=`300 ${Math.round(W*.02)}px Kanit,sans-serif`;
+    ctx.fillStyle='rgba(255,255,255,0.28)';
+    ctx.textAlign='right';ctx.textBaseline='bottom';
+    ctx.fillText('ไปไหนดี • Painaidee',W-W*.03,H-H*.02);
+    ctx.textAlign='left';
+}
+
+function roundRect(ctx,x,y,w,h,r){
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+    ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+    ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+    ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
+}
+
+function wrapText(ctx,text,x,y,maxW,lineH){
+    if(!text)return;
+    const words=text.split(' ');let line='',cy=y;
+    for(let n=0;n<words.length;n++){
+        const test=line+words[n]+' ';
+        if(ctx.measureText(test).width>maxW&&n>0){ctx.fillText(line,x,cy);line=words[n]+' ';cy+=lineH;}
+        else line=test;
+    }
+    ctx.fillText(line,x,cy);
+}
+
+function downloadPromo(){
+    const preview=document.getElementById('promoCanvas');
+    const realW=parseInt(preview.dataset.realW);
+    const realH=parseInt(preview.dataset.realH);
+    const off=document.createElement('canvas');
+    off.width=realW;off.height=realH;
+    const origW=preview.width,origH=preview.height;
+    preview.width=realW;preview.height=realH;
+    drawCanvas();
+    off.getContext('2d').drawImage(preview,0,0);
+    preview.width=origW;preview.height=origH;
+    drawCanvas();
+    const a=document.createElement('a');
+    a.download=`painaidee-promo-${Date.now()}.png`;
+    a.href=off.toDataURL('image/png');
+    a.click();
+}
+</script>
 </body>
 </html>
