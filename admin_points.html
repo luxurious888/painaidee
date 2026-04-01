@@ -98,15 +98,15 @@
 <div id="tab-users" class="tab-pane">
     <div class="container">
         <h2 style="color: var(--info);">👥 จัดการแต้มสมาชิก</h2>
-        <p style="color: #aaa; font-size: 13px; margin-bottom: 20px; text-align: center;">นำรหัส <strong>LINE UID</strong> ของลูกค้ามาค้นหาเพื่อเพิ่ม/ลดแต้ม</p>
+        <p style="color: #aaa; font-size: 13px; margin-bottom: 20px; text-align: center;">พิมพ์รหัสแนะนำเพื่อน (เช่น <strong>AFF...</strong>) เพื่อค้นหาและปรับแต้มลูกค้า</p>
         
         <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-            <input type="text" id="searchUid" placeholder="วาง LINE UID ที่นี่...">
+            <input type="text" id="searchAffCode" placeholder="พิมพ์รหัส AFF... (ตัวพิมพ์เล็ก/ใหญ่ได้หมด)">
             <button class="btn-info" onclick="searchUserPoints()" style="white-space: nowrap;">🔍 ค้นหา</button>
         </div>
 
         <div id="userEditSection" style="display:none; background: rgba(0,0,0,0.3); padding: 20px; border-radius: 12px; border: 1px dashed var(--info);">
-            <p style="margin: 0 0 5px; color: #FFF;">รหัส: <span id="displayUid" style="font-size: 12px; color: #888;"></span></p>
+            <p style="margin: 0 0 5px; color: #FFF;">รหัส UID (แปลงมาจากรหัส AFF): <br><span id="displayUid" style="font-size: 12px; color: #888; word-break: break-all;"></span></p>
             <p style="margin: 0 0 15px; color: #FFF; font-size: 16px;">แต้มปัจจุบัน: <strong id="currentUserPoints" style="color: #FFD700; font-size: 24px;">0</strong></p>
             
             <label style="color: #ccc; font-size: 13px;">กำหนดแต้มใหม่ให้ลูกค้า:</label>
@@ -180,17 +180,41 @@
         try { await db.collection('painaidee').doc('wheelSettings').set({ spinCost: parseInt(document.getElementById('spinCost').value)||50, rewards: rewards }, { merge: true }); alert("✅ บันทึกสำเร็จ!"); } catch(e) { alert("❌ Error"); }
     }
 
-    // ฟังก์ชันสำหรับค้นหาและแก้ไขแต้มสมาชิก
+    // 🌟 ระบบค้นหาลูกค้าด้วยรหัส AFF (ดึง UID จากระบบหลังบ้าน)
     async function searchUserPoints() {
-        const uid = document.getElementById('searchUid').value.trim();
-        if(!uid) return alert("กรุณาระบุ UID");
+        const affCodeInput = document.getElementById('searchAffCode').value.trim().toUpperCase();
+        if(!affCodeInput) return alert("กรุณาพิมพ์รหัส AFF ก่อนครับ");
+
+        // 1. ค้นหาใน userPoints ว่ามี UID ตัวไหนที่ถูกครอบด้วยรหัสนี้ไหม
+        // (เพราะรหัส AFF คือ 5 ตัวแรกของ UID เสมอ)
         try {
-            const doc = await db.collection('userPoints').doc(uid).get();
-            document.getElementById('displayUid').innerText = uid;
-            document.getElementById('currentUserPoints').innerText = doc.exists ? (doc.data().points || 0) : 0;
-            document.getElementById('editPointsValue').value = doc.exists ? (doc.data().points || 0) : 0;
-            document.getElementById('userEditSection').style.display = 'block';
-        } catch(e) { alert("หาข้อมูลไม่พบ"); }
+            const snapshot = await db.collection('userPoints').get();
+            let targetUid = null;
+            let targetPoints = 0;
+
+            snapshot.forEach(doc => {
+                const uid = doc.id;
+                // เช็คว่า 5 ตัวแรกของ UID ตรงกับส่วนหลังของรหัส AFF ไหม
+                const expectedAffCode = "AFF" + uid.substring(0, 5).toUpperCase();
+                if(expectedAffCode === affCodeInput) {
+                    targetUid = uid;
+                    targetPoints = doc.data().points || 0;
+                }
+            });
+
+            if(targetUid) {
+                document.getElementById('displayUid').innerText = targetUid; // แอบโชว์ UID เผื่อจำเป็น
+                document.getElementById('currentUserPoints').innerText = targetPoints;
+                document.getElementById('editPointsValue').value = targetPoints;
+                document.getElementById('userEditSection').style.display = 'block';
+            } else {
+                alert("ไม่พบข้อมูลลูกค้าจากรหัส " + affCodeInput + " นี้ครับ");
+                document.getElementById('userEditSection').style.display = 'none';
+            }
+        } catch(e) {
+            console.error(e);
+            alert("เกิดข้อผิดพลาดในการดึงข้อมูล");
+        }
     }
 
     async function updateUserPoints() {
