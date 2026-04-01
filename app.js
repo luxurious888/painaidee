@@ -943,12 +943,39 @@ async function trackAction(storeName, actionType) {
 // 🪙 ระบบ Daily Actions แจกแต้มเมื่อใช้งาน
 // ==========================================
 
+// ==========================================
+// 🪙 ระบบ Daily Actions (ป้องกันสแปม + เช็คอินรายวัน)
+// ==========================================
+
+// 🌟 ตัวแปรเก็บค่าตั้งต้น (เผื่อแอดมินยังไม่ได้ตั้งค่า)
+let pointSettings = { checkIn: 10, view: 1, dir: 5, share: 5, viewLimit: 10, dirLimit: 2, shareLimit: 2 };
+
+// 🌟 สั่งให้ดึงค่าแต้มที่แอดมินตั้งไว้ มาอัปเดตแบบ Real-time
+db.collection('painaidee').doc('pointSettings').onSnapshot((doc) => {
+    if (doc.exists) { 
+        pointSettings = { ...pointSettings, ...doc.data() }; 
+        const btnText = document.getElementById('display-checkin-pts');
+        if(btnText) btnText.innerText = pointSettings.checkIn;
+    }
+});
+
+let isCheckedInToday = false;
+
 async function loadUserPoints(uid) {
     if(!uid || !db) return;
     try {
         const doc = await db.collection('userPoints').doc(uid).get();
+        const today = new Date().toLocaleDateString('en-CA'); 
+
         if(doc.exists) {
-            userCurrentPoints = doc.data().points || 0;
+            let data = doc.data();
+            userCurrentPoints = data.points || 0;
+            // เช็คว่าวันนี้กดเช็คอินไปหรือยัง
+            if(data.history && data.history[today] && data.history[today].checkedIn) {
+                isCheckedInToday = true;
+                const btn = document.getElementById('btn-daily-checkin');
+                if(btn) { btn.innerText = "✅ วันนี้เช็คอินแล้ว"; btn.disabled = true; btn.style.background = "#555"; btn.style.color = "#ccc"; }
+            }
         } else {
             await db.collection('userPoints').doc(uid).set({ points: 0, history: {} });
         }
@@ -966,7 +993,8 @@ function showPointToast(text) {
     setTimeout(() => { toast.style.bottom = '-100px'; }, 3000); 
 }
 
-async function earnPoints(actionType) {
+// 🌟 ฟังก์ชันแจกแต้มฉบับป้องกันคนสแปม (บังคับส่ง storeId มาด้วย)
+async function earnPoints(actionType, storeId = null) {
     if(!myLineUid || !db) return; 
 
     const today = new Date().toLocaleDateString('en-CA'); 
@@ -976,17 +1004,42 @@ async function earnPoints(actionType) {
         const doc = await userRef.get();
         let data = doc.exists ? doc.data() : { points: 0, history: {} };
         if(!data.history) data.history = {};
-        if(!data.history[today]) data.history[today] = { view: 0, dir: 0, share: 0 }; 
+        
+        // 🌟 เปลี่ยนประวัติการกดเป็น Array เพื่อจำชื่อร้าน ป้องกันกดร้านเดิมซ้ำ
+        if(!data.history[today]) data.history[today] = { viewed: [], dir: [], share: [], checkedIn: false }; 
 
         let pointsToAdd = 0;
         let actionName = "";
 
-        if(actionType === 'view' && data.history[today].view < 10) {
-            pointsToAdd = 1; data.history[today].view++; actionName = "ส่องร้านค้า";
-        } else if(actionType === 'dir' && data.history[today].dir < 2) {
-            pointsToAdd = 5; data.history[today].dir++; actionName = "กดนำทาง";
-        } else if(actionType === 'share' && data.history[today].share < 2) {
-            pointsToAdd = 5; data.history[today].share++; actionName = "บอกต่อเพื่อน";
+        if(actionType === 'checkin') {
+            if(data.history[today].checkedIn) return alert("วันนี้คุณเช็คอินรับแต้มไปแล้วครับ พรุ่งนี้มาใหม่นะ!");
+            pointsToAdd = pointSettings.checkIn || 10;
+            data.history[today].checkedIn = true;
+            actionName = "เช็คอินรายวัน";
+            alert(`🎉 เช็คอินสำเร็จ! รับฟรี ${pointsToAdd} แต้ม`);
+            const btn = document.getElementById('btn-daily-checkin');
+            btn.innerText = "✅ วันนี้เช็คอินแล้ว"; btn.disabled = true; btn.style.background = "#555"; btn.style.color = "#ccc";
+        }
+        else if(actionType === 'view') {
+            if(data.history[today].viewed.includes(storeId)) return; // 🛑 ถ้าร้านนี้กดไปแล้ว ข้ามเลย!
+            if(data.history[today].viewed.length >= (pointSettings.viewLimit || 10)) return; // 🛑 เช็คโควต้าต่อวัน
+            pointsToAdd = pointSettings.view || 1;
+            data.history[today].viewed.push(storeId); // จำชื่อร้านไว้
+            actionName = "ส่องร้านค้า";
+        } 
+        else if(actionType === 'dir') {
+            if(data.history[today].dir.includes(storeId)) return; 
+            if(data.history[today].dir.length >= (pointSettings.dirLimit || 2)) return;
+            pointsToAdd = pointSettings.dir || 5;
+            data.history[today].dir.push(storeId);
+            actionName = "กดนำทาง";
+        } 
+        else if(actionType === 'share') {
+            if(data.history[today].share.includes(storeId)) return;
+            if(data.history[today].share.length >= (pointSettings.shareLimit || 2)) return;
+            pointsToAdd = pointSettings.share || 5;
+            data.history[today].share.push(storeId);
+            actionName = "บอกต่อเพื่อน";
         }
 
         if(pointsToAdd > 0) {
@@ -997,9 +1050,33 @@ async function earnPoints(actionType) {
             if(document.getElementById('user-points-display')) {
                 document.getElementById('user-points-display').innerText = userCurrentPoints;
             }
-            showPointToast(`+${pointsToAdd} แต้ม จากการ${actionName}!`);
+            if(actionType !== 'checkin') showPointToast(`+${pointsToAdd} แต้ม จากการ${actionName}!`);
         }
     } catch(e) { console.log("ให้แต้มไม่สำเร็จ", e); }
+}
+
+// ==========================================
+// 🔄 อัปเดตฟังก์ชันเก่า ให้ส่งชื่อร้านเข้ามาระบบกันโกงด้วย
+// ==========================================
+
+function sharePlace(name, lat, lng, event) {
+    event.stopPropagation(); 
+    earnPoints('share', name); // 🌟 ส่งชื่อร้านไปด้วย
+
+    const mapUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`; 
+    if (navigator.share) { navigator.share({ title: 'แอปไปไหนดี', text: `ลองดูร้าน "${name}" สิ! น่าสนใจมากเลย 📍 ดูพิกัดได้ที่นี่: `, url: mapUrl }).catch(err => console.log('Share failed:', err));
+    } else { navigator.clipboard.writeText(mapUrl).then(() => { alert('คัดลอกลิงก์พิกัดเรียบร้อยแล้ว! สามารถนำไปวาง (Paste) ส่งให้เพื่อนได้เลยครับ'); }); }
+}
+
+async function trackAction(storeName, actionType) {
+    if (!storeName || !db) return;
+    try {
+        earnPoints(actionType, storeName); // 🌟 ส่งชื่อร้านไปด้วย
+
+        const statRef = db.collection('storeStats').doc(storeName);
+        if (actionType === 'view') { await statRef.set({ views: firebase.firestore.FieldValue.increment(1) }, { merge: true }); } 
+        else if (actionType === 'dir') { await statRef.set({ directions: firebase.firestore.FieldValue.increment(1) }, { merge: true }); }
+    } catch (e) {}
 }
 
 // ==========================================
@@ -1014,14 +1091,13 @@ let isSpinning = false;
 async function spinWheel() {
     if(isSpinning) return;
     if(!myLineUid) return alert("กรุณาล็อคอินด้วย LINE ก่อนเพื่อร่วมสนุกครับ!");
-    if(userCurrentPoints < 50) return alert(`แต้มของคุณไม่พอครับ 😢\n(มีอยู่ ${userCurrentPoints} แต้ม / ต้องใช้ 50 แต้ม)\n\nหาแต้มเพิ่มง่ายๆ แค่กดดูร้านค้า, นำทาง หรือแชร์ร้านครับ!`);
+    if(userCurrentPoints < 50) return alert(`แต้มของคุณไม่พอครับ 😢\n(มีอยู่ ${userCurrentPoints} แต้ม / ต้องใช้ 50 แต้ม)\n\nอย่าลืมกดเช็คอินรายวัน หรือหาสะสมจากการส่องร้านค้านะครับ!`);
 
     isSpinning = true;
     const btn = document.getElementById('btn-spin-wheel');
     btn.innerText = "กำลังหมุน... 🎡";
     btn.disabled = true;
 
-    // 1. หักแต้มบน Firestore ก่อนหมุน
     try {
         const userRef = db.collection('userPoints').doc(myLineUid);
         const doc = await userRef.get();
@@ -1036,19 +1112,14 @@ async function spinWheel() {
         return;
     }
 
-    // 2. เอฟเฟกต์หมุนกงล้อ
     const wheel = document.getElementById('wheel-spinner');
-    // สุ่มองศาหมุนให้หมุนไปอย่างน้อย 10 รอบ (3600 องศา) + องศาสุ่ม
     const randomDegree = Math.floor(Math.random() * 360) + 3600; 
     wheel.style.transform = `rotate(${randomDegree}deg)`;
 
-    // 3. รอให้กงล้อหยุด (ตั้งเวลาเท่ากับ transition ใน css คือ 4 วินาที)
     setTimeout(() => {
         isSpinning = false;
         btn.innerText = "🎯 หมุนอีกครั้ง (50 แต้ม)";
         btn.disabled = false;
-        
-        // เด้งแจ้งเตือนชั่วคราว เดี๋ยวเราจะมาเปลี่ยนระบบสุ่มรางวัลของจริงในสเต็ปหน้าครับ
         alert("🎉 ยินดีด้วย! กงล้อหยุดแล้ว\n\n(เดี๋ยวเราจะมาใส่ระบบสุ่มของรางวัล และบันทึกของรางวัลลงกระเป๋าต่อในสเต็ปหน้าครับ!)");
     }, 4000); 
 }
