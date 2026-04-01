@@ -9,217 +9,94 @@ window.addEventListener('error', function(event) {
 });
 
 const API_URL = "https://script.google.com/macros/s/AKfycbwojqh2ry1b_xkuVp28w5q8Cs0CX9xBcI-upICxz98NtRrwnJ99GwLneWXFGQJySN1T/exec";
-
-const firebaseConfig = {
-    apiKey: "AIzaSyBSFWKdLCjLWqzo2_mzUE95CyoiUv5TdnY",
-    authDomain: "painaid-88c53.firebaseapp.com",
-    projectId: "painaid-88c53",
-    storageBucket: "painaid-88c53.firebasestorage.app",
-    messagingSenderId: "229290700458",
-    appId: "1:229290700458:web:74a57d0be5df9326c5ead3"
-};
+const firebaseConfig = { apiKey: "AIzaSyBSFWKdLCjLWqzo2_mzUE95CyoiUv5TdnY", authDomain: "painaid-88c53.firebaseapp.com", projectId: "painaid-88c53", storageBucket: "painaid-88c53.firebasestorage.app", messagingSenderId: "229290700458", appId: "1:229290700458:web:74a57d0be5df9326c5ead3" };
 
 let db, storage;
-try {
-    if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-    db = firebase.firestore(); storage = firebase.storage();
-} catch (e) { console.error("Firebase init failed:", e); }
+try { if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); } db = firebase.firestore(); storage = firebase.storage(); } catch (e) { console.error(e); }
 
-// ==========================================
-// 🧠 ตัวแปรหลักของระบบ และ ระบบแต้ม
-// ==========================================
 let appData = { registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], mainCategories: [], categories: [], closedReports: [], blacklistedPlaces: [], services: [], pendingVipRequests: [], affiliateWallets: [], withdrawalRequests: [] };
-
-let myLineUid = ""; 
-let userCurrentPoints = 0; 
-let isCheckedInToday = false;
+let myLineUid = ""; let userCurrentPoints = 0; let isCheckedInToday = false;
 let pointSettings = { checkIn: 10, view: 1, dir: 5, share: 5, viewLimit: 10, dirLimit: 2, shareLimit: 2 };
-let wheelRewards = [];
-let wheelSpinCost = 50; 
+let wheelRewards = []; let wheelSpinCost = 50; 
 
-// ==========================================
-// 🎨 สมองควบคุมธีม (Theme Engine)
-// ==========================================
 let currentTheme = { bgColor: "#121418", primaryColor: "#C5A059", vipBorderColor: "#FFD700", vipEffect: "none", logoEffect: "shine", profileEffect: "none", logoUrl: "" };
 
 function applyThemeToApp(data) {
-    if(!data) return;
-    currentTheme = { ...currentTheme, ...data };
-    const root = document.documentElement;
-
-    root.style.setProperty('--primary', currentTheme.primaryColor || '#C5A059');
-    root.style.setProperty('--prev-primary', currentTheme.primaryColor || '#C5A059');
-    root.style.setProperty('--bg-light', currentTheme.bgColor || '#121418');
-    root.style.setProperty('--dark', currentTheme.bgColor || '#121418');
-    root.style.setProperty('--surface', adjustColor(currentTheme.bgColor || '#121418', 15));
-    root.style.setProperty('--prev-vip', currentTheme.vipBorderColor || '#FFD700');
-
+    if(!data) return; currentTheme = { ...currentTheme, ...data }; const root = document.documentElement;
+    root.style.setProperty('--primary', currentTheme.primaryColor || '#C5A059'); root.style.setProperty('--prev-primary', currentTheme.primaryColor || '#C5A059'); root.style.setProperty('--bg-light', currentTheme.bgColor || '#121418'); root.style.setProperty('--dark', currentTheme.bgColor || '#121418'); root.style.setProperty('--surface', adjustColor(currentTheme.bgColor || '#121418', 15)); root.style.setProperty('--prev-vip', currentTheme.vipBorderColor || '#FFD700');
     const goldLogos = document.querySelectorAll('.gold-logo');
     goldLogos.forEach(logo => {
-        let parent = logo.parentElement;
-        let customImg = parent.querySelector('.custom-logo-img');
-
+        let parent = logo.parentElement; let customImg = parent.querySelector('.custom-logo-img');
         if (currentTheme.logoUrl && currentTheme.logoUrl !== "") {
             logo.style.display = 'none';
-            if(!customImg) {
-                customImg = document.createElement('img');
-                customImg.className = 'custom-logo-img logo-' + (currentTheme.logoEffect || 'none');
-                customImg.style.width = logo.style.width || '150px';
-                customImg.style.height = 'auto';
-                customImg.style.marginBottom = logo.style.marginBottom || '10px';
-                customImg.style.borderRadius = '12px';
-                parent.insertBefore(customImg, logo);
-            }
-            customImg.src = currentTheme.logoUrl;
-            customImg.className = 'custom-logo-img logo-' + (currentTheme.logoEffect || 'none');
-        } else {
-            logo.style.display = 'inline-block';
-            logo.setAttribute('class', 'gold-logo logo-' + (currentTheme.logoEffect || 'none'));
-            if(customImg) customImg.remove();
-        }
+            if(!customImg) { customImg = document.createElement('img'); customImg.className = 'custom-logo-img logo-' + (currentTheme.logoEffect || 'none'); customImg.style.width = logo.style.width || '150px'; customImg.style.height = 'auto'; customImg.style.marginBottom = logo.style.marginBottom || '10px'; customImg.style.borderRadius = '12px'; parent.insertBefore(customImg, logo); }
+            customImg.src = currentTheme.logoUrl; customImg.className = 'custom-logo-img logo-' + (currentTheme.logoEffect || 'none');
+        } else { logo.style.display = 'inline-block'; logo.setAttribute('class', 'gold-logo logo-' + (currentTheme.logoEffect || 'none')); if(customImg) customImg.remove(); }
     });
-
     const profileBox = document.getElementById('header-profile');
-    if (profileBox) {
-        profileBox.className = Array.from(profileBox.classList).filter(c => !c.startsWith('prof-')).join(' ');
-        if(currentTheme.profileEffect && currentTheme.profileEffect !== 'none') {
-            profileBox.classList.add('prof-' + currentTheme.profileEffect);
-        }
-    }
+    if (profileBox) { profileBox.className = Array.from(profileBox.classList).filter(c => !c.startsWith('prof-')).join(' '); if(currentTheme.profileEffect && currentTheme.profileEffect !== 'none') { profileBox.classList.add('prof-' + currentTheme.profileEffect); } }
 }
 
 function adjustColor(hex, amt) {
-    if(!hex) return "#1A1D23";
-    var usePound = false; if (hex[0] == "#") { hex = hex.slice(1); usePound = true; }
-    var num = parseInt(hex, 16);
-    var r = (num >> 16) + amt; if (r > 255) r = 255; else if (r < 0) r = 0;
-    var b = ((num >> 8) & 0x00FF) + amt; if (b > 255) b = 255; else if (b < 0) b = 0;
-    var g = (num & 0x0000FF) + amt; if (g > 255) g = 255; else if (g < 0) g = 0;
-    return (usePound ? "#" : "") + (g | (b << 8) | (r << 16)).toString(16).padStart(6, '0');
+    if(!hex) return "#1A1D23"; var usePound = false; if (hex[0] == "#") { hex = hex.slice(1); usePound = true; } var num = parseInt(hex, 16); var r = (num >> 16) + amt; if (r > 255) r = 255; else if (r < 0) r = 0; var b = ((num >> 8) & 0x00FF) + amt; if (b > 255) b = 255; else if (b < 0) b = 0; var g = (num & 0x0000FF) + amt; if (g > 255) g = 255; else if (g < 0) g = 0; return (usePound ? "#" : "") + (g | (b << 8) | (r << 16)).toString(16).padStart(6, '0');
 }
 
-// ==========================================
-// 🛠️ Helper Functions
-// ==========================================
 const resizeImg = (file) => new Promise((resolve) => {
-    if(!file) return resolve('');
-    const reader = new FileReader(); reader.readAsDataURL(file);
-    reader.onload = e => {
-        const img = new Image(); img.src = e.target.result;
-        img.onload = () => {
-            const canvas = document.createElement('canvas');
-            let width = img.width; let height = img.height; const max_size = 1200; 
-            if (width > max_size || height > max_size) { if (width > height) { height = Math.round((height *= max_size / width)); width = max_size; } else { width = Math.round((width *= max_size / height)); height = max_size; } }
-            canvas.width = width; canvas.height = height; canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-            resolve(canvas.toDataURL('image/jpeg', 0.85)); 
-        };
-        img.onerror = () => resolve('');
-    };
-    reader.onerror = () => resolve('');
+    if(!file) return resolve(''); const reader = new FileReader(); reader.readAsDataURL(file);
+    reader.onload = e => { const img = new Image(); img.src = e.target.result; img.onload = () => { const canvas = document.createElement('canvas'); let width = img.width; let height = img.height; const max_size = 1200; if (width > max_size || height > max_size) { if (width > height) { height = Math.round((height *= max_size / width)); width = max_size; } else { width = Math.round((width *= max_size / height)); height = max_size; } } canvas.width = width; canvas.height = height; canvas.getContext('2d').drawImage(img, 0, 0, width, height); resolve(canvas.toDataURL('image/jpeg', 0.85)); }; img.onerror = () => resolve(''); }; reader.onerror = () => resolve('');
 });
 
-async function uploadImageToStorage(dataUrl, folder) {
-    if (!dataUrl) return ""; if (dataUrl.startsWith('http')) return dataUrl;
-    const ref = storage.ref(`${folder}/${Date.now()}_${Math.random().toString(36).substring(2,9)}.jpg`);
-    await ref.putString(dataUrl, 'data_url'); return await ref.getDownloadURL();
-}
-
+async function uploadImageToStorage(dataUrl, folder) { if (!dataUrl) return ""; if (dataUrl.startsWith('http')) return dataUrl; const ref = storage.ref(`${folder}/${Date.now()}_${Math.random().toString(36).substring(2,9)}.jpg`); await ref.putString(dataUrl, 'data_url'); return await ref.getDownloadURL(); }
 async function sendTelegramNotify(msg) { try { await fetch(API_URL, { method: 'POST', body: JSON.stringify({ telegramMsg: msg }) }); } catch(e) {} }
 function openImageModal(src) { document.getElementById('viewerImg').src = src; document.getElementById('imageViewerModal').style.display = 'flex'; }
 
-// ==========================================
-// 🚀 เริ่มต้นระบบ & โหลดข้อมูล (LIFF & Firebase)
-// ==========================================
 let isAppReady = false;
-
 document.addEventListener('DOMContentLoaded', () => {
-    initSystem();
-    setTimeout(() => { 
-        const loginOverlay = document.getElementById('loginOverlay');
-        const loginCard = document.getElementById('loginCard');
-        const loadingSpinner = document.getElementById('loadingSpinner');
-        if (!isAppReady) { 
-            if (loadingSpinner) loadingSpinner.style.display = 'none';
-            if (loginCard) loginCard.style.display = 'block'; 
-        }
-    }, 6000);
+    initSystem(); setTimeout(() => { const loginOverlay = document.getElementById('loginOverlay'); const loginCard = document.getElementById('loginCard'); const loadingSpinner = document.getElementById('loadingSpinner'); if (!isAppReady) { if (loadingSpinner) loadingSpinner.style.display = 'none'; if (loginCard) loginCard.style.display = 'block'; } }, 6000);
 });
 
 function enterApp() { document.getElementById('loginOverlay').style.display = 'none'; document.getElementById('appContent').style.display = 'block'; }
-
-function switchPage(p) { 
-    document.querySelectorAll('.page').forEach(el => el.classList.remove('active')); 
-    document.querySelectorAll('nav div').forEach(el => el.classList.remove('active')); 
-    const page = document.getElementById('page-'+p); if(page) page.classList.add('active'); 
-    const tab = document.getElementById('tab-'+p); if(tab) tab.classList.add('active'); 
-    try { const url = new URL(window.location.href); url.searchParams.set('page', p); window.history.replaceState({}, '', url); } catch(e) {}
-}
-
+function switchPage(p) { document.querySelectorAll('.page').forEach(el => el.classList.remove('active')); document.querySelectorAll('nav div').forEach(el => el.classList.remove('active')); const page = document.getElementById('page-'+p); if(page) page.classList.add('active'); const tab = document.getElementById('tab-'+p); if(tab) tab.classList.add('active'); try { const url = new URL(window.location.href); url.searchParams.set('page', p); window.history.replaceState({}, '', url); } catch(e) {} }
 function navigateToAffiliate() { switchPage('affiliate'); }
 
 async function navigateToPartner() {
-    if (!liff.isLoggedIn()) {
-        document.getElementById('partner-friend-blocker').style.display = 'flex'; 
-        document.getElementById('partner-actual-content').style.display = 'none'; 
-        switchPage('partner'); return;
-    }
+    if (!liff.isLoggedIn()) { document.getElementById('partner-friend-blocker').style.display = 'flex'; document.getElementById('partner-actual-content').style.display = 'none'; switchPage('partner'); return; }
     switchPage('partner'); checkFriendshipForPartner(false); 
 }
 
 async function checkFriendshipForPartner(showAlert) {
-    const blocker = document.getElementById('partner-friend-blocker'); const content = document.getElementById('partner-actual-content');
-    if(showAlert) blocker.innerHTML = '<div class="spinner"></div><p style="color:#FFF;">กำลังตรวจสอบ...</p>';
+    const blocker = document.getElementById('partner-friend-blocker'); const content = document.getElementById('partner-actual-content'); if(showAlert) blocker.innerHTML = '<div class="spinner"></div><p style="color:#FFF;">กำลังตรวจสอบ...</p>';
     try {
         if (liff.isLoggedIn()) {
             const friend = await liff.getFriendship();
-            if (friend.friendFlag) { blocker.style.display = 'none'; content.style.display = 'block'; if(showAlert) alert("✅ ตรวจสอบสำเร็จ"); } 
-            else { blocker.style.display = 'flex'; content.style.display = 'none'; renderFriendBlocker(); if(showAlert) alert("⚠️ ระบบตรวจไม่พบความเป็นเพื่อน"); }
+            if (friend.friendFlag) { blocker.style.display = 'none'; content.style.display = 'block'; if(showAlert) alert("✅ ตรวจสอบสำเร็จ"); } else { blocker.style.display = 'flex'; content.style.display = 'none'; renderFriendBlocker(); if(showAlert) alert("⚠️ ระบบตรวจไม่พบความเป็นเพื่อน"); }
         }
     } catch(e) { blocker.style.display = 'flex'; content.style.display = 'none'; renderFriendBlocker(); }
 }
 
-function renderFriendBlocker() {
-    document.getElementById('partner-friend-blocker').innerHTML = `<img src="https://upload.wikimedia.org/wikipedia/commons/4/41/LINE_logo.svg" alt="LINE Official Account" style="width: 80px; margin-bottom: 25px;"><div class="friend-note"><span style="color:var(--primary); font-weight:600;">⚠️ สำคัญมาก</span><br>สำหรับร้านค้าจำเป็นต้องเพิ่มเพื่อนก่อน เพื่อรับรหัสผ่านในการใช้งานครับ</div><button class="btn-line-glow" style="width: auto; padding: 14px 24px; border:none; border-radius:12px; font-family:'Kanit'; font-weight:600; font-size:16px; cursor:pointer; animation: none;" onclick="window.location.href='https://lin.ee/5SBoptj'">➕ เพิ่มเพื่อน LINE OA ของเรา</button><button class="btn-outline" style="margin-top: 20px; font-size: 13px; border-color:var(--dark-muted); color:var(--text-muted);" onclick="checkFriendshipForPartner(true)">ฉันเพิ่มเพื่อนแล้ว ตรวจสอบอีกครั้ง</button>`;
-}
+function renderFriendBlocker() { document.getElementById('partner-friend-blocker').innerHTML = `<img src="https://upload.wikimedia.org/wikipedia/commons/4/41/LINE_logo.svg" alt="LINE Official Account" style="width: 80px; margin-bottom: 25px;"><div class="friend-note"><span style="color:var(--primary); font-weight:600;">⚠️ สำคัญมาก</span><br>สำหรับร้านค้าจำเป็นต้องเพิ่มเพื่อนก่อน เพื่อรับรหัสผ่านในการใช้งานครับ</div><button class="btn-line-glow" style="width: auto; padding: 14px 24px; border:none; border-radius:12px; font-family:'Kanit'; font-weight:600; font-size:16px; cursor:pointer; animation: none;" onclick="window.location.href='https://lin.ee/5SBoptj'">➕ เพิ่มเพื่อน LINE OA ของเรา</button><button class="btn-outline" style="margin-top: 20px; font-size: 13px; border-color:var(--dark-muted); color:var(--text-muted);" onclick="checkFriendshipForPartner(true)">ฉันเพิ่มเพื่อนแล้ว ตรวจสอบอีกครั้ง</button>`; }
 
 async function initSystem() {
     try {
         await liff.init({ liffId: "2009598846-wiCUeV35" });
         await loadFromCloud();
-        const urlParams = new URLSearchParams(window.location.search);
-        const targetPage = urlParams.get('page'); const refParam = urlParams.get('ref');
+        const urlParams = new URLSearchParams(window.location.search); const targetPage = urlParams.get('page'); const refParam = urlParams.get('ref');
         if (refParam) { sessionStorage.setItem('savedRefCode', refParam); }
 
         if (liff.isLoggedIn()) {
-            const profile = await liff.getProfile();
-            document.getElementById('header-profile').innerHTML = `<img src="${profile.pictureUrl}" style="width:100%; height:100%; object-fit:cover;">`;
-            
-            myLineUid = profile.userId;
-            loadUserPoints(myLineUid);
-
+            const profile = await liff.getProfile(); document.getElementById('header-profile').innerHTML = `<img src="${profile.pictureUrl}" style="width:100%; height:100%; object-fit:cover;">`;
+            myLineUid = profile.userId; loadUserPoints(myLineUid);
             const myCode = "AFF" + profile.userId.substring(0, 5).toUpperCase(); window.myAffCode = myCode;
             if(document.getElementById('myAffiliateCode')) { document.getElementById('myAffiliateCode').innerText = myCode; }
-            
-            document.getElementById('affiliate-actual-content').style.display = 'block'; document.getElementById('affiliate-guest-view').style.display = 'none';
-            document.getElementById('loginOverlay').style.display = 'none'; document.getElementById('appContent').style.display = 'block';
-            
+            document.getElementById('affiliate-actual-content').style.display = 'block'; document.getElementById('affiliate-guest-view').style.display = 'none'; document.getElementById('loginOverlay').style.display = 'none'; document.getElementById('appContent').style.display = 'block';
             if(document.getElementById('points-widget')) document.getElementById('points-widget').style.display = 'flex';
-
             updateWalletUI(); 
-            
-            const savedRef = sessionStorage.getItem('savedRefCode');
-            if (savedRef && document.getElementById('regRefCode')) { if (savedRef.toUpperCase() !== myCode.toUpperCase()) { document.getElementById('regRefCode').value = savedRef; } }
+            const savedRef = sessionStorage.getItem('savedRefCode'); if (savedRef && document.getElementById('regRefCode')) { if (savedRef.toUpperCase() !== myCode.toUpperCase()) { document.getElementById('regRefCode').value = savedRef; } }
             if (targetPage) { setTimeout(() => { switchPage(targetPage); }, 300); } else { setTimeout(() => { switchPage('home'); }, 300); }
             isAppReady = true; 
         } else {
-            document.getElementById('header-profile').innerHTML = `<div style="font-size: 50px; line-height: 100px; text-align: center;">👤</div>`;
-            document.getElementById('affiliate-actual-content').style.display = 'none'; document.getElementById('affiliate-guest-view').style.display = 'block';
-            
-            const loadingSpinner = document.getElementById('loadingSpinner');
-            const loginCard = document.getElementById('loginCard');
-            if (loadingSpinner) loadingSpinner.style.display = 'none';
-            if (loginCard) loginCard.style.display = 'block';
-            isAppReady = true;
+            document.getElementById('header-profile').innerHTML = `<div style="font-size: 50px; line-height: 100px; text-align: center;">👤</div>`; document.getElementById('affiliate-actual-content').style.display = 'none'; document.getElementById('affiliate-guest-view').style.display = 'block';
+            const loadingSpinner = document.getElementById('loadingSpinner'); const loginCard = document.getElementById('loginCard'); if (loadingSpinner) loadingSpinner.style.display = 'none'; if (loginCard) loginCard.style.display = 'block'; isAppReady = true;
         }
     } catch (err) { console.error("LIFF Init Error:", err); isAppReady = true; }
 }
@@ -227,53 +104,33 @@ async function initSystem() {
 function smartLogin(targetPage) {
     let baseUrl = window.location.href.split('?')[0]; let pageParam = targetPage ? '?page=' + targetPage : '';
     if (liff.isLoggedIn()) { if(targetPage) switchPage(targetPage); return; }
-    const os = liff.getOS(); 
-    if (os === 'web') { liff.login({ redirectUri: baseUrl + pageParam }); } 
-    else {
-        if (liff.isInClient()) { liff.login(); } 
-        else { window.location.href = 'https://liff.line.me/2009598846-wiCUeV35' + pageParam; }
-    }
+    const os = liff.getOS(); if (os === 'web') { liff.login({ redirectUri: baseUrl + pageParam }); } else { if (liff.isInClient()) { liff.login(); } else { window.location.href = 'https://liff.line.me/2009598846-wiCUeV35' + pageParam; } }
 }
 
 let unsubscribe = null;
 function loadFromCloud() {
     return new Promise((resolve) => {
         if(!db) return resolve();
-        
-        let isResolved = false;
-        const fallbackTimer = setTimeout(() => {
-            if(!isResolved) { console.warn("Firebase โหลดช้าเกินไป"); isResolved = true; resolve(); }
-        }, 5000);
+        let isResolved = false; const fallbackTimer = setTimeout(() => { if(!isResolved) { console.warn("Firebase โหลดช้า"); isResolved = true; resolve(); } }, 5000);
 
         unsubscribe = db.collection('painaidee').doc('systemData').onSnapshot((doc) => {
             if (doc.exists) { appData = { ...appData, ...doc.data() }; }
             ['registeredStores', 'activePromotions', 'mainCategories', 'categories', 'services', 'affiliateWallets', 'withdrawalRequests', 'registrationRequests', 'pendingPromotions', 'pendingVipRequests'].forEach(k => { if(!appData[k]) appData[k] = []; });
-            
-            renderUI(); updateWalletUI(); renderPromos();
-            if (googlePlaces.length > 0) renderCards(document.getElementById('searchBox').value || 'ร้านอาหาร');
-            if (document.getElementById('lockedFeatures') && document.getElementById('lockedFeatures').style.display === 'block') { verifyStore(true); }
-            
+            renderUI(); updateWalletUI(); renderPromos(); if (googlePlaces.length > 0) renderCards(document.getElementById('searchBox').value || 'ร้านอาหาร'); if (document.getElementById('lockedFeatures') && document.getElementById('lockedFeatures').style.display === 'block') { verifyStore(true); }
             if (!isResolved) { clearTimeout(fallbackTimer); isResolved = true; resolve(); }
         });
 
-        db.collection('painaidee').doc('themeSettings').onSnapshot((doc) => {
-            if (doc.exists) { applyThemeToApp(doc.data()); if (googlePlaces.length > 0) renderCards(document.getElementById('searchBox').value || 'ร้านอาหาร'); }
-        });
+        db.collection('painaidee').doc('themeSettings').onSnapshot((doc) => { if (doc.exists) { applyThemeToApp(doc.data()); if (googlePlaces.length > 0) renderCards(document.getElementById('searchBox').value || 'ร้านอาหาร'); } });
 
         db.collection('painaidee').doc('pointSettings').onSnapshot((doc) => {
-            if (doc.exists) { 
-                pointSettings = { ...pointSettings, ...doc.data() }; 
-                const btnText = document.getElementById('display-checkin-pts');
-                if(btnText) btnText.innerText = pointSettings.checkIn || 10;
-            }
+            if (doc.exists) { pointSettings = { ...pointSettings, ...doc.data() }; const btnText = document.getElementById('display-checkin-pts'); if(btnText) btnText.innerText = pointSettings.checkIn || 10; }
         });
 
         db.collection('painaidee').doc('wheelSettings').onSnapshot((doc) => {
             if (doc.exists) {
-                wheelRewards = doc.data().rewards || [];
-                wheelSpinCost = doc.data().spinCost || 50;
-                const costDisplay = document.getElementById('display-spin-cost');
-                if(costDisplay) costDisplay.innerText = wheelSpinCost;
+                wheelRewards = doc.data().rewards || []; wheelSpinCost = doc.data().spinCost || 50;
+                const costDisplay = document.getElementById('display-spin-cost'); if(costDisplay) costDisplay.innerText = wheelSpinCost;
+                renderWheelLabels(); // 🌟 อัปเดตกราฟิกกงล้อทันทีที่ดึงข้อมูลเสร็จ
             }
         });
     });
@@ -282,56 +139,31 @@ function loadFromCloud() {
 async function saveToCloud() { try { if(db) await db.collection('painaidee').doc('systemData').set(appData); return true; } catch(e) { throw e; } }
 
 // ==========================================
-// 💰 ระบบ Affiliate และ ถอนเงิน (แก้ไขที่ตกหล่น)
+// 💰 ระบบ Affiliate และ ถอนเงิน
 // ==========================================
 function updateWalletUI() {
     if(!window.myAffCode) return;
     const wallets = appData.affiliateWallets || []; const myWallet = wallets.find(w => w.refCode === window.myAffCode); const balance = myWallet ? myWallet.balance : 0;
     const settings = appData.affiliateSettings || { minWithdrawal: 300 }; const minW = settings.minWithdrawal || 300;
-    
     if(document.getElementById('aff-page-balance')) { document.getElementById('aff-page-balance').innerText = balance.toLocaleString() + ' ฿'; }
     if(document.getElementById('aff-min-text')) { document.getElementById('aff-min-text').innerText = `*(ถอนขั้นต่ำ ${minW} บาท)*`; }
     const btn = document.getElementById('btn-page-withdraw');
-    if(btn) {
-        btn.innerText = `ถอนเงินเข้าบัญชี (ขั้นต่ำ ${minW})`;
-        if (balance >= minW) { btn.style.background = 'linear-gradient(90deg, #06C755, #05A044)'; btn.style.color = '#FFF'; btn.style.borderColor = '#06C755'; btn.style.cursor = 'pointer'; btn.disabled = false;
-        } else { btn.style.background = 'var(--dark-muted)'; btn.style.color = 'var(--text-muted)'; btn.style.borderColor = 'var(--border)'; btn.style.cursor = 'not-allowed'; btn.disabled = true; }
-    }
-
+    if(btn) { btn.innerText = `ถอนเงินเข้าบัญชี (ขั้นต่ำ ${minW})`; if (balance >= minW) { btn.style.background = 'linear-gradient(90deg, #06C755, #05A044)'; btn.style.color = '#FFF'; btn.style.borderColor = '#06C755'; btn.style.cursor = 'pointer'; btn.disabled = false; } else { btn.style.background = 'var(--dark-muted)'; btn.style.color = 'var(--text-muted)'; btn.style.borderColor = 'var(--border)'; btn.style.cursor = 'not-allowed'; btn.disabled = true; } }
     const historyList = document.getElementById('affiliate-history-list');
-    if(historyList) {
-        const referredStores = (appData.registeredStores || []).filter(s => s.refCode && s.refCode.toUpperCase() === window.myAffCode.toUpperCase());
-        if(referredStores.length > 0) {
-            historyList.innerHTML = referredStores.map((s, i) => `
-                <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(197, 160, 89, 0.1);">
-                    <div><p style="margin: 0; color: #FFF; font-weight: 500;">${i+1}. ${s.name}</p><p style="margin: 0; font-size: 11px; color: ${s.hasPaidFirstComm ? '#06C755' : '#999'};">${s.hasPaidFirstComm ? '✅ สร้างรายได้แล้ว' : '⏳ รอร้านค้าอัปเกรด'}</p></div>
-                    ${s.isVIP ? `<span style="background: var(--prev-vip); color: #000; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold;">VIP</span>` : ''}
-                </div>`).join('');
-        } else { historyList.innerHTML = `<p style="text-align: center; color: #777; margin: 10px 0;">ยังไม่มีประวัติการแนะนำ</p>`; }
-    }
+    if(historyList) { const referredStores = (appData.registeredStores || []).filter(s => s.refCode && s.refCode.toUpperCase() === window.myAffCode.toUpperCase()); if(referredStores.length > 0) { historyList.innerHTML = referredStores.map((s, i) => `<div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(197, 160, 89, 0.1);"><div><p style="margin: 0; color: #FFF; font-weight: 500;">${i+1}. ${s.name}</p><p style="margin: 0; font-size: 11px; color: ${s.hasPaidFirstComm ? '#06C755' : '#999'};">${s.hasPaidFirstComm ? '✅ สร้างรายได้แล้ว' : '⏳ รอร้านค้าอัปเกรด'}</p></div>${s.isVIP ? `<span style="background: var(--prev-vip); color: #000; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold;">VIP</span>` : ''}</div>`).join(''); } else { historyList.innerHTML = `<p style="text-align: center; color: #777; margin: 10px 0;">ยังไม่มีประวัติการแนะนำ</p>`; } }
 }
 
 async function requestWithdraw() {
     const wallets = appData.affiliateWallets || []; const myWallet = wallets.find(w => w.refCode === window.myAffCode); if(!myWallet) return;
     const settings = appData.affiliateSettings || { minWithdrawal: 300 }; if(myWallet.balance < settings.minWithdrawal) return;
-    
-    const bankInfo = prompt(`ยอดเงินที่สามารถถอนได้คือ ${myWallet.balance.toLocaleString()} บาท\n\nกรุณากรอกข้อมูลบัญชีรับเงิน\n(รูปแบบ: ชื่อธนาคาร / เลขบัญชี / ชื่อ-สกุล):`);
-    if(!bankInfo || bankInfo.trim() === '') return;
-    if(!appData.withdrawalRequests) appData.withdrawalRequests = [];
-    
-    const reqAmount = myWallet.balance; myWallet.balance = 0; let uid = ""; try { if(liff.isLoggedIn()) uid = (await liff.getProfile()).userId; } catch(e){}
-
+    const bankInfo = prompt(`ยอดเงินที่สามารถถอนได้คือ ${myWallet.balance.toLocaleString()} บาท\n\nกรุณากรอกข้อมูลบัญชีรับเงิน\n(รูปแบบ: ชื่อธนาคาร / เลขบัญชี / ชื่อ-สกุล):`); if(!bankInfo || bankInfo.trim() === '') return;
+    if(!appData.withdrawalRequests) appData.withdrawalRequests = []; const reqAmount = myWallet.balance; myWallet.balance = 0; let uid = ""; try { if(liff.isLoggedIn()) uid = (await liff.getProfile()).userId; } catch(e){}
     appData.withdrawalRequests.push({ id: Date.now().toString(), refCode: window.myAffCode, userId: uid, amount: reqAmount, bankDetails: bankInfo, status: 'pending', requestDate: new Date().toLocaleString() });
-    try {
-        document.getElementById('btn-page-withdraw').innerText = 'กำลังส่งเรื่อง...'; document.getElementById('btn-page-withdraw').disabled = true;
-        await saveToCloud(); sendTelegramNotify(`💸 <b>มีคำร้องขอถอนเงินค่าคอม!</b>\n\nรหัสตัวแทน: ${window.myAffCode}\nยอดถอน: <b>${reqAmount.toLocaleString()} บาท</b>\nบัญชี: ${bankInfo}\n\n👉 กรุณาโอนเงินและกดอนุมัติในหน้าแอดมินครับ`);
-        alert("ส่งคำร้องขอถอนเงินเรียบร้อยแล้ว! แอดมินจะตรวจสอบและโอนเงินให้ท่านในเร็วๆ นี้ครับ"); updateWalletUI(); 
-    } catch(e) { alert("เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่"); myWallet.balance = reqAmount; updateWalletUI(); }
+    try { document.getElementById('btn-page-withdraw').innerText = 'กำลังส่งเรื่อง...'; document.getElementById('btn-page-withdraw').disabled = true; await saveToCloud(); sendTelegramNotify(`💸 <b>มีคำร้องขอถอนเงินค่าคอม!</b>\n\nรหัสตัวแทน: ${window.myAffCode}\nยอดถอน: <b>${reqAmount.toLocaleString()} บาท</b>\nบัญชี: ${bankInfo}\n\n👉 กรุณาโอนเงินและกดอนุมัติในหน้าแอดมินครับ`); alert("ส่งคำร้องขอถอนเงินเรียบร้อยแล้ว! แอดมินจะตรวจสอบและโอนเงินให้ท่านในเร็วๆ นี้ครับ"); updateWalletUI(); } catch(e) { alert("เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่"); myWallet.balance = reqAmount; updateWalletUI(); }
 }
 
 function copyHeaderAffCode() { if(window.myAffCode) { navigator.clipboard.writeText(window.myAffCode).then(() => { alert("คัดลอกรหัส "+window.myAffCode+" สำเร็จ!"); }); } }
 function copyAffLink() { if(window.myAffCode) { navigator.clipboard.writeText("https://liff.line.me/2009598846-wiCUeV35?ref=" + window.myAffCode).then(() => { alert("คัดลอกลิงก์แนะนำเพื่อนสำเร็จ!"); }); } }
-
 
 // ==========================================
 // 🪙 ระบบ Daily Actions (แจกแต้ม & ป้องกันสแปม)
@@ -339,110 +171,90 @@ function copyAffLink() { if(window.myAffCode) { navigator.clipboard.writeText("h
 async function loadUserPoints(uid) {
     if(!uid || !db) return;
     try {
-        const doc = await db.collection('userPoints').doc(uid).get();
-        const today = new Date().toLocaleDateString('en-CA'); 
-
-        if(doc.exists) {
-            let data = doc.data();
-            userCurrentPoints = data.points || 0;
-            if(data.history && data.history[today] && data.history[today].checkedIn) {
-                isCheckedInToday = true;
-                const btn = document.getElementById('btn-daily-checkin');
-                if(btn) { btn.innerText = "✅ วันนี้เช็คอินแล้ว"; btn.disabled = true; btn.style.background = "#555"; btn.style.color = "#ccc"; }
-            }
-        } else {
-            await db.collection('userPoints').doc(uid).set({ points: 0, history: {} });
-        }
-        if(document.getElementById('user-points-display')) {
-            document.getElementById('user-points-display').innerText = userCurrentPoints;
-        }
+        const doc = await db.collection('userPoints').doc(uid).get(); const today = new Date().toLocaleDateString('en-CA'); 
+        if(doc.exists) { let data = doc.data(); userCurrentPoints = data.points || 0; if(data.history && data.history[today] && data.history[today].checkedIn) { isCheckedInToday = true; const btn = document.getElementById('btn-daily-checkin'); if(btn) { btn.innerText = "✅ วันนี้เช็คอินแล้ว"; btn.disabled = true; btn.style.background = "#555"; btn.style.color = "#ccc"; } } } else { await db.collection('userPoints').doc(uid).set({ points: 0, history: {} }); }
+        if(document.getElementById('user-points-display')) { document.getElementById('user-points-display').innerText = userCurrentPoints; }
     } catch(e) { console.log("โหลดแต้มไม่สำเร็จ", e); }
 }
 
-function showPointToast(text) {
-    const toast = document.getElementById('point-toast');
-    if(!toast) return;
-    document.getElementById('point-toast-text').innerText = text;
-    toast.style.bottom = '80px'; 
-    setTimeout(() => { toast.style.bottom = '-100px'; }, 3000); 
-}
+function showPointToast(text) { const toast = document.getElementById('point-toast'); if(!toast) return; document.getElementById('point-toast-text').innerText = text; toast.style.bottom = '80px'; setTimeout(() => { toast.style.bottom = '-100px'; }, 3000); }
 
 async function earnPoints(actionType, targetId = null) {
     if(!myLineUid || !db) return; 
-
-    const today = new Date().toLocaleDateString('en-CA'); 
-    const userRef = db.collection('userPoints').doc(myLineUid);
-
+    const today = new Date().toLocaleDateString('en-CA'); const userRef = db.collection('userPoints').doc(myLineUid);
     try {
-        const doc = await userRef.get();
-        let data = doc.exists ? doc.data() : { points: 0, history: {} };
-        if(!data.history) data.history = {};
-        
-        if(!data.history[today]) {
-            data.history[today] = { viewed: [], dir: [], share: [], checkedIn: false }; 
-        } else {
-            if(!Array.isArray(data.history[today].viewed)) data.history[today].viewed = [];
-            if(!Array.isArray(data.history[today].dir)) data.history[today].dir = [];
-            if(!Array.isArray(data.history[today].share)) data.history[today].share = [];
-        }
-
-        let pointsToAdd = 0;
-        let actionName = "";
+        const doc = await userRef.get(); let data = doc.exists ? doc.data() : { points: 0, history: {} }; if(!data.history) data.history = {};
+        if(!data.history[today]) { data.history[today] = { viewed: [], dir: [], share: [], checkedIn: false }; } else { if(!Array.isArray(data.history[today].viewed)) data.history[today].viewed = []; if(!Array.isArray(data.history[today].dir)) data.history[today].dir = []; if(!Array.isArray(data.history[today].share)) data.history[today].share = []; }
+        let pointsToAdd = 0; let actionName = "";
 
         if(actionType === 'checkin') {
             if(data.history[today].checkedIn) return alert("วันนี้คุณเช็คอินรับแต้มไปแล้วครับ พรุ่งนี้มาใหม่นะ!");
-            pointsToAdd = parseInt(pointSettings.checkIn) || 10;
-            data.history[today].checkedIn = true;
-            actionName = "เช็คอินรายวัน";
-            alert(`🎉 เช็คอินสำเร็จ! รับฟรี ${pointsToAdd} แต้ม`);
-            const btn = document.getElementById('btn-daily-checkin');
-            if(btn) { btn.innerText = "✅ วันนี้เช็คอินแล้ว"; btn.disabled = true; btn.style.background = "#555"; btn.style.color = "#ccc"; }
-        }
-        else if(actionType === 'view' && targetId) {
-            if(data.history[today].viewed.includes(targetId)) return; 
-            if(data.history[today].viewed.length >= (parseInt(pointSettings.viewLimit) || 10)) return; 
-            pointsToAdd = parseInt(pointSettings.view) || 1;
-            data.history[today].viewed.push(targetId);
-            actionName = "ส่องร้านค้า";
-        } 
-        else if(actionType === 'dir' && targetId) {
-            if(data.history[today].dir.includes(targetId)) return; 
-            if(data.history[today].dir.length >= (parseInt(pointSettings.dirLimit) || 2)) return;
-            pointsToAdd = parseInt(pointSettings.dir) || 5;
-            data.history[today].dir.push(targetId);
-            actionName = "กดนำทาง";
-        } 
-        else if(actionType === 'share' && targetId) {
-            if(data.history[today].share.includes(targetId)) return;
-            if(data.history[today].share.length >= (parseInt(pointSettings.shareLimit) || 2)) return;
-            pointsToAdd = parseInt(pointSettings.share) || 5;
-            data.history[today].share.push(targetId);
-            actionName = "บอกต่อเพื่อน";
-        }
-        else if(actionType === 'wheel_bonus' && targetId) {
-            pointsToAdd = parseInt(targetId);
-            actionName = "หมุนกงล้อ";
+            pointsToAdd = parseInt(pointSettings.checkIn) || 10; data.history[today].checkedIn = true; actionName = "เช็คอินรายวัน";
+            alert(`🎉 เช็คอินสำเร็จ! รับฟรี ${pointsToAdd} แต้ม`); const btn = document.getElementById('btn-daily-checkin'); if(btn) { btn.innerText = "✅ วันนี้เช็คอินแล้ว"; btn.disabled = true; btn.style.background = "#555"; btn.style.color = "#ccc"; }
+        } else if(actionType === 'view' && targetId) {
+            if(data.history[today].viewed.includes(targetId)) return; if(data.history[today].viewed.length >= (parseInt(pointSettings.viewLimit) || 10)) return; 
+            pointsToAdd = parseInt(pointSettings.view) || 1; data.history[today].viewed.push(targetId); actionName = "ส่องร้านค้า";
+        } else if(actionType === 'dir' && targetId) {
+            if(data.history[today].dir.includes(targetId)) return; if(data.history[today].dir.length >= (parseInt(pointSettings.dirLimit) || 2)) return;
+            pointsToAdd = parseInt(pointSettings.dir) || 5; data.history[today].dir.push(targetId); actionName = "กดนำทาง";
+        } else if(actionType === 'share' && targetId) {
+            if(data.history[today].share.includes(targetId)) return; if(data.history[today].share.length >= (parseInt(pointSettings.shareLimit) || 2)) return;
+            pointsToAdd = parseInt(pointSettings.share) || 5; data.history[today].share.push(targetId); actionName = "บอกต่อเพื่อน";
+        } else if(actionType === 'wheel_bonus' && targetId) {
+            pointsToAdd = parseInt(targetId); actionName = "หมุนกงล้อ";
         }
 
         if(pointsToAdd > 0) {
-            data.points += pointsToAdd;
-            userCurrentPoints = data.points;
-            await userRef.set(data); 
-            
-            if(document.getElementById('user-points-display')) {
-                document.getElementById('user-points-display').innerText = userCurrentPoints;
-            }
+            data.points += pointsToAdd; userCurrentPoints = data.points; await userRef.set(data); 
+            if(document.getElementById('user-points-display')) { document.getElementById('user-points-display').innerText = userCurrentPoints; }
             if(actionType !== 'checkin') showPointToast(`+${pointsToAdd} แต้ม จากการ${actionName}!`);
         }
     } catch(e) { console.log("ให้แต้มไม่สำเร็จ", e); }
 }
 
 // ==========================================
-// 🎡 ระบบกงล้อเสี่ยงโชค (Lucky Wheel)
+// 🎡 ระบบกงล้อเสี่ยงโชค (วาดข้อความ & หมุน)
 // ==========================================
 function openLuckyWheel() { document.getElementById('luckyWheelModal').style.display = 'flex'; }
 
-let isSpinning = false; 
+// 🌟 ฟังก์ชันวาดสีและข้อความลงบนกงล้อ
+function renderWheelLabels() {
+    const wheel = document.getElementById('wheel-spinner');
+    if(!wheel || wheelRewards.length === 0) return;
+
+    // คำนวณองศาและวาดสีพื้นหลัง
+    const segmentDegree = 360 / wheelRewards.length;
+    let colors = ['#D9534F', '#17a2b8', '#06C755', '#FFD700', '#9C27B0', '#FF9800', '#3F51B5', '#E91E63'];
+    let gradientParts = wheelRewards.map((r, idx) => `${colors[idx % colors.length]} ${idx * segmentDegree}deg ${(idx + 1) * segmentDegree}deg`).join(', ');
+    wheel.style.background = `conic-gradient(${gradientParts})`;
+
+    wheel.innerHTML = ''; // เคลียร์ข้อความเก่า
+
+    // วาดข้อความแต่ละช่อง
+    wheelRewards.forEach((r, idx) => {
+        const labelAngle = (idx * segmentDegree) + (segmentDegree / 2);
+        const label = document.createElement('div');
+        label.style.position = 'absolute';
+        label.style.top = '50%';
+        label.style.left = '50%';
+        label.style.width = '75px'; // ความกว้างข้อความ 
+        label.style.transformOrigin = '0 0';
+        label.style.transform = `rotate(${labelAngle - 90}deg) translate(25px, -50%)`; // ดันให้ชิดขอบ
+        label.style.color = '#FFF';
+        label.style.fontWeight = '600';
+        label.style.fontSize = '10px'; // ขนาดอักษร
+        label.style.fontFamily = 'Kanit';
+        label.style.textShadow = '0 1px 3px rgba(0,0,0,0.8)';
+        label.style.textAlign = 'left'; 
+        label.style.whiteSpace = 'nowrap';
+        label.style.overflow = 'hidden';
+        label.style.textOverflow = 'ellipsis';
+        label.innerText = r.name;
+        wheel.appendChild(label);
+    });
+}
+
+let isSpinning = false;
 async function spinWheel() {
     if(isSpinning) return;
     if(!myLineUid) return alert("กรุณาล็อคอินด้วย LINE ก่อนเพื่อร่วมสนุกครับ!");
@@ -452,18 +264,13 @@ async function spinWheel() {
     isSpinning = true;
     const btn = document.getElementById('btn-spin-wheel');
     const wheel = document.getElementById('wheel-spinner');
-    btn.innerText = "กำลังลุ้น... 🎡";
-    btn.disabled = true;
+    btn.innerText = "กำลังลุ้น... 🎡"; btn.disabled = true;
 
     try {
         const userRef = db.collection('userPoints').doc(myLineUid);
-        userCurrentPoints -= wheelSpinCost;
-        await userRef.update({ points: userCurrentPoints });
+        userCurrentPoints -= wheelSpinCost; await userRef.update({ points: userCurrentPoints });
         document.getElementById('user-points-display').innerText = userCurrentPoints;
-    } catch(e) {
-        alert("เกิดข้อผิดพลาดในการตัดแต้ม กรุณาลองใหม่ครับ");
-        isSpinning = false; btn.innerText = "🎯 กดหมุนเลย!"; btn.disabled = false; return;
-    }
+    } catch(e) { alert("เกิดข้อผิดพลาดในการตัดแต้ม กรุณาลองใหม่ครับ"); isSpinning = false; btn.innerText = "🎯 กดหมุนเลย!"; btn.disabled = false; return; }
 
     let randomNumber = Math.random() * 100;
     let selectedPrizeIndex = 0; let cumulativeChance = 0;
@@ -473,11 +280,9 @@ async function spinWheel() {
     }
 
     const segmentDegree = 360 / wheelRewards.length;
-    let colors = ['#D9534F', '#17a2b8', '#06C755', '#FFD700', '#9C27B0', '#FF9800', '#3F51B5', '#E91E63'];
-    let gradientParts = wheelRewards.map((r, idx) => `${colors[idx % colors.length]} ${idx * segmentDegree}deg ${(idx + 1) * segmentDegree}deg`).join(', ');
-    wheel.style.background = `conic-gradient(${gradientParts})`;
-
     const targetDegree = 3600 + (360 - (selectedPrizeIndex * segmentDegree)) - (segmentDegree / 2);
+    
+    wheel.style.transition = 'transform 4s cubic-bezier(0.25, 0.1, 0.15, 1)';
     wheel.style.transform = `rotate(${targetDegree}deg)`;
 
     setTimeout(() => {
@@ -492,7 +297,6 @@ async function spinWheel() {
         
         wheel.style.transition = 'none';
         wheel.style.transform = `rotate(${targetDegree % 360}deg)`;
-        setTimeout(() => { wheel.style.transition = 'transform 4s cubic-bezier(0.25, 0.1, 0.15, 1)'; }, 50);
     }, 4000); 
 }
 
