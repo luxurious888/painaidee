@@ -28,10 +28,17 @@ try {
 } catch (e) { console.error("Firebase init failed:", e); }
 
 // ==========================================
-// 🧠 สมองควบคุมธีม (Theme Engine)
+// 🧠 ตัวแปรหลักของระบบ และ ระบบแต้ม (Points)
 // ==========================================
 let appData = { registrationRequests: [], registeredStores: [], pendingPromotions: [], activePromotions: [], mainCategories: [], categories: [], closedReports: [], blacklistedPlaces: [], services: [], pendingVipRequests: [], affiliateWallets: [], withdrawalRequests: [] };
 
+// 🌟 ตัวแปรเก็บข้อมูล User และแต้ม
+let myLineUid = ""; 
+let userCurrentPoints = 0; 
+
+// ==========================================
+// 🎨 สมองควบคุมธีม (Theme Engine)
+// ==========================================
 let currentTheme = {
     bgColor: "#121418", primaryColor: "#C5A059", vipBorderColor: "#FFD700",
     vipEffect: "none", logoEffect: "shine", profileEffect: "none", logoUrl: ""
@@ -92,8 +99,10 @@ function adjustColor(hex, amt) {
     var g = (num & 0x0000FF) + amt; if (g > 255) g = 255; else if (g < 0) g = 0;
     return (usePound ? "#" : "") + (g | (b << 8) | (r << 16)).toString(16).padStart(6, '0');
 }
-// ==========================================
 
+// ==========================================
+// 🛠️ Helper Functions
+// ==========================================
 const resizeImg = (file) => new Promise((resolve) => {
     if(!file) return resolve('');
     const reader = new FileReader(); reader.readAsDataURL(file);
@@ -138,7 +147,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function enterApp() { document.getElementById('loginOverlay').style.display = 'none'; document.getElementById('appContent').style.display = 'block'; }
 
-// 🔄 อัปเดตฟังก์ชันนี้ เพื่อไม่ให้กดรีเฟรชแล้วเด้งไปหน้าเก่า
 function switchPage(p) { 
     document.querySelectorAll('.page').forEach(el => el.classList.remove('active')); 
     document.querySelectorAll('nav div').forEach(el => el.classList.remove('active')); 
@@ -190,6 +198,11 @@ async function initSystem() {
         if (liff.isLoggedIn()) {
             const profile = await liff.getProfile();
             document.getElementById('header-profile').innerHTML = `<img src="${profile.pictureUrl}" style="width:100%; height:100%; object-fit:cover;">`;
+            
+            // 🌟 เก็บ UID และโหลดแต้มจากฐานข้อมูล
+            myLineUid = profile.userId;
+            loadUserPoints(myLineUid);
+
             const myCode = "AFF" + profile.userId.substring(0, 5).toUpperCase(); window.myAffCode = myCode;
             if(document.getElementById('myAffiliateCode')) { document.getElementById('myAffiliateCode').innerText = myCode; }
             
@@ -312,6 +325,8 @@ function copyAffLink() { if(window.myAffCode) { navigator.clipboard.writeText("h
 async function trackAction(storeName, actionType) {
     if (!storeName || !db) return;
     try {
+        earnPoints(actionType); // 🌟 แจกแต้มทันทีที่มีการ Action
+
         const statRef = db.collection('storeStats').doc(storeName);
         if (actionType === 'view') { await statRef.set({ views: firebase.firestore.FieldValue.increment(1) }, { merge: true }); } 
         else if (actionType === 'dir') { await statRef.set({ directions: firebase.firestore.FieldValue.increment(1) }, { merge: true }); }
@@ -906,16 +921,134 @@ function callPlace(placeId, event) {
 
 function sharePlace(name, lat, lng, event) {
     event.stopPropagation(); 
+    earnPoints('share'); // 🌟 แจกแต้มเมื่อแชร์
+
     const mapUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`; 
     if (navigator.share) { navigator.share({ title: 'แอปไปไหนดี', text: `ลองดูร้าน "${name}" สิ! น่าสนใจมากเลย 📍 ดูพิกัดได้ที่นี่: `, url: mapUrl }).catch(err => console.log('Share failed:', err));
     } else { navigator.clipboard.writeText(mapUrl).then(() => { alert('คัดลอกลิงก์พิกัดเรียบร้อยแล้ว! สามารถนำไปวาง (Paste) ส่งให้เพื่อนได้เลยครับ'); }); }
 }
 
-// 🎡 ฟังก์ชันจำลองสำหรับกงล้อ (เดี๋ยวเราจะมาเขียนเพิ่มทีหลังครับ)
+async function trackAction(storeName, actionType) {
+    if (!storeName || !db) return;
+    try {
+        earnPoints(actionType); // 🌟 แจกแต้มเมื่อส่องร้านหรือนำทาง
+
+        const statRef = db.collection('storeStats').doc(storeName);
+        if (actionType === 'view') { await statRef.set({ views: firebase.firestore.FieldValue.increment(1) }, { merge: true }); } 
+        else if (actionType === 'dir') { await statRef.set({ directions: firebase.firestore.FieldValue.increment(1) }, { merge: true }); }
+    } catch (e) {}
+}
+
+// ==========================================
+// 🪙 ระบบ Daily Actions แจกแต้มเมื่อใช้งาน
+// ==========================================
+
+async function loadUserPoints(uid) {
+    if(!uid || !db) return;
+    try {
+        const doc = await db.collection('userPoints').doc(uid).get();
+        if(doc.exists) {
+            userCurrentPoints = doc.data().points || 0;
+        } else {
+            await db.collection('userPoints').doc(uid).set({ points: 0, history: {} });
+        }
+        if(document.getElementById('user-points-display')) {
+            document.getElementById('user-points-display').innerText = userCurrentPoints;
+        }
+    } catch(e) { console.log("โหลดแต้มไม่สำเร็จ", e); }
+}
+
+function showPointToast(text) {
+    const toast = document.getElementById('point-toast');
+    if(!toast) return;
+    document.getElementById('point-toast-text').innerText = text;
+    toast.style.bottom = '80px'; 
+    setTimeout(() => { toast.style.bottom = '-100px'; }, 3000); 
+}
+
+async function earnPoints(actionType) {
+    if(!myLineUid || !db) return; 
+
+    const today = new Date().toLocaleDateString('en-CA'); 
+    const userRef = db.collection('userPoints').doc(myLineUid);
+
+    try {
+        const doc = await userRef.get();
+        let data = doc.exists ? doc.data() : { points: 0, history: {} };
+        if(!data.history) data.history = {};
+        if(!data.history[today]) data.history[today] = { view: 0, dir: 0, share: 0 }; 
+
+        let pointsToAdd = 0;
+        let actionName = "";
+
+        if(actionType === 'view' && data.history[today].view < 10) {
+            pointsToAdd = 1; data.history[today].view++; actionName = "ส่องร้านค้า";
+        } else if(actionType === 'dir' && data.history[today].dir < 2) {
+            pointsToAdd = 5; data.history[today].dir++; actionName = "กดนำทาง";
+        } else if(actionType === 'share' && data.history[today].share < 2) {
+            pointsToAdd = 5; data.history[today].share++; actionName = "บอกต่อเพื่อน";
+        }
+
+        if(pointsToAdd > 0) {
+            data.points += pointsToAdd;
+            userCurrentPoints = data.points;
+            await userRef.set(data); 
+            
+            if(document.getElementById('user-points-display')) {
+                document.getElementById('user-points-display').innerText = userCurrentPoints;
+            }
+            showPointToast(`+${pointsToAdd} แต้ม จากการ${actionName}!`);
+        }
+    } catch(e) { console.log("ให้แต้มไม่สำเร็จ", e); }
+}
+
+// ==========================================
+// 🎡 ระบบกงล้อเสี่ยงโชค (Lucky Wheel)
+// ==========================================
+
 function openLuckyWheel() {
     document.getElementById('luckyWheelModal').style.display = 'flex';
 }
 
-function spinWheel() {
-    alert("ระบบกงล้อกำลังอยู่ในระหว่างการพัฒนาครับ!");
+let isSpinning = false;
+async function spinWheel() {
+    if(isSpinning) return;
+    if(!myLineUid) return alert("กรุณาล็อคอินด้วย LINE ก่อนเพื่อร่วมสนุกครับ!");
+    if(userCurrentPoints < 50) return alert(`แต้มของคุณไม่พอครับ 😢\n(มีอยู่ ${userCurrentPoints} แต้ม / ต้องใช้ 50 แต้ม)\n\nหาแต้มเพิ่มง่ายๆ แค่กดดูร้านค้า, นำทาง หรือแชร์ร้านครับ!`);
+
+    isSpinning = true;
+    const btn = document.getElementById('btn-spin-wheel');
+    btn.innerText = "กำลังหมุน... 🎡";
+    btn.disabled = true;
+
+    // 1. หักแต้มบน Firestore ก่อนหมุน
+    try {
+        const userRef = db.collection('userPoints').doc(myLineUid);
+        const doc = await userRef.get();
+        let data = doc.data();
+        data.points -= 50;
+        userCurrentPoints = data.points;
+        await userRef.set(data);
+        document.getElementById('user-points-display').innerText = userCurrentPoints;
+    } catch(e) {
+        alert("เกิดข้อผิดพลาดในการตัดแต้ม กรุณาลองใหม่ครับ");
+        isSpinning = false; btn.innerText = "🎯 กดหมุนเลย!"; btn.disabled = false;
+        return;
+    }
+
+    // 2. เอฟเฟกต์หมุนกงล้อ
+    const wheel = document.getElementById('wheel-spinner');
+    // สุ่มองศาหมุนให้หมุนไปอย่างน้อย 10 รอบ (3600 องศา) + องศาสุ่ม
+    const randomDegree = Math.floor(Math.random() * 360) + 3600; 
+    wheel.style.transform = `rotate(${randomDegree}deg)`;
+
+    // 3. รอให้กงล้อหยุด (ตั้งเวลาเท่ากับ transition ใน css คือ 4 วินาที)
+    setTimeout(() => {
+        isSpinning = false;
+        btn.innerText = "🎯 หมุนอีกครั้ง (50 แต้ม)";
+        btn.disabled = false;
+        
+        // เด้งแจ้งเตือนชั่วคราว เดี๋ยวเราจะมาเปลี่ยนระบบสุ่มรางวัลของจริงในสเต็ปหน้าครับ
+        alert("🎉 ยินดีด้วย! กงล้อหยุดแล้ว\n\n(เดี๋ยวเราจะมาใส่ระบบสุ่มของรางวัล และบันทึกของรางวัลลงกระเป๋าต่อในสเต็ปหน้าครับ!)");
+    }, 4000); 
 }
