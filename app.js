@@ -25,6 +25,7 @@ let userCurrentPoints = 0;
 let isCheckedInToday = false;
 let pointSettings = { checkIn: 10, view: 1, dir: 5, share: 5, viewLimit: 10, dirLimit: 2, shareLimit: 2 };
 let wheelRewards = [];
+let wheelSpinCost = 50; // ตัวแปรเก็บค่าใช้จ่ายในการหมุน
 
 // ==========================================
 // 🎨 สมองควบคุมธีม (Theme Engine)
