@@ -3,29 +3,16 @@ window.addEventListener('error', function(event) {
     if(loadingText) {
         loadingText.innerHTML = "พบปัญหา: " + event.message + "<br><span style='font-size:12px; color:#aaa;'>กรุณารีเฟรชหน้าจอใหม่อีกครั้ง</span>";
         loadingText.style.color = "#D9534F";
-        const goldLogo = document.querySelector('.gold-logo');
-        if (goldLogo) goldLogo.style.display = 'none';
-        const customImg = document.querySelector('.custom-logo-img');
-        if(customImg) customImg.style.display = 'none';
+        const spinner = document.querySelector('#loadingSpinner svg');
+        if(spinner) spinner.style.display = 'none'; // ปิดตัวหมุนถ้าเกิด Error จะได้เห็นข้อความชัดๆ
     }
 });
 
 const API_URL = "https://script.google.com/macros/s/AKfycbwojqh2ry1b_xkuVp28w5q8Cs0CX9xBcI-upICxz98NtRrwnJ99GwLneWXFGQJySN1T/exec";
-
-const firebaseConfig = {
-    apiKey: "AIzaSyBSFWKdLCjLWqzo2_mzUE95CyoiUv5TdnY",
-    authDomain: "painaid-88c53.firebaseapp.com",
-    projectId: "painaid-88c53",
-    storageBucket: "painaid-88c53.firebasestorage.app",
-    messagingSenderId: "229290700458",
-    appId: "1:229290700458:web:74a57d0be5df9326c5ead3"
-};
+const firebaseConfig = { apiKey: "AIzaSyBSFWKdLCjLWqzo2_mzUE95CyoiUv5TdnY", authDomain: "painaid-88c53.firebaseapp.com", projectId: "painaid-88c53", storageBucket: "painaid-88c53.firebasestorage.app", messagingSenderId: "229290700458", appId: "1:229290700458:web:74a57d0be5df9326c5ead3" };
 
 let db, storage;
-try {
-    if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-    db = firebase.firestore(); storage = firebase.storage();
-} catch (e) { console.error("Firebase init failed:", e); }
+try { if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); } db = firebase.firestore(); storage = firebase.storage(); } catch (e) { console.error("Firebase init failed:", e); }
 
 // ==========================================
 // 🧠 ตัวแปรหลักของระบบ
@@ -154,11 +141,7 @@ function switchPage(p) {
     document.querySelectorAll('nav div').forEach(el => el.classList.remove('active')); 
     const page = document.getElementById('page-'+p); if(page) page.classList.add('active'); 
     const tab = document.getElementById('tab-'+p); if(tab) tab.classList.add('active'); 
-    try {
-        const url = new URL(window.location.href);
-        url.searchParams.set('page', p);
-        window.history.replaceState({}, '', url);
-    } catch(e) {}
+    try { const url = new URL(window.location.href); url.searchParams.set('page', p); window.history.replaceState({}, '', url); } catch(e) {}
 }
 
 function navigateToAffiliate() { switchPage('affiliate'); }
@@ -210,7 +193,6 @@ async function initSystem() {
             document.getElementById('affiliate-actual-content').style.display = 'block'; document.getElementById('affiliate-guest-view').style.display = 'none';
             document.getElementById('loginOverlay').style.display = 'none'; document.getElementById('appContent').style.display = 'block';
             
-            // โชว์ป้ายคะแนน
             if(document.getElementById('points-widget')) document.getElementById('points-widget').style.display = 'flex';
 
             updateWalletUI(); 
@@ -253,7 +235,6 @@ function loadFromCloud() {
             if(!isResolved) { console.warn("Firebase โหลดช้าเกินไป"); isResolved = true; resolve(); }
         }, 5000);
 
-        // โหลดข้อมูลแอปหลัก
         unsubscribe = db.collection('painaidee').doc('systemData').onSnapshot((doc) => {
             if (doc.exists) { appData = { ...appData, ...doc.data() }; }
             ['registeredStores', 'activePromotions', 'mainCategories', 'categories', 'services', 'affiliateWallets', 'withdrawalRequests', 'registrationRequests', 'pendingPromotions', 'pendingVipRequests'].forEach(k => { if(!appData[k]) appData[k] = []; });
@@ -265,7 +246,6 @@ function loadFromCloud() {
             if (!isResolved) { clearTimeout(fallbackTimer); isResolved = true; resolve(); }
         });
 
-        // โหลดธีมสี
         db.collection('painaidee').doc('themeSettings').onSnapshot((doc) => {
             if (doc.exists) {
                 applyThemeToApp(doc.data());
@@ -273,16 +253,14 @@ function loadFromCloud() {
             }
         });
 
-        // โหลดกฎกติกาการแจกแต้มจากแอดมิน
         db.collection('painaidee').doc('pointSettings').onSnapshot((doc) => {
             if (doc.exists) { 
                 pointSettings = { ...pointSettings, ...doc.data() }; 
                 const btnText = document.getElementById('display-checkin-pts');
-                if(btnText) btnText.innerText = pointSettings.checkIn;
+                if(btnText) btnText.innerText = pointSettings.checkIn || 10;
             }
         });
 
-        // โหลดของรางวัลในกงล้อจากแอดมิน
         db.collection('painaidee').doc('wheelSettings').onSnapshot((doc) => {
             if (doc.exists) wheelRewards = doc.data().rewards || [];
         });
@@ -291,11 +269,9 @@ function loadFromCloud() {
 
 async function saveToCloud() { try { if(db) await db.collection('painaidee').doc('systemData').set(appData); return true; } catch(e) { throw e; } }
 
-
 // ==========================================
 // 🪙 ระบบ Daily Actions (แจกแต้ม & ป้องกันสแปม)
 // ==========================================
-
 async function loadUserPoints(uid) {
     if(!uid || !db) return;
     try {
@@ -327,7 +303,6 @@ function showPointToast(text) {
     setTimeout(() => { toast.style.bottom = '-100px'; }, 3000); 
 }
 
-// ฟังก์ชันแจกแต้ม บังคับส่งชื่อร้านหรือรหัสไอเทมมาเพื่อเช็คการกดซ้ำ
 async function earnPoints(actionType, targetId = null) {
     if(!myLineUid || !db) return; 
 
@@ -338,7 +313,15 @@ async function earnPoints(actionType, targetId = null) {
         const doc = await userRef.get();
         let data = doc.exists ? doc.data() : { points: 0, history: {} };
         if(!data.history) data.history = {};
-        if(!data.history[today]) data.history[today] = { viewed: [], dir: [], share: [], checkedIn: false }; 
+        
+        // 🌟 ดักระบบกันพัง เผื่อของเก่าเป็นตัวเลข ให้กลายเป็น Array ให้หมด
+        if(!data.history[today]) {
+            data.history[today] = { viewed: [], dir: [], share: [], checkedIn: false }; 
+        } else {
+            if(!Array.isArray(data.history[today].viewed)) data.history[today].viewed = [];
+            if(!Array.isArray(data.history[today].dir)) data.history[today].dir = [];
+            if(!Array.isArray(data.history[today].share)) data.history[today].share = [];
+        }
 
         let pointsToAdd = 0;
         let actionName = "";
@@ -350,11 +333,11 @@ async function earnPoints(actionType, targetId = null) {
             actionName = "เช็คอินรายวัน";
             alert(`🎉 เช็คอินสำเร็จ! รับฟรี ${pointsToAdd} แต้ม`);
             const btn = document.getElementById('btn-daily-checkin');
-            btn.innerText = "✅ วันนี้เช็คอินแล้ว"; btn.disabled = true; btn.style.background = "#555"; btn.style.color = "#ccc";
+            if(btn) { btn.innerText = "✅ วันนี้เช็คอินแล้ว"; btn.disabled = true; btn.style.background = "#555"; btn.style.color = "#ccc"; }
         }
         else if(actionType === 'view' && targetId) {
-            if(data.history[today].viewed.includes(targetId)) return; // กดไปแล้วข้ามเลย
-            if(data.history[today].viewed.length >= (pointSettings.viewLimit || 10)) return; // เกินโควต้า
+            if(data.history[today].viewed.includes(targetId)) return; 
+            if(data.history[today].viewed.length >= (pointSettings.viewLimit || 10)) return; 
             pointsToAdd = pointSettings.view || 1;
             data.history[today].viewed.push(targetId);
             actionName = "ส่องร้านค้า";
@@ -374,7 +357,6 @@ async function earnPoints(actionType, targetId = null) {
             actionName = "บอกต่อเพื่อน";
         }
         else if(actionType === 'wheel_bonus' && targetId) {
-            // โบนัสจากกงล้อ ไม่จำกัดโควต้า
             pointsToAdd = parseInt(targetId);
             actionName = "หมุนกงล้อ";
         }
@@ -395,17 +377,14 @@ async function earnPoints(actionType, targetId = null) {
 // ==========================================
 // 🎡 ระบบกงล้อเสี่ยงโชค (Lucky Wheel)
 // ==========================================
-
-function openLuckyWheel() {
-    document.getElementById('luckyWheelModal').style.display = 'flex';
-}
+function openLuckyWheel() { document.getElementById('luckyWheelModal').style.display = 'flex'; }
 
 let isSpinning = false;
 async function spinWheel() {
     if(isSpinning) return;
-    if(!myLineUid) return alert("กรุณาล็อคอินก่อนครับ!");
+    if(!myLineUid) return alert("กรุณาล็อคอินด้วย LINE ก่อนเพื่อร่วมสนุกครับ!");
     if(wheelRewards.length === 0) return alert("แอดมินยังไม่ได้ตั้งค่าของรางวัลครับ");
-    if(userCurrentPoints < 50) return alert(`แต้มไม่พอครับ (ขาดอีก ${50 - userCurrentPoints} แต้ม)`);
+    if(userCurrentPoints < 50) return alert(`แต้มของคุณไม่พอครับ 😢\n(มีอยู่ ${userCurrentPoints} แต้ม / ต้องใช้ 50 แต้ม)\n\nอย่าลืมกดเช็คอินรายวัน หรือหาสะสมจากการส่องร้านค้านะครับ!`);
 
     isSpinning = true;
     const btn = document.getElementById('btn-spin-wheel');
@@ -413,63 +392,79 @@ async function spinWheel() {
     btn.innerText = "กำลังลุ้น... 🎡";
     btn.disabled = true;
 
-    // ตัดแต้มก่อน
     try {
         const userRef = db.collection('userPoints').doc(myLineUid);
         userCurrentPoints -= 50;
         await userRef.update({ points: userCurrentPoints });
         document.getElementById('user-points-display').innerText = userCurrentPoints;
     } catch(e) {
-        isSpinning = false; btn.disabled = false; btn.innerText = "🎯 กดหมุนเลย!"; return alert("การเชื่อมต่อมีปัญหา");
+        alert("เกิดข้อผิดพลาดในการตัดแต้ม กรุณาลองใหม่ครับ");
+        isSpinning = false; btn.innerText = "🎯 กดหมุนเลย!"; btn.disabled = false; return;
     }
 
-    // คำนวณผลรางวัลล่วงหน้า (Weighted Random)
     let randomNumber = Math.random() * 100;
-    let selectedPrizeIndex = 0;
-    let cumulativeChance = 0;
-
+    let selectedPrizeIndex = 0; let cumulativeChance = 0;
     for (let i = 0; i < wheelRewards.length; i++) {
         cumulativeChance += wheelRewards[i].chance;
-        if (randomNumber <= cumulativeChance) {
-            selectedPrizeIndex = i; break;
-        }
+        if (randomNumber <= cumulativeChance) { selectedPrizeIndex = i; break; }
     }
 
-    // จัดการสีของกงล้อให้พอดีกับจำนวนรางวัลที่มี
     const segmentDegree = 360 / wheelRewards.length;
     let colors = ['#D9534F', '#17a2b8', '#06C755', '#FFD700', '#9C27B0', '#FF9800', '#3F51B5', '#E91E63'];
     let gradientParts = wheelRewards.map((r, idx) => `${colors[idx % colors.length]} ${idx * segmentDegree}deg ${(idx + 1) * segmentDegree}deg`).join(', ');
     wheel.style.background = `conic-gradient(${gradientParts})`;
 
-    // คำนวณองศาให้ไปหยุดที่รางวัลนั้น (บวกไป 10 รอบเพื่อความสมจริง)
     const targetDegree = 3600 + (360 - (selectedPrizeIndex * segmentDegree)) - (segmentDegree / 2);
     wheel.style.transform = `rotate(${targetDegree}deg)`;
 
-    // แสดงผลรางวัล
     setTimeout(() => {
-        isSpinning = false;
-        btn.innerText = "🎯 หมุนอีกครั้ง (50 แต้ม)";
-        btn.disabled = false;
-        
+        isSpinning = false; btn.innerText = "🎯 หมุนอีกครั้ง (50 แต้ม)"; btn.disabled = false;
         const prize = wheelRewards[selectedPrizeIndex];
         alert(`🎉 ยินดีด้วยครับ!\nคุณได้รับ: "${prize.name}"`);
         
-        // ถ้าเป็นรางวัลที่ได้แต้มคืน
         if(prize.name.includes("แต้ม")) {
             let bonus = parseInt(prize.name.replace(/[^0-9]/g, '')) || 0;
             if(bonus > 0) earnPoints('wheel_bonus', bonus); 
         }
         
-        // รีเซ็ตกงล้อให้พร้อมหมุนรอบใหม่ โดยไม่เปลี่ยนหน้าตา
         wheel.style.transition = 'none';
         wheel.style.transform = `rotate(${targetDegree % 360}deg)`;
         setTimeout(() => { wheel.style.transition = 'transform 4s cubic-bezier(0.25, 0.1, 0.15, 1)'; }, 50);
-
     }, 4000); 
 }
 
 // ==========================================
-// 💰 ระบบแนะนำเพื่อน (Affiliate)
+// 🔗 ระบบ Interaction (นำทาง, แชร์) + แจกแต้ม
+// ==========================================
+function callPlace(placeId, event) {
+    event.stopPropagation();
+    service.getDetails({ placeId: placeId, fields: ['formatted_phone_number'] }, (place, status) => {
+        if (status === google.maps.places.PlacesServiceStatus.OK && place.formatted_phone_number) { window.location.href = 'tel:' + place.formatted_phone_number.replace(/[^0-9+]/g, ''); } else { alert("ขออภัยครับ ไม่พบเบอร์โทรศัพท์ของสถานที่นี้ในระบบแผนที่"); }
+    });
+}
+
+function sharePlace(name, lat, lng, event) {
+    event.stopPropagation(); 
+    earnPoints('share', name); 
+
+    const mapUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`; 
+    if (navigator.share) { navigator.share({ title: 'แอปไปไหนดี', text: `ลองดูร้าน "${name}" สิ! น่าสนใจมากเลย 📍 ดูพิกัดได้ที่นี่: `, url: mapUrl }).catch(err => console.log('Share failed:', err));
+    } else { navigator.clipboard.writeText(mapUrl).then(() => { alert('คัดลอกลิงก์พิกัดเรียบร้อยแล้ว! สามารถนำไปวาง (Paste) ส่งให้เพื่อนได้เลยครับ'); }); }
+}
+
+async function trackAction(storeName, actionType) {
+    if (!storeName || !db) return;
+    try {
+        earnPoints(actionType, storeName); 
+
+        const statRef = db.collection('storeStats').doc(storeName);
+        if (actionType === 'view') { await statRef.set({ views: firebase.firestore.FieldValue.increment(1) }, { merge: true }); } 
+        else if (actionType === 'dir') { await statRef.set({ directions: firebase.firestore.FieldValue.increment(1) }, { merge: true }); }
+    } catch (e) {}
+}
+
+// ==========================================
+// 💰 ระบบ Affiliate และ ถอนเงิน
 // ==========================================
 function updateWalletUI() {
     if(!window.myAffCode) return;
@@ -1103,211 +1098,4 @@ async function submitEditPromo() {
         await saveToCloud(); sendTelegramNotify(`📝 <b>มีการขอแก้ไขแบนเนอร์!</b>\n\n🏬 ร้าน: <b>${store.name}</b>\n\n👉 กรุณาตรวจสอบในหน้าแอดมินครับ`);
         alert("ส่งข้อมูลขอแก้ไขเรียบร้อย! รอแอดมินตรวจสอบการเปลี่ยนแปลงครับ (วันหมดอายุจะคงเดิม)"); document.getElementById('editPromoImageInput').value = '';
     } catch (error) { alert("❌ ไม่สามารถส่งข้อมูลได้ กรุณาลองใหม่อีกครั้ง"); } finally { btn.innerText = "🔄 ส่งเรื่องขอแก้ไขข้อมูล"; btn.disabled = false; }
-}
-
-// ==========================================
-// 🔗 ระบบ Interaction (นำทาง, โทร, แชร์) + แจกแต้ม
-// ==========================================
-
-function callPlace(placeId, event) {
-    event.stopPropagation();
-    service.getDetails({ placeId: placeId, fields: ['formatted_phone_number'] }, (place, status) => {
-        if (status === google.maps.places.PlacesServiceStatus.OK && place.formatted_phone_number) { window.location.href = 'tel:' + place.formatted_phone_number.replace(/[^0-9+]/g, ''); } else { alert("ขออภัยครับ ไม่พบเบอร์โทรศัพท์ของสถานที่นี้ในระบบแผนที่"); }
-    });
-}
-
-function sharePlace(name, lat, lng, event) {
-    event.stopPropagation(); 
-    earnPoints('share', name); // 🌟 แจกแต้มจากการแชร์ (ส่งชื่อร้านไปกันสแปม)
-
-    const mapUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`; 
-    if (navigator.share) { navigator.share({ title: 'แอปไปไหนดี', text: `ลองดูร้าน "${name}" สิ! น่าสนใจมากเลย 📍 ดูพิกัดได้ที่นี่: `, url: mapUrl }).catch(err => console.log('Share failed:', err));
-    } else { navigator.clipboard.writeText(mapUrl).then(() => { alert('คัดลอกลิงก์พิกัดเรียบร้อยแล้ว! สามารถนำไปวาง (Paste) ส่งให้เพื่อนได้เลยครับ'); }); }
-}
-
-async function trackAction(storeName, actionType) {
-    if (!storeName || !db) return;
-    try {
-        earnPoints(actionType, storeName); // 🌟 แจกแต้มจากการส่องร้านหรือกดนำทาง
-
-        const statRef = db.collection('storeStats').doc(storeName);
-        if (actionType === 'view') { await statRef.set({ views: firebase.firestore.FieldValue.increment(1) }, { merge: true }); } 
-        else if (actionType === 'dir') { await statRef.set({ directions: firebase.firestore.FieldValue.increment(1) }, { merge: true }); }
-    } catch (e) {}
-}
-
-
-// ==========================================
-// 🪙 ระบบสะสมแต้ม (Daily Actions & Check-in)
-// ==========================================
-
-async function loadUserPoints(uid) {
-    if(!uid || !db) return;
-    try {
-        const doc = await db.collection('userPoints').doc(uid).get();
-        const today = new Date().toLocaleDateString('en-CA'); 
-
-        if(doc.exists) {
-            let data = doc.data();
-            userCurrentPoints = data.points || 0;
-            if(data.history && data.history[today] && data.history[today].checkedIn) {
-                isCheckedInToday = true;
-                const btn = document.getElementById('btn-daily-checkin');
-                if(btn) { btn.innerText = "✅ วันนี้เช็คอินแล้ว"; btn.disabled = true; btn.style.background = "#555"; btn.style.color = "#ccc"; }
-            }
-        } else {
-            await db.collection('userPoints').doc(uid).set({ points: 0, history: {} });
-        }
-        if(document.getElementById('user-points-display')) {
-            document.getElementById('user-points-display').innerText = userCurrentPoints;
-        }
-    } catch(e) { console.log("โหลดแต้มไม่สำเร็จ", e); }
-}
-
-function showPointToast(text) {
-    const toast = document.getElementById('point-toast');
-    if(!toast) return;
-    document.getElementById('point-toast-text').innerText = text;
-    toast.style.bottom = '80px'; 
-    setTimeout(() => { toast.style.bottom = '-100px'; }, 3000); 
-}
-
-async function earnPoints(actionType, targetId = null) {
-    if(!myLineUid || !db) return; 
-
-    const today = new Date().toLocaleDateString('en-CA'); 
-    const userRef = db.collection('userPoints').doc(myLineUid);
-
-    try {
-        const doc = await userRef.get();
-        let data = doc.exists ? doc.data() : { points: 0, history: {} };
-        if(!data.history) data.history = {};
-        if(!data.history[today]) data.history[today] = { viewed: [], dir: [], share: [], checkedIn: false }; 
-
-        let pointsToAdd = 0;
-        let actionName = "";
-
-        if(actionType === 'checkin') {
-            if(data.history[today].checkedIn) return alert("วันนี้คุณเช็คอินรับแต้มไปแล้วครับ พรุ่งนี้มาใหม่นะ!");
-            pointsToAdd = pointSettings.checkIn || 10;
-            data.history[today].checkedIn = true;
-            actionName = "เช็คอินรายวัน";
-            alert(`🎉 เช็คอินสำเร็จ! รับฟรี ${pointsToAdd} แต้ม`);
-            const btn = document.getElementById('btn-daily-checkin');
-            btn.innerText = "✅ วันนี้เช็คอินแล้ว"; btn.disabled = true; btn.style.background = "#555"; btn.style.color = "#ccc";
-        }
-        else if(actionType === 'view' && targetId) {
-            if(data.history[today].viewed.includes(targetId)) return; 
-            if(data.history[today].viewed.length >= (pointSettings.viewLimit || 10)) return; 
-            pointsToAdd = pointSettings.view || 1;
-            data.history[today].viewed.push(targetId);
-            actionName = "ส่องร้านค้า";
-        } 
-        else if(actionType === 'dir' && targetId) {
-            if(data.history[today].dir.includes(targetId)) return; 
-            if(data.history[today].dir.length >= (pointSettings.dirLimit || 2)) return;
-            pointsToAdd = pointSettings.dir || 5;
-            data.history[today].dir.push(targetId);
-            actionName = "กดนำทาง";
-        } 
-        else if(actionType === 'share' && targetId) {
-            if(data.history[today].share.includes(targetId)) return;
-            if(data.history[today].share.length >= (pointSettings.shareLimit || 2)) return;
-            pointsToAdd = pointSettings.share || 5;
-            data.history[today].share.push(targetId);
-            actionName = "บอกต่อเพื่อน";
-        }
-        else if(actionType === 'wheel_bonus' && targetId) {
-            pointsToAdd = parseInt(targetId);
-            actionName = "หมุนกงล้อ";
-        }
-
-        if(pointsToAdd > 0) {
-            data.points += pointsToAdd;
-            userCurrentPoints = data.points;
-            await userRef.set(data); 
-            
-            if(document.getElementById('user-points-display')) {
-                document.getElementById('user-points-display').innerText = userCurrentPoints;
-            }
-            if(actionType !== 'checkin') showPointToast(`+${pointsToAdd} แต้ม จากการ${actionName}!`);
-        }
-    } catch(e) { console.log("ให้แต้มไม่สำเร็จ", e); }
-}
-
-
-// ==========================================
-// 🎡 ระบบกงล้อเสี่ยงโชค (Lucky Wheel) 
-// ==========================================
-
-function openLuckyWheel() {
-    document.getElementById('luckyWheelModal').style.display = 'flex';
-}
-
-let isSpinning = false;
-async function spinWheel() {
-    if(isSpinning) return;
-    if(!myLineUid) return alert("กรุณาล็อคอินด้วย LINE ก่อนเพื่อร่วมสนุกครับ!");
-    if(wheelRewards.length === 0) return alert("แอดมินยังไม่ได้ตั้งค่าของรางวัลครับ");
-    if(userCurrentPoints < 50) return alert(`แต้มของคุณไม่พอครับ 😢\n(มีอยู่ ${userCurrentPoints} แต้ม / ต้องใช้ 50 แต้ม)\n\nอย่าลืมกดเช็คอินรายวัน หรือหาสะสมจากการส่องร้านค้านะครับ!`);
-
-    isSpinning = true;
-    const btn = document.getElementById('btn-spin-wheel');
-    const wheel = document.getElementById('wheel-spinner');
-    btn.innerText = "กำลังลุ้น... 🎡";
-    btn.disabled = true;
-
-    // ตัดแต้มจาก Firebase ทันทีที่กดหมุน ป้องกันการโกง
-    try {
-        const userRef = db.collection('userPoints').doc(myLineUid);
-        userCurrentPoints -= 50;
-        await userRef.update({ points: userCurrentPoints });
-        document.getElementById('user-points-display').innerText = userCurrentPoints;
-    } catch(e) {
-        alert("เกิดข้อผิดพลาดในการตัดแต้ม กรุณาลองใหม่ครับ");
-        isSpinning = false; btn.innerText = "🎯 กดหมุนเลย!"; btn.disabled = false; return;
-    }
-
-    // คำนวณเปอร์เซ็นต์ (Weighted Random)
-    let randomNumber = Math.random() * 100;
-    let selectedPrizeIndex = 0;
-    let cumulativeChance = 0;
-
-    for (let i = 0; i < wheelRewards.length; i++) {
-        cumulativeChance += wheelRewards[i].chance;
-        if (randomNumber <= cumulativeChance) {
-            selectedPrizeIndex = i; break;
-        }
-    }
-
-    // วาดสีกงล้อและคำนวณองศาให้หมุนไปตกช่องที่สุ่มได้เป๊ะๆ
-    const segmentDegree = 360 / wheelRewards.length;
-    let colors = ['#D9534F', '#17a2b8', '#06C755', '#FFD700', '#9C27B0', '#FF9800', '#3F51B5', '#E91E63'];
-    let gradientParts = wheelRewards.map((r, idx) => `${colors[idx % colors.length]} ${idx * segmentDegree}deg ${(idx + 1) * segmentDegree}deg`).join(', ');
-    wheel.style.background = `conic-gradient(${gradientParts})`;
-
-    const targetDegree = 3600 + (360 - (selectedPrizeIndex * segmentDegree)) - (segmentDegree / 2);
-    wheel.style.transform = `rotate(${targetDegree}deg)`;
-
-    // โชว์ผลลัพธ์
-    setTimeout(() => {
-        isSpinning = false;
-        btn.innerText = "🎯 หมุนอีกครั้ง (50 แต้ม)";
-        btn.disabled = false;
-        
-        const prize = wheelRewards[selectedPrizeIndex];
-        alert(`🎉 ยินดีด้วยครับ!\nคุณได้รับ: "${prize.name}"`);
-        
-        // ถ้ารางวัลมีคำว่า "แต้ม" ให้บวกแต้มคืนอัตโนมัติ
-        if(prize.name.includes("แต้ม")) {
-            let bonus = parseInt(prize.name.replace(/[^0-9]/g, '')) || 0;
-            if(bonus > 0) earnPoints('wheel_bonus', bonus); 
-        }
-        
-        // รีเซ็ตกงล้อเตรียมหมุนรอบใหม่ (หลอกตาให้กลับไปจุดเริ่มต้นโดยไม่ขยับ)
-        wheel.style.transition = 'none';
-        wheel.style.transform = `rotate(${targetDegree % 360}deg)`;
-        setTimeout(() => { wheel.style.transition = 'transform 4s cubic-bezier(0.25, 0.1, 0.15, 1)'; }, 50);
-
-    }, 4000); 
 }
