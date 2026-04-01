@@ -11,38 +11,34 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap');
         
-        :root { --primary: #C5A059; --bg: #121418; --surface: #1A1D23; --success: #06C755; --danger: #D9534F; }
+        :root { --primary: #C5A059; --bg: #121418; --surface: #1A1D23; --success: #06C755; --danger: #D9534F; --info: #17a2b8; }
         body { font-family: 'Kanit', sans-serif; background-color: var(--bg); color: #FFF; margin: 0; padding: 0; }
         
-        /* 📌 เมนูนำทาง (Tabs) */
-        .admin-nav { display: flex; justify-content: center; background: var(--surface); box-shadow: 0 4px 15px rgba(0,0,0,0.5); border-bottom: 1px solid rgba(255, 255, 255, 0.1); position: sticky; top: 0; z-index: 100; }
-        .admin-nav div { cursor: pointer; font-weight: 500; color: #999; padding: 15px 30px; font-size: 16px; transition: 0.3s; border-bottom: 3px solid transparent; }
+        .admin-nav { display: flex; justify-content: center; background: var(--surface); box-shadow: 0 4px 15px rgba(0,0,0,0.5); border-bottom: 1px solid rgba(255, 255, 255, 0.1); position: sticky; top: 0; z-index: 100; flex-wrap: wrap; }
+        .admin-nav div { cursor: pointer; font-weight: 500; color: #999; padding: 15px 20px; font-size: 15px; transition: 0.3s; border-bottom: 3px solid transparent; text-align: center; }
         .admin-nav div:hover { color: #FFF; background: rgba(255,255,255,0.05); }
         .admin-nav div.active { color: var(--primary); font-weight: 600; border-bottom: 3px solid var(--primary); }
         
-        /* 📌 คอนเทนต์ในแท็บ */
-        .tab-pane { display: none; animation: fadeIn 0.4s ease; padding: 30px 20px; }
-        .tab-pane.active { display: block; }
+        .tab-pane { display: none; animation: fadeIn 0.4s ease; padding: 30px 20px; justify-content: center; }
+        .tab-pane.active { display: flex; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .container { background: var(--surface); padding: 30px; border-radius: 16px; width: 100%; max-width: 550px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid rgba(197, 160, 89, 0.2); margin: 0 auto; }
+        .container { background: var(--surface); padding: 30px; border-radius: 16px; width: 100%; max-width: 550px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid rgba(197, 160, 89, 0.2); }
         h2 { text-align: center; margin-top: 0; border-bottom: 1px dashed #555; padding-bottom: 15px; }
         
-        /* 📌 ฟอร์มกรอกข้อมูล */
         .form-row { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 12px 15px; border-radius: 10px; margin-bottom: 10px; border: 1px solid #333; gap: 10px; }
         label { font-size: 14px; font-weight: 500; color: #eee; flex: 1; }
-        input { padding: 10px; border-radius: 8px; border: 1px solid #555; background: var(--bg); color: #FFF; font-family: 'Kanit'; outline: none; transition: 0.3s; }
+        input { padding: 10px; border-radius: 8px; border: 1px solid #555; background: var(--bg); color: #FFF; font-family: 'Kanit'; outline: none; transition: 0.3s; width: 100%; box-sizing: border-box;}
         input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.2); }
-        input[type="number"] { width: 70px; text-align: center; }
-        input[type="text"] { flex: 2; }
+        input[type="number"].short { width: 70px; text-align: center; }
         
-        /* 📌 ปุ่มต่างๆ */
         .btn-save { background: linear-gradient(135deg, #FFD700, #C5A059); color: #000; font-size: 16px; font-weight: 600; padding: 15px; border: none; border-radius: 12px; width: 100%; cursor: pointer; transition: 0.3s; margin-top: 20px; box-shadow: 0 4px 15px rgba(197, 160, 89, 0.3); font-family: 'Kanit'; }
         .btn-save:hover { transform: translateY(-2px); filter: brightness(1.1); }
-        .btn-add { background: var(--success); color: #FFF; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-size: 13px; font-family: 'Kanit'; font-weight: 600; box-shadow: 0 2px 10px rgba(6, 199, 85, 0.3); transition: 0.3s; }
+        .btn-add { background: var(--success); color: #FFF; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-size: 13px; font-family: 'Kanit'; font-weight: 600; transition: 0.3s; }
         .btn-add:hover { background: #05A044; }
         .btn-del { background: var(--danger); color: #FFF; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; transition: 0.3s; }
         .btn-del:hover { background: #C9302C; }
+        .btn-info { background: var(--info); color: #FFF; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-family: 'Kanit'; font-weight: 600; transition: 0.3s; }
         
         .total-percent { text-align: right; font-size: 16px; margin-top: 10px; color: #aaa; font-weight: bold; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; border: 1px solid #333; }
         .status-ok { color: var(--success); border-color: var(--success); background: rgba(6, 199, 85, 0.1); } 
@@ -53,30 +49,27 @@
 
 <nav class="admin-nav">
     <div id="nav-points" class="active" onclick="switchTab('points')">🪙 ตั้งค่าการแจกแต้ม</div>
-    <div id="nav-wheel" onclick="switchTab('wheel')">🎡 ตั้งค่าของรางวัลกงล้อ</div>
+    <div id="nav-wheel" onclick="switchTab('wheel')">🎡 ตั้งค่ากงล้อ</div>
+    <div id="nav-users" onclick="switchTab('users')">👥 จัดการแต้มสมาชิก</div>
 </nav>
 
 <div id="tab-points" class="tab-pane active">
     <div class="container">
         <h2 style="color: #C5A059;">🪙 ตั้งค่าการแจกแต้มรายวัน</h2>
-
         <div style="font-size: 14px; color: #DFBF8B; margin: 20px 0 10px; font-weight: bold;">✨ เช็คอินรับแต้ม (รายวัน)</div>
-        <div class="form-row">
-            <label>แต้มที่ได้จากการกดเช็คอิน (ต่อวัน)</label>
-            <input type="number" id="checkInPoints" value="10">
-        </div>
+        <div class="form-row"><label>แต้มเช็คอิน (ต่อวัน)</label><input type="number" class="short" id="checkInPoints"></div>
 
-        <div style="font-size: 14px; color: #DFBF8B; margin: 20px 0 10px; font-weight: bold;">👀 ส่องร้านค้า (ได้แต้มเมื่อกดดูแผนที่ร้าน)</div>
-        <div class="form-row"><label>แต้มที่ได้ ต่อการดู 1 ร้าน</label><input type="number" id="viewPoints" value="1"></div>
-        <div class="form-row"><label>ลิมิตการรับแต้ม (ครั้ง/วัน)</label><input type="number" id="viewLimit" value="10"></div>
+        <div style="font-size: 14px; color: #DFBF8B; margin: 20px 0 10px; font-weight: bold;">👀 ส่องร้านค้า</div>
+        <div class="form-row"><label>แต้มที่ได้ (ต่อร้าน)</label><input type="number" class="short" id="viewPoints"></div>
+        <div class="form-row"><label>ลิมิต (ครั้ง/วัน)</label><input type="number" class="short" id="viewLimit"></div>
 
-        <div style="font-size: 14px; color: #DFBF8B; margin: 20px 0 10px; font-weight: bold;">📍 นำทาง (ได้แต้มเมื่อกดปุ่มนำทาง)</div>
-        <div class="form-row"><label>แต้มที่ได้ ต่อการกด 1 ครั้ง</label><input type="number" id="dirPoints" value="5"></div>
-        <div class="form-row"><label>ลิมิตการรับแต้ม (ครั้ง/วัน)</label><input type="number" id="dirLimit" value="2"></div>
+        <div style="font-size: 14px; color: #DFBF8B; margin: 20px 0 10px; font-weight: bold;">📍 นำทาง</div>
+        <div class="form-row"><label>แต้มที่ได้ (ต่อครั้ง)</label><input type="number" class="short" id="dirPoints"></div>
+        <div class="form-row"><label>ลิมิต (ครั้ง/วัน)</label><input type="number" class="short" id="dirLimit"></div>
 
-        <div style="font-size: 14px; color: #DFBF8B; margin: 20px 0 10px; font-weight: bold;">📢 แชร์ร้าน (ได้แต้มเมื่อกดปุ่มแชร์)</div>
-        <div class="form-row"><label>แต้มที่ได้ ต่อการแชร์ 1 ครั้ง</label><input type="number" id="sharePoints" value="5"></div>
-        <div class="form-row"><label>ลิมิตการรับแต้ม (ครั้ง/วัน)</label><input type="number" id="shareLimit" value="2"></div>
+        <div style="font-size: 14px; color: #DFBF8B; margin: 20px 0 10px; font-weight: bold;">📢 แชร์ร้าน</div>
+        <div class="form-row"><label>แต้มที่ได้ (ต่อครั้ง)</label><input type="number" class="short" id="sharePoints"></div>
+        <div class="form-row"><label>ลิมิต (ครั้ง/วัน)</label><input type="number" class="short" id="shareLimit"></div>
 
         <button class="btn-save" onclick="savePointSettings()">💾 บันทึกการตั้งค่าแต้ม</button>
     </div>
@@ -85,35 +78,47 @@
 <div id="tab-wheel" class="tab-pane">
     <div class="container">
         <h2 style="color: #FFD700;">🎡 ของรางวัลกงล้อเสี่ยงโชค</h2>
-
-        <div style="font-size: 14px; color: #FFD700; margin: 20px 0 10px; font-weight: bold;">🪙 ค่าใช้จ่ายในการหมุน</div>
         <div class="form-row" style="border-color: var(--primary);">
-            <label style="color: var(--primary);">แต้มที่ต้องใช้หมุนกงล้อ (ต่อ 1 ครั้ง)</label>
-            <input type="number" id="spinCost" value="50" style="border-color: var(--primary); color: var(--primary); font-weight: bold;">
+            <label style="color: var(--primary);">แต้มที่ต้องใช้หมุน (ต่อครั้ง)</label>
+            <input type="number" class="short" id="spinCost" style="border-color: var(--primary); color: var(--primary); font-weight: bold;">
         </div>
-
         <hr style="border-color: rgba(255,255,255,0.1); margin: 20px 0;">
+        <p style="color: #aaa; font-size: 12px; margin-bottom: 15px;">รวมเปอร์เซ็นต์โอกาสรับรางวัลต้องได้ 100% พอดี</p>
 
-        <div style="font-size: 14px; color: #FFD700; margin: 20px 0 10px; font-weight: bold;">🎁 รายการของรางวัล</div>
-        <p style="color: #aaa; font-size: 12px; margin-top: -5px; margin-bottom: 15px;">
-            กำหนดของรางวัลและโอกาสได้รับ (เปอร์เซ็นต์รวมกันต้องได้ 100% พอดี)<br>
-            <span style="color: var(--primary);">* ถ้ารางวัลคือแต้ม ให้พิมพ์คำว่า "แต้ม" เข้าไปในชื่อรางวัลด้วย ระบบจะจ่ายแต้มให้อัตโนมัติ</span>
-        </p>
-
-        <div id="reward-list">
-            </div>
+        <div id="reward-list"></div>
 
         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
             <button class="btn-add" onclick="addRewardRow('', 0)">➕ เพิ่มช่องรางวัล</button>
             <div class="total-percent status-err" id="total-percent-display">รวม: 0%</div>
         </div>
-        
         <button class="btn-save" onclick="saveWheelSettings()">💾 บันทึกการตั้งค่ากงล้อ</button>
     </div>
 </div>
 
+<div id="tab-users" class="tab-pane">
+    <div class="container">
+        <h2 style="color: var(--info);">👥 จัดการแต้มสมาชิก</h2>
+        <p style="color: #aaa; font-size: 13px; margin-bottom: 20px; text-align: center;">นำรหัส <strong>LINE UID</strong> ของลูกค้ามาค้นหาเพื่อเพิ่ม/ลดแต้ม</p>
+        
+        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+            <input type="text" id="searchUid" placeholder="วาง LINE UID ที่นี่...">
+            <button class="btn-info" onclick="searchUserPoints()" style="white-space: nowrap;">🔍 ค้นหา</button>
+        </div>
+
+        <div id="userEditSection" style="display:none; background: rgba(0,0,0,0.3); padding: 20px; border-radius: 12px; border: 1px dashed var(--info);">
+            <p style="margin: 0 0 5px; color: #FFF;">รหัส: <span id="displayUid" style="font-size: 12px; color: #888;"></span></p>
+            <p style="margin: 0 0 15px; color: #FFF; font-size: 16px;">แต้มปัจจุบัน: <strong id="currentUserPoints" style="color: #FFD700; font-size: 24px;">0</strong></p>
+            
+            <label style="color: #ccc; font-size: 13px;">กำหนดแต้มใหม่ให้ลูกค้า:</label>
+            <div style="display: flex; gap: 10px; margin-top: 8px;">
+                <input type="number" id="editPointsValue" placeholder="ระบุแต้มที่ต้องการให้มี">
+                <button class="btn-save" style="margin: 0; padding: 10px 20px; font-size: 15px;" onclick="updateUserPoints()">💾 เซฟ</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
-    // ⚡ ระบบสลับแท็บเมนู
     function switchTab(tabId) {
         document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.admin-nav div').forEach(el => el.classList.remove('active'));
@@ -121,24 +126,12 @@
         document.getElementById('nav-' + tabId).classList.add('active');
     }
 
-    // ⚡ เชื่อมต่อ Firebase
-    const firebaseConfig = {
-        apiKey: "AIzaSyBSFWKdLCjLWqzo2_mzUE95CyoiUv5TdnY",
-        authDomain: "painaid-88c53.firebaseapp.com",
-        projectId: "painaid-88c53",
-        storageBucket: "painaid-88c53.firebasestorage.app",
-        messagingSenderId: "229290700458",
-        appId: "1:229290700458:web:74a57d0be5df9326c5ead3"
-    };
+    const firebaseConfig = { apiKey: "AIzaSyBSFWKdLCjLWqzo2_mzUE95CyoiUv5TdnY", authDomain: "painaid-88c53.firebaseapp.com", projectId: "painaid-88c53", storageBucket: "painaid-88c53.firebasestorage.app", messagingSenderId: "229290700458", appId: "1:229290700458:web:74a57d0be5df9326c5ead3" };
     if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
     const db = firebase.firestore();
 
-    // ==========================================
-    // 🧠 โหลดข้อมูลทั้งหมดเมื่อเปิดหน้า
-    // ==========================================
     async function loadSettings() {
         try {
-            // 1. โหลดข้อมูลแต้ม
             const pDoc = await db.collection('painaidee').doc('pointSettings').get();
             if(pDoc.exists) {
                 const d = pDoc.data();
@@ -148,108 +141,69 @@
                 document.getElementById('sharePoints').value = d.share || 5; document.getElementById('shareLimit').value = d.shareLimit || 2;
             }
 
-            // 2. โหลดข้อมูลของรางวัลและค่าแต้มที่ใช้หมุน
             const wDoc = await db.collection('painaidee').doc('wheelSettings').get();
             if(wDoc.exists) {
                 document.getElementById('spinCost').value = wDoc.data().spinCost || 50;
                 if(wDoc.data().rewards && wDoc.data().rewards.length > 0) {
                     wDoc.data().rewards.forEach(r => addRewardRow(r.name, r.chance));
-                } else {
-                    addDefaultRewards();
-                }
-            } else {
-                addDefaultRewards();
-            }
+                } else { addDefaultRewards(); }
+            } else { addDefaultRewards(); }
             calculateTotal();
-        } catch(e) { console.error("โหลดข้อมูลผิดพลาด", e); }
+        } catch(e) { console.error(e); }
     }
 
     function addDefaultRewards() {
-        addRewardRow('กินเกลือ (ไม่ได้อะไรเลย)', 50);
-        addRewardRow('ได้แต้มคืน 20 แต้ม', 40);
-        addRewardRow('ส่วนลด 10% ร้าน... (แคปจอ)', 10);
+        addRewardRow('เกลือ', 50); addRewardRow('คืน 20 แต้ม', 40); addRewardRow('ส่วนลด 10%', 10);
     }
 
-    // ==========================================
-    // 🎡 ระบบจัดการฟอร์มกงล้อ
-    // ==========================================
     function addRewardRow(name, chance) {
-        const div = document.createElement('div');
-        div.className = 'form-row reward-item';
-        div.innerHTML = `
-            <input type="text" class="r-name" placeholder="ชื่อรางวัล เช่น ส่วนลด 10%" value="${name}">
-            <input type="number" class="r-chance" placeholder="%" value="${chance}" oninput="calculateTotal()"> 
-            <span style="font-size:14px; color:#999; font-weight:bold;">%</span>
-            <button class="btn-del" onclick="this.parentElement.remove(); calculateTotal();">✕</button>
-        `;
-        document.getElementById('reward-list').appendChild(div);
-        calculateTotal();
+        const div = document.createElement('div'); div.className = 'form-row reward-item';
+        div.innerHTML = `<input type="text" class="r-name" placeholder="ชื่อรางวัลสั้นๆ" value="${name}"> <input type="number" class="r-chance short" value="${chance}" oninput="calculateTotal()"> <span style="font-size:14px; color:#999; font-weight:bold;">%</span> <button class="btn-del" onclick="this.parentElement.remove(); calculateTotal();">✕</button>`;
+        document.getElementById('reward-list').appendChild(div); calculateTotal();
     }
 
     function calculateTotal() {
-        let total = 0;
-        document.querySelectorAll('.r-chance').forEach(input => total += parseInt(input.value || 0));
+        let total = 0; document.querySelectorAll('.r-chance').forEach(input => total += parseInt(input.value || 0));
         const display = document.getElementById('total-percent-display');
-        display.innerText = `รวมเปอร์เซ็นต์ทั้งหมด: ${total}%`;
-        
-        if(total === 100) {
-            display.className = 'total-percent status-ok';
-        } else {
-            display.className = 'total-percent status-err';
-        }
+        display.innerText = `รวม: ${total}%`; display.className = (total === 100) ? 'total-percent status-ok' : 'total-percent status-err';
         return total;
     }
 
-    // ==========================================
-    // 💾 ระบบบันทึกข้อมูล
-    // ==========================================
     async function savePointSettings() {
-        const btn = document.querySelector('#tab-points .btn-save');
-        btn.innerText = "กำลังบันทึก... ⏳"; btn.disabled = true;
-
-        const data = {
-            checkIn: parseInt(document.getElementById('checkInPoints').value) || 0,
-            view: parseInt(document.getElementById('viewPoints').value) || 0, 
-            viewLimit: parseInt(document.getElementById('viewLimit').value) || 0,
-            dir: parseInt(document.getElementById('dirPoints').value) || 0, 
-            dirLimit: parseInt(document.getElementById('dirLimit').value) || 0,
-            share: parseInt(document.getElementById('sharePoints').value) || 0, 
-            shareLimit: parseInt(document.getElementById('shareLimit').value) || 0
-        };
-
-        try {
-            await db.collection('painaidee').doc('pointSettings').set(data, { merge: true });
-            alert("✅ บันทึกการตั้งค่าแจกแต้มสำเร็จ!");
-        } catch(e) { alert("❌ เกิดข้อผิดพลาด"); }
-        finally { btn.innerText = "💾 บันทึกการตั้งค่าแต้ม"; btn.disabled = false; }
+        const data = { checkIn: parseInt(document.getElementById('checkInPoints').value)||0, view: parseInt(document.getElementById('viewPoints').value)||0, viewLimit: parseInt(document.getElementById('viewLimit').value)||0, dir: parseInt(document.getElementById('dirPoints').value)||0, dirLimit: parseInt(document.getElementById('dirLimit').value)||0, share: parseInt(document.getElementById('sharePoints').value)||0, shareLimit: parseInt(document.getElementById('shareLimit').value)||0 };
+        try { await db.collection('painaidee').doc('pointSettings').set(data, { merge: true }); alert("✅ บันทึกสำเร็จ!"); } catch(e) { alert("❌ Error"); }
     }
 
     async function saveWheelSettings() {
-        if(calculateTotal() !== 100) {
-            return alert("❌ บันทึกไม่ได้!\n\nเปอร์เซ็นต์รวมของรางวัลต้องเท่ากับ 100% พอดีครับ\nกรุณาปรับตัวเลขใหม่");
-        }
-
-        const btn = document.querySelector('#tab-wheel .btn-save');
-        btn.innerText = "กำลังบันทึก... ⏳"; btn.disabled = true;
-
-        const rewards = [];
-        document.querySelectorAll('.reward-item').forEach(el => {
-            rewards.push({
-                name: el.querySelector('.r-name').value.trim(),
-                chance: parseInt(el.querySelector('.r-chance').value) || 0
-            });
-        });
-
-        const spinCostVal = parseInt(document.getElementById('spinCost').value) || 50;
-
-        try {
-            await db.collection('painaidee').doc('wheelSettings').set({ spinCost: spinCostVal, rewards: rewards }, { merge: true });
-            alert("✅ บันทึกของรางวัลกงล้อและค่าใช้จ่ายสำเร็จแล้ว! ข้อมูลจะอัปเดตในแอปทันที");
-        } catch(e) { alert("❌ เกิดข้อผิดพลาด"); }
-        finally { btn.innerText = "💾 บันทึกการตั้งค่ากงล้อ"; btn.disabled = false; }
+        if(calculateTotal() !== 100) return alert("❌ รวมต้องได้ 100% พอดีครับ");
+        const rewards = []; document.querySelectorAll('.reward-item').forEach(el => { rewards.push({ name: el.querySelector('.r-name').value.trim(), chance: parseInt(el.querySelector('.r-chance').value)||0 }); });
+        try { await db.collection('painaidee').doc('wheelSettings').set({ spinCost: parseInt(document.getElementById('spinCost').value)||50, rewards: rewards }, { merge: true }); alert("✅ บันทึกสำเร็จ!"); } catch(e) { alert("❌ Error"); }
     }
 
-    // เริ่มโหลดข้อมูลเมื่อเปิดหน้า
+    // ฟังก์ชันสำหรับค้นหาและแก้ไขแต้มสมาชิก
+    async function searchUserPoints() {
+        const uid = document.getElementById('searchUid').value.trim();
+        if(!uid) return alert("กรุณาระบุ UID");
+        try {
+            const doc = await db.collection('userPoints').doc(uid).get();
+            document.getElementById('displayUid').innerText = uid;
+            document.getElementById('currentUserPoints').innerText = doc.exists ? (doc.data().points || 0) : 0;
+            document.getElementById('editPointsValue').value = doc.exists ? (doc.data().points || 0) : 0;
+            document.getElementById('userEditSection').style.display = 'block';
+        } catch(e) { alert("หาข้อมูลไม่พบ"); }
+    }
+
+    async function updateUserPoints() {
+        const uid = document.getElementById('displayUid').innerText;
+        const newPts = parseInt(document.getElementById('editPointsValue').value) || 0;
+        if(!uid) return;
+        try {
+            await db.collection('userPoints').doc(uid).set({ points: newPts }, { merge: true });
+            document.getElementById('currentUserPoints').innerText = newPts;
+            alert("✅ อัปเดตแต้มให้สมาชิกเรียบร้อยแล้ว!");
+        } catch(e) { alert("อัปเดตไม่สำเร็จ"); }
+    }
+
     loadSettings();
 </script>
 </body>
