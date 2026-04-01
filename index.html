@@ -674,6 +674,13 @@ function switchPage(p) {
     document.querySelectorAll('nav div').forEach(el => el.classList.remove('active')); 
     const page = document.getElementById('page-'+p); if(page) page.classList.add('active'); 
     const tab = document.getElementById('tab-'+p); if(tab) tab.classList.add('active'); 
+    
+    // 🔥 อัปเดต URL ด้านบนอัตโนมัติ เพื่อป้องกันการรีเฟรชแล้วเด้งกลับไปหน้าเก่า
+    try {
+        const url = new URL(window.location.href);
+        url.searchParams.set('page', p);
+        window.history.replaceState({}, '', url);
+    } catch(e) {}
 }
 
 function navigateToAffiliate() { switchPage('affiliate'); }
