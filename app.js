@@ -775,24 +775,33 @@ async function forgotPin() {
 }
 
 function verifyStore(silent = false) {
-    const stores = appData.registeredStores || []; const store = stores.find(s => s.pin === document.getElementById('storePinInput').value);
+    const stores = appData.registeredStores || []; 
+    const store = stores.find(s => s.pin === document.getElementById('storePinInput').value);
+    
     if(store) { 
-        document.getElementById('lockedFeatures').style.display = 'block'; document.getElementById('storeVerifyCard').style.display = 'none'; 
-        const now = Date.now(); let isVIP = false;
+        // 1. ปลดล็อกแผงควบคุม และซ่อนหน้าล็อกอิน
+        document.getElementById('lockedFeatures').style.display = 'block'; 
+        document.getElementById('storeVerifyCard').style.display = 'none'; 
+        document.getElementById('storeRegistrationCard').style.display = 'none'; // ซ่อนส่วนลงทะเบียนไปด้วยเพื่อความสะอาด
+        
+        const now = Date.now(); 
+        let isVIP = false;
         if (store.isVIP && (!store.vipExpireTimestamp || store.vipExpireTimestamp > now || store.vipAutoRenew)) isVIP = true;
 
         document.getElementById('displayVipPrice').innerText = appData.vipSettings?.price || 500; 
-        document.getElementById('displayBankAcc').innerText = appData.vipSettings?.bankAccount || 'รอแอดมินตั้งค่าบัญชี (ไปไหนดี)';
+        document.getElementById('displayBankAcc').innerText = appData.vipSettings?.bankAccount || 'กรุณาติดต่อแอดมินเพื่อขอเลขบัญชี';
 
+        // 2. ถ้าเป็น VIP -> โชว์ฟีเจอร์จัดการร้าน และ ปุ่มต่ออายุ
         if(isVIP) {
-            document.getElementById('vipHoursSection').style.display = 'block'; // โชว์ โซนเวลา โซเชียล คูปอง
-            document.getElementById('vipUpdateSection').style.display = 'block'; // โชว์ สถิติ
-            document.getElementById('vipSubscribeTitle').innerHTML = '👑 สถานะ: <span style="color:#06C755;">เป็น VIP แล้ว</span>'; 
-            document.getElementById('nonVipStatsBlock').style.display = 'none'; // ซ่อนข้อความสิทธิประโยชน์
+            document.getElementById('vipHoursSection').style.display = 'block'; 
+            document.getElementById('vipUpdateSection').style.display = 'block';
+            document.getElementById('vipSubscribeTitle').innerHTML = '👑 สถานะร้านค้า: <span style="color:#06C755;">VIP Active</span>'; 
+            document.getElementById('nonVipStatsBlock').style.display = 'none'; 
             
-            document.getElementById('btnShowRenewVip').style.display = 'block'; // โชว์ปุ่มต่ออายุ
-            document.getElementById('vipPaymentArea').style.display = 'none'; // ซ่อนฟอร์มโอนเงินไปก่อน
+            document.getElementById('btnShowRenewVip').style.display = 'block'; 
+            document.getElementById('vipPaymentArea').style.display = 'none'; 
             
+            // โหลดสถิติ
             if(db) db.collection('storeStats').doc(store.name).get().then(doc => {
                 let d = doc.exists ? doc.data() : { views: 0, directions: 0 };
                 document.getElementById('statViews').innerText = d.views || 0;
@@ -804,35 +813,35 @@ function verifyStore(silent = false) {
                 document.getElementById('vipFbInput').value = store.fbUrl || '';
                 renderHoursGrid(store);
             }
-        } else {
-            document.getElementById('vipHoursSection').style.display = 'none'; // ซ่อน โซนเวลา โซเชียล คูปอง
-            document.getElementById('vipUpdateSection').style.display = 'none'; // ซ่อน สถิติ
-            document.getElementById('vipSubscribeTitle').innerHTML = '👑 สมัครสมาชิก VIP'; 
-            document.getElementById('nonVipStatsBlock').style.display = 'block'; // โชว์ข้อความโปรโมท VIP
+        } 
+        // 3. ถ้าไม่ใช่ VIP -> ซ่อนฟีเจอร์ และ โชว์หน้าสมัคร VIP ทันที
+        else {
+            document.getElementById('vipHoursSection').style.display = 'none'; 
+            document.getElementById('vipUpdateSection').style.display = 'none'; 
+            document.getElementById('vipSubscribeTitle').innerHTML = '👑 สนใจรับสิทธิพิเศษ VIP?'; 
+            document.getElementById('nonVipStatsBlock').style.display = 'block'; 
             
-            document.getElementById('btnShowRenewVip').style.display = 'none'; // ซ่อนปุ่มต่ออายุ
-            document.getElementById('vipPaymentArea').style.display = 'block'; // โชว์ฟอร์มโอนเงิน
+            document.getElementById('btnShowRenewVip').style.display = 'none'; 
+            document.getElementById('vipPaymentArea').style.display = 'block'; 
         }
 
-        const activePromo = (appData.activePromotions || []).find(p => p.storeName === store.name); const hasFreePromo = store.freePromoDays && store.freePromoDays > 0; const promoTitle = document.getElementById('buyPromoTitle'); const slipArea = document.getElementById('promoSlipArea');
-
+        // 4. จัดการส่วนโปรโมชั่นแบนเนอร์
+        const activePromo = (appData.activePromotions || []).find(p => p.storeName === store.name); 
         if (activePromo) {
-            document.getElementById('editPromoSection').style.display = 'block'; document.getElementById('buyPromoSection').style.display = 'none'; 
+            document.getElementById('editPromoSection').style.display = 'block'; 
+            document.getElementById('buyPromoSection').style.display = 'none'; 
             if(!silent) document.getElementById('editPromoDetailInput').value = activePromo.detail || '';
         } else {
-            document.getElementById('editPromoSection').style.display = 'none'; document.getElementById('buyPromoSection').style.display = 'block';
-            if(hasFreePromo) {
-                promoTitle.innerHTML = '🎁 สิทธิพิเศษ VIP: ฟรีพื้นที่โปรโมท 7 วัน!'; slipArea.style.display = 'none'; document.getElementById('promoServiceSelect').innerHTML = `<option value="ฟรี 7 วัน (สิทธิ์ VIP)">ใช้สิทธิ์โปรโมทฟรี 7 วัน</option>`;
-            } else {
-                promoTitle.innerHTML = '🚀 ดันยอดขายพุ่ง! พื้นที่โปรโมทหน้าแรก'; slipArea.style.display = 'block'; 
-                const sData = (appData.services && appData.services.length > 0) ? appData.services : []; document.getElementById('promoServiceSelect').innerHTML = sData.map(s => `<option value="${s.name} - ${s.price}฿">${s.name} - ${s.price}฿</option>`).join('');
-            }
+            document.getElementById('editPromoSection').style.display = 'none'; 
+            document.getElementById('buyPromoSection').style.display = 'block';
         }
-        if(!silent) alert("ยืนยันตัวตนสำเร็จ! ยินดีต้อนรับร้าน " + store.name); 
+        
+        if(!silent) alert("ยินดีต้อนรับร้าน " + store.name); 
     } else {
-        if(!silent) alert("รหัส PIN ไม่ถูกต้อง");
+        if(!silent) alert("รหัส PIN ไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง");
     }
 }
+
 function renderHoursGrid(store) {
     const daysTH = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์']; let hoursHtml = '';
     for(let i=0; i<7; i++) {
