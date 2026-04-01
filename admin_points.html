@@ -20,12 +20,12 @@
         .admin-nav div:hover { color: #FFF; background: rgba(255,255,255,0.05); }
         .admin-nav div.active { color: var(--primary); font-weight: 600; border-bottom: 3px solid var(--primary); }
         
-        /* 📌 คอนเทนต์ในแท็บ */
-        .tab-pane { display: none; animation: fadeIn 0.4s ease; padding: 30px 20px; display: flex; justify-content: center; }
-        .tab-pane.active { display: flex; }
+        /* 📌 คอนเทนต์ในแท็บ (แก้ปัญหาไม่ยอมแยกหน้าแล้วครับ) */
+        .tab-pane { display: none; animation: fadeIn 0.4s ease; padding: 30px 20px; }
+        .tab-pane.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .container { background: var(--surface); padding: 30px; border-radius: 16px; width: 100%; max-width: 550px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid rgba(197, 160, 89, 0.2); }
+        .container { background: var(--surface); padding: 30px; border-radius: 16px; width: 100%; max-width: 550px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid rgba(197, 160, 89, 0.2); margin: 0 auto; }
         h2 { text-align: center; margin-top: 0; border-bottom: 1px dashed #555; padding-bottom: 15px; }
         
         /* 📌 ฟอร์มกรอกข้อมูล */
