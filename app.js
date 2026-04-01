@@ -620,9 +620,10 @@ function renderCards(keywordSearched) {
         const hasLine = store && store.lineUrl && store.lineUrl.trim() !== ''; const hasFb = store && store.fbUrl && store.fbUrl.trim() !== '';
         const imgUrl = p.photos ? p.photos[0].getUrl({maxWidth:400}) : 'https://via.placeholder.com/400x200?text=Painaidee';
 
+        // 🚨 แก้บั๊กตัวแปร extraHtml ตรงนี้ครับ 🚨
         let extraTags = "";
         if(store && store.coupon && store.coupon.trim() !== "") extraTags += `<span onclick="showCustomerDetail('coupon', '${p.name.replace(/'/g, "\\'")}')" style="background:rgba(217, 83, 79, 0.1); color:var(--danger); padding:4px 10px; border-radius:10px; font-size:11px; font-weight:bold; margin-right:5px; display:inline-block; margin-bottom:5px; cursor:pointer; border:1px solid rgba(217, 83, 79, 0.3); pointer-events:auto;">🎟️ กดดูคูปอง</span>`;
-        if(store && store.event && store.event.trim() !== "") extraHtml += `<span onclick="showCustomerDetail('event', '${p.name.replace(/'/g, "\\'")}')" style="background:rgba(23, 162, 184, 0.1); color:var(--info); padding:4px 10px; border-radius:10px; font-size:11px; font-weight:bold; display:inline-block; margin-bottom:5px; cursor:pointer; border:1px solid rgba(23, 162, 184, 0.3); pointer-events:auto;">🎉 ดูกิจกรรม</span>`;
+        if(store && store.event && store.event.trim() !== "") extraTags += `<span onclick="showCustomerDetail('event', '${p.name.replace(/'/g, "\\'")}')" style="background:rgba(23, 162, 184, 0.1); color:var(--info); padding:4px 10px; border-radius:10px; font-size:11px; font-weight:bold; display:inline-block; margin-bottom:5px; cursor:pointer; border:1px solid rgba(23, 162, 184, 0.3); pointer-events:auto;">🎉 ดูกิจกรรม</span>`;
 
         let vipEffectClass = "";
         if (isVIP && currentTheme.vipEffect && currentTheme.vipEffect !== 'none') {
