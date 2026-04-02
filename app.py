@@ -55,8 +55,9 @@ _initialized = False
 def startup():
     global active_sessions, _initialized
     if not _initialized:
-        active_sessions = {}
-        _initialized = False
+        init_db()
+        active_sessions = load_sessions()
+        _initialized = True
 
 @app.route("/")
 def index(): return render_template("index.html")
