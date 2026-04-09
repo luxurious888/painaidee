@@ -1903,4 +1903,211 @@ async function submitEditPromo() {
         btn.innerText = '🔄 ส่งเรื่องขอแก้ไขข้อมูล';
         btn.disabled  = false;
     }
+
+    // ==========================================
+// 🎡 Restaurant Spin Wheel (กงล้อสุ่มร้าน)
+// ==========================================
+function spinRestaurantWheel() {
+    if (isSpinning) return;
+    
+    // เช็คว่ามีร้านในแผนที่ให้สุ่มหรือไม่
+    if (!googlePlaces || googlePlaces.length === 0) {
+        return alert('ไม่พบร้านค้าในบริเวณนี้ให้สุ่มครับ ลองขยายพื้นที่ค้นหาดูนะ 😅');
+    }
+
+    isSpinning = true;
+    const btn = document.getElementById('btn-spin-wheel');
+    const wheel = document.getElementById('wheel-spinner');
+    
+    btn.innerText = 'กำลังสุ่ม... 🎡';
+    btn.disabled = true;
+
+    // สุ่มเลือกร้าน 1 ร้านจากรายการที่ดึงมาได้
+    const randIndex = Math.floor(Math.random() * googlePlaces.length);
+    const selectedPlace = googlePlaces[randIndex];
+
+    // คำนวณองศาการหมุน (หมุนหลอก 10 รอบ + สุ่มองศาหยุด)
+    const targetDeg = 3600 + Math.floor(Math.random() * 360); 
+
+    // เริ่มหมุน
+    wheel.style.transition = 'transform 4s cubic-bezier(0.25, 0.1, 0.15, 1)';
+    wheel.style.transform = `rotate(${targetDeg}deg)`;
+
+    // เมื่อหมุนเสร็จ (4 วินาที)
+    setTimeout(() => {
+        isSpinning = false;
+        btn.disabled = false;
+        btn.innerText = '🎯 หมุนเลย!';
+        
+        // รีเซ็ตองศาแบบเนียนๆ ไม่ให้กระตุก
+        wheel.style.transition = 'none';
+        wheel.style.transform = `rotate(${targetDeg % 360}deg)`;
+
+        // นำข้อมูลร้านที่สุ่มได้ไปแสดงผล
+        showSpinResult(selectedPlace);
+    }, 4000);
+}
+
+function showSpinResult(place) {
+    document.getElementById('luckyWheelModal').style.display = 'none';
+    document.getElementById('spinResultModal').style.display = 'flex';
+
+    const imgUrl = place.photos ? place.photos[0].getUrl({maxWidth: 400}) : 'https://via.placeholder.com/400x200?text=Painaidee';
+    
+    // วาดการ์ดร้านที่สุ่มได้
+    const resultHtml = `
+        <div class="place-card" style="margin:15px auto; pointer-events:none; border:2px solid var(--primary); box-shadow: 0 0 15px rgba(197,160,89,0.3);">
+            <img src="${imgUrl}" class="main-img" style="height:160px; object-fit:cover; border-radius:12px 12px 0 0;">
+            <div class="place-info" style="padding:15px;">
+                <h3 style="margin:0 0 5px; color:var(--primary); font-size:18px;">${place.name}</h3>
+                <p style="font-size:13px; color:#aaa; margin:0 0 10px;">${place.vicinity}</p>
+                <div style="color:#06C755; font-weight:bold; font-size:14px;">⭐ ${place.rating || 'ใหม่'}</div>
+            </div>
+        </div>
+        <button class="btn-primary" style="width:100%; margin-top:10px; font-size:16px; padding:12px;"
+                onclick="document.getElementById('spinResultModal').style.display='none'; focusPlace('${place.place_id}');">
+            📍 ดูพิกัดและนำทางไปเลย!
+        </button>
+    `;
+    
+    document.getElementById('spinResultContent').innerHTML = resultHtml;
+}
+
+    // ==========================================
+// 🎟️ Deal & QR System (ระบบดีลและสแกนคูปอง)
+// ==========================================
+
+// เปิดหน้าต่างสร้างดีล
+function openDealCreator() {
+    // ล้างค่าในฟอร์มเก่าออกก่อน
+    document.getElementById('dealTitle').value = '';
+    document.getElementById('dealDesc').value = '';
+    document.getElementById('dealMaxUses').value = '0';
+    document.getElementById('dealExpiry').value = '';
+    
+    document.getElementById('dealCreatorModal').style.display = 'flex';
+}
+
+// บันทึกดีลลงระบบ
+async function saveDeal() {
+    const pin = document.getElementById('storePinInput').value;
+    const storeIndex = appData.registeredStores.findIndex(s => s.pin === pin);
+    if (storeIndex === -1) return alert('กรุณาเข้าสู่ระบบร้านค้าก่อนครับ');
+
+    const title = document.getElementById('dealTitle').value.trim();
+    const desc = document.getElementById('dealDesc').value.trim();
+    const maxUses = parseInt(document.getElementById('dealMaxUses').value) || 0;
+    const expiry = document.getElementById('dealExpiry').value;
+
+    if (!title) return alert('⚠️ กรุณากรอกชื่อดีลครับ');
+
+    // สร้างออบเจกต์ดีลใหม่
+    const newDeal = {
+        id: 'DEAL_' + Date.now(),
+        title: title,
+        desc: desc,
+        maxUses: maxUses,
+        expiry: expiry,
+        usedCount: 0,
+        active: true
+    };
+
+    // เช็คว่าร้านนี้เคยมี Array deals หรือยัง ถ้ายังให้สร้างใหม่
+    if (!appData.registeredStores[storeIndex].deals) {
+        appData.registeredStores[storeIndex].deals = [];
+    }
+    
+    appData.registeredStores[storeIndex].deals.push(newDeal);
+
+    const btn = document.getElementById('btnSaveDeal');
+    btn.innerText = 'กำลังบันทึก... ⏳';
+    btn.disabled = true;
+
+    try {
+        await saveToCloud();
+        document.getElementById('dealCreatorModal').style.display = 'none';
+        alert('✅ สร้างดีลเรียบร้อยแล้ว!');
+        renderStoreDeals(); // อัปเดตรายการดีลบนหน้าจอ
+    } catch(e) {
+        alert('❌ บันทึกข้อมูลไม่สำเร็จ กรุณาลองใหม่');
+    } finally {
+        btn.innerText = '✅ บันทึกดีล';
+        btn.disabled = false;
+    }
+}
+
+// ดึงรายการดีลมาแสดงในหน้าแผงควบคุมร้านค้า
+function renderStoreDeals() {
+    const pin = document.getElementById('storePinInput').value;
+    const store = appData.registeredStores.find(s => s.pin === pin);
+    const listDiv = document.getElementById('storeDealsList');
+    
+    if (!listDiv || !store) return;
+
+    if (!store.deals || store.deals.length === 0) {
+        listDiv.innerHTML = '<p style="text-align:center; color:#888; font-size:13px;">ยังไม่มีดีลที่เปิดใช้งาน</p>';
+        return;
+    }
+
+    listDiv.innerHTML = store.deals.map(d => `
+        <div style="background:rgba(0,0,0,0.3); border:1px solid #555; padding:12px; border-radius:8px; margin-bottom:10px;">
+            <h4 style="margin:0 0 5px; color:#FFF;">${d.title}</h4>
+            <p style="margin:0 0 8px; font-size:12px; color:#aaa;">${d.desc || 'ไม่มีคำอธิบาย'}</p>
+            <div style="display:flex; justify-content:space-between; font-size:11px; color:#888;">
+                <span>ใช้ไปแล้ว: ${d.usedCount} / ${d.maxUses === 0 ? 'ไม่จำกัด' : d.maxUses}</span>
+                <span>${d.expiry ? 'หมดเขต: ' + d.expiry : 'ไม่มีวันหมดอายุ'}</span>
+            </div>
+        </div>
+    `).join('');
+}
+
+// ผูกการแสดงผลดีลเข้ากับตอน Login ร้านค้า
+const originalVerifyStore = verifyStore;
+verifyStore = function(silent = false) {
+    originalVerifyStore(silent);
+    renderStoreDeals(); // ให้วาดรายการดีลทันทีที่ Login ผ่าน
+};
+
+// เปิดหน้าต่างสแกน QR
+function openQRScanner() {
+    document.getElementById('qrScanInput').value = '';
+    document.getElementById('qrScanResult').style.display = 'none';
+    document.getElementById('qrScannerModal').style.display = 'flex';
+}
+
+// ตรวจสอบและใช้งานดีล
+async function verifyAndUseDeal() {
+    const scanData = document.getElementById('qrScanInput').value.trim();
+    const resultDiv = document.getElementById('qrScanResult');
+    resultDiv.style.display = 'block';
+
+    if (!scanData) {
+        resultDiv.innerHTML = '<div style="padding:10px; background:#FFF3F3; color:var(--danger); border-radius:8px; text-align:center;">❌ กรุณาวางข้อความจาก QR Code ของลูกค้าครับ</div>';
+        return;
+    }
+
+    try {
+        // สมมติว่ารูปแบบ QR ที่ลูกค้าสร้างมาคือ JSON
+        const data = JSON.parse(scanData);
+        
+        if (!data.dealId || !data.userId) {
+            throw new Error('Invalid Format');
+        }
+
+        // TODO: ในอนาคตสามารถใส่ Logic ตัดจำนวนสิทธิ์จาก Firebase ตรงนี้ได้
+        
+        resultDiv.innerHTML = `
+            <div style="padding:15px; background:#F4FBF4; border:1px solid #06C755; border-radius:8px; text-align:center;">
+                <h4 style="margin:0 0 5px; color:#06C755;">✅ ยืนยันสิทธิ์สำเร็จ!</h4>
+                <p style="margin:0; font-size:13px; color:#333;">รหัสลูกค้า: ${data.userId.substring(0, 8)}...<br>รหัสดีล: ${data.dealId}</p>
+            </div>
+        `;
+        
+        // ล้างช่อง input
+        document.getElementById('qrScanInput').value = '';
+        
+    } catch (e) {
+        resultDiv.innerHTML = '<div style="padding:10px; background:#FFF3F3; color:var(--danger); border-radius:8px; text-align:center;">❌ รูปแบบ QR ไม่ถูกต้อง หรือข้อมูลเสียหาย</div>';
+    }
+
 }
