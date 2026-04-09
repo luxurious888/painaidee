@@ -1087,20 +1087,71 @@ function claimDeal(dealId) {
 }
 
 // ── ฝั่งร้านค้า: แสกน QR ──
+// ==========================================
+// 📷 ระบบเปิดกล้องสแกน QR Code
+// ==========================================
+let html5QrcodeScanner = null;
+
 function openQRScanner() {
     document.getElementById('qrScannerModal').style.display = 'flex';
     document.getElementById('qrScanInput').value = '';
-    document.getElementById('qrScanResult').innerHTML = '';
     document.getElementById('qrScanResult').style.display = 'none';
+    document.getElementById('qrScanResult').innerHTML = '';
+
+    // ล้างตัวสแกนเก่า (ถ้ามี)
+    if (html5QrcodeScanner) {
+        html5QrcodeScanner.clear();
+    }
+
+    // ตั้งค่ากล้องสแกน QR
+    html5QrcodeScanner = new Html5QrcodeScanner(
+        "qr-reader", 
+        { fps: 10, qrbox: { width: 250, height: 250 } },
+        false
+    );
+
+    // เริ่มเปิดกล้อง
+    html5QrcodeScanner.render(onScanSuccess, onScanFailure);
 }
 
-async function verifyAndUseDeal() {
-    const rawText = document.getElementById('qrScanInput').value.trim();
+function closeQRScanner() {
+    document.getElementById('qrScannerModal').style.display = 'none';
+    // ปิดกล้องเมื่อกดกากบาท หรือแสกนเสร็จ
+    if (html5QrcodeScanner) {
+        html5QrcodeScanner.clear().catch(error => {
+            console.error("Failed to clear scanner.", error);
+        });
+    }
+}
+
+// เมื่อกล้องสแกนเจอ QR Code
+function onScanSuccess(decodedText, decodedResult) {
+    // ปิดกล้องทันทีเพื่อไม่ให้มันสแกนซ้ำรัวๆ
+    if (html5QrcodeScanner) {
+        html5QrcodeScanner.clear();
+    }
+    
+    // เอาข้อความที่สแกนได้ไปใส่ในช่อง Input เผื่อให้เห็นว่าสแกนอะไรได้
+    document.getElementById('qrScanInput').value = decodedText;
+    
+    // โยนข้อความเข้าฟังก์ชันตรวจสอบดีลอัตโนมัติเลย (ไม่ต้องรอให้กดปุ่ม)
+    verifyAndUseDeal(decodedText);
+}
+
+function onScanFailure(error) {
+    // ปล่อยว่างไว้ ให้มันค้นหา QR ต่อไปเรื่อยๆ จนกว่าจะเจอ
+}
+
+// ตรวจสอบและใช้งานดีล (ปรับให้รับค่าจากกล้องได้โดยตรง)
+async function verifyAndUseDeal(scannedText = null) {
+    // ถ้าสแกนจากกล้องจะส่ง scannedText มา ถ้าไม่มีให้ไปดึงจากช่องกรอก
+    const rawText = scannedText || document.getElementById('qrScanInput').value.trim();
     const resultEl = document.getElementById('qrScanResult');
-    if (!rawText) return alert('กรุณาวางข้อความจาก QR Code ของลูกค้าครับ');
+    
+    if (!rawText) return alert('กรุณาสแกนหรือกรอกข้อความ QR Code ของลูกค้าครับ');
 
     resultEl.style.display = 'block';
-    resultEl.innerHTML = '<p style="color:#aaa;text-align:center;">กำลังตรวจสอบ...</p>';
+    resultEl.innerHTML = '<p style="color:#aaa;text-align:center;">กำลังตรวจสอบสิทธิ์...</p>';
 
     try {
         const parts = rawText.split('|');
@@ -1142,7 +1193,7 @@ async function verifyAndUseDeal() {
                 <p style="color:#777;font-size:11px;margin:0;">เวลาใช้งาน: ${usedTime}<br>ใช้ไปแล้ว: ${deal.usedCount}${deal.maxUses > 0 ? '/' + deal.maxUses : ''} ครั้ง</p>
             </div>`;
     } catch (e) {
-        resultEl.innerHTML = `<div style="text-align:center;padding:15px;background:rgba(217,83,79,0.1);border:1px solid #D9534F;border-radius:10px;"><p style="color:#D9534F;font-weight:700;margin:0;">❌ QR Code ไม่ถูกต้อง</p></div>`;
+        resultEl.innerHTML = `<div style="text-align:center;padding:15px;background:rgba(217,83,79,0.1);border:1px solid #D9534F;border-radius:10px;"><p style="color:#D9534F;font-weight:700;margin:0;">❌ QR Code ไม่ถูกต้อง หรือไม่ใช่ของระบบ</p></div>`;
     }
 }
 
