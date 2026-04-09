@@ -10,6 +10,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 
     <link rel="stylesheet" href="style.css">
@@ -98,48 +99,135 @@
     </div>
 </div>
 
-<!-- Lucky Wheel Modal -->
+<!-- 🎡 Restaurant Spin Wheel Modal -->
 <div id="luckyWheelModal" class="feature-modal"
      style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
             z-index:99999; justify-content:center; align-items:center;">
     <div class="feature-modal-content"
-         style="text-align:center; background:linear-gradient(135deg, var(--dark), var(--surface));">
-        <h2 style="margin-top:0; color:var(--primary); font-size:22px;">🎁 ศูนย์รวมรางวัล</h2>
-        <button class="btn-outline"
-                style="width:100%; border-color:#17a2b8; color:#17a2b8; margin-bottom:15px;
-                       font-weight:bold; background:rgba(23,162,184,0.1);"
-                onclick="openMyRewards()">🎟️ กระเป๋ารางวัลของฉัน</button>
-        <div style="background:rgba(0,0,0,0.3); padding:15px; border-radius:12px;
-                    margin-bottom:20px; border:1px dashed #06C755;">
-            <button id="btn-daily-checkin" class="btn-primary"
-                    style="background:#06C755; color:#FFF; width:100%; border:none;"
-                    onclick="earnPoints('checkin')">
-                ✅ กดรับ <span id="display-checkin-pts">10</span> แต้มวันนี้
-            </button>
-        </div>
-        <hr style="border-color:rgba(255,255,255,0.1); margin-bottom:20px;">
-        <h3 style="margin-top:0; color:var(--prev-vip); font-size:18px;">🎡 หมุนวงล้อพารวย</h3>
-        <p style="color:#aaa; font-size:12px; margin-bottom:15px;">
-            ใช้ <strong style="color:var(--primary);"><span id="display-spin-cost">50</span> แต้ม</strong> / ครั้ง
-        </p>
-        <div style="position:relative; width:220px; height:220px; margin:0 auto 20px;">
-            <div style="position:absolute; top:-15px; left:50%; transform:translateX(-50%);
-                        width:0; height:0; border-left:15px solid transparent;
-                        border-right:15px solid transparent; border-top:25px solid var(--danger); z-index:10;"></div>
+         style="text-align:center; background:linear-gradient(135deg,var(--dark),var(--surface));">
+        <h2 style="margin-top:0; color:var(--primary); font-size:20px;">🎡 สุ่มร้านให้ฉัน!</h2>
+        <p id="wheel-store-count" style="color:#aaa; font-size:13px; margin:-5px 0 15px;">กำลังโหลด...</p>
+        <div style="position:relative; width:240px; height:240px; margin:0 auto 20px;">
+            <div style="position:absolute; top:-14px; left:50%; transform:translateX(-50%);
+                        width:0; height:0; border-left:14px solid transparent;
+                        border-right:14px solid transparent; border-top:24px solid var(--danger);
+                        z-index:10;"></div>
             <div id="wheel-spinner"
-                 style="width:100%; height:100%; border-radius:50%; border:4px solid var(--primary);
-                        box-shadow:0 0 20px rgba(0,0,0,0.4);
+                 style="width:100%; height:100%; border-radius:50%;
+                        border:5px solid var(--primary);
+                        box-shadow:0 0 25px rgba(197,160,89,0.4);
                         transition:transform 4s cubic-bezier(0.25,0.1,0.15,1);"></div>
         </div>
+        <p style="font-size:11px; color:#666; margin-bottom:15px;">⭐ = ร้าน VIP โอกาสสูงกว่า</p>
         <button id="btn-spin-wheel" class="btn-enter-glow"
-                onclick="spinWheel()"
-                style="font-size:16px; padding:10px; margin-bottom:10px; width:100%;">
-            🎯 กดหมุนเลย!
+                onclick="spinRestaurantWheel()"
+                style="font-size:16px; padding:12px; margin-bottom:10px; width:100%;">
+            🎯 หมุนเลย!
         </button>
         <button class="btn-outline" style="width:100%;"
                 onclick="document.getElementById('luckyWheelModal').style.display='none'">
             ❌ ปิดหน้าต่าง
         </button>
+    </div>
+</div>
+
+<!-- 🎉 Spin Result Modal -->
+<div id="spinResultModal" class="feature-modal"
+     style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+            z-index:99999; justify-content:center; align-items:center;">
+    <div class="feature-modal-content" style="max-height:85vh; overflow-y:auto;">
+        <h2 style="margin-top:0; color:var(--primary); font-size:18px; text-align:center;">
+            🎉 ได้ร้านนี้เลย!
+        </h2>
+        <div id="spinResultContent"></div>
+        <button class="btn-outline" style="width:100%; margin-top:12px;"
+                onclick="document.getElementById('spinResultModal').style.display='none';
+                         document.getElementById('luckyWheelModal').style.display='flex';">
+            🔄 หมุนใหม่
+        </button>
+        <button class="btn-outline" style="width:100%; margin-top:8px; border-color:#555; color:#888;"
+                onclick="document.getElementById('spinResultModal').style.display='none'">
+            ปิดหน้าต่าง
+        </button>
+    </div>
+</div>
+
+<!-- 🎟️ Deal QR Modal (ฝั่งลูกค้า) -->
+<div id="dealQRModal" class="feature-modal"
+     style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+            z-index:999999; justify-content:center; align-items:center;">
+    <div class="feature-modal-content" style="text-align:center;">
+        <h2 style="margin-top:0; color:var(--danger); font-size:20px;">🎟️ คูปองสิทธิ์พิเศษ</h2>
+        <p id="qrDealStore" style="color:var(--primary); font-weight:600; margin:0 0 5px;"></p>
+        <p id="qrDealTitle" style="color:#FFF; font-size:17px; font-weight:700; margin:0 0 5px;"></p>
+        <p id="qrDealDesc" style="color:#aaa; font-size:13px; margin:0 0 5px;"></p>
+        <p id="qrDealExpiry" style="color:#777; font-size:11px; margin:0 0 15px;"></p>
+        <div style="background:#FFF; padding:12px; border-radius:12px; display:inline-block; margin-bottom:15px;">
+            <div id="qrCodeContainer"></div>
+        </div>
+        <p style="font-size:11px; color:#D9534F; margin:0 0 15px;">
+            ⚠️ แสดง QR นี้ให้พนักงานสแกน — ใช้ได้ครั้งเดียวเท่านั้น!
+        </p>
+        <button class="btn-outline" style="width:100%;"
+                onclick="document.getElementById('dealQRModal').style.display='none'">
+            ปิดหน้าต่าง
+        </button>
+    </div>
+</div>
+
+<!-- 📷 QR Scanner Modal (ฝั่งร้านค้า) -->
+<div id="qrScannerModal" class="feature-modal"
+     style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+            z-index:99999; justify-content:center; align-items:center;">
+    <div class="feature-modal-content">
+        <h3 style="margin-top:0; color:var(--primary);">📷 ยืนยัน QR Code ลูกค้า</h3>
+        <p style="font-size:13px; color:#aaa; margin-bottom:15px;">
+            ให้ลูกค้าแสดง QR แล้วสแกนด้วยแอปสแกน QR ของมือถือ จากนั้นวาง text ที่ได้ลงในช่องด้านล่าง
+        </p>
+        <div class="form-group">
+            <label>วาง QR Code Text ที่นี่</label>
+            <textarea id="qrScanInput" class="input-dark" rows="4"
+                      placeholder='{"v":1,"dealId":"DEAL...","userId":"...",...}'
+                      style="font-size:12px; font-family:monospace;"></textarea>
+        </div>
+        <button class="btn-primary" style="margin-bottom:10px;" onclick="verifyAndUseDeal()">
+            ✅ ตรวจสอบและใช้สิทธิ์
+        </button>
+        <div id="qrScanResult" style="display:none; margin-bottom:10px;"></div>
+        <button class="btn-outline" style="width:100%;"
+                onclick="document.getElementById('qrScannerModal').style.display='none'">
+            ปิดหน้าต่าง
+        </button>
+    </div>
+</div>
+
+<!-- ➕ Deal Creator Modal (ร้านค้าสร้างดีล) -->
+<div id="dealCreatorModal" class="feature-modal"
+     style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+            z-index:99999; justify-content:center; align-items:center;">
+    <div class="feature-modal-content">
+        <h3 style="margin-top:0; color:var(--danger);">🎟️ สร้างดีลใหม่</h3>
+        <div class="form-group">
+            <label>ชื่อดีล <span style="color:var(--danger)">*</span></label>
+            <input type="text" id="dealTitle" class="input-dark" placeholder="เช่น ลด 50฿ เมื่อซื้อครบ 200฿">
+        </div>
+        <div class="form-group">
+            <label>รายละเอียด</label>
+            <textarea id="dealDesc" class="input-dark" rows="2"
+                      placeholder="เช่น ใช้ได้กับเมนูอาหารทุกชนิด ยกเว้นเมนูโปรโมชั่น"></textarea>
+        </div>
+        <div class="form-group">
+            <label>จำนวนสิทธิ์สูงสุด (0 = ไม่จำกัด)</label>
+            <input type="number" id="dealMaxUses" class="input-dark" value="0" min="0">
+        </div>
+        <div class="form-group">
+            <label>วันหมดอายุ (เว้นว่างถ้าไม่จำกัด)</label>
+            <input type="date" id="dealExpiry" class="input-dark">
+        </div>
+        <button id="btnSaveDeal" class="btn-primary" style="background:var(--danger); border:none; margin-bottom:10px;"
+                onclick="saveDeal()">✅ บันทึกดีล</button>
+        <button class="btn-outline" style="width:100%;"
+                onclick="document.getElementById('dealCreatorModal').style.display='none'">ยกเลิก</button>
     </div>
 </div>
 
@@ -247,14 +335,8 @@
         <h3 id="loadingText" style="color:#FFF;">กำลังเตรียมระบบ...</h3>
     </div>
 
-   <div class="glass-card" id="loginCard" style="display: none;">
-        <div class="logo-circle" style="background: none; overflow: hidden; border: 2px solid var(--primary);">
-            <img src="https://lh3.googleusercontent.com/d/1B0qf7r8f9S-p1u0KxP_uI_T9x2p-Wv8N" 
-                 style="width: 100%; height: 100%; object-fit: cover;">
-        </div>
-        
-        <h2 style="color: #FFF; margin: 0 0 20px 0; font-size: 22px; font-weight: 600;">เลือกรูปแบบการใช้งาน</h2>
-        ...
+    <div class="glass-card" id="loginCard" style="display:none; z-index:10;">
+        <h2 style="color:#FFF; margin:0 0 20px 0; font-size:22px; font-weight:600;">เลือกรูปแบบการใช้งาน</h2>
         <div style="margin-bottom:20px;">
             <button onclick="enterApp()" class="btn-enter-glow"
                     style="margin-bottom:8px; width:100%;">🚀 เข้าใช้งานทั่วไป</button>
@@ -703,6 +785,21 @@
                                 onclick="submitEditPromo()">🔄 ส่งเรื่องขอแก้ไขข้อมูล</button>
                         <button class="btn-primary" style="width:100%;"
                                 onclick="openRenewPromo()">แพ็กเกจหมดอายุ? ต่ออายุที่นี่</button>
+                    </div>
+
+                    <!-- Deal & QR Section -->
+                    <div class="glass-card" style="margin-bottom:20px; border:1px solid var(--danger);">
+                        <h3 style="margin-top:0; color:var(--danger);">🎟️ จัดการดีลและคูปอง</h3>
+                        <p style="font-size:13px; color:#aaa; margin-bottom:15px;">
+                            สร้างส่วนลดพิเศษ ลูกค้ากดรับ QR แล้วให้พนักงานสแกนยืนยัน
+                        </p>
+                        <div style="display:flex; gap:10px; margin-bottom:15px;">
+                            <button class="btn-outline" style="flex:1; border-color:var(--danger); color:var(--danger);"
+                                    onclick="openDealCreator()">➕ สร้างดีลใหม่</button>
+                            <button class="btn-outline" style="flex:1; border-color:var(--primary); color:var(--primary);"
+                                    onclick="openQRScanner()">📷 สแกน QR ลูกค้า</button>
+                        </div>
+                        <div id="storeDealsList"></div>
                     </div>
 
                 </div><!-- /lockedFeatures -->
