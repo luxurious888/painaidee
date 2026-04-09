@@ -62,15 +62,17 @@ let userFreeSpins    = 0;
 let userRewardsInventory = [];
 let isCheckedInToday = false;
 let pointSettings    = { checkIn: 10, view: 1, dir: 5, share: 5, viewLimit: 10, dirLimit: 2, shareLimit: 2 };
+let wheelRewards     = [];
+let wheelSpinCost    = 50;
 let isSpinning       = false;
 let isAppReady       = false;
 
 // 🎡 Restaurant Wheel
-let wheelRestaurants  = []; // ร้านที่อยู่ในกงล้อ
-let selectedWheelItem = null; // ร้านที่ถูกสุ่มได้
+let wheelRestaurants  = [];
+let selectedWheelItem = null;
 
 // 📍 VIP Markers
-let vipMarkers = []; // markers ทองบนแผนที่
+let vipMarkers = [];
 
 // ==========================================
 // 🎨 Theme Engine
@@ -172,9 +174,7 @@ const resizeImg = (file) =>
 async function uploadImageToStorage(dataUrl, folder) {
     if (!dataUrl)                       return '';
     if (dataUrl.startsWith('http'))     return dataUrl;
-    const ref = storage.ref(
-        `${folder}/${Date.now()}_${Math.random().toString(36).substring(2, 9)}.jpg`
-    );
+    const ref = storage.ref(`${folder}/${Date.now()}_${Math.random().toString(36).substring(2, 9)}.jpg`);
     await ref.putString(dataUrl, 'data_url');
     return await ref.getDownloadURL();
 }
@@ -353,6 +353,8 @@ function loadFromCloud() {
                 wheelSpinCost = doc.data().spinCost || 50;
                 const costEl = document.getElementById('display-spin-cost');
                 if (costEl) costEl.innerText = wheelSpinCost;
+                
+                // ลบคำสั่ง renderWheelLabels() ตรงนี้ออกแล้ว ป้องกัน Error !!
                 updateSpinButtonUI();
             }
         });
@@ -378,7 +380,6 @@ async function initSystem() {
 
         if (liff.isLoggedIn()) {
             const profile = await liff.getProfile();
-
             const pf = document.getElementById('header-profile');
             if (pf) pf.innerHTML = `<img src="${profile.pictureUrl}" style="width:100%; height:100%; object-fit:cover;">`;
 
@@ -421,7 +422,6 @@ async function initSystem() {
             if (spinner) spinner.style.display = 'none';
             if (card)    card.style.display    = 'block';
         }
-
         isAppReady = true;
     } catch (err) {
         console.error('LIFF Init Error:', err);
@@ -507,9 +507,7 @@ function updateWalletUI() {
                                         border-radius:4px; font-size:10px; font-weight:bold;">VIP</span>`
                         : ''}
                 </div>`).join('')
-            : `<p style="text-align:center; color:#777; margin:10px 0;">
-                   ยังไม่มีประวัติการแนะนำ
-               </p>`;
+            : `<p style="text-align:center; color:#777; margin:10px 0;">ยังไม่มีประวัติการแนะนำ</p>`;
     }
 }
 
@@ -542,11 +540,7 @@ async function requestWithdraw() {
     try {
         if (btn) { btn.innerText = 'กำลังส่งเรื่อง...'; btn.disabled = true; }
         await saveToCloud();
-        sendTelegramNotify(
-            `💸 <b>มีคำร้องขอถอนเงินค่าคอม!</b>\n\n` +
-            `รหัสตัวแทน: ${window.myAffCode}\nยอดถอน: <b>${reqAmount.toLocaleString()} บาท</b>\n` +
-            `บัญชี: ${bankInfo}\n\n👉 กรุณาโอนเงินและกดอนุมัติในหน้าแอดมินครับ`
-        );
+        sendTelegramNotify(`💸 <b>มีคำร้องขอถอนเงินค่าคอม!</b>\n\nรหัสตัวแทน: ${window.myAffCode}\nยอดถอน: <b>${reqAmount.toLocaleString()} บาท</b>\nบัญชี: ${bankInfo}\n\n👉 กรุณาโอนเงินและกดอนุมัติในหน้าแอดมินครับ`);
         alert('ส่งคำร้องขอถอนเงินเรียบร้อยแล้ว! แอดมินจะตรวจสอบและโอนเงินให้ท่านในเร็วๆ นี้ครับ');
         updateWalletUI();
     } catch (e) {
@@ -558,14 +552,12 @@ async function requestWithdraw() {
 
 function copyHeaderAffCode() {
     if (!window.myAffCode) return;
-    navigator.clipboard.writeText(window.myAffCode)
-        .then(() => alert('คัดลอกรหัส ' + window.myAffCode + ' สำเร็จ!'));
+    navigator.clipboard.writeText(window.myAffCode).then(() => alert('คัดลอกรหัส ' + window.myAffCode + ' สำเร็จ!'));
 }
 
 function copyAffLink() {
     if (!window.myAffCode) return;
-    navigator.clipboard.writeText('https://liff.line.me/2009598846-wiCUeV35?ref=' + window.myAffCode)
-        .then(() => alert('คัดลอกลิงก์แนะนำเพื่อนสำเร็จ!'));
+    navigator.clipboard.writeText('https://liff.line.me/2009598846-wiCUeV35?ref=' + window.myAffCode).then(() => alert('คัดลอกลิงก์แนะนำเพื่อนสำเร็จ!'));
 }
 
 // ==========================================
@@ -634,28 +626,24 @@ async function earnPoints(actionType, targetId = null) {
             alert(`🎉 เช็คอินสำเร็จ! รับฟรี ${pointsToAdd} แต้ม`);
             const btn = document.getElementById('btn-daily-checkin');
             if (btn) { btn.innerText = '✅ วันนี้เช็คอินแล้ว'; btn.disabled = true; btn.style.background = '#555'; btn.style.color = '#ccc'; }
-
         } else if (actionType === 'view' && targetId) {
             if (data.history[today].viewed.includes(targetId)) return;
             if (data.history[today].viewed.length >= (parseInt(pointSettings.viewLimit) || 10)) return;
             pointsToAdd = parseInt(pointSettings.view) || 1;
             data.history[today].viewed.push(targetId);
             actionName = 'ส่องร้านค้า';
-
         } else if (actionType === 'dir' && targetId) {
             if (data.history[today].dir.includes(targetId)) return;
             if (data.history[today].dir.length >= (parseInt(pointSettings.dirLimit) || 2)) return;
             pointsToAdd = parseInt(pointSettings.dir) || 5;
             data.history[today].dir.push(targetId);
             actionName = 'กดนำทาง';
-
         } else if (actionType === 'share' && targetId) {
             if (data.history[today].share.includes(targetId)) return;
             if (data.history[today].share.length >= (parseInt(pointSettings.shareLimit) || 2)) return;
             pointsToAdd = parseInt(pointSettings.share) || 5;
             data.history[today].share.push(targetId);
             actionName = 'บอกต่อเพื่อน';
-
         } else if (actionType === 'wheel_bonus' && targetId) {
             pointsToAdd = parseInt(targetId);
             actionName  = 'หมุนกงล้อ';
@@ -1075,8 +1063,9 @@ function claimDeal(dealId) {
     if (deal.maxUses > 0 && deal.usedCount >= deal.maxUses) return alert('ขออภัย สิทธิ์ดีลนี้เต็มแล้วครับ');
     if ((deal.claimedBy || []).includes(myLineUid)) return alert('คุณเคยกดรับสิทธิ์ดีลนี้ไปแล้วครับ!');
 
+    // ย่อ Payload ให้สั้นที่สุด ป้องกัน error
     const shortClaimId = Math.random().toString(36).substr(2, 6).toUpperCase();
-    const qrPayload = `V1-${deal.id}-${myLineUid}-C${Date.now()}${shortClaimId}`;
+    const qrPayload = `V1|${deal.id}|${myLineUid}|${shortClaimId}`;
 
     document.getElementById('qrDealTitle').innerText   = deal.title;
     document.getElementById('qrDealDesc').innerText    = deal.description;
@@ -1114,7 +1103,7 @@ async function verifyAndUseDeal() {
     resultEl.innerHTML = '<p style="color:#aaa;text-align:center;">กำลังตรวจสอบ...</p>';
 
     try {
-        const parts = rawText.split('-');
+        const parts = rawText.split('|');
         if (parts.length < 4 || parts[0] !== 'V1') throw new Error('Invalid Format');
 
         const scanDealId = parts[1];
@@ -1154,6 +1143,45 @@ async function verifyAndUseDeal() {
             </div>`;
     } catch (e) {
         resultEl.innerHTML = `<div style="text-align:center;padding:15px;background:rgba(217,83,79,0.1);border:1px solid #D9534F;border-radius:10px;"><p style="color:#D9534F;font-weight:700;margin:0;">❌ QR Code ไม่ถูกต้อง</p></div>`;
+    }
+}
+
+// ==========================================
+// 🎟️ Rewards Inventory
+// ==========================================
+function openMyRewards() {
+    const list      = document.getElementById('my-rewards-list');
+    const available = userRewardsInventory.filter(r => !r.used);
+    list.innerHTML  = available.length === 0
+        ? '<p style="text-align:center; color:#888; padding:20px;">ไม่มีของรางวัลที่สามารถใช้งานได้ในขณะนี้ 😢</p>'
+        : available.map(r => `
+            <div style="background:rgba(0,0,0,0.4); border:1px solid var(--info); padding:15px;
+                        border-radius:12px; margin-bottom:12px; text-align:left;
+                        box-shadow:0 4px 10px rgba(0,0,0,0.3);">
+                <h4 style="margin:0 0 5px; color:#FFF; font-size:16px;">🎁 ${r.name}</h4>
+                <p style="margin:0 0 12px; font-size:12px; color:#888;">ได้รับเมื่อ: ${r.date}</p>
+                <button class="btn-primary"
+                        style="background:linear-gradient(135deg,#17a2b8,#00d2ff); color:#FFF;
+                               width:100%; border:none; padding:10px; font-size:14px; border-radius:8px;"
+                        onclick="claimReward('${r.id}')">
+                    กดใช้สิทธิ์ (แสดงหน้าจอให้ร้านดู)
+                </button>
+            </div>`).join('');
+    document.getElementById('myRewardsModal').style.display = 'flex';
+}
+
+async function claimReward(rewardId) {
+    if (!confirm('⚠️ คำเตือน!\n\nกรุณากดใช้สิทธิ์นี้ \'ต่อหน้าพนักงานที่ร้าน\' เท่านั้น!\nหากกดยืนยันแล้ว คูปองจะหายไปทันที\n\nคุณต้องการยืนยันการใช้สิทธิ์ใช่หรือไม่?'))
+        return;
+    const idx = userRewardsInventory.findIndex(r => r.id === rewardId);
+    if (idx > -1) {
+        userRewardsInventory[idx].used     = true;
+        userRewardsInventory[idx].usedDate = new Date().toLocaleString('th-TH');
+        try {
+            await db.collection('userPoints').doc(myLineUid).update({ rewards: userRewardsInventory });
+            alert(`✅ ใช้สิทธิ์เรียบร้อยแล้ว!\n\n🎁 ${userRewardsInventory[idx].name}\nเวลา: ${userRewardsInventory[idx].usedDate}\n\nพนักงานสามารถตรวจสอบหน้าจอนี้ได้เลยครับ`);
+            openMyRewards();
+        } catch (e) { alert('เกิดข้อผิดพลาดในการใช้งานคูปอง กรุณาลองใหม่'); }
     }
 }
 
@@ -1369,6 +1397,7 @@ function focusPlace(placeId) {
         let extraHtml = '';
         const safeName = place.name.replace(/'/g, "\\'");
         
+        // --- ส่วนโชว์ดีลบนแผนที่ ---
         const activeDeals = (appData.deals || []).filter(d => 
             d.storeName === place.name && d.isActive && 
             (!d.expiryDate || new Date(d.expiryDate) > new Date()) && 
@@ -1531,6 +1560,7 @@ function renderCards(keywordSearched) {
         const imgUrl  = p.photos ? p.photos[0].getUrl({ maxWidth: 400 }) : 'https://via.placeholder.com/400x200?text=Painaidee';
         const safeName = p.name.replace(/'/g, "\\'");
 
+        // --- ส่วนโชว์ดีลบนหน้าจอหลัก ---
         const activeDeals = (appData.deals || []).filter(d => 
             d.storeName === p.name && d.isActive && 
             (!d.expiryDate || new Date(d.expiryDate) > new Date()) && 
@@ -1655,6 +1685,7 @@ function renderPromos() {
 
         const safeStore = p.storeName.replace(/'/g, "\\'");
         
+        // --- ดึงดีลมาโชว์ใน Banner โปรโมท ---
         const activeDeals = (appData.deals || []).filter(d => 
             d.storeName === p.storeName && d.isActive && 
             (!d.expiryDate || new Date(d.expiryDate) > new Date()) && 
@@ -1702,6 +1733,7 @@ function renderPromos() {
     }).join('');
 }
 
+// Auto-slide promo images
 setInterval(() => {
     document.querySelectorAll('.promo-slider-container').forEach(slider => {
         const imgs = slider.querySelectorAll('.slide-item');
