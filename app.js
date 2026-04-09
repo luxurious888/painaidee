@@ -2076,6 +2076,7 @@ function openQRScanner() {
 }
 
 // ตรวจสอบและใช้งานดีล
+// ตรวจสอบและใช้งานดีล
 async function verifyAndUseDeal() {
     const scanData = document.getElementById('qrScanInput').value.trim();
     const resultDiv = document.getElementById('qrScanResult');
@@ -2086,7 +2087,7 @@ async function verifyAndUseDeal() {
         return;
     }
 
-    try {
+    try {  // <--- เติม try { กลับเข้ามาให้ตรงนี้ครับ
         // สมมติว่ารูปแบบ QR ที่ลูกค้าสร้างมาคือ JSON
         const data = JSON.parse(scanData);
         
@@ -2109,5 +2110,4 @@ async function verifyAndUseDeal() {
     } catch (e) {
         resultDiv.innerHTML = '<div style="padding:10px; background:#FFF3F3; color:var(--danger); border-radius:8px; text-align:center;">❌ รูปแบบ QR ไม่ถูกต้อง หรือข้อมูลเสียหาย</div>';
     }
-
 }
