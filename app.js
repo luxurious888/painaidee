@@ -1939,11 +1939,19 @@ function updateGalleryUI() {
 // ⚙️ Store Management
 // ==========================================
 function reportClosed(id, n) {
-    if (!confirm('ยืนยันแจ้งปิดร้าน ' + n + ' ถาวร?')) return;
+    if (!confirm('ยืนยันแจ้งปิดร้าน "' + n + '" ถาวร?')) return;
+    
     if (!appData.closedReports) appData.closedReports = [];
-    appData.closedReports.push({ placeId: id, storeName: n, date: new Date().toLocaleString() });
+    
+    // เช็คว่าเคยแจ้งร้านนี้ไปแล้วหรือยัง เพื่อป้องกันการกดเบิ้ล
+    const alreadyReported = appData.closedReports.find(r => r.placeId === id);
+    if (alreadyReported) {
+        return alert('ร้านนี้มีการแจ้งปิดถาวรเข้ามาแล้ว แอดมินกำลังตรวจสอบครับ 🙏');
+    }
+
+    appData.closedReports.push({ placeId: id, storeName: n, date: new Date().toLocaleString('th-TH') });
     saveToCloud();
-    alert('ขอบคุณครับ แอดมินจะตรวจสอบครับ');
+    alert('ขอบคุณครับ แอดมินจะตรวจสอบและลบออกจากระบบครับ');
 }
 
 function searchRegStore() {
