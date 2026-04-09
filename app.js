@@ -1640,7 +1640,10 @@ function renderCards(keywordSearched) {
     let html = sorted.slice(0, 80).map(p => {
         const store  = stores.find(s => s.name === p.name);
         const isVIP  = !!(store?.isVIP && (!store.vipExpireTimestamp || store.vipExpireTimestamp > now || store.vipAutoRenew));
+        
+        // 🔥 แก้ไข: อัปเดตลิงก์นำทาง Google Maps ให้ถูกต้อง
         const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${p.geometry.location.lat()},${p.geometry.location.lng()}`;
+        
         const distKm = window.google?.maps?.geometry
             ? (google.maps.geometry.spherical.computeDistanceBetween(originPoint, p.geometry.location) / 1000).toFixed(1)
             : '0.0';
@@ -1662,7 +1665,9 @@ function renderCards(keywordSearched) {
         const hasLine = !!(store?.lineUrl?.trim());
         const hasFb   = !!(store?.fbUrl?.trim());
         const imgUrl  = p.photos ? p.photos[0].getUrl({ maxWidth: 400 }) : 'https://via.placeholder.com/400x200?text=Painaidee';
-        const safeName = p.name.replace(/'/g, "\\'");
+        
+        // 🔥 แก้ไข: ทำชื่อร้านให้ปลอดภัย ไม่ให้ทำปุ่มพัง
+        const safeName = p.name ? p.name.replace(/'/g, "\\'").replace(/"/g, '&quot;') : 'ร้านค้า';
 
         // --- เพิ่มระบบ Gallery สำหรับ VIP ---
         let imageBlock = '';
@@ -1727,11 +1732,11 @@ function renderCards(keywordSearched) {
                         แชร์
                     </button>
                 </div>
-                <div style="margin-top:15px;text-align:right;">
-                    <span style="color:var(--danger);font-size:11px;cursor:pointer;opacity:0.6;border-bottom:1px dotted var(--danger);"
-                          onclick="reportClosed('${p.place_id}','${p.name.replace(/'/g, '')}'); event.stopPropagation();">
+                <div style="margin-top:15px; text-align:right; position:relative; z-index:10;">
+                    <button onclick="reportClosed('${p.place_id}', '${safeName}'); event.stopPropagation();"
+                            style="background:none; border:none; color:var(--danger); font-size:12px; cursor:pointer; opacity:0.8; font-family:'Kanit'; text-decoration:underline; padding:5px;">
                         🚩 แจ้งร้านปิดถาวร
-                    </span>
+                    </button>
                 </div>
             </div>
         </div>`;
