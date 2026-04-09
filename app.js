@@ -1690,11 +1690,40 @@ setInterval(() => {
 // ⚙️ Store Management
 // ==========================================
 function reportClosed(id, n) {
-    if (!confirm('ยืนยันแจ้งปิดร้าน ' + n + ' ถาวร?')) return;
+    // LINE Browser บล็อก confirm() — ใช้ modal แทน
+    const existing = document.getElementById('reportClosedModal');
+    if (existing) existing.remove();
+
+    const modal = document.createElement('div');
+    modal.id = 'reportClosedModal';
+    modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:9999999;display:flex;justify-content:center;align-items:center;padding:20px;box-sizing:border-box;';
+    modal.innerHTML = `
+        <div style="background:#1A1D23;border:1px solid var(--danger);border-radius:16px;padding:25px;width:100%;max-width:340px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,0.8);">
+            <p style="font-size:24px;margin:0 0 10px;">🚩</p>
+            <h3 style="color:var(--danger);margin:0 0 10px;font-size:17px;">แจ้งปิดร้านถาวร</h3>
+            <p style="color:#ddd;font-size:14px;margin:0 0 20px;line-height:1.5;">ยืนยันการแจ้งว่า<br><b style="color:#FFF;">"${n}"</b><br>ปิดถาวรแล้ว?</p>
+            <div style="display:flex;gap:10px;">
+                <button onclick="document.getElementById('reportClosedModal').remove()"
+                        style="flex:1;padding:12px;border-radius:10px;border:1px solid #555;background:transparent;color:#aaa;font-family:'Kanit';font-size:14px;cursor:pointer;">
+                    ยกเลิก
+                </button>
+                <button onclick="confirmReportClosed('${id}','${n}')"
+                        style="flex:1;padding:12px;border-radius:10px;border:none;background:var(--danger);color:#FFF;font-family:'Kanit';font-size:14px;font-weight:600;cursor:pointer;">
+                    ยืนยัน
+                </button>
+            </div>
+        </div>`;
+    document.body.appendChild(modal);
+}
+
+function confirmReportClosed(id, n) {
+    document.getElementById('reportClosedModal')?.remove();
     if (!appData.closedReports) appData.closedReports = [];
     appData.closedReports.push({ placeId: id, storeName: n, date: new Date().toLocaleString() });
-    saveToCloud();
-    alert('ขอบคุณครับ แอดมินจะตรวจสอบครับ');
+    saveToCloud().catch(() => {});
+
+    // แสดง toast แทน alert
+    showPointToast('🚩 ส่งรายงานแล้ว ขอบคุณครับ!');
 }
 
 function searchRegStore() {
