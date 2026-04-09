@@ -4,9 +4,7 @@
 window.addEventListener('error', function (event) {
     const loadingText = document.getElementById('loadingText');
     if (loadingText) {
-        loadingText.innerHTML =
-            'พบปัญหา: ' + event.message +
-            '<br><span style="font-size:12px;color:#aaa;">กรุณารีเฟรชหน้าจอใหม่อีกครั้ง</span>';
+        loadingText.innerHTML = 'พบปัญหา: ' + event.message + '<br><span style="font-size:12px;color:#aaa;">กรุณารีเฟรชหน้าจอใหม่อีกครั้ง</span>';
         loadingText.style.color = '#D9534F';
         const spinner = document.querySelector('#loadingSpinner svg');
         if (spinner) spinner.style.display = 'none';
@@ -54,7 +52,6 @@ let isCheckedInToday = false;
 let pointSettings = { checkIn: 10, view: 1, dir: 5, share: 5, viewLimit: 10, dirLimit: 2, shareLimit: 2 };
 let isAppReady = false;
 
-// Wheel & Gallery & Map Variables
 let wheelRewards = [];
 let wheelSpinCost = 50;
 let isSpinning = false;
@@ -72,8 +69,6 @@ let gpsMarker = null;
 let activeMarker = null;
 let regMiniMap = null;
 let regMiniMarker = null;
-
-// QR Scanner (ร้านค้า)
 let html5QrcodeScanner = null;
 
 // ==========================================
@@ -176,8 +171,7 @@ async function uploadImageToStorage(dataUrl, folder) {
 }
 
 async function sendTelegramNotify(msg) {
-    try { await fetch(API_URL, { method: 'POST', body: JSON.stringify({ telegramMsg: msg }) }); }
-    catch (e) { }
+    try { await fetch(API_URL, { method: 'POST', body: JSON.stringify({ telegramMsg: msg }) }); } catch (e) { }
 }
 
 function openImageModal(src) {
@@ -1125,7 +1119,6 @@ async function claimReward(rewardId) {
         } catch (e) { alert('เกิดข้อผิดพลาดในการใช้งานคูปอง กรุณาลองใหม่'); }
     }
 }
-
 // ==========================================
 // 🔗 Interaction Tracking
 // ==========================================
@@ -1164,6 +1157,60 @@ async function trackAction(storeName, actionType) {
 // ==========================================
 // 📍 Map & UI Rendering
 // ==========================================
+const provinces = [
+    {id:'bkk',name:'กรุงเทพมหานคร',lat:13.7563,lng:100.5018},{id:'krabi',name:'กระบี่',lat:8.0863,lng:98.9063},{id:'kanchanaburi',name:'กาญจนบุรี',lat:14.0159,lng:99.5336},{id:'kalasin',name:'กาฬสินธุ์',lat:16.4322,lng:103.5061},{id:'kamphaengphet',name:'กำแพงเพชร',lat:16.4828,lng:99.5227},{id:'khonkaen',name:'ขอนแก่น',lat:16.4322,lng:102.8236},{id:'chanthaburi',name:'จันทบุรี',lat:12.6114,lng:102.1039},{id:'chachoengsao',name:'ฉะเชิงเทรา',lat:13.6904,lng:101.0718},{id:'chonburi',name:'ชลบุรี',lat:13.3611,lng:100.9847},{id:'chainat',name:'ชัยนาท',lat:15.1852,lng:100.1251},{id:'chaiyaphum',name:'ชัยภูมิ',lat:15.8066,lng:102.0315},{id:'chumphon',name:'ชุมพร',lat:10.4930,lng:99.1800},{id:'chiangrai',name:'เชียงราย',lat:19.9105,lng:99.8406},{id:'chiangmai',name:'เชียงใหม่',lat:18.7883,lng:98.9853},{id:'trang',name:'ตรัง',lat:7.5563,lng:99.6114},{id:'trat',name:'ตราด',lat:12.2428,lng:102.5175},{id:'tak',name:'ตาก',lat:16.8840,lng:99.1258},{id:'nakhonnayok',name:'นครนายก',lat:14.2069,lng:101.2131},{id:'nakhonpathom',name:'นครปฐม',lat:13.8199,lng:100.0601},{id:'nakhonphanom',name:'นครพนม',lat:17.4048,lng:104.7816},{id:'nakhonratchasima',name:'นครราชสีมา',lat:14.9799,lng:102.0978},{id:'nakhonsithammarat',name:'นครศรีธรรมราช',lat:8.4304,lng:99.9631},{id:'nakhonsawan',name:'นครสวรรค์',lat:15.6987,lng:100.1221},{id:'nonthaburi',name:'นนทบุรี',lat:13.8591,lng:100.5217},{id:'narathiwat',name:'นราธิวาส',lat:6.4255,lng:101.8253},{id:'nan',name:'น่าน',lat:18.7828,lng:100.7787},{id:'buengkan',name:'บึงกาฬ',lat:18.3609,lng:103.6508},{id:'buriram',name:'บุรีรัมย์',lat:14.9930,lng:103.1029},{id:'pathumthani',name:'ปทุมธานี',lat:14.0208,lng:100.5250},{id:'prachuapkhirikhan',name:'ประจวบคีรีขันธ์',lat:11.8105,lng:99.7971},{id:'prachinburi',name:'ปราจีนบุรี',lat:14.0510,lng:101.3736},{id:'pattani',name:'ปัตตานี',lat:6.8673,lng:101.2501},{id:'phranakhonsiayutthaya',name:'พระนครศรีอยุธยา',lat:14.3532,lng:100.5684},{id:'phayao',name:'พะเยา',lat:19.1666,lng:99.9022},{id:'phangnga',name:'พังงา',lat:8.4501,lng:98.5283},{id:'phatthalung',name:'พัทลุง',lat:7.6166,lng:100.0740},{id:'phichit',name:'พิจิตร',lat:16.4411,lng:100.3488},{id:'phitsanulok',name:'พิษณุโลก',lat:16.8211,lng:100.2659},{id:'phetchaburi',name:'เพชรบุรี',lat:13.1112,lng:99.9405},{id:'phetchabun',name:'เพชรบูรณ์',lat:16.4184,lng:101.1554},{id:'phrae',name:'แพร่',lat:18.1446,lng:100.1403},{id:'phuket',name:'ภูเก็ต',lat:7.9519,lng:98.3381},{id:'mahasarakham',name:'มหาสารคาม',lat:16.1852,lng:103.3007},{id:'mukdahan',name:'มุกดาหาร',lat:16.5453,lng:104.7195},{id:'maehongson',name:'แม่ฮ่องสอน',lat:19.3020,lng:97.9654},{id:'yala',name:'ยะลา',lat:6.5411,lng:101.2804},{id:'yasothon',name:'ยโสธร',lat:15.7926,lng:104.1453},{id:'roiet',name:'ร้อยเอ็ด',lat:16.0538,lng:103.6520},{id:'ranong',name:'ระนอง',lat:9.9658,lng:98.6348},{id:'rayong',name:'ระยอง',lat:12.6814,lng:101.2816},{id:'ratchaburi',name:'ราชบุรี',lat:13.5283,lng:99.8134},{id:'lopburi',name:'ลพบุรี',lat:14.7995,lng:100.6534},{id:'lampang',name:'ลำปาง',lat:18.2888,lng:99.4930},{id:'lamphun',name:'ลำพูน',lat:18.5745,lng:99.0087},{id:'loei',name:'เลย',lat:17.4860,lng:101.7223},{id:'sisaket',name:'ศรีสะเกษ',lat:15.1151,lng:104.3220},{id:'sakonnakon',name:'สกลนคร',lat:17.1664,lng:104.1486},{id:'songkhla',name:'สงขลา',lat:7.1897,lng:100.5954},{id:'satun',name:'สตูล',lat:6.6238,lng:100.0674},{id:'samutprakan',name:'สมุทรปราการ',lat:13.5993,lng:100.5968},{id:'samutsongkhram',name:'สมุทรสงคราม',lat:13.4098,lng:100.0023},{id:'samutsakhon',name:'สมุทรสาคร',lat:13.5475,lng:100.2736},{id:'sakaeo',name:'สระแก้ว',lat:13.8240,lng:102.0646},{id:'saraburi',name:'สระบุรี',lat:14.5289,lng:100.9101},{id:'singburi',name:'สิงห์บุรี',lat:14.8936,lng:100.3967},{id:'sukhothai',name:'สุโขทัย',lat:17.0116,lng:99.8253},{id:'suphanburi',name:'สุพรรณบุรี',lat:14.4742,lng:100.1123},{id:'suratthani',name:'สุราษฎร์ธานี',lat:9.1342,lng:99.3215},{id:'surin',name:'สุรินทร์',lat:14.8818,lng:103.4936},{id:'nongkhai',name:'หนองคาย',lat:17.8783,lng:102.7420},{id:'nongbualamphu',name:'หนองบัวลำภู',lat:17.2045,lng:102.4339},{id:'angthong',name:'อ่างทอง',lat:14.5896,lng:100.4551},{id:'amnatdharoen',name:'อำนาจเจริญ',lat:15.8657,lng:104.6258},{id:'udonthani',name:'อุดรธานี',lat:17.4138,lng:102.7872},{id:'uttaradit',name:'อุตรดิตถ์',lat:17.6201,lng:100.0993},{id:'uthaithani',name:'อุทัยธานี',lat:15.3730,lng:100.0243},{id:'ubon',name:'อุบลราชธานี',lat:15.2287,lng:104.8564},
+];
+
+function initMap() {
+    const pSel = document.getElementById('provinceSelect');
+    const prSel = document.getElementById('promoProvinceSelect');
+    if (pSel) pSel.innerHTML = '<option value="current">📍 ตำแหน่งปัจจุบัน</option>';
+    if (prSel) prSel.innerHTML = '';
+    provinces.sort((a, b) => a.name.localeCompare(b.name, 'th')).forEach(p => {
+        if (pSel) pSel.appendChild(new Option(p.name, p.id));
+        if (prSel) prSel.appendChild(new Option(p.name, p.id));
+    });
+    if (pSel) pSel.value = 'current';
+    map = new google.maps.Map(document.getElementById('map'), {
+        center: currentCoords, zoom: 14, mapTypeControl: false, streetViewControl: false,
+    });
+    service = new google.maps.places.PlacesService(map);
+    infoWindow = new google.maps.InfoWindow();
+    changeLocation();
+}
+
+function changeLocation() {
+    const val = document.getElementById('provinceSelect').value;
+    if (gpsMarker) gpsMarker.setMap(null);
+    if (activeMarker) activeMarker.setMap(null);
+
+    if (val === 'current') {
+        document.getElementById('placeList').innerHTML = '<p style="text-align:center; grid-column:1/-1; padding:50px; color:var(--text-muted);">📍 กำลังขอพิกัด GPS...</p>';
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                pos => {
+                    currentCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+                    gpsMarker = new google.maps.Marker({ position: currentCoords, map });
+                    map.setCenter(currentCoords);
+                    executeSearch('food');
+                },
+                () => {
+                    document.getElementById('placeList').innerHTML = '<p style="text-align:center; grid-column:1/-1; padding:50px; color:var(--danger);">📍 ไม่สามารถดึงพิกัดปัจจุบันได้<br><span style="font-size:13px; color:var(--text-muted);">สลับไปอุบลราชธานี...</span></p>';
+                    setTimeout(() => { document.getElementById('provinceSelect').value = 'ubon'; changeLocation(); }, 1500);
+                },
+                { timeout: 10000, enableHighAccuracy: true }
+            );
+        }
+    } else {
+        const sel = provinces.find(p => p.id === val);
+        if (sel) {
+            currentCoords = { lat: sel.lat, lng: sel.lng };
+            map.setCenter(currentCoords);
+            executeSearch('food');
+        }
+    }
+}
+
 function getVIPMarkerIcon() {
     return {
         url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
