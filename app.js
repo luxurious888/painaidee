@@ -53,6 +53,7 @@ let appData = {
     pendingVipRequests: [],
     affiliateWallets: [],
     withdrawalRequests: [],
+    deals: [],
 };
 
 let myLineUid        = '';
@@ -193,7 +194,6 @@ function openImageModal(src) {
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
     initSystem();
-    // Fallback: show login card after 6s if LIFF is slow
     setTimeout(() => {
         if (!isAppReady) {
             const spinner = document.getElementById('loadingSpinner');
@@ -210,13 +210,11 @@ function enterApp() {
     if (overlay) overlay.style.display = 'none';
     if (app)     app.style.display     = 'block';
 
-    // ใส่ icon guest ถ้ายังไม่มีรูป
     const pf = document.getElementById('header-profile');
     if (pf && pf.innerHTML.trim() === '') {
         pf.innerHTML = '<div style="font-size:50px; line-height:100px; text-align:center;">👤</div>';
     }
 
-    // Trigger แผนที่ render ใหม่ เพราะ div ซ่อนอยู่ตอน initMap ทำงาน
     setTimeout(() => {
         if (typeof map !== 'undefined' && map) {
             google.maps.event.trigger(map, 'resize');
@@ -254,7 +252,6 @@ async function navigateToPartner() {
         }
         checkFriendshipForPartner(false);
     } catch (e) {
-        // LIFF not ready yet — show content anyway (guest mode)
         const blocker = document.getElementById('partner-friend-blocker');
         const content = document.getElementById('partner-actual-content');
         if (blocker) blocker.style.display = 'none';
@@ -332,7 +329,6 @@ function loadFromCloud() {
             updateWalletUI();
             renderPromos();
             if (googlePlaces.length > 0) renderCards(document.getElementById('searchBox').value || 'ร้านอาหาร');
-            // Auto-refresh store dashboard if already logged-in
             if (document.getElementById('lockedFeatures')?.style.display === 'block') {
                 verifyStore(true);
             }
@@ -357,7 +353,6 @@ function loadFromCloud() {
                 wheelSpinCost = doc.data().spinCost || 50;
                 const costEl = document.getElementById('display-spin-cost');
                 if (costEl) costEl.innerText = wheelSpinCost;
-                renderWheelLabels();
                 updateSpinButtonUI();
             }
         });
@@ -384,13 +379,10 @@ async function initSystem() {
         if (liff.isLoggedIn()) {
             const profile = await liff.getProfile();
 
-            // Profile pic
             const pf = document.getElementById('header-profile');
-            if (pf) pf.innerHTML = `<img src="${profile.pictureUrl}"
-                style="width:100%; height:100%; object-fit:cover;">`;
+            if (pf) pf.innerHTML = `<img src="${profile.pictureUrl}" style="width:100%; height:100%; object-fit:cover;">`;
 
             myLineUid = profile.userId;
-            // ใส่ timeout 5 วิ ป้องกันค้างถ้า Firestore ตอบช้า
             await Promise.race([
                 loadUserPoints(myLineUid),
                 new Promise(resolve => setTimeout(resolve, 5000))
@@ -419,7 +411,6 @@ async function initSystem() {
 
             setTimeout(() => switchPage(targetPage || 'home'), 300);
         } else {
-            // Guest mode
             const pf = document.getElementById('header-profile');
             if (pf) pf.innerHTML = `<div style="font-size:50px; line-height:100px; text-align:center;">👤</div>`;
             document.getElementById('affiliate-actual-content').style.display = 'none';
@@ -435,7 +426,6 @@ async function initSystem() {
     } catch (err) {
         console.error('LIFF Init Error:', err);
         isAppReady = true;
-        // Show login card on LIFF failure
         const spinner = document.getElementById('loadingSpinner');
         const card    = document.getElementById('loginCard');
         if (spinner) spinner.style.display = 'none';
@@ -757,14 +747,53 @@ function renderRestaurantWheel() {
     });
 }
 
-function spinRestaurantWheel() {
+function updateSpinButtonUI() {
+    const btn = document.getElementById('btn-spin-wheel');
+    if (!btn) return;
+    if (userFreeSpins > 0) {
+        btn.innerText        = `🎯 กดหมุนเลย (ฟรี ${userFreeSpins} ครั้ง!)`;
+        btn.style.background = 'linear-gradient(135deg,#06C755,#05A044)';
+        btn.style.color      = '#FFF';
+    } else {
+        btn.innerText        = `🎯 กดหมุนเลย (${wheelSpinCost} แต้ม)`;
+        btn.style.background = 'linear-gradient(135deg,var(--primary),var(--primary-hover))';
+        btn.style.color      = '#000';
+    }
+}
+
+async function spinRestaurantWheel() {
     if (isSpinning) return;
     if (wheelRestaurants.length === 0) return alert('ไม่มีร้านในกงล้อครับ');
+
+    const isUsingFreeSpin = userFreeSpins > 0;
+    if (!isUsingFreeSpin && userCurrentPoints < wheelSpinCost) {
+        return alert(`แต้มของคุณไม่พอครับ 😢\n(มีอยู่ ${userCurrentPoints} แต้ม / ต้องใช้ ${wheelSpinCost} แต้ม)`);
+    }
 
     isSpinning = true;
     const btn   = document.getElementById('btn-spin-wheel');
     const wheel = document.getElementById('wheel-spinner');
     btn.innerText = 'กำลังสุ่ม... 🎡'; btn.disabled = true;
+
+    try {
+        const userRef = db.collection('userPoints').doc(myLineUid);
+        if (isUsingFreeSpin) {
+            userFreeSpins -= 1;
+            await userRef.update({ freeSpins: userFreeSpins });
+        } else {
+            userCurrentPoints -= wheelSpinCost;
+            await userRef.update({ points: userCurrentPoints });
+            const ptEl = document.getElementById('user-points-display');
+            if (ptEl) ptEl.innerText = userCurrentPoints;
+        }
+        updateSpinButtonUI();
+    } catch (e) {
+        alert('เกิดข้อผิดพลาด กรุณาลองใหม่ครับ');
+        isSpinning   = false;
+        btn.disabled = false;
+        updateSpinButtonUI();
+        return;
+    }
 
     // ลดน้ำหนัก VIP ลงเหลือ 2 เท่า (เดิม 3) เพื่อให้สุ่มติดร้านธรรมดาง่ายขึ้น
     const weights     = wheelRestaurants.map(item => item.isVIP ? 2 : 1);
@@ -783,7 +812,7 @@ function spinRestaurantWheel() {
 
     setTimeout(() => {
         isSpinning   = false;
-        btn.innerText = '🔄 หมุนใหม่!'; btn.disabled = false;
+        updateSpinButtonUI();
         wheel.style.transition = 'none';
         wheel.style.transform  = `rotate(${targetDeg % 360}deg)`;
 
@@ -797,7 +826,6 @@ function showSpinResult(item) {
     const p      = item.place;
     const stores = appData.registeredStores || [];
     const store  = stores.find(s => s.name === p.name);
-    const now    = Date.now();
     const isVIP  = item.isVIP;
     const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${p.geometry.location.lat()},${p.geometry.location.lng()}`;
     const imgUrl = p.photos ? p.photos[0].getUrl({ maxWidth: 500 }) : 'https://via.placeholder.com/500x250?text=Painaidee';
@@ -1047,14 +1075,8 @@ function claimDeal(dealId) {
     if (deal.maxUses > 0 && deal.usedCount >= deal.maxUses) return alert('ขออภัย สิทธิ์ดีลนี้เต็มแล้วครับ');
     if ((deal.claimedBy || []).includes(myLineUid)) return alert('คุณเคยกดรับสิทธิ์ดีลนี้ไปแล้วครับ!');
 
-    const qrPayload = JSON.stringify({
-        v:         1,
-        dealId:    deal.id,
-        storeName: deal.storeName,
-        userId:    myLineUid,
-        claimId:   'C' + Date.now() + Math.random().toString(36).substr(2, 4).toUpperCase(),
-        ts:        Date.now(),
-    });
+    const shortClaimId = Math.random().toString(36).substr(2, 6).toUpperCase();
+    const qrPayload = `V1-${deal.id}-${myLineUid}-C${Date.now()}${shortClaimId}`;
 
     document.getElementById('qrDealTitle').innerText   = deal.title;
     document.getElementById('qrDealDesc').innerText    = deal.description;
@@ -1069,7 +1091,7 @@ function claimDeal(dealId) {
         height:     220,
         colorDark:  '#000000',
         colorLight: '#FFFFFF',
-        correctLevel: QRCode.CorrectLevel.H,
+        correctLevel: QRCode.CorrectLevel.M,
     });
 
     document.getElementById('dealQRModal').style.display = 'flex';
@@ -1092,8 +1114,13 @@ async function verifyAndUseDeal() {
     resultEl.innerHTML = '<p style="color:#aaa;text-align:center;">กำลังตรวจสอบ...</p>';
 
     try {
-        const data = JSON.parse(rawText);
-        const deal = (appData.deals || []).find(d => d.id === data.dealId);
+        const parts = rawText.split('-');
+        if (parts.length < 4 || parts[0] !== 'V1') throw new Error('Invalid Format');
+
+        const scanDealId = parts[1];
+        const scanUserId = parts[2];
+
+        const deal = (appData.deals || []).find(d => d.id === scanDealId);
 
         if (!deal) {
             resultEl.innerHTML = `<div style="text-align:center;padding:15px;background:rgba(217,83,79,0.1);border:1px solid #D9534F;border-radius:10px;"><p style="color:#D9534F;font-size:18px;font-weight:700;margin:0;">❌ ไม่พบดีลในระบบ</p></div>`;
@@ -1103,7 +1130,7 @@ async function verifyAndUseDeal() {
             resultEl.innerHTML = `<div style="text-align:center;padding:15px;background:rgba(217,83,79,0.1);border:1px solid #D9534F;border-radius:10px;"><p style="color:#D9534F;font-weight:700;margin:0;">❌ ดีลนี้ปิดใช้งานแล้ว</p></div>`;
             return;
         }
-        if ((deal.claimedBy || []).includes(data.userId)) {
+        if ((deal.claimedBy || []).includes(scanUserId)) {
             resultEl.innerHTML = `<div style="text-align:center;padding:15px;background:rgba(217,83,79,0.1);border:1px solid #D9534F;border-radius:10px;"><p style="color:#D9534F;font-weight:700;margin:0;">❌ QR นี้ถูกใช้งานไปแล้ว!</p></div>`;
             return;
         }
@@ -1113,7 +1140,7 @@ async function verifyAndUseDeal() {
         }
 
         if (!deal.claimedBy) deal.claimedBy = [];
-        deal.claimedBy.push(data.userId);
+        deal.claimedBy.push(scanUserId);
         deal.usedCount = (deal.usedCount || 0) + 1;
         await saveToCloud();
 
@@ -1123,7 +1150,7 @@ async function verifyAndUseDeal() {
                 <p style="color:#06C755;font-size:22px;font-weight:700;margin:0 0 8px;">✅ ยืนยันสิทธิ์สำเร็จ!</p>
                 <p style="color:#FFF;font-size:15px;font-weight:600;margin:0 0 5px;">${deal.title}</p>
                 <p style="color:#aaa;font-size:12px;margin:0 0 12px;">ร้าน: ${deal.storeName}</p>
-                <p style="color:#777;font-size:11px;margin:0;">เวลาใช้งาน: ${usedTime}<br>สิทธิ์คงเหลือ: ${deal.maxUses === 0 ? 'ไม่จำกัด' : (deal.maxUses - deal.usedCount) + ' สิทธิ์'}</p>
+                <p style="color:#777;font-size:11px;margin:0;">เวลาใช้งาน: ${usedTime}<br>ใช้ไปแล้ว: ${deal.usedCount}${deal.maxUses > 0 ? '/' + deal.maxUses : ''} ครั้ง</p>
             </div>`;
     } catch (e) {
         resultEl.innerHTML = `<div style="text-align:center;padding:15px;background:rgba(217,83,79,0.1);border:1px solid #D9534F;border-radius:10px;"><p style="color:#D9534F;font-weight:700;margin:0;">❌ QR Code ไม่ถูกต้อง</p></div>`;
@@ -1342,7 +1369,6 @@ function focusPlace(placeId) {
         let extraHtml = '';
         const safeName = place.name.replace(/'/g, "\\'");
         
-        // --- ส่วนโชว์ดีลบนแผนที่ ---
         const activeDeals = (appData.deals || []).filter(d => 
             d.storeName === place.name && d.isActive && 
             (!d.expiryDate || new Date(d.expiryDate) > new Date()) && 
@@ -1505,7 +1531,6 @@ function renderCards(keywordSearched) {
         const imgUrl  = p.photos ? p.photos[0].getUrl({ maxWidth: 400 }) : 'https://via.placeholder.com/400x200?text=Painaidee';
         const safeName = p.name.replace(/'/g, "\\'");
 
-        // --- ส่วนโชว์ดีลบนหน้าจอหลัก ---
         const activeDeals = (appData.deals || []).filter(d => 
             d.storeName === p.name && d.isActive && 
             (!d.expiryDate || new Date(d.expiryDate) > new Date()) && 
@@ -1630,7 +1655,6 @@ function renderPromos() {
 
         const safeStore = p.storeName.replace(/'/g, "\\'");
         
-        // --- ดึงดีลมาโชว์ใน Banner โปรโมท ---
         const activeDeals = (appData.deals || []).filter(d => 
             d.storeName === p.storeName && d.isActive && 
             (!d.expiryDate || new Date(d.expiryDate) > new Date()) && 
@@ -1678,7 +1702,6 @@ function renderPromos() {
     }).join('');
 }
 
-// Auto-slide promo images
 setInterval(() => {
     document.querySelectorAll('.promo-slider-container').forEach(slider => {
         const imgs = slider.querySelectorAll('.slide-item');
@@ -1807,7 +1830,6 @@ async function forgotPin() {
     }
 }
 
-// ── Verify Store PIN ──
 function verifyStore(silent = false) {
     const pin   = document.getElementById('storePinInput').value;
     const store = (appData.registeredStores || []).find(s => s.pin === pin);
@@ -1872,7 +1894,6 @@ function verifyStore(silent = false) {
         document.getElementById('vipPaymentArea').style.display    = 'block';
     }
 
-    // Promo section
     const activePromo = (appData.activePromotions || []).find(p => p.storeName === store.name);
     if (activePromo) {
         document.getElementById('editPromoSection').style.display = 'block';
@@ -1903,7 +1924,6 @@ function logoutStore() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// ── Hours Grid ──
 function renderHoursGrid(store) {
     const daysTH = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
     document.getElementById('hoursGrid').innerHTML = Array.from({ length: 7 }, (_, i) => {
@@ -1992,37 +2012,6 @@ async function saveOperatingHours() {
     }
 }
 
-// ── Event ──
-function openEventEditor() {
-    const store = appData.registeredStores.find(s => s.pin === document.getElementById('storePinInput').value);
-    if (!store) return;
-    document.getElementById('eventText').value            = store.event || '';
-    document.getElementById('eventModal').style.display   = 'flex';
-}
-
-async function saveEvent() {
-    const pin        = document.getElementById('storePinInput').value;
-    const storeIndex = appData.registeredStores.findIndex(s => s.pin === pin);
-    if (storeIndex === -1) return;
-    appData.registeredStores[storeIndex].event = document.getElementById('eventText').value.trim();
-    try {
-        await saveToCloud();
-        document.getElementById('eventModal').style.display = 'none';
-        alert('✅ อัปเดตกิจกรรมเรียบร้อยแล้ว!');
-    } catch (e) { alert('❌ เกิดข้อผิดพลาดในการบันทึกข้อมูล'); }
-}
-
-async function deleteEvent() {
-    const pin        = document.getElementById('storePinInput').value;
-    const storeIndex = appData.registeredStores.findIndex(s => s.pin === pin);
-    if (storeIndex === -1) return;
-    appData.registeredStores[storeIndex].event = '';
-    await saveToCloud();
-    document.getElementById('eventModal').style.display = 'none';
-    alert('🗑️ ลบกิจกรรมเรียบร้อยแล้ว!');
-}
-
-// ── VIP Contact ──
 async function updateVipData() {
     const pin        = document.getElementById('storePinInput').value;
     const storeIndex = appData.registeredStores.findIndex(s => s.pin === pin);
@@ -2033,7 +2022,6 @@ async function updateVipData() {
     alert('บันทึกข้อมูลติดต่อแล้ว ลูกค้าสามารถกดเข้า LINE/FB ได้ทันที');
 }
 
-// ── Renew Promo ──
 function openRenewPromo() {
     const store = appData.registeredStores.find(s => s.pin === document.getElementById('storePinInput').value);
     document.getElementById('editPromoSection').style.display = 'none';
@@ -2050,7 +2038,6 @@ function openRenewPromo() {
     }
 }
 
-// ── Submit VIP ──
 async function submitVipRequest() {
     const store    = appData.registeredStores.find(s => s.pin === document.getElementById('storePinInput').value);
     const slipFile = document.getElementById('vipSlipInput').files[0];
@@ -2080,7 +2067,6 @@ async function submitVipRequest() {
     }
 }
 
-// ── Submit Promo ──
 async function submitPromoWithPIN() {
     const btn        = document.getElementById('btnSubmitPromo');
     const pin        = document.getElementById('storePinInput').value;
@@ -2134,7 +2120,6 @@ async function submitPromoWithPIN() {
     }
 }
 
-// ── Edit Promo ──
 async function submitEditPromo() {
     const btn         = document.getElementById('btnEditPromo');
     const pin         = document.getElementById('storePinInput').value;
