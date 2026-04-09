@@ -61,10 +61,15 @@ let userFreeSpins    = 0;
 let userRewardsInventory = [];
 let isCheckedInToday = false;
 let pointSettings    = { checkIn: 10, view: 1, dir: 5, share: 5, viewLimit: 10, dirLimit: 2, shareLimit: 2 };
-let wheelRewards     = [];
-let wheelSpinCost    = 50;
 let isSpinning       = false;
 let isAppReady       = false;
+
+// 🎡 Restaurant Wheel
+let wheelRestaurants  = []; // ร้านที่อยู่ในกงล้อ
+let selectedWheelItem = null; // ร้านที่ถูกสุ่มได้
+
+// 📍 VIP Markers
+let vipMarkers = []; // markers ทองบนแผนที่
 
 // ==========================================
 // 🎨 Theme Engine
@@ -96,8 +101,8 @@ function applyThemeToApp(data) {
         if (currentTheme.logoUrl && currentTheme.logoUrl !== '') {
             logo.style.display = 'none';
             if (!customImg) {
-                customImg             = document.createElement('img');
-                customImg.className   = 'custom-logo-img logo-' + (currentTheme.logoEffect || 'none');
+                customImg              = document.createElement('img');
+                customImg.className    = 'custom-logo-img logo-' + (currentTheme.logoEffect || 'none');
                 customImg.style.width = logo.style.width  || '150px';
                 customImg.style.height = 'auto';
                 customImg.style.marginBottom = logo.style.marginBottom || '10px';
@@ -320,7 +325,7 @@ function loadFromCloud() {
             if (doc.exists) appData = { ...appData, ...doc.data() };
             ['registeredStores','activePromotions','mainCategories','categories','services',
              'affiliateWallets','withdrawalRequests','registrationRequests',
-             'pendingPromotions','pendingVipRequests'].forEach(k => {
+             'pendingPromotions','pendingVipRequests','deals'].forEach(k => {
                 if (!appData[k]) appData[k] = [];
             });
             renderUI();
@@ -601,7 +606,6 @@ async function loadUserPoints(uid) {
         }
         const ptEl = document.getElementById('user-points-display');
         if (ptEl) ptEl.innerText = userCurrentPoints;
-        updateSpinButtonUI();
     } catch (e) { console.log(e); }
 }
 
@@ -679,178 +683,450 @@ async function earnPoints(actionType, targetId = null) {
 }
 
 // ==========================================
-// 🎡 Lucky Wheel
+// 🎡 กงล้อสุ่มร้านอาหาร (Restaurant Wheel)
 // ==========================================
 function openLuckyWheel() {
+    if (!myLineUid) return alert('กรุณาล็อคอินด้วย LINE ก่อนครับ!');
+    if (googlePlaces.length === 0) return alert('กรุณาค้นหาร้านอาหารในพื้นที่ก่อนครับ!\n(เลือกจังหวัดหรือค้นหาบนหน้าแรก)');
+    buildRestaurantWheel();
     document.getElementById('luckyWheelModal').style.display = 'flex';
 }
 
-function renderWheelLabels() {
+function buildRestaurantWheel() {
+    const stores = appData.registeredStores || [];
+    const now    = Date.now();
+
+    let vipItems    = [];
+    let normalItems = [];
+
+    googlePlaces.forEach(p => {
+        const store = stores.find(s => s.name === p.name);
+        const isVIP = !!(store?.isVIP && (!store.vipExpireTimestamp || store.vipExpireTimestamp > now || store.vipAutoRenew));
+        if (isVIP) vipItems.push({ place: p, isVIP: true });
+        else       normalItems.push({ place: p, isVIP: false });
+    });
+
+    const shuffleArr = arr => arr.sort(() => Math.random() - 0.5);
+    shuffleArr(vipItems); 
+    shuffleArr(normalItems);
+
+    // ดึง VIP เข้ากงล้อสูงสุดแค่ 2 ร้าน ที่เหลือเติมร้านธรรมดาให้ครบ 8
+    const selectedVips = vipItems.slice(0, 2);
+    const selectedNormals = normalItems.slice(0, 8 - selectedVips.length);
+
+    wheelRestaurants = [...selectedVips, ...selectedNormals];
+    shuffleArr(wheelRestaurants); // สลับไม่ให้ VIP กระจุกอยู่ติดกัน
+
+    renderRestaurantWheel();
+    const countEl = document.getElementById('wheel-store-count');
+    if (countEl) countEl.innerText = wheelRestaurants.length + ' ร้าน';
+    const spinBtn = document.getElementById('btn-spin-wheel');
+    if (spinBtn) { spinBtn.innerText = '🎯 หมุนเลย!'; spinBtn.disabled = false; }
+}
+
+function renderRestaurantWheel() {
     const wheel = document.getElementById('wheel-spinner');
-    if (!wheel || wheelRewards.length === 0) return;
-    const segDeg = 360 / wheelRewards.length;
-    const colors = ['#D9534F','#17a2b8','#06C755','#FFD700','#9C27B0','#FF9800','#3F51B5','#E91E63'];
-    const parts  = wheelRewards.map((r, i) =>
-        `${colors[i % colors.length]} ${i * segDeg}deg ${(i + 1) * segDeg}deg`
-    ).join(', ');
+    if (!wheel || wheelRestaurants.length === 0) return;
+
+    const segDeg   = 360 / wheelRestaurants.length;
+    // ธีมใหม่ ดำ-แดง-ทอง หรูหราและอ่านง่าย
+    const colors   = ['#1A1D23', '#8B0000', '#2A2D34', '#C5A059']; 
+
+    const parts = wheelRestaurants.map((item, i) => {
+        const c = colors[i % colors.length];
+        return `${c} ${i * segDeg}deg ${(i + 1) * segDeg}deg`;
+    }).join(', ');
     wheel.style.background = `conic-gradient(${parts})`;
     wheel.innerHTML = '';
-    wheelRewards.forEach((r, idx) => {
+
+    wheelRestaurants.forEach((item, idx) => {
         const angle = idx * segDeg + segDeg / 2;
         const label = document.createElement('div');
         Object.assign(label.style, {
-            position: 'absolute', top: '50%', left: '50%', width: '85px',
+            position: 'absolute', top: '50%', left: '50%', width: '95px',
             transformOrigin: '0 0',
-            transform: `rotate(${angle - 90}deg) translate(25px,-50%)`,
-            color: '#FFF', fontWeight: '600', fontSize: '11px', fontFamily: 'Kanit',
-            textShadow: '0 1px 3px rgba(0,0,0,0.8)', textAlign: 'left',
-            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+            transform: `rotate(${angle - 90}deg) translate(20px,-50%)`,
+            color: '#FFF', fontWeight: 'bold',
+            fontSize: '11px', fontFamily: 'Kanit',
+            textShadow: '1px 1px 3px rgba(0,0,0,0.9)',
+            textAlign: 'left', whiteSpace: 'nowrap',
+            overflow: 'hidden', textOverflow: 'ellipsis',
         });
-        label.innerText = r.name;
+        label.innerHTML = (item.isVIP ? '<span style="color:#FFD700">⭐</span> ' : '') + item.place.name;
         wheel.appendChild(label);
     });
 }
 
-function updateSpinButtonUI() {
-    const btn = document.getElementById('btn-spin-wheel');
-    if (!btn) return;
-    if (userFreeSpins > 0) {
-        btn.innerText        = `🎯 กดหมุนเลย (ฟรี ${userFreeSpins} ครั้ง!)`;
-        btn.style.background = 'linear-gradient(135deg,#06C755,#05A044)';
-        btn.style.color      = '#FFF';
-    } else {
-        btn.innerText        = `🎯 กดหมุนเลย (${wheelSpinCost} แต้ม)`;
-        btn.style.background = 'linear-gradient(135deg,var(--primary),var(--primary-hover))';
-        btn.style.color      = '#000';
-    }
-}
-
-async function spinWheel() {
+function spinRestaurantWheel() {
     if (isSpinning) return;
-    if (!myLineUid) return alert('กรุณาล็อคอินด้วย LINE ก่อนเพื่อร่วมสนุกครับ!');
-    if (wheelRewards.length === 0) return alert('แอดมินยังไม่ได้ตั้งค่าของรางวัลครับ');
-
-    const isUsingFreeSpin = userFreeSpins > 0;
-    if (!isUsingFreeSpin && userCurrentPoints < wheelSpinCost) {
-        return alert(`แต้มของคุณไม่พอครับ 😢\n(มีอยู่ ${userCurrentPoints} แต้ม / ต้องใช้ ${wheelSpinCost} แต้ม)`);
-    }
+    if (wheelRestaurants.length === 0) return alert('ไม่มีร้านในกงล้อครับ');
 
     isSpinning = true;
     const btn   = document.getElementById('btn-spin-wheel');
     const wheel = document.getElementById('wheel-spinner');
-    btn.innerText = 'กำลังลุ้น... 🎡';
-    btn.disabled  = true;
+    btn.innerText = 'กำลังสุ่ม... 🎡'; btn.disabled = true;
 
-    try {
-        const userRef = db.collection('userPoints').doc(myLineUid);
-        if (isUsingFreeSpin) {
-            userFreeSpins -= 1;
-            await userRef.update({ freeSpins: userFreeSpins });
-        } else {
-            userCurrentPoints -= wheelSpinCost;
-            await userRef.update({ points: userCurrentPoints });
-            const ptEl = document.getElementById('user-points-display');
-            if (ptEl) ptEl.innerText = userCurrentPoints;
-        }
-        updateSpinButtonUI();
-    } catch (e) {
-        alert('เกิดข้อผิดพลาด กรุณาลองใหม่ครับ');
-        isSpinning   = false;
-        btn.disabled = false;
-        updateSpinButtonUI();
-        return;
+    // ลดน้ำหนัก VIP ลงเหลือ 2 เท่า (เดิม 3) เพื่อให้สุ่มติดร้านธรรมดาง่ายขึ้น
+    const weights     = wheelRestaurants.map(item => item.isVIP ? 2 : 1);
+    const totalWeight = weights.reduce((a, b) => a + b, 0);
+    let   rand        = Math.random() * totalWeight;
+    let   selectedIdx = wheelRestaurants.length - 1;
+    for (let i = 0; i < weights.length; i++) {
+        rand -= weights[i];
+        if (rand <= 0) { selectedIdx = i; break; }
     }
 
-    // Weighted random pick — fixed: use cumulative properly
-    const rand = Math.random() * 100;
-    let selectedIdx = wheelRewards.length - 1; // default to last segment
-    let cumulative  = 0;
-    for (let i = 0; i < wheelRewards.length; i++) {
-        cumulative += wheelRewards[i].chance;
-        if (rand < cumulative) { selectedIdx = i; break; }
-    }
-
-    const segDeg     = 360 / wheelRewards.length;
-    const targetDeg  = 3600 + (360 - selectedIdx * segDeg) - segDeg / 2;
+    const segDeg    = 360 / wheelRestaurants.length;
+    const targetDeg = 3600 + (360 - selectedIdx * segDeg) - segDeg / 2;
     wheel.style.transition = 'transform 4s cubic-bezier(0.25,0.1,0.15,1)';
     wheel.style.transform  = `rotate(${targetDeg}deg)`;
 
-    setTimeout(async () => {
+    setTimeout(() => {
         isSpinning   = false;
-        btn.disabled = false;
-        updateSpinButtonUI();
-
-        const prize        = wheelRewards[selectedIdx];
-        let   isItemReward = true;
-
-        if (prize.name.includes('แต้ม')) {
-            const bonus = parseInt(prize.name.replace(/[^0-9]/g, '')) || 0;
-            if (bonus > 0) earnPoints('wheel_bonus', String(bonus));
-            isItemReward = false;
-        } else if (prize.name.includes('หมุนฟรี') || prize.name.includes('ฟรี')) {
-            const freeCount = parseInt(prize.name.replace(/[^0-9]/g, '')) || 1;
-            userFreeSpins  += freeCount;
-            await db.collection('userPoints').doc(myLineUid).update({ freeSpins: userFreeSpins });
-            updateSpinButtonUI();
-            alert(`🎉 ยินดีด้วยครับ!\nคุณได้รับสิทธิ์ "หมุนฟรี ${freeCount} ครั้ง"`);
-            isItemReward = false;
-        } else if (prize.name.includes('เกลือ') || prize.name.includes('ไม่ได้')) {
-            alert(`😅 ว้าาา... "${prize.name}"\nไม่เป็นไรครับ ลองหมุนใหม่รอบหน้านะ!`);
-            isItemReward = false;
-        }
-
-        if (isItemReward) {
-            const newReward = {
-                id: 'RW' + Date.now(), name: prize.name,
-                date: new Date().toLocaleString('th-TH'), used: false,
-            };
-            userRewardsInventory.push(newReward);
-            await db.collection('userPoints').doc(myLineUid).update({ rewards: userRewardsInventory });
-            alert(`🎉 ยินดีด้วยครับ!\nคุณได้รับ: "${prize.name}"\n\n(ระบบเก็บรางวัลเข้า "กระเป๋ารางวัล" ให้แล้วครับ)`);
-        }
-
-        // Reset wheel rotation to equivalent angle without transition
+        btn.innerText = '🔄 หมุนใหม่!'; btn.disabled = false;
         wheel.style.transition = 'none';
         wheel.style.transform  = `rotate(${targetDeg % 360}deg)`;
+
+        selectedWheelItem = wheelRestaurants[selectedIdx];
+        document.getElementById('luckyWheelModal').style.display = 'none';
+        showSpinResult(selectedWheelItem);
     }, 4000);
 }
 
-// ==========================================
-// 🎟️ Rewards Inventory
-// ==========================================
-function openMyRewards() {
-    const list      = document.getElementById('my-rewards-list');
-    const available = userRewardsInventory.filter(r => !r.used);
-    list.innerHTML  = available.length === 0
-        ? '<p style="text-align:center; color:#888; padding:20px;">ไม่มีของรางวัลที่สามารถใช้งานได้ในขณะนี้ 😢</p>'
-        : available.map(r => `
-            <div style="background:rgba(0,0,0,0.4); border:1px solid var(--info); padding:15px;
-                        border-radius:12px; margin-bottom:12px; text-align:left;
-                        box-shadow:0 4px 10px rgba(0,0,0,0.3);">
-                <h4 style="margin:0 0 5px; color:#FFF; font-size:16px;">🎁 ${r.name}</h4>
-                <p style="margin:0 0 12px; font-size:12px; color:#888;">ได้รับเมื่อ: ${r.date}</p>
-                <button class="btn-primary"
-                        style="background:linear-gradient(135deg,#17a2b8,#00d2ff); color:#FFF;
-                               width:100%; border:none; padding:10px; font-size:14px; border-radius:8px;"
-                        onclick="claimReward('${r.id}')">
-                    กดใช้สิทธิ์ (แสดงหน้าจอให้ร้านดู)
-                </button>
-            </div>`).join('');
-    document.getElementById('myRewardsModal').style.display = 'flex';
+function showSpinResult(item) {
+    const p      = item.place;
+    const stores = appData.registeredStores || [];
+    const store  = stores.find(s => s.name === p.name);
+    const now    = Date.now();
+    const isVIP  = item.isVIP;
+    const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${p.geometry.location.lat()},${p.geometry.location.lng()}`;
+    const imgUrl = p.photos ? p.photos[0].getUrl({ maxWidth: 500 }) : 'https://via.placeholder.com/500x250?text=Painaidee';
+
+    let statusHtml = '';
+    const cs = store?.operatingHours ? getCustomStoreStatus(store.operatingHours) : null;
+    if (cs) statusHtml = cs.html;
+    else if (p.opening_hours) {
+        const isOpen = typeof p.opening_hours.isOpen === 'function' ? p.opening_hours.isOpen() : p.opening_hours.open_now;
+        if (isOpen === true)  statusHtml = '<span style="background:#06C755;color:#FFF;padding:3px 8px;border-radius:10px;font-size:11px;">เปิดอยู่</span>';
+        if (isOpen === false) statusHtml = '<span style="background:#D9534F;color:#FFF;padding:3px 8px;border-radius:10px;font-size:11px;">ปิดแล้ว</span>';
+    }
+
+    const activeDeals = (appData.deals || []).filter(d =>
+        d.storeName === p.name && d.isActive &&
+        (!d.expiryDate || new Date(d.expiryDate) > new Date()) &&
+        (d.maxUses === 0 || d.usedCount < d.maxUses)
+    );
+    
+    let dealHtml = '';
+    if (activeDeals.length > 0) {
+        dealHtml = `<div style="margin-top:12px; padding-top:12px; border-top:1px dashed rgba(255,255,255,0.15);">
+            <p style="font-size:12px;color:#FFD700;margin:0 0 8px;font-weight:600;">🎟️ ดีลพิเศษจากร้านนี้!</p>
+            ${activeDeals.map(d => `
+                <div style="background:rgba(217,83,79,0.1);border:1px solid rgba(217,83,79,0.4);border-radius:10px;padding:10px;margin-bottom:8px;text-align:left;">
+                    <p style="margin:0 0 4px;color:#FFF;font-weight:600;font-size:13px;">${d.title}</p>
+                    <p style="margin:0 0 8px;font-size:11px;color:#aaa;">${d.description}</p>
+                    <button onclick="claimDeal('${d.id}'); document.getElementById('spinResultModal').style.display='none';"
+                            style="background:#D9534F;color:#FFF;border:none;padding:7px 14px;border-radius:8px;font-family:'Kanit';font-size:12px;cursor:pointer;width:100%;">
+                        🎟️ กดรับ QR Code สิทธิ์นี้
+                    </button>
+                </div>`).join('')}
+        </div>`;
+    }
+
+    const hasLine = !!(store?.lineUrl?.trim());
+    const hasFb   = !!(store?.fbUrl?.trim());
+    let contactHtml = '';
+    if (hasLine) contactHtml += `<button onclick="window.open('${store.lineUrl.startsWith('http') ? store.lineUrl : 'https://'+store.lineUrl}','_blank')" style="flex:1;background:#06C755;color:#FFF;border:none;padding:10px;border-radius:8px;font-family:'Kanit';font-size:13px;font-weight:600;cursor:pointer;">💬 LINE</button>`;
+    if (hasFb)   contactHtml += `<button onclick="window.open('${store.fbUrl.startsWith('http') ? store.fbUrl : 'https://'+store.fbUrl}','_blank')" style="flex:1;background:#1877F2;color:#FFF;border:none;padding:10px;border-radius:8px;font-family:'Kanit';font-size:13px;font-weight:600;cursor:pointer;">👍 FB</button>`;
+
+    document.getElementById('spinResultContent').innerHTML = `
+        ${isVIP ? '<div style="text-align:center;color:#FFD700;font-weight:700;font-size:13px;margin-bottom:10px;letter-spacing:1px;">⭐ VIP RECOMMEND ⭐</div>' : ''}
+        <img src="${imgUrl}" style="width:100%;height:170px;object-fit:cover;border-radius:12px;margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+            <h3 style="margin:0;font-size:17px;color:${isVIP ? '#FFD700' : 'var(--primary)'};flex:1;">${p.name}</h3>
+            <div>${statusHtml}</div>
+        </div>
+        <p style="font-size:12px;color:#aaa;margin:0 0 4px;">${p.vicinity}</p>
+        <p style="color:var(--primary);font-size:13px;margin:0 0 12px;">⭐ ${p.rating || 'ใหม่'} ${p.user_ratings_total ? '(' + p.user_ratings_total + ' รีวิว)' : ''}</p>
+        ${dealHtml}
+        <div style="display:flex;gap:8px;margin-top:14px;">
+            <button onclick="window.open('${navUrl}','_blank'); trackAction('${p.name}','dir');"
+                    style="flex:2;background:linear-gradient(135deg,var(--primary),#a8813c);color:#000;border:none;padding:12px;border-radius:10px;font-family:'Kanit';font-weight:700;font-size:14px;cursor:pointer;">
+                📍 นำทางไปเลย!
+            </button>
+            <button onclick="focusPlace('${p.place_id}'); document.getElementById('spinResultModal').style.display='none'; document.getElementById('appContent').scrollTo({top:0,behavior:'smooth'});"
+                    style="flex:1;background:rgba(255,255,255,0.08);color:#FFF;border:1px solid #555;padding:12px;border-radius:10px;font-family:'Kanit';font-size:13px;cursor:pointer;">
+                🗺️ แผนที่
+            </button>
+        </div>
+        ${contactHtml ? `<div style="display:flex;gap:8px;margin-top:8px;">${contactHtml}</div>` : ''}
+    `;
+    document.getElementById('spinResultModal').style.display = 'flex';
 }
 
-async function claimReward(rewardId) {
-    if (!confirm('⚠️ คำเตือน!\n\nกรุณากดใช้สิทธิ์นี้ \'ต่อหน้าพนักงานที่ร้าน\' เท่านั้น!\nหากกดยืนยันแล้ว คูปองจะหายไปทันที\n\nคุณต้องการยืนยันการใช้สิทธิ์ใช่หรือไม่?'))
+// ==========================================
+// 📍 VIP Markers บนแผนที่
+// ==========================================
+function getVIPMarkerIcon() {
+    return {
+        url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="52" viewBox="0 0 40 52">
+                <path d="M20 0C9 0 0 9 0 20c0 15 20 32 20 32S40 35 40 20C40 9 31 0 20 0z"
+                      fill="#FFD700" stroke="#C5A059" stroke-width="2"/>
+                <circle cx="20" cy="19" r="11" fill="#1A1D23"/>
+                <text x="20" y="24" text-anchor="middle" font-size="14" fill="#FFD700" font-family="Arial">★</text>
+            </svg>`),
+        scaledSize: new google.maps.Size(40, 52),
+        anchor:     new google.maps.Point(20, 52),
+    };
+}
+
+function refreshVIPMarkers() {
+    vipMarkers.forEach(m => m.setMap(null));
+    vipMarkers = [];
+
+    if (!map) return;
+    const stores = appData.registeredStores || [];
+    const now    = Date.now();
+    const icon   = getVIPMarkerIcon();
+
+    stores.forEach(store => {
+        if (!(store.isVIP && (!store.vipExpireTimestamp || store.vipExpireTimestamp > now || store.vipAutoRenew))) return;
+        const place = googlePlaces.find(p => p.name === store.name);
+        if (!place) return;
+
+        const marker = new google.maps.Marker({
+            position:  place.geometry.location,
+            map:       map,
+            icon:      icon,
+            title:     '⭐ ' + store.name + ' (VIP)',
+            zIndex:    1000,
+            animation: google.maps.Animation.DROP,
+        });
+        marker.addListener('click', () => {
+            focusPlace(place.place_id);
+        });
+        vipMarkers.push(marker);
+    });
+}
+
+// ==========================================
+// 🎟️ ระบบ Deal & QR Code
+// ==========================================
+function openDealCreator() {
+    const pin = document.getElementById('storePinInput').value;
+    if (!pin) return alert('กรุณาใส่ PIN ร้านค้าก่อนครับ');
+    document.getElementById('dealCreatorModal').style.display = 'flex';
+}
+
+async function saveDeal() {
+    const pin        = document.getElementById('storePinInput').value;
+    const storeIndex = (appData.registeredStores || []).findIndex(s => s.pin === pin);
+    if (storeIndex === -1) return alert('กรุณาเข้าสู่ระบบด้วย PIN ก่อนครับ');
+
+    const store    = appData.registeredStores[storeIndex];
+    const title    = document.getElementById('dealTitle').value.trim();
+    const desc     = document.getElementById('dealDesc').value.trim();
+    const maxUses  = parseInt(document.getElementById('dealMaxUses').value) || 0;
+    const expiry   = document.getElementById('dealExpiry').value;
+
+    if (!title) return alert('กรุณาใส่ชื่อดีลครับ');
+
+    if (!appData.deals) appData.deals = [];
+    appData.deals.push({
+        id:          'DEAL' + Date.now(),
+        storeName:   store.name,
+        title,
+        description: desc,
+        maxUses,
+        usedCount:   0,
+        expiryDate:  expiry,
+        isActive:    true,
+        createdAt:   new Date().toLocaleString('th-TH'),
+        claimedBy:   [],
+    });
+
+    const btn = document.getElementById('btnSaveDeal');
+    btn.innerText = 'กำลังบันทึก...'; btn.disabled = true;
+    try {
+        await saveToCloud();
+        document.getElementById('dealCreatorModal').style.display = 'none';
+        alert('✅ สร้างดีลเรียบร้อยแล้ว! ลูกค้าจะเห็นบนการ์ดร้านทันที');
+        renderStoreDeals();
+    } catch (e) {
+        alert('❌ เกิดข้อผิดพลาด: ' + e.message);
+        appData.deals.pop();
+    } finally {
+        btn.innerText = '✅ บันทึกดีล'; btn.disabled = false;
+    }
+}
+
+async function toggleDealActive(dealId) {
+    const deal = (appData.deals || []).find(d => d.id === dealId);
+    if (!deal) return;
+    deal.isActive = !deal.isActive;
+    try { await saveToCloud(); renderStoreDeals(); } catch (e) { deal.isActive = !deal.isActive; }
+}
+
+async function deleteDeal(dealId) {
+    if (!confirm('ยืนยันลบดีลนี้?')) return;
+    const idx = (appData.deals || []).findIndex(d => d.id === dealId);
+    if (idx === -1) return;
+    appData.deals.splice(idx, 1);
+    try { await saveToCloud(); renderStoreDeals(); } catch (e) {}
+}
+
+function renderStoreDeals() {
+    const pin     = document.getElementById('storePinInput').value;
+    const store   = (appData.registeredStores || []).find(s => s.pin === pin);
+    const listEl  = document.getElementById('storeDealsList');
+    if (!listEl || !store) return;
+
+    const myDeals = (appData.deals || []).filter(d => d.storeName === store.name);
+    if (myDeals.length === 0) {
+        listEl.innerHTML = '<p style="color:#777;text-align:center;margin:10px 0;">ยังไม่มีดีล กดปุ่มด้านบนเพื่อสร้างดีลแรก!</p>';
         return;
-    const idx = userRewardsInventory.findIndex(r => r.id === rewardId);
-    if (idx > -1) {
-        userRewardsInventory[idx].used     = true;
-        userRewardsInventory[idx].usedDate = new Date().toLocaleString('th-TH');
-        try {
-            await db.collection('userPoints').doc(myLineUid).update({ rewards: userRewardsInventory });
-            alert(`✅ ใช้สิทธิ์เรียบร้อยแล้ว!\n\n🎁 ${userRewardsInventory[idx].name}\nเวลา: ${userRewardsInventory[idx].usedDate}\n\nพนักงานสามารถตรวจสอบหน้าจอนี้ได้เลยครับ`);
-            openMyRewards();
-        } catch (e) { alert('เกิดข้อผิดพลาดในการใช้งานคูปอง กรุณาลองใหม่'); }
+    }
+    listEl.innerHTML = myDeals.map(d => `
+        <div style="background:rgba(0,0,0,0.3);border:1px solid ${d.isActive ? 'rgba(6,199,85,0.3)' : 'rgba(255,255,255,0.1)'};border-radius:10px;padding:12px;margin-bottom:10px;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+                <div style="flex:1;">
+                    <p style="margin:0 0 3px;color:#FFF;font-weight:600;font-size:14px;">${d.title}</p>
+                    <p style="margin:0 0 6px;font-size:12px;color:#aaa;">${d.description}</p>
+                    <p style="margin:0;font-size:11px;color:#777;">ใช้ไปแล้ว: ${d.usedCount || 0}${d.maxUses > 0 ? '/' + d.maxUses : ''} ครั้ง ${d.expiryDate ? '| หมดเขต: ' + d.expiryDate : ''}</p>
+                </div>
+                <span style="background:${d.isActive ? '#06C755' : '#555'};color:#FFF;padding:3px 8px;border-radius:8px;font-size:11px;white-space:nowrap;">${d.isActive ? 'เปิดใช้' : 'ปิดแล้ว'}</span>
+            </div>
+            <div style="display:flex;gap:6px;margin-top:10px;">
+                <button onclick="toggleDealActive('${d.id}')" style="flex:1;padding:7px;border-radius:7px;border:1px solid #555;background:transparent;color:#aaa;font-family:'Kanit';font-size:12px;cursor:pointer;">${d.isActive ? '⏸ ปิดดีล' : '▶ เปิดดีล'}</button>
+                <button onclick="deleteDeal('${d.id}')" style="flex:1;padding:7px;border-radius:7px;border:1px solid rgba(217,83,79,0.4);background:rgba(217,83,79,0.1);color:#D9534F;font-family:'Kanit';font-size:12px;cursor:pointer;">🗑️ ลบ</button>
+            </div>
+        </div>`).join('');
+}
+
+// ── ฝั่งลูกค้า: หน้าต่างแสดงดีลของร้าน ──
+function showStoreDealsModal(storeName) {
+    const activeDeals = (appData.deals || []).filter(d => 
+        d.storeName === storeName && d.isActive && 
+        (!d.expiryDate || new Date(d.expiryDate) > new Date()) && 
+        (d.maxUses === 0 || d.usedCount < d.maxUses)
+    );
+    
+    const title    = document.getElementById('cdTitle');
+    const claimBtn = document.getElementById('btnClaim');
+    
+    title.innerText   = '🎟️ ดีลส่วนลดพิเศษจากร้าน';
+    title.style.color = '#D9534F';
+    if (claimBtn) claimBtn.style.display = 'none';
+
+    let html = activeDeals.map(d => `
+        <div style="background:rgba(217,83,79,0.1);border:1px solid rgba(217,83,79,0.4);border-radius:10px;padding:15px;margin-bottom:10px;text-align:left;">
+            <p style="margin:0 0 5px;color:#FFF;font-weight:600;font-size:15px;">${d.title}</p>
+            <p style="margin:0 0 10px;font-size:12px;color:#ccc;">${d.description}</p>
+            <div style="font-size:11px; color:#888; margin-bottom:10px;">
+                เหลือสิทธิ์: ${d.maxUses === 0 ? 'ไม่จำกัด' : (d.maxUses - d.usedCount) + ' สิทธิ์'}
+            </div>
+            <button onclick="claimDeal('${d.id}'); document.getElementById('customerDetailModal').style.display='none';"
+                    style="background:#D9534F;color:#FFF;border:none;padding:10px 14px;border-radius:8px;font-family:'Kanit';font-size:13px;cursor:pointer;width:100%;font-weight:bold;box-shadow:0 4px 10px rgba(217,83,79,0.3);">
+                🎫 กดรับ QR Code สิทธิ์นี้
+            </button>
+        </div>`).join('');
+
+    document.getElementById('cdStoreName').innerText = storeName;
+    document.getElementById('cdText').innerHTML = html;
+    document.getElementById('customerDetailModal').style.display = 'flex';
+}
+
+function claimDeal(dealId) {
+    if (!myLineUid) return alert('กรุณาล็อคอินด้วย LINE ก่อนครับ!');
+
+    const deal = (appData.deals || []).find(d => d.id === dealId);
+    if (!deal)         return alert('ไม่พบดีลนี้ครับ');
+    if (!deal.isActive) return alert('ดีลนี้ปิดใช้งานแล้วครับ');
+    if (deal.expiryDate && new Date(deal.expiryDate) < new Date()) return alert('ดีลนี้หมดเขตไปแล้วครับ');
+    if (deal.maxUses > 0 && deal.usedCount >= deal.maxUses) return alert('ขออภัย สิทธิ์ดีลนี้เต็มแล้วครับ');
+    if ((deal.claimedBy || []).includes(myLineUid)) return alert('คุณเคยกดรับสิทธิ์ดีลนี้ไปแล้วครับ!');
+
+    const qrPayload = JSON.stringify({
+        v:         1,
+        dealId:    deal.id,
+        storeName: deal.storeName,
+        userId:    myLineUid,
+        claimId:   'C' + Date.now() + Math.random().toString(36).substr(2, 4).toUpperCase(),
+        ts:        Date.now(),
+    });
+
+    document.getElementById('qrDealTitle').innerText   = deal.title;
+    document.getElementById('qrDealDesc').innerText    = deal.description;
+    document.getElementById('qrDealStore').innerText   = '🏪 ' + deal.storeName;
+    document.getElementById('qrDealExpiry').innerText  = deal.expiryDate ? 'หมดเขต: ' + deal.expiryDate : 'ไม่มีวันหมดอายุ';
+
+    const qrContainer = document.getElementById('qrCodeContainer');
+    qrContainer.innerHTML = '';
+    new QRCode(qrContainer, {
+        text:       qrPayload,
+        width:      220,
+        height:     220,
+        colorDark:  '#000000',
+        colorLight: '#FFFFFF',
+        correctLevel: QRCode.CorrectLevel.H,
+    });
+
+    document.getElementById('dealQRModal').style.display = 'flex';
+}
+
+// ── ฝั่งร้านค้า: แสกน QR ──
+function openQRScanner() {
+    document.getElementById('qrScannerModal').style.display = 'flex';
+    document.getElementById('qrScanInput').value = '';
+    document.getElementById('qrScanResult').innerHTML = '';
+    document.getElementById('qrScanResult').style.display = 'none';
+}
+
+async function verifyAndUseDeal() {
+    const rawText = document.getElementById('qrScanInput').value.trim();
+    const resultEl = document.getElementById('qrScanResult');
+    if (!rawText) return alert('กรุณาวางข้อความจาก QR Code ของลูกค้าครับ');
+
+    resultEl.style.display = 'block';
+    resultEl.innerHTML = '<p style="color:#aaa;text-align:center;">กำลังตรวจสอบ...</p>';
+
+    try {
+        const data = JSON.parse(rawText);
+        const deal = (appData.deals || []).find(d => d.id === data.dealId);
+
+        if (!deal) {
+            resultEl.innerHTML = `<div style="text-align:center;padding:15px;background:rgba(217,83,79,0.1);border:1px solid #D9534F;border-radius:10px;"><p style="color:#D9534F;font-size:18px;font-weight:700;margin:0;">❌ ไม่พบดีลในระบบ</p></div>`;
+            return;
+        }
+        if (!deal.isActive) {
+            resultEl.innerHTML = `<div style="text-align:center;padding:15px;background:rgba(217,83,79,0.1);border:1px solid #D9534F;border-radius:10px;"><p style="color:#D9534F;font-weight:700;margin:0;">❌ ดีลนี้ปิดใช้งานแล้ว</p></div>`;
+            return;
+        }
+        if ((deal.claimedBy || []).includes(data.userId)) {
+            resultEl.innerHTML = `<div style="text-align:center;padding:15px;background:rgba(217,83,79,0.1);border:1px solid #D9534F;border-radius:10px;"><p style="color:#D9534F;font-weight:700;margin:0;">❌ QR นี้ถูกใช้งานไปแล้ว!</p></div>`;
+            return;
+        }
+        if (deal.maxUses > 0 && deal.usedCount >= deal.maxUses) {
+            resultEl.innerHTML = `<div style="text-align:center;padding:15px;background:rgba(217,83,79,0.1);border:1px solid #D9534F;border-radius:10px;"><p style="color:#D9534F;font-weight:700;margin:0;">❌ สิทธิ์เต็มแล้ว (ครบจำนวน)</p></div>`;
+            return;
+        }
+
+        if (!deal.claimedBy) deal.claimedBy = [];
+        deal.claimedBy.push(data.userId);
+        deal.usedCount = (deal.usedCount || 0) + 1;
+        await saveToCloud();
+
+        const usedTime = new Date().toLocaleString('th-TH');
+        resultEl.innerHTML = `
+            <div style="text-align:center;padding:20px;background:rgba(6,199,85,0.1);border:2px solid #06C755;border-radius:12px;">
+                <p style="color:#06C755;font-size:22px;font-weight:700;margin:0 0 8px;">✅ ยืนยันสิทธิ์สำเร็จ!</p>
+                <p style="color:#FFF;font-size:15px;font-weight:600;margin:0 0 5px;">${deal.title}</p>
+                <p style="color:#aaa;font-size:12px;margin:0 0 12px;">ร้าน: ${deal.storeName}</p>
+                <p style="color:#777;font-size:11px;margin:0;">เวลาใช้งาน: ${usedTime}<br>สิทธิ์คงเหลือ: ${deal.maxUses === 0 ? 'ไม่จำกัด' : (deal.maxUses - deal.usedCount) + ' สิทธิ์'}</p>
+            </div>`;
+    } catch (e) {
+        resultEl.innerHTML = `<div style="text-align:center;padding:15px;background:rgba(217,83,79,0.1);border:1px solid #D9534F;border-radius:10px;"><p style="color:#D9534F;font-weight:700;margin:0;">❌ QR Code ไม่ถูกต้อง</p></div>`;
     }
 }
 
@@ -1007,7 +1283,7 @@ function getCustomStoreStatus(hoursObj) {
 function showCustomerDetail(type, storeName) {
     const store = (appData.registeredStores || []).find(s => s.name === storeName);
     if (!store) return;
-    const title   = document.getElementById('cdTitle');
+    const title    = document.getElementById('cdTitle');
     const claimBtn = document.getElementById('btnClaim');
     let   textToShow = '';
 
@@ -1065,8 +1341,18 @@ function focusPlace(placeId) {
 
         let extraHtml = '';
         const safeName = place.name.replace(/'/g, "\\'");
-        if (store?.coupon?.trim())
-            extraHtml += `<button onclick="showCustomerDetail('coupon','${safeName}')" style="margin:8px 5px 0 0;font-size:12px;font-weight:bold;background:rgba(217,83,79,0.1);border:1px solid #D9534F;color:#D9534F;padding:6px 12px;border-radius:12px;cursor:pointer;">🎟️ กดดูคูปอง</button>`;
+        
+        // --- ส่วนโชว์ดีลบนแผนที่ ---
+        const activeDeals = (appData.deals || []).filter(d => 
+            d.storeName === place.name && d.isActive && 
+            (!d.expiryDate || new Date(d.expiryDate) > new Date()) && 
+            (d.maxUses === 0 || d.usedCount < d.maxUses)
+        );
+
+        if (activeDeals.length > 0) {
+            extraHtml += `<button onclick="showStoreDealsModal('${safeName}')" style="margin:8px 5px 0 0;font-size:12px;font-weight:bold;background:rgba(217,83,79,0.1);border:1px solid #D9534F;color:#D9534F;padding:6px 12px;border-radius:12px;cursor:pointer;box-shadow:0 2px 5px rgba(217,83,79,0.3);">🎟️ กดดู ${activeDeals.length} ดีลพิเศษ</button>`;
+        }
+        
         if (store?.event?.trim())
             extraHtml += `<button onclick="showCustomerDetail('event','${safeName}')" style="margin:8px 0 0;font-size:12px;font-weight:bold;background:rgba(23,162,184,0.1);border:1px solid #17a2b8;color:#17a2b8;padding:6px 12px;border-radius:12px;cursor:pointer;">🎉 ดูกิจกรรม</button>`;
 
@@ -1195,7 +1481,7 @@ function renderCards(keywordSearched) {
     let html = sorted.slice(0, 80).map(p => {
         const store  = stores.find(s => s.name === p.name);
         const isVIP  = !!(store?.isVIP && (!store.vipExpireTimestamp || store.vipExpireTimestamp > now || store.vipAutoRenew));
-        const navUrl = `https://www.google.com/maps/search/?api=1&query=${p.geometry.location.lat()},${p.geometry.location.lng()}`;
+        const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${p.geometry.location.lat()},${p.geometry.location.lng()}`;
         const distKm = window.google?.maps?.geometry
             ? (google.maps.geometry.spherical.computeDistanceBetween(originPoint, p.geometry.location) / 1000).toFixed(1)
             : '0.0';
@@ -1219,11 +1505,20 @@ function renderCards(keywordSearched) {
         const imgUrl  = p.photos ? p.photos[0].getUrl({ maxWidth: 400 }) : 'https://via.placeholder.com/400x200?text=Painaidee';
         const safeName = p.name.replace(/'/g, "\\'");
 
+        // --- ส่วนโชว์ดีลบนหน้าจอหลัก ---
+        const activeDeals = (appData.deals || []).filter(d => 
+            d.storeName === p.name && d.isActive && 
+            (!d.expiryDate || new Date(d.expiryDate) > new Date()) && 
+            (d.maxUses === 0 || d.usedCount < d.maxUses)
+        );
+
         let extraTags = '';
-        if (store?.coupon?.trim())
-            extraTags += `<span onclick="showCustomerDetail('coupon','${safeName}')" style="background:rgba(217,83,79,0.1);color:var(--danger);padding:4px 10px;border-radius:10px;font-size:11px;font-weight:bold;margin-right:5px;display:inline-block;margin-bottom:5px;cursor:pointer;border:1px solid rgba(217,83,79,0.3);pointer-events:auto;">🎟️ กดดูคูปอง</span>`;
-        if (store?.event?.trim())
-            extraTags += `<span onclick="showCustomerDetail('event','${safeName}')" style="background:rgba(23,162,184,0.1);color:var(--info);padding:4px 10px;border-radius:10px;font-size:11px;font-weight:bold;display:inline-block;margin-bottom:5px;cursor:pointer;border:1px solid rgba(23,162,184,0.3);pointer-events:auto;">🎉 ดูกิจกรรม</span>`;
+        if (activeDeals.length > 0) {
+            extraTags += `<span onclick="showStoreDealsModal('${safeName}'); event.stopPropagation();" style="background:rgba(217,83,79,0.1);color:var(--danger);padding:5px 12px;border-radius:10px;font-size:11px;font-weight:bold;margin-right:5px;display:inline-block;margin-bottom:5px;cursor:pointer;border:1px solid rgba(217,83,79,0.3);pointer-events:auto;box-shadow:0 2px 5px rgba(217,83,79,0.2);">🎟️ มี ${activeDeals.length} ดีลพิเศษ!</span>`;
+        }
+        if (store?.event?.trim()) {
+            extraTags += `<span onclick="showCustomerDetail('event','${safeName}'); event.stopPropagation();" style="background:rgba(23,162,184,0.1);color:var(--info);padding:5px 12px;border-radius:10px;font-size:11px;font-weight:bold;display:inline-block;margin-bottom:5px;cursor:pointer;border:1px solid rgba(23,162,184,0.3);pointer-events:auto;">🎉 ดูกิจกรรม</span>`;
+        }
 
         const vipEffectClass = isVIP && currentTheme.vipEffect && currentTheme.vipEffect !== 'none'
             ? ' vip-' + currentTheme.vipEffect : '';
@@ -1280,6 +1575,7 @@ function renderCards(keywordSearched) {
 
     list.innerHTML = html;
     renderPromos();
+    refreshVIPMarkers();
 }
 
 function renderPromos() {
@@ -1333,9 +1629,17 @@ function renderPromos() {
         sliderHtml += '</div>';
 
         const safeStore = p.storeName.replace(/'/g, "\\'");
+        
+        // --- ดึงดีลมาโชว์ใน Banner โปรโมท ---
+        const activeDeals = (appData.deals || []).filter(d => 
+            d.storeName === p.storeName && d.isActive && 
+            (!d.expiryDate || new Date(d.expiryDate) > new Date()) && 
+            (d.maxUses === 0 || d.usedCount < d.maxUses)
+        );
+
         let extraHtml = '';
-        if (store?.coupon?.trim())
-            extraHtml += `<span onclick="showCustomerDetail('coupon','${safeStore}'); event.stopPropagation();" style="background:rgba(217,83,79,0.1);color:var(--danger);padding:4px 8px;border-radius:10px;font-size:10px;font-weight:bold;margin-right:5px;display:inline-block;margin-bottom:5px;cursor:pointer;border:1px solid rgba(217,83,79,0.3);pointer-events:auto;">🎟️ คูปอง</span>`;
+        if (activeDeals.length > 0)
+            extraHtml += `<span onclick="showStoreDealsModal('${safeStore}'); event.stopPropagation();" style="background:rgba(217,83,79,0.1);color:var(--danger);padding:4px 8px;border-radius:10px;font-size:10px;font-weight:bold;margin-right:5px;display:inline-block;margin-bottom:5px;cursor:pointer;border:1px solid rgba(217,83,79,0.3);pointer-events:auto;">🎟️ มี ${activeDeals.length} ดีล!</span>`;
         if (store?.event?.trim())
             extraHtml += `<span onclick="showCustomerDetail('event','${safeStore}'); event.stopPropagation();" style="background:rgba(23,162,184,0.1);color:var(--info);padding:4px 8px;border-radius:10px;font-size:10px;font-weight:bold;display:inline-block;margin-bottom:5px;cursor:pointer;border:1px solid rgba(23,162,184,0.3);pointer-events:auto;">🎉 กิจกรรม</span>`;
 
@@ -1588,6 +1892,7 @@ function verifyStore(silent = false) {
     }
 
     if (!silent) alert('ยินดีต้อนรับร้าน ' + store.name);
+    renderStoreDeals();
 }
 
 function logoutStore() {
@@ -1685,36 +1990,6 @@ async function saveOperatingHours() {
     } finally {
         if (btn) { btn.innerText = '💾 บันทึกเวลาลงระบบ'; btn.disabled = false; }
     }
-}
-
-// ── Coupon ──
-function openCouponEditor() {
-    const store = appData.registeredStores.find(s => s.pin === document.getElementById('storePinInput').value);
-    if (!store) return;
-    document.getElementById('couponText').value            = store.coupon || '';
-    document.getElementById('couponModal').style.display   = 'flex';
-}
-
-async function saveCoupon() {
-    const pin        = document.getElementById('storePinInput').value;
-    const storeIndex = appData.registeredStores.findIndex(s => s.pin === pin);
-    if (storeIndex === -1) return;
-    appData.registeredStores[storeIndex].coupon = document.getElementById('couponText').value.trim();
-    try {
-        await saveToCloud();
-        document.getElementById('couponModal').style.display = 'none';
-        alert('✅ อัปเดตคูปองส่วนลดเรียบร้อยแล้ว!');
-    } catch (e) { alert('❌ เกิดข้อผิดพลาดในการบันทึกข้อมูล'); }
-}
-
-async function deleteCoupon() {
-    const pin        = document.getElementById('storePinInput').value;
-    const storeIndex = appData.registeredStores.findIndex(s => s.pin === pin);
-    if (storeIndex === -1) return;
-    appData.registeredStores[storeIndex].coupon = '';
-    await saveToCloud();
-    document.getElementById('couponModal').style.display = 'none';
-    alert('🗑️ ลบคูปองเรียบร้อยแล้ว!');
 }
 
 // ── Event ──
@@ -1860,7 +2135,6 @@ async function submitPromoWithPIN() {
 }
 
 // ── Edit Promo ──
-// ── Edit Promo ──
 async function submitEditPromo() {
     const btn         = document.getElementById('btnEditPromo');
     const pin         = document.getElementById('storePinInput').value;
@@ -1904,181 +2178,4 @@ async function submitEditPromo() {
         btn.innerText = '🔄 ส่งเรื่องขอแก้ไขข้อมูล';
         btn.disabled  = false;
     }
-} // <==== ตัวปัญหาคือปีกกาปิดตัวนี้หายไปครับ! ผมเติมให้แล้ว
-
-// ==========================================
-// 🎡 Restaurant Spin Wheel (กงล้อสุ่มร้าน)
-// ==========================================
-function spinRestaurantWheel() {
-    if (isSpinning) return;
-    if (!googlePlaces || googlePlaces.length === 0) {
-        return alert('ไม่พบร้านค้าในบริเวณนี้ให้สุ่มครับ ลองขยายพื้นที่ค้นหาดูนะ 😅');
-    }
-
-    isSpinning = true;
-    const btn = document.getElementById('btn-spin-wheel');
-    const wheel = document.getElementById('wheel-spinner');
-    
-    btn.innerText = 'กำลังสุ่ม... 🎡';
-    btn.disabled = true;
-
-    const randIndex = Math.floor(Math.random() * googlePlaces.length);
-    const selectedPlace = googlePlaces[randIndex];
-    const targetDeg = 3600 + Math.floor(Math.random() * 360); 
-
-    wheel.style.transition = 'transform 4s cubic-bezier(0.25, 0.1, 0.15, 1)';
-    wheel.style.transform = `rotate(${targetDeg}deg)`;
-
-    setTimeout(() => {
-        isSpinning = false;
-        btn.disabled = false;
-        btn.innerText = '🎯 หมุนเลย!';
-        wheel.style.transition = 'none';
-        wheel.style.transform = `rotate(${targetDeg % 360}deg)`;
-        showSpinResult(selectedPlace);
-    }, 4000);
 }
-
-function showSpinResult(place) {
-    document.getElementById('luckyWheelModal').style.display = 'none';
-    document.getElementById('spinResultModal').style.display = 'flex';
-
-    const imgUrl = place.photos ? place.photos[0].getUrl({maxWidth: 400}) : 'https://via.placeholder.com/400x200?text=Painaidee';
-    
-    const resultHtml = `
-        <div class="place-card" style="margin:15px auto; pointer-events:none; border:2px solid var(--primary); box-shadow: 0 0 15px rgba(197,160,89,0.3);">
-            <img src="${imgUrl}" class="main-img" style="height:160px; object-fit:cover; border-radius:12px 12px 0 0;">
-            <div class="place-info" style="padding:15px;">
-                <h3 style="margin:0 0 5px; color:var(--primary); font-size:18px;">${place.name}</h3>
-                <p style="font-size:13px; color:#aaa; margin:0 0 10px;">${place.vicinity}</p>
-                <div style="color:#06C755; font-weight:bold; font-size:14px;">⭐ ${place.rating || 'ใหม่'}</div>
-            </div>
-        </div>
-        <button class="btn-primary" style="width:100%; margin-top:10px; font-size:16px; padding:12px;"
-                onclick="document.getElementById('spinResultModal').style.display='none'; focusPlace('${place.place_id}');">
-            📍 ดูพิกัดและนำทางไปเลย!
-        </button>
-    `;
-    document.getElementById('spinResultContent').innerHTML = resultHtml;
-}
-
-// ==========================================
-// 🎟️ Deal & QR System (ระบบดีลและสแกนคูปอง)
-// ==========================================
-function openDealCreator() {
-    document.getElementById('dealTitle').value = '';
-    document.getElementById('dealDesc').value = '';
-    document.getElementById('dealMaxUses').value = '0';
-    document.getElementById('dealExpiry').value = '';
-    document.getElementById('dealCreatorModal').style.display = 'flex';
-}
-
-async function saveDeal() {
-    const pin = document.getElementById('storePinInput').value;
-    const storeIndex = appData.registeredStores.findIndex(s => s.pin === pin);
-    if (storeIndex === -1) return alert('กรุณาเข้าสู่ระบบร้านค้าก่อนครับ');
-
-    const title = document.getElementById('dealTitle').value.trim();
-    const desc = document.getElementById('dealDesc').value.trim();
-    const maxUses = parseInt(document.getElementById('dealMaxUses').value) || 0;
-    const expiry = document.getElementById('dealExpiry').value;
-
-    if (!title) return alert('⚠️ กรุณากรอกชื่อดีลครับ');
-
-    const newDeal = {
-        id: 'DEAL_' + Date.now(),
-        title: title,
-        desc: desc,
-        maxUses: maxUses,
-        expiry: expiry,
-        usedCount: 0,
-        active: true
-    };
-
-    if (!appData.registeredStores[storeIndex].deals) {
-        appData.registeredStores[storeIndex].deals = [];
-    }
-    appData.registeredStores[storeIndex].deals.push(newDeal);
-
-    const btn = document.getElementById('btnSaveDeal');
-    btn.innerText = 'กำลังบันทึก... ⏳';
-    btn.disabled = true;
-
-    try {
-        await saveToCloud();
-        document.getElementById('dealCreatorModal').style.display = 'none';
-        alert('✅ สร้างดีลเรียบร้อยแล้ว!');
-        renderStoreDeals();
-    } catch(e) {
-        alert('❌ บันทึกข้อมูลไม่สำเร็จ กรุณาลองใหม่');
-    } finally {
-        btn.innerText = '✅ บันทึกดีล';
-        btn.disabled = false;
-    }
-}
-
-function renderStoreDeals() {
-    const pin = document.getElementById('storePinInput').value;
-    const store = appData.registeredStores.find(s => s.pin === pin);
-    const listDiv = document.getElementById('storeDealsList');
-    
-    if (!listDiv || !store) return;
-
-    if (!store.deals || store.deals.length === 0) {
-        listDiv.innerHTML = '<p style="text-align:center; color:#888; font-size:13px;">ยังไม่มีดีลที่เปิดใช้งาน</p>';
-        return;
-    }
-
-    listDiv.innerHTML = store.deals.map(d => `
-        <div style="background:rgba(0,0,0,0.3); border:1px solid #555; padding:12px; border-radius:8px; margin-bottom:10px;">
-            <h4 style="margin:0 0 5px; color:#FFF;">${d.title}</h4>
-            <p style="margin:0 0 8px; font-size:12px; color:#aaa;">${d.desc || 'ไม่มีคำอธิบาย'}</p>
-            <div style="display:flex; justify-content:space-between; font-size:11px; color:#888;">
-                <span>ใช้ไปแล้ว: ${d.usedCount} / ${d.maxUses === 0 ? 'ไม่จำกัด' : d.maxUses}</span>
-                <span>${d.expiry ? 'หมดเขต: ' + d.expiry : 'ไม่มีวันหมดอายุ'}</span>
-            </div>
-        </div>
-    `).join('');
-}
-
-const originalVerifyStore = verifyStore;
-verifyStore = function(silent = false) {
-    originalVerifyStore(silent);
-    renderStoreDeals();
-};
-
-function openQRScanner() {
-    document.getElementById('qrScanInput').value = '';
-    document.getElementById('qrScanResult').style.display = 'none';
-    document.getElementById('qrScannerModal').style.display = 'flex';
-}
-
-async function verifyAndUseDeal() {
-    const scanData = document.getElementById('qrScanInput').value.trim();
-    const resultDiv = document.getElementById('qrScanResult');
-    resultDiv.style.display = 'block';
-
-    if (!scanData) {
-        resultDiv.innerHTML = '<div style="padding:10px; background:#FFF3F3; color:var(--danger); border-radius:8px; text-align:center;">❌ กรุณาวางข้อความจาก QR Code ของลูกค้าครับ</div>';
-        return;
-    }
-
-    try {
-        const data = JSON.parse(scanData);
-        if (!data.dealId || !data.userId) {
-            throw new Error('Invalid Format');
-        }
-
-        resultDiv.innerHTML = `
-            <div style="padding:15px; background:#F4FBF4; border:1px solid #06C755; border-radius:8px; text-align:center;">
-                <h4 style="margin:0 0 5px; color:#06C755;">✅ ยืนยันสิทธิ์สำเร็จ!</h4>
-                <p style="margin:0; font-size:13px; color:#333;">รหัสลูกค้า: ${data.userId.substring(0, 8)}...<br>รหัสดีล: ${data.dealId}</p>
-            </div>
-        `;
-        document.getElementById('qrScanInput').value = '';
-        
-    } catch (e) {
-        resultDiv.innerHTML = '<div style="padding:10px; background:#FFF3F3; color:var(--danger); border-radius:8px; text-align:center;">❌ รูปแบบ QR ไม่ถูกต้อง หรือข้อมูลเสียหาย</div>';
-    }
-}
-// จบไฟล์
