@@ -356,16 +356,7 @@ function loadFromCloud() {
             }
         });
 
-        db.collection('painaidee').doc('wheelSettings').onSnapshot((doc) => {
-            if (doc.exists) {
-                wheelRewards  = doc.data().rewards  || [];
-                wheelSpinCost = doc.data().spinCost || 50;
-                const costEl = document.getElementById('display-spin-cost');
-                if (costEl) costEl.innerText = wheelSpinCost;
-                renderWheelLabels();
-                updateSpinButtonUI();
-            }
-        });
+        // wheelSettings ไม่ใช้แล้ว (กงล้อใหม่สุ่มจากร้านในแผนที่)
     });
 }
 
