@@ -1644,9 +1644,16 @@ function renderPromos() {
         const safeStore = p.storeName.replace(/'/g, "\\'");
         let extraHtml = '';
         if (store?.coupon?.trim())
-            extraHtml += `<span onclick="showCustomerDetail('coupon','${safeStore}'); event.stopPropagation();" style="background:rgba(217,83,79,0.1);color:var(--danger);padding:4px 8px;border-radius:10px;font-size:10px;font-weight:bold;margin-right:5px;display:inline-block;margin-bottom:5px;cursor:pointer;border:1px solid rgba(217,83,79,0.3);pointer-events:auto;">🎟️ คูปอง</span>`;
+            extraHtml += `<span onclick="showCustomerDetail('coupon','${safeStore}')" style="background:rgba(217,83,79,0.1);color:var(--danger);padding:4px 8px;border-radius:10px;font-size:10px;font-weight:bold;margin-right:5px;display:inline-block;margin-bottom:5px;cursor:pointer;border:1px solid rgba(217,83,79,0.3);">🎟️ คูปอง</span>`;
         if (store?.event?.trim())
-            extraHtml += `<span onclick="showCustomerDetail('event','${safeStore}'); event.stopPropagation();" style="background:rgba(23,162,184,0.1);color:var(--info);padding:4px 8px;border-radius:10px;font-size:10px;font-weight:bold;display:inline-block;margin-bottom:5px;cursor:pointer;border:1px solid rgba(23,162,184,0.3);pointer-events:auto;">🎉 กิจกรรม</span>`;
+            extraHtml += `<span onclick="showCustomerDetail('event','${safeStore}')" style="background:rgba(23,162,184,0.1);color:var(--info);padding:4px 8px;border-radius:10px;font-size:10px;font-weight:bold;display:inline-block;margin-bottom:5px;cursor:pointer;border:1px solid rgba(23,162,184,0.3);">🎉 กิจกรรม</span>`;
+        const activeDealsPromo = (appData.deals || []).filter(d =>
+            d.storeName === p.storeName && d.isActive &&
+            (!d.expiryDate || new Date(d.expiryDate) > new Date()) &&
+            (d.maxUses === 0 || d.usedCount < d.maxUses)
+        );
+        if (activeDealsPromo.length > 0)
+            extraHtml += `<span onclick="showStoreDealsModal('${safeStore}')" style="background:rgba(217,83,79,0.15);color:var(--danger);padding:4px 8px;border-radius:10px;font-size:10px;font-weight:bold;display:inline-block;margin-bottom:5px;cursor:pointer;border:1px solid rgba(217,83,79,0.4);">🎟️ ${activeDealsPromo.length} ดีล!</span>`;
 
         return `
         <div class="promo-item place-card"
