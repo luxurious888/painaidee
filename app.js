@@ -1342,7 +1342,8 @@ function focusPlace(placeId) {
     activeMarker = new google.maps.Marker({
         position: place.geometry.location, map, animation: google.maps.Animation.DROP,
     });
-    // ไม่ scroll อัตโนมัติ — ให้ infoWindow popup ขึ้นแทน
+    // scroll ขึ้นไปหาแผนที่
+    document.getElementById('map').scrollIntoView({ behavior: 'smooth', block: 'start' });
 
     service.getDetails({ placeId, fields: ['name', 'opening_hours'] }, (details, status) => {
         let timeText     = 'ทางร้านไม่ได้ระบุเวลาเปิด-ปิด';
@@ -1540,7 +1541,8 @@ function renderCards(keywordSearched) {
 
         return `
         <div class="place-card ${isVIP ? 'card-vip' + vipEffectClass : ''}"
-             onclick="if(!event.target.closest('button,span.tag-btn,span.report-btn')) { focusPlace('${p.place_id}'); trackAction('${p.name.replace(/'/g,"\\'")}','view'); }">
+             onclick="if(!event.target.closest('button,.tag-btn')) { focusPlace('${p.place_id}'); trackAction('${p.name.replace(/'/g,"\\'")}','view'); }"
+             style="cursor:pointer;">
             ${isVIP ? '<div class="vip-crown-badge">👑 VIP RECOMMEND</div>' : ''}
             <div class="distance-badge">${distKm} กม.</div>
             <img src="${imgUrl}" class="main-img"
@@ -1571,11 +1573,11 @@ function renderCards(keywordSearched) {
                         แชร์
                     </button>
                 </div>
-                <div style="margin-top:15px;text-align:right;">
-                    <span class="report-btn" style="color:var(--danger);font-size:11px;cursor:pointer;opacity:0.6;border-bottom:1px dotted var(--danger);"
-                          onclick="event.stopPropagation(); reportClosed('${p.place_id}');">
+                <div style="margin-top:12px;text-align:right;">
+                    <button onclick="event.stopPropagation(); reportClosed('${p.place_id}');"
+                            style="background:none;border:none;color:var(--danger);font-size:11px;cursor:pointer;opacity:0.7;border-bottom:1px dotted var(--danger);font-family:'Kanit';padding:4px 2px;">
                         🚩 แจ้งร้านปิดถาวร
-                    </span>
+                    </button>
                 </div>
             </div>
         </div>`;
