@@ -1526,18 +1526,18 @@ function renderCards(keywordSearched) {
 
         let extraTags = '';
         if (activeDeals.length > 0)
-            extraTags += `<span onclick="showStoreDealsModal('${safeName}'); event.stopPropagation();" style="background:rgba(217,83,79,0.15);color:var(--danger);padding:4px 10px;border-radius:10px;font-size:11px;font-weight:bold;margin-right:5px;display:inline-block;margin-bottom:5px;cursor:pointer;border:1px solid rgba(217,83,79,0.4);">🎟️ ${activeDeals.length} ดีลพิเศษ!</span>`;
+            extraTags += `<span class="tag-btn" onclick="event.stopPropagation(); showStoreDealsModal('${safeName}');" style="background:rgba(217,83,79,0.15);color:var(--danger);padding:4px 10px;border-radius:10px;font-size:11px;font-weight:bold;margin-right:5px;display:inline-block;margin-bottom:5px;cursor:pointer;border:1px solid rgba(217,83,79,0.4);">🎟️ ${activeDeals.length} ดีลพิเศษ!</span>`;
         if (store?.coupon?.trim())
-            extraTags += `<span onclick="showCustomerDetail('coupon','${safeName}'); event.stopPropagation();" style="background:rgba(217,83,79,0.1);color:var(--danger);padding:4px 10px;border-radius:10px;font-size:11px;font-weight:bold;margin-right:5px;display:inline-block;margin-bottom:5px;cursor:pointer;border:1px solid rgba(217,83,79,0.3);">🎟️ คูปอง</span>`;
+            extraTags += `<span class="tag-btn" onclick="event.stopPropagation(); showCustomerDetail('coupon','${safeName}');" style="background:rgba(217,83,79,0.1);color:var(--danger);padding:4px 10px;border-radius:10px;font-size:11px;font-weight:bold;margin-right:5px;display:inline-block;margin-bottom:5px;cursor:pointer;border:1px solid rgba(217,83,79,0.3);">🎟️ คูปอง</span>`;
         if (store?.event?.trim())
-            extraTags += `<span onclick="showCustomerDetail('event','${safeName}'); event.stopPropagation();" style="background:rgba(23,162,184,0.1);color:var(--info);padding:4px 10px;border-radius:10px;font-size:11px;font-weight:bold;display:inline-block;margin-bottom:5px;cursor:pointer;border:1px solid rgba(23,162,184,0.3);">🎉 กิจกรรม</span>`;
+            extraTags += `<span class="tag-btn" onclick="event.stopPropagation(); showCustomerDetail('event','${safeName}');" style="background:rgba(23,162,184,0.1);color:var(--info);padding:4px 10px;border-radius:10px;font-size:11px;font-weight:bold;display:inline-block;margin-bottom:5px;cursor:pointer;border:1px solid rgba(23,162,184,0.3);">🎉 กิจกรรม</span>`;
 
         const vipEffectClass = isVIP && currentTheme.vipEffect && currentTheme.vipEffect !== 'none'
             ? ' vip-' + currentTheme.vipEffect : '';
 
         return `
         <div class="place-card ${isVIP ? 'card-vip' + vipEffectClass : ''}"
-             onclick="focusPlace('${p.place_id}'); trackAction('${p.name.replace(/'/g,"\\'")}','view')">
+             onclick="if(!event.target.closest('button,span.tag-btn,span.report-btn')) { focusPlace('${p.place_id}'); trackAction('${p.name.replace(/'/g,"\\'")}','view'); }">
             ${isVIP ? '<div class="vip-crown-badge">👑 VIP RECOMMEND</div>' : ''}
             <div class="distance-badge">${distKm} กม.</div>
             <img src="${imgUrl}" class="main-img"
@@ -1556,21 +1556,21 @@ function renderCards(keywordSearched) {
                 <div><span style="color:var(--primary);font-weight:600;">⭐ ${p.rating || 'ใหม่'}</span></div>
                 <div class="action-buttons">
                     <button class="btn-action btn-nav"
-                            onclick="window.open('${navUrl}','_blank'); trackAction('${p.name.replace(/'/g,"\\'")}','dir'); event.stopPropagation();">
+                            onclick="event.stopPropagation(); window.open('${navUrl}','_blank'); trackAction('${p.name.replace(/'/g,"\\'")}','dir');">
                         นำทาง
                     </button>
                     <button class="btn-action btn-call"
-                            onclick="callPlace('${p.place_id}',event)">โทร</button>
-                    ${hasLine ? `<button class="btn-action btn-line" onclick="window.open('${store.lineUrl.startsWith('http') ? store.lineUrl : 'https://' + store.lineUrl}','_blank'); event.stopPropagation();">LINE</button>` : ''}
-                    ${hasFb   ? `<button class="btn-action btn-fb"   onclick="window.open('${store.fbUrl.startsWith('http')   ? store.fbUrl   : 'https://' + store.fbUrl  }','_blank'); event.stopPropagation();">FB</button>` : ''}
+                            onclick="event.stopPropagation(); callPlace('${p.place_id}',event);">โทร</button>
+                    ${hasLine ? `<button class="btn-action btn-line" onclick="event.stopPropagation(); window.open('${store.lineUrl.startsWith('http') ? store.lineUrl : 'https://' + store.lineUrl}','_blank');">LINE</button>` : ''}
+                    ${hasFb   ? `<button class="btn-action btn-fb"   onclick="event.stopPropagation(); window.open('${store.fbUrl.startsWith('http')   ? store.fbUrl   : 'https://' + store.fbUrl  }','_blank');">FB</button>` : ''}
                     <button class="btn-action btn-share"
-                            onclick="sharePlace('${safeName}',${p.geometry.location.lat()},${p.geometry.location.lng()},event)">
+                            onclick="event.stopPropagation(); sharePlace('${safeName}',${p.geometry.location.lat()},${p.geometry.location.lng()},event);">
                         แชร์
                     </button>
                 </div>
                 <div style="margin-top:15px;text-align:right;">
-                    <span style="color:var(--danger);font-size:11px;cursor:pointer;opacity:0.6;border-bottom:1px dotted var(--danger);"
-                          onclick="event.stopPropagation(); reportClosed('${p.place_id}')">
+                    <span class="report-btn" style="color:var(--danger);font-size:11px;cursor:pointer;opacity:0.6;border-bottom:1px dotted var(--danger);"
+                          onclick="event.stopPropagation(); reportClosed('${p.place_id}');">
                         🚩 แจ้งร้านปิดถาวร
                     </span>
                 </div>
