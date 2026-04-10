@@ -1715,6 +1715,43 @@ setInterval(() => {
 // ==========================================
 // ⚙️ Store Management
 // ==========================================
+// ── แสดงดีลทั้งหมดของร้าน (ฝั่งลูกค้า) ──
+function showStoreDealsModal(storeName) {
+    const activeDeals = (appData.deals || []).filter(d =>
+        d.storeName === storeName && d.isActive &&
+        (!d.expiryDate || new Date(d.expiryDate) > new Date()) &&
+        (d.maxUses === 0 || d.usedCount < d.maxUses)
+    );
+
+    const title    = document.getElementById('cdTitle');
+    const claimBtn = document.getElementById('btnClaim');
+    const textEl   = document.getElementById('cdText');
+
+    if (title)    { title.innerText = '🎁 ดีลพิเศษจากร้านนี้'; title.style.color = '#9C27B0'; }
+    if (claimBtn) claimBtn.style.display = 'none';
+    document.getElementById('cdStoreName').innerText = '🏪 ' + storeName;
+
+    if (activeDeals.length === 0) {
+        if (textEl) textEl.innerHTML = '<p style="color:#aaa;text-align:center;">ไม่มีดีลที่ใช้ได้ในขณะนี้</p>';
+    } else {
+        if (textEl) textEl.innerHTML = activeDeals.map(d => `
+            <div style="background:rgba(156,39,176,0.1);border:1px solid rgba(156,39,176,0.4);border-radius:12px;padding:14px;margin-bottom:10px;text-align:left;">
+                <p style="margin:0 0 4px;color:#FFF;font-weight:700;font-size:14px;">🎁 ${d.title}</p>
+                <p style="margin:0 0 10px;font-size:12px;color:#ccc;">${d.description || ''}</p>
+                <p style="margin:0 0 10px;font-size:11px;color:#888;">
+                    เหลือสิทธิ์: ${d.maxUses === 0 ? 'ไม่จำกัด' : (d.maxUses - (d.usedCount||0)) + ' สิทธิ์'}
+                    ${d.expiryDate ? ' | หมดอายุ: ' + d.expiryDate : ''}
+                </p>
+                <button onclick="claimDeal('${d.id}'); document.getElementById('customerDetailModal').style.display='none';"
+                        style="width:100%;background:linear-gradient(135deg,#9C27B0,#7B1FA2);color:#FFF;border:none;padding:10px;border-radius:8px;font-family:'Kanit';font-size:13px;font-weight:700;cursor:pointer;">
+                    🎫 กดรับ QR Code สิทธิ์นี้
+                </button>
+            </div>`).join('');
+    }
+
+    document.getElementById('customerDetailModal').style.display = 'flex';
+}
+
 function reportClosed(placeId) {
     const place = googlePlaces.find(p => p.place_id === placeId);
     const n = place ? place.name : '';
