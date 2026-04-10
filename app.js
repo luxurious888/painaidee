@@ -1585,6 +1585,7 @@ function renderCards(keywordSearched) {
                 <div style="margin-top:12px;text-align:right;">
                     <button class="report-closed-btn"
                             data-pid="${p.place_id}"
+                            onclick="event.stopPropagation(); reportClosed(this.dataset.pid);"
                             style="background:none;border:none;color:var(--danger);font-size:11px;cursor:pointer;opacity:0.7;border-bottom:1px dotted var(--danger);font-family:'Kanit';padding:4px 2px;">
                         🚩 แจ้งร้านปิดถาวร
                     </button>
