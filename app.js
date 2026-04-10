@@ -1581,13 +1581,11 @@ function renderCards(keywordSearched) {
                             onclick="event.stopPropagation(); sharePlace('${safeName}',${p.geometry.location.lat()},${p.geometry.location.lng()},event);">
                         แชร์
                     </button>
-                </div>
-                <div style="margin-top:12px;text-align:right;">
-                    <button class="report-closed-btn"
-                            data-pid="${p.place_id}"
+                    <button class="btn-action"
                             onclick="event.stopPropagation(); reportClosed(this.dataset.pid);"
-                            style="background:none;border:none;color:var(--danger);font-size:11px;cursor:pointer;opacity:0.7;border-bottom:1px dotted var(--danger);font-family:'Kanit';padding:4px 2px;">
-                        🚩 แจ้งร้านปิดถาวร
+                            data-pid="${p.place_id}"
+                            style="background:rgba(217,83,79,0.15);color:var(--danger);border:1px solid rgba(217,83,79,0.4);font-size:11px;">
+                        🚩 ปิดถาวร
                     </button>
                 </div>
             </div>
