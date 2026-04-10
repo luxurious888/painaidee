@@ -1222,6 +1222,35 @@ function initMap() {
     });
     service    = new google.maps.places.PlacesService(map);
     infoWindow = new google.maps.InfoWindow();
+
+    // ── Event Delegation สำหรับการ์ดร้าน (ผูกครั้งเดียว) ──
+    document.getElementById('placeList').addEventListener('click', function(e) {
+        const reportBtn = e.target.closest('.report-closed-btn');
+        const actionBtn = e.target.closest('[data-action]');
+        const card      = e.target.closest('.place-card[data-placeid]');
+
+        if (reportBtn) {
+            e.stopPropagation();
+            reportClosed(reportBtn.dataset.placeid);
+            return;
+        }
+        if (actionBtn) {
+            e.stopPropagation();
+            const action = actionBtn.dataset.action;
+            if      (action === 'viewImage') openImageModal(actionBtn.src);
+            else if (action === 'navigate')  { window.open(actionBtn.dataset.navurl, '_blank'); trackAction(actionBtn.dataset.storename, 'dir'); }
+            else if (action === 'call')      callPlace(actionBtn.dataset.placeid, e);
+            else if (action === 'openurl')   window.open(actionBtn.dataset.url, '_blank');
+            else if (action === 'share')     sharePlace(actionBtn.dataset.name, parseFloat(actionBtn.dataset.lat), parseFloat(actionBtn.dataset.lng), e);
+            return;
+        }
+        if (card) {
+            focusPlace(card.dataset.placeid);
+            trackAction(card.dataset.storename, 'view');
+            document.getElementById('map').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    });
+
     changeLocation();
 }
 
@@ -1580,47 +1609,6 @@ function renderCards(keywordSearched) {
     list.innerHTML = html;
     renderPromos();
     refreshVIPMarkers();
-
-    // ── Event Delegation (ป้องกันปัญหา inline onclick ใน LINE Browser) ──
-    list.addEventListener('click', function(e) {
-        const reportBtn  = e.target.closest('.report-closed-btn');
-        const actionBtn  = e.target.closest('[data-action]');
-        const card       = e.target.closest('.place-card[data-placeid]');
-
-        // 1. ปุ่มแจ้งปิดร้าน
-        if (reportBtn) {
-            e.stopPropagation();
-            reportClosed(reportBtn.dataset.placeid);
-            return;
-        }
-
-        // 2. ปุ่มต่างๆ ภายในการ์ด
-        if (actionBtn) {
-            e.stopPropagation();
-            const action = actionBtn.dataset.action;
-            if (action === 'viewImage') {
-                openImageModal(actionBtn.src);
-            } else if (action === 'navigate') {
-                window.open(actionBtn.dataset.navurl, '_blank');
-                trackAction(actionBtn.dataset.storename, 'dir');
-            } else if (action === 'call') {
-                callPlace(actionBtn.dataset.placeid, e);
-            } else if (action === 'openurl') {
-                window.open(actionBtn.dataset.url, '_blank');
-            } else if (action === 'share') {
-                sharePlace(actionBtn.dataset.name, parseFloat(actionBtn.dataset.lat), parseFloat(actionBtn.dataset.lng), e);
-            }
-            return;
-        }
-
-        // 3. กดที่การ์ด (ไม่ใช่ปุ่ม) → ปักหมุดแผนที่ + scroll ขึ้นไป
-        if (card) {
-            focusPlace(card.dataset.placeid);
-            trackAction(card.dataset.storename, 'view');
-            const mapEl = document.getElementById('map');
-            if (mapEl) mapEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-    });
  // ปักหมุด VIP ทอง
 }
 
