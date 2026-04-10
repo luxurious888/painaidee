@@ -1644,45 +1644,50 @@ function renderPromos() {
         const safeStore = p.storeName.replace(/'/g, "\\'");
         let extraHtml = '';
         if (store?.coupon?.trim())
-            extraHtml += `<span onclick="showCustomerDetail('coupon','${safeStore}')" style="background:rgba(217,83,79,0.1);color:var(--danger);padding:4px 8px;border-radius:10px;font-size:10px;font-weight:bold;margin-right:5px;display:inline-block;margin-bottom:5px;cursor:pointer;border:1px solid rgba(217,83,79,0.3);">🎟️ คูปอง</span>`;
+            extraHtml += `<button onclick="showCustomerDetail('coupon','${safeStore}')" style="background:linear-gradient(135deg,#D9534F,#c0392b);color:#FFF;border:none;padding:9px 14px;border-radius:10px;font-family:'Kanit';font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 3px 8px rgba(217,83,79,0.5);">🎟️ กดรับคูปอง</button>`;
         if (store?.event?.trim())
-            extraHtml += `<span onclick="showCustomerDetail('event','${safeStore}')" style="background:rgba(23,162,184,0.1);color:var(--info);padding:4px 8px;border-radius:10px;font-size:10px;font-weight:bold;display:inline-block;margin-bottom:5px;cursor:pointer;border:1px solid rgba(23,162,184,0.3);">🎉 กิจกรรม</span>`;
+            extraHtml += `<button onclick="showCustomerDetail('event','${safeStore}')" style="background:linear-gradient(135deg,#17a2b8,#0d7a8a);color:#FFF;border:none;padding:9px 14px;border-radius:10px;font-family:'Kanit';font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 3px 8px rgba(23,162,184,0.5);">🎉 กิจกรรมวันนี้</button>`;
         const activeDealsPromo = (appData.deals || []).filter(d =>
             d.storeName === p.storeName && d.isActive &&
             (!d.expiryDate || new Date(d.expiryDate) > new Date()) &&
             (d.maxUses === 0 || d.usedCount < d.maxUses)
         );
         if (activeDealsPromo.length > 0)
-            extraHtml += `<span onclick="showStoreDealsModal('${safeStore}')" style="background:rgba(217,83,79,0.15);color:var(--danger);padding:4px 8px;border-radius:10px;font-size:10px;font-weight:bold;display:inline-block;margin-bottom:5px;cursor:pointer;border:1px solid rgba(217,83,79,0.4);">🎟️ ${activeDealsPromo.length} ดีล!</span>`;
+            extraHtml += `<button onclick="showStoreDealsModal('${safeStore}')" style="background:linear-gradient(135deg,#9C27B0,#7B1FA2);color:#FFF;border:none;padding:9px 14px;border-radius:10px;font-family:'Kanit';font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 3px 8px rgba(156,39,176,0.5);">🎁 ${activeDealsPromo.length} ดีลพิเศษ!</button>`;
 
         return `
         <div class="promo-item place-card"
-             style="border:2px solid var(--primary);box-shadow:0 0 20px rgba(0,0,0,0.2);">
+             style="border:2px solid var(--primary);box-shadow:0 0 20px rgba(0,0,0,0.2);overflow:hidden;">
             <div style="position:absolute;top:12px;right:-28px;background:#D9534F;color:#FFF;
                         padding:4px 30px;transform:rotate(45deg);font-size:11px;font-weight:800;
                         z-index:20;box-shadow:0 2px 5px rgba(0,0,0,0.3);pointer-events:none;">HOT 🔥</div>
             ${sliderHtml}
-            <div style="padding:18px;display:flex;flex-direction:column;flex-grow:1;">
-                <div style="margin-bottom:8px;">
-                    ${p.category ? `<span style="background:var(--primary);color:#000;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:600;display:inline-block;margin-right:5px;">📌 ${p.category}</span>` : ''}
-                    ${extraHtml}
+            <div style="padding:16px;display:flex;flex-direction:column;flex-grow:1;">
+
+                <!-- ชื่อร้าน + สถานะ -->
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;gap:8px;">
+                    <div>
+                        ${p.category ? `<span style="background:var(--primary);color:#000;padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;display:inline-block;margin-bottom:5px;">📌 ${p.category}</span>` : ''}
+                        <h3 style="margin:0;font-size:16px;color:var(--prev-vip);font-weight:700;line-height:1.3;">✨ ${p.storeName}</h3>
+                    </div>
+                    <div style="flex-shrink:0;transform:scale(0.85);transform-origin:right top;">${timeHtml}</div>
                 </div>
-                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
-                    <h3 style="margin:0;font-size:18px;color:var(--prev-vip);font-weight:600;text-shadow:0 0 5px rgba(0,0,0,0.3);flex:1;">
-                        ✨ ${p.storeName}
-                    </h3>
-                    <div style="flex-shrink:0;transform:scale(0.9);transform-origin:right top;">${timeHtml}</div>
+
+                <!-- รายละเอียดโปรโมชั่น -->
+                <div style="background:rgba(0,0,0,0.25);padding:10px 12px;border-radius:8px;border-left:3px solid var(--primary);margin-bottom:14px;">
+                    <p style="font-size:13px;color:#eee;margin:0;line-height:1.5;">${p.detail}</p>
                 </div>
-                <div style="background:rgba(0,0,0,0.2);padding:12px;border-radius:8px;border:1px dashed var(--primary);margin-bottom:15px;">
-                    <p style="font-size:14px;color:var(--text-main);margin:0;">${p.detail}</p>
-                </div>
+
+                <!-- ปุ่มพิเศษ: คูปอง / กิจกรรม / ดีล -->
+                ${extraHtml ? `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">${extraHtml}</div>` : ''}
+
+                <!-- ปุ่มหลัก -->
                 <div style="display:flex;gap:8px;margin-top:auto;">
-                    ${hasLine ? `<button onclick="window.open('${store.lineUrl.startsWith('http') ? store.lineUrl : 'https://' + store.lineUrl}','_blank')" class="promo-btn-hover" style="flex:1;background:var(--line-green);color:white;border:none;padding:10px;border-radius:8px;font-family:'Kanit';font-weight:600;font-size:13px;cursor:pointer;">💬 LINE</button>` : ''}
-                    ${hasFb   ? `<button onclick="window.open('${store.fbUrl.startsWith('http')   ? store.fbUrl   : 'https://' + store.fbUrl  }','_blank')" class="promo-btn-hover" style="flex:1;background:var(--fb-blue);color:white;border:none;padding:10px;border-radius:8px;font-family:'Kanit';font-weight:600;font-size:13px;cursor:pointer;">👍 FB</button>` : ''}
+                    ${hasLine ? `<button onclick="window.open('${store.lineUrl.startsWith('http') ? store.lineUrl : 'https://' + store.lineUrl}','_blank')" style="flex:1;background:#06C755;color:#FFF;border:none;padding:11px 6px;border-radius:10px;font-family:'Kanit';font-weight:700;font-size:13px;cursor:pointer;box-shadow:0 3px 8px rgba(6,199,85,0.4);">💬 LINE</button>` : ''}
+                    ${hasFb   ? `<button onclick="window.open('${store.fbUrl.startsWith('http') ? store.fbUrl : 'https://' + store.fbUrl}','_blank')" style="flex:1;background:#1877F2;color:#FFF;border:none;padding:11px 6px;border-radius:10px;font-family:'Kanit';font-weight:700;font-size:13px;cursor:pointer;box-shadow:0 3px 8px rgba(24,119,242,0.4);">👍 FB</button>` : ''}
                     <button onclick="searchAndFocusStore('${p.storeName}'); trackAction('${p.storeName}','view')"
-                            class="promo-btn-hover"
-                            style="flex:1;background:var(--primary);color:#000;border:none;padding:10px;border-radius:8px;font-family:'Kanit';font-weight:600;font-size:13px;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,0.2);">
-                        📍 ดูพิกัดร้าน
+                            style="flex:1;background:linear-gradient(135deg,var(--primary),#a8813c);color:#000;border:none;padding:11px 6px;border-radius:10px;font-family:'Kanit';font-weight:700;font-size:13px;cursor:pointer;box-shadow:0 3px 8px rgba(197,160,89,0.4);">
+                        📍 ดูพิกัด
                     </button>
                 </div>
             </div>
