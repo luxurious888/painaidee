@@ -1606,6 +1606,14 @@ function renderCards(keywordSearched) {
                     ${p.vicinity}
                 </p>
                 <div><span style="color:var(--primary);font-weight:600;">⭐ ${p.rating || 'ใหม่'}</span></div>
+                ${store?.gallery?.length > 0 ? `
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin:8px 0;">
+                    ${store.gallery.slice(0,6).map(img => `
+                        <img src="${img}"
+                             onclick="event.stopPropagation(); openImageModal(this.src);"
+                             style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:6px;cursor:pointer;">
+                    `).join('')}
+                </div>` : ''}
                 <div class="action-buttons">
                     <button class="btn-action btn-nav"
                             onclick="event.stopPropagation(); window.open('${navUrl}','_blank'); trackAction('${p.name.replace(/'/g,"\\'")}','dir');">
