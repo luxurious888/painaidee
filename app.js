@@ -96,23 +96,28 @@ function applyThemeToApp(data) {
     root.style.setProperty('--prev-vip',     currentTheme.vipBorderColor || '#FFD700');
 
     document.querySelectorAll('.gold-logo').forEach(logo => {
-        const parent    = logo.parentElement;
-        let  customImg  = parent.querySelector('.custom-logo-img');
+        const parent   = logo.parentElement;
+        let  customImg = parent.querySelector('.custom-logo-img');
+
         if (currentTheme.logoUrl && currentTheme.logoUrl !== '') {
-            logo.style.display = 'none';
+            // ใช้ class แทน inline style เพราะ CSS มี !important
+            logo.classList.add('hidden-logo');
+
             if (!customImg) {
-                customImg             = document.createElement('img');
-                customImg.className   = 'custom-logo-img logo-' + (currentTheme.logoEffect || 'none');
-                customImg.style.width = logo.style.width  || '150px';
-                customImg.style.height = 'auto';
-                customImg.style.marginBottom = logo.style.marginBottom || '10px';
+                customImg                    = document.createElement('img');
+                customImg.style.width        = '150px';
+                customImg.style.height       = 'auto';
+                customImg.style.marginBottom = '10px';
                 customImg.style.borderRadius = '12px';
+                customImg.style.display      = 'block';
+                customImg.style.margin       = '0 auto';
                 parent.insertBefore(customImg, logo);
             }
             customImg.src       = currentTheme.logoUrl;
             customImg.className = 'custom-logo-img logo-' + (currentTheme.logoEffect || 'none');
         } else {
-            logo.style.display = 'inline-block';
+            // คืนค่า SVG โลโก้
+            logo.classList.remove('hidden-logo');
             logo.setAttribute('class', 'gold-logo logo-' + (currentTheme.logoEffect || 'none'));
             if (customImg) customImg.remove();
         }
