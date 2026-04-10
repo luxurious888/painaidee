@@ -1603,6 +1603,14 @@ function renderCards(keywordSearched) {
     list.innerHTML = html;
     renderPromos();
     refreshVIPMarkers();
+
+    // ผูก click listener ตรงๆ กับปุ่มแจ้งปิดร้านทุกปุ่ม
+    list.querySelectorAll('.report-closed-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            reportClosed(btn.dataset.pid);
+        });
+    });
  // ปักหมุด VIP ทอง
 }
 
