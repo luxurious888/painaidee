@@ -1789,13 +1789,17 @@ function renderGalleryManager(store) {
                             style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.7);color:#FFF;border:none;border-radius:50%;width:22px;height:22px;font-size:12px;cursor:pointer;line-height:22px;text-align:center;">×</button>
                 </div>`).join('')}
             ${images.length < 6 ? `
-                <label style="aspect-ratio:1;border-radius:8px;border:2px dashed #444;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:4px;color:#666;font-size:12px;">
-                    <span style="font-size:24px;">+</span>
-                    เพิ่มรูป
-                    <input type="file" accept="image/*" multiple style="display:none" onchange="uploadGalleryImages(this)">
-                </label>` : ''}
+                <div style="aspect-ratio:1;border-radius:8px;border:2px dashed #333;display:flex;align-items:center;justify-content:center;color:#555;font-size:24px;">+</div>
+            ` : ''}
         </div>
-        <p style="font-size:11px;color:#666;text-align:center;margin:0;">${images.length}/6 รูป</p>`;
+        <p style="font-size:11px;color:#666;text-align:center;margin:0 0 12px;">${images.length}/6 รูป</p>
+        ${images.length < 6 ? `
+        <label id="btnGalleryUpload" style="display:block;width:100%;background:linear-gradient(135deg,var(--primary),#a8813c);color:#000;text-align:center;padding:11px;border-radius:10px;font-family:'Kanit';font-size:14px;font-weight:700;cursor:pointer;box-sizing:border-box;">
+            📤 เลือกรูปอัปโหลด (เหลืออีก ${6 - images.length} รูป)
+            <input type="file" accept="image/*" multiple style="display:none" onchange="uploadGalleryImages(this)">
+        </label>` : `
+        <p style="text-align:center;color:#06C755;font-size:13px;font-weight:600;">✅ อัปโหลดครบ 6 รูปแล้ว</p>`}
+    `;
 }
 
 async function uploadGalleryImages(input) {
@@ -1810,8 +1814,8 @@ async function uploadGalleryImages(input) {
     const files = Array.from(input.files).slice(0, remaining);
     if (files.length === 0) return;
 
-    const btn = document.getElementById('btnGalleryUpload');
-    if (btn) { btn.innerText = 'กำลังอัปโหลด...'; btn.disabled = true; }
+    const lbl = document.getElementById('btnGalleryUpload');
+    if (lbl) { lbl.style.opacity = '0.5'; lbl.style.pointerEvents = 'none'; lbl.childNodes[0].textContent = '⏳ กำลังอัปโหลด...'; }
 
     try {
         for (const file of files) {
@@ -1824,7 +1828,6 @@ async function uploadGalleryImages(input) {
     } catch(e) {
         alert('❌ อัปโหลดไม่สำเร็จ กรุณาลองใหม่');
     } finally {
-        if (btn) { btn.innerText = '📤 อัปโหลดรูป'; btn.disabled = false; }
         input.value = '';
     }
 }
