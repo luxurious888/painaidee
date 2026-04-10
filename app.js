@@ -1021,38 +1021,41 @@ function claimDeal(dealId) {
     if (!myLineUid) return alert('กรุณาล็อคอินด้วย LINE ก่อนครับ!');
 
     const deal = (appData.deals || []).find(d => d.id === dealId);
-    if (!deal)         return alert('ไม่พบดีลนี้ครับ');
-    if (!deal.isActive) return alert('ดีลนี้ปิดใช้งานแล้วครับ');
+    if (!deal)          return alert('ไม่พบดีลนี้ครับ');
+    if (!deal.isActive)  return alert('ดีลนี้ปิดใช้งานแล้วครับ');
     if (deal.expiryDate && new Date(deal.expiryDate) < new Date()) return alert('ดีลนี้หมดอายุแล้วครับ');
     if (deal.maxUses > 0 && deal.usedCount >= deal.maxUses) return alert('ดีลนี้หมดแล้วครับ');
     if ((deal.claimedBy || []).includes(myLineUid)) return alert('คุณใช้สิทธิ์ดีลนี้ไปแล้วครับ!');
 
-    // สร้าง QR data
-    const qrPayload = JSON.stringify({
-        v:         1,
-        dealId:    deal.id,
-        storeName: deal.storeName,
-        userId:    myLineUid,
-        claimId:   'C' + Date.now() + Math.random().toString(36).substr(2, 4).toUpperCase(),
-        ts:        Date.now(),
-    });
+    // ย่อ payload ให้สั้น — ใช้ | คั่นแทน JSON (ป้องกัน QR overflow)
+    const claimId  = Math.random().toString(36).substr(2, 6).toUpperCase();
+    // ย่อ userId เหลือ 12 ตัวสุดท้าย + ย่อ dealId เหลือ 8 ตัวสุดท้าย
+    const shortUid  = myLineUid.slice(-12);
+    const shortDeal = dealId.slice(-10);
+    const qrPayload = `PND|${shortDeal}|${shortUid}|${claimId}`;
 
-    document.getElementById('qrDealTitle').innerText   = deal.title;
-    document.getElementById('qrDealDesc').innerText    = deal.description;
-    document.getElementById('qrDealStore').innerText   = '🏪 ' + deal.storeName;
-    document.getElementById('qrDealExpiry').innerText  = deal.expiryDate ? 'หมดอายุ: ' + deal.expiryDate : 'ไม่มีวันหมดอายุ';
+    document.getElementById('qrDealTitle').innerText  = deal.title;
+    document.getElementById('qrDealDesc').innerText   = deal.description || '';
+    document.getElementById('qrDealStore').innerText  = '🏪 ' + deal.storeName;
+    document.getElementById('qrDealExpiry').innerText = deal.expiryDate ? 'หมดอายุ: ' + deal.expiryDate : 'ไม่มีวันหมดอายุ';
 
-    // Generate QR
+    // เก็บ mapping ไว้ใน window เพื่อให้ verifyAndUseDeal ใช้ decode กลับได้
+    window._pendingClaim = { dealId, userId: myLineUid, claimId };
+
     const qrContainer = document.getElementById('qrCodeContainer');
     qrContainer.innerHTML = '';
-    new QRCode(qrContainer, {
-        text:       qrPayload,
-        width:      220,
-        height:     220,
-        colorDark:  '#000000',
-        colorLight: '#FFFFFF',
-        correctLevel: QRCode.CorrectLevel.H,
-    });
+    try {
+        new QRCode(qrContainer, {
+            text:         qrPayload,
+            width:        200,
+            height:       200,
+            colorDark:    '#000000',
+            colorLight:   '#FFFFFF',
+            correctLevel: QRCode.CorrectLevel.L,  // L รองรับข้อมูลได้มากที่สุด
+        });
+    } catch(e) {
+        qrContainer.innerHTML = `<p style="color:#D9534F;font-size:13px;">ไม่สามารถสร้าง QR ได้<br>รหัส: <b>${qrPayload}</b></p>`;
+    }
 
     document.getElementById('dealQRModal').style.display = 'flex';
 }
@@ -1074,29 +1077,25 @@ async function verifyAndUseDeal() {
     resultEl.innerHTML = '<p style="color:#aaa;text-align:center;">กำลังตรวจสอบ...</p>';
 
     try {
-        const data = JSON.parse(rawText);
-        const deal = (appData.deals || []).find(d => d.id === data.dealId);
+        const parts = rawText.split('|');
+        if (parts.length < 4 || parts[0] !== 'PND') throw new Error('Invalid');
 
-        if (!deal) {
-            resultEl.innerHTML = `<div style="text-align:center;padding:15px;background:rgba(217,83,79,0.1);border:1px solid #D9534F;border-radius:10px;"><p style="color:#D9534F;font-size:18px;font-weight:700;margin:0;">❌ ไม่พบดีลในระบบ</p></div>`;
-            return;
-        }
-        if (!deal.isActive) {
-            resultEl.innerHTML = `<div style="text-align:center;padding:15px;background:rgba(217,83,79,0.1);border:1px solid #D9534F;border-radius:10px;"><p style="color:#D9534F;font-weight:700;margin:0;">❌ ดีลนี้ปิดใช้งานแล้ว</p></div>`;
-            return;
-        }
-        if ((deal.claimedBy || []).includes(data.userId)) {
-            resultEl.innerHTML = `<div style="text-align:center;padding:15px;background:rgba(217,83,79,0.1);border:1px solid #D9534F;border-radius:10px;"><p style="color:#D9534F;font-weight:700;margin:0;">❌ QR นี้ถูกใช้ไปแล้ว!</p></div>`;
-            return;
+        const shortDeal = parts[1];  // 10 ตัวท้ายของ deal.id
+        const shortUid  = parts[2];  // 12 ตัวท้ายของ userId
+
+        const deal = (appData.deals || []).find(d => d.id.endsWith(shortDeal));
+
+        if (!deal) { resultEl.innerHTML = errorBox('❌ ไม่พบดีลในระบบ'); return; }
+        if (!deal.isActive) { resultEl.innerHTML = errorBox('❌ ดีลนี้ปิดใช้งานแล้ว'); return; }
+        if ((deal.claimedBy || []).some(uid => uid === shortUid || uid.endsWith(shortUid))) {
+            resultEl.innerHTML = errorBox('❌ QR นี้ถูกใช้ไปแล้ว!'); return;
         }
         if (deal.maxUses > 0 && deal.usedCount >= deal.maxUses) {
-            resultEl.innerHTML = `<div style="text-align:center;padding:15px;background:rgba(217,83,79,0.1);border:1px solid #D9534F;border-radius:10px;"><p style="color:#D9534F;font-weight:700;margin:0;">❌ ดีลนี้หมดแล้ว (ครบจำนวน)</p></div>`;
-            return;
+            resultEl.innerHTML = errorBox('❌ ดีลนี้หมดแล้ว (ครบจำนวน)'); return;
         }
 
-        // ✅ ใช้งานได้ → บันทึก
         if (!deal.claimedBy) deal.claimedBy = [];
-        deal.claimedBy.push(data.userId);
+        deal.claimedBy.push(shortUid);
         deal.usedCount = (deal.usedCount || 0) + 1;
         await saveToCloud();
 
@@ -1106,11 +1105,15 @@ async function verifyAndUseDeal() {
                 <p style="color:#06C755;font-size:22px;font-weight:700;margin:0 0 8px;">✅ ยืนยันสำเร็จ!</p>
                 <p style="color:#FFF;font-size:15px;font-weight:600;margin:0 0 5px;">${deal.title}</p>
                 <p style="color:#aaa;font-size:12px;margin:0 0 12px;">ร้าน: ${deal.storeName}</p>
-                <p style="color:#777;font-size:11px;margin:0;">เวลาใช้งาน: ${usedTime}<br>ใช้ไปแล้ว: ${deal.usedCount}${deal.maxUses > 0 ? '/' + deal.maxUses : ''} ครั้ง</p>
+                <p style="color:#777;font-size:11px;margin:0;">เวลา: ${usedTime}<br>ใช้ไปแล้ว: ${deal.usedCount}${deal.maxUses > 0 ? '/' + deal.maxUses : ''} ครั้ง</p>
             </div>`;
     } catch (e) {
-        resultEl.innerHTML = `<div style="text-align:center;padding:15px;background:rgba(217,83,79,0.1);border:1px solid #D9534F;border-radius:10px;"><p style="color:#D9534F;font-weight:700;margin:0;">❌ QR Code ไม่ถูกต้อง</p></div>`;
+        resultEl.innerHTML = errorBox('❌ QR Code ไม่ถูกต้อง');
     }
+}
+
+function errorBox(msg) {
+    return `<div style="text-align:center;padding:15px;background:rgba(217,83,79,0.1);border:1px solid #D9534F;border-radius:10px;"><p style="color:#D9534F;font-weight:700;margin:0;">${msg}</p></div>`;
 }
 
 // ==========================================
