@@ -1222,35 +1222,6 @@ function initMap() {
     });
     service    = new google.maps.places.PlacesService(map);
     infoWindow = new google.maps.InfoWindow();
-
-    // ── Event Delegation สำหรับการ์ดร้าน (ผูกครั้งเดียว) ──
-    document.getElementById('placeList').addEventListener('click', function(e) {
-        const reportBtn = e.target.closest('.report-closed-btn');
-        const actionBtn = e.target.closest('[data-action]');
-        const card      = e.target.closest('.place-card[data-placeid]');
-
-        if (reportBtn) {
-            e.stopPropagation();
-            reportClosed(reportBtn.dataset.placeid);
-            return;
-        }
-        if (actionBtn) {
-            e.stopPropagation();
-            const action = actionBtn.dataset.action;
-            if      (action === 'viewImage') openImageModal(actionBtn.src);
-            else if (action === 'navigate')  { window.open(actionBtn.dataset.navurl, '_blank'); trackAction(actionBtn.dataset.storename, 'dir'); }
-            else if (action === 'call')      callPlace(actionBtn.dataset.placeid, e);
-            else if (action === 'openurl')   window.open(actionBtn.dataset.url, '_blank');
-            else if (action === 'share')     sharePlace(actionBtn.dataset.name, parseFloat(actionBtn.dataset.lat), parseFloat(actionBtn.dataset.lng), e);
-            return;
-        }
-        if (card) {
-            focusPlace(card.dataset.placeid);
-            trackAction(card.dataset.storename, 'view');
-            document.getElementById('map').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-    });
-
     changeLocation();
 }
 
@@ -1546,23 +1517,31 @@ function renderCards(keywordSearched) {
         const imgUrl  = p.photos ? p.photos[0].getUrl({ maxWidth: 400 }) : 'https://via.placeholder.com/400x200?text=Painaidee';
         const safeName = p.name.replace(/'/g, "\\'");
 
+        // ดึงดีลที่ active ของร้านนี้
+        const activeDeals = (appData.deals || []).filter(d =>
+            d.storeName === p.name && d.isActive &&
+            (!d.expiryDate || new Date(d.expiryDate) > new Date()) &&
+            (d.maxUses === 0 || d.usedCount < d.maxUses)
+        );
+
         let extraTags = '';
+        if (activeDeals.length > 0)
+            extraTags += `<span onclick="showStoreDealsModal('${safeName}'); event.stopPropagation();" style="background:rgba(217,83,79,0.15);color:var(--danger);padding:4px 10px;border-radius:10px;font-size:11px;font-weight:bold;margin-right:5px;display:inline-block;margin-bottom:5px;cursor:pointer;border:1px solid rgba(217,83,79,0.4);">🎟️ ${activeDeals.length} ดีลพิเศษ!</span>`;
         if (store?.coupon?.trim())
-            extraTags += `<span onclick="showCustomerDetail('coupon','${safeName}')" style="background:rgba(217,83,79,0.1);color:var(--danger);padding:4px 10px;border-radius:10px;font-size:11px;font-weight:bold;margin-right:5px;display:inline-block;margin-bottom:5px;cursor:pointer;border:1px solid rgba(217,83,79,0.3);pointer-events:auto;">🎟️ กดดูคูปอง</span>`;
+            extraTags += `<span onclick="showCustomerDetail('coupon','${safeName}'); event.stopPropagation();" style="background:rgba(217,83,79,0.1);color:var(--danger);padding:4px 10px;border-radius:10px;font-size:11px;font-weight:bold;margin-right:5px;display:inline-block;margin-bottom:5px;cursor:pointer;border:1px solid rgba(217,83,79,0.3);">🎟️ คูปอง</span>`;
         if (store?.event?.trim())
-            extraTags += `<span onclick="showCustomerDetail('event','${safeName}')" style="background:rgba(23,162,184,0.1);color:var(--info);padding:4px 10px;border-radius:10px;font-size:11px;font-weight:bold;display:inline-block;margin-bottom:5px;cursor:pointer;border:1px solid rgba(23,162,184,0.3);pointer-events:auto;">🎉 ดูกิจกรรม</span>`;
+            extraTags += `<span onclick="showCustomerDetail('event','${safeName}'); event.stopPropagation();" style="background:rgba(23,162,184,0.1);color:var(--info);padding:4px 10px;border-radius:10px;font-size:11px;font-weight:bold;display:inline-block;margin-bottom:5px;cursor:pointer;border:1px solid rgba(23,162,184,0.3);">🎉 กิจกรรม</span>`;
 
         const vipEffectClass = isVIP && currentTheme.vipEffect && currentTheme.vipEffect !== 'none'
             ? ' vip-' + currentTheme.vipEffect : '';
 
         return `
         <div class="place-card ${isVIP ? 'card-vip' + vipEffectClass : ''}"
-             data-placeid="${p.place_id}"
-             data-storename="${p.name.replace(/"/g, '&quot;')}"
-             style="cursor:pointer;">
+             onclick="focusPlace('${p.place_id}'); trackAction('${p.name.replace(/'/g,"\\'")}','view')">
             ${isVIP ? '<div class="vip-crown-badge">👑 VIP RECOMMEND</div>' : ''}
             <div class="distance-badge">${distKm} กม.</div>
-            <img src="${imgUrl}" class="main-img" data-action="viewImage">
+            <img src="${imgUrl}" class="main-img"
+                 onclick="event.stopPropagation(); openImageModal(this.src)">
             <div class="place-info">
                 <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:8px;">
                     <h3 style="margin:0;font-size:16px;flex:1;color:${isVIP ? 'var(--prev-vip)' : 'var(--primary)'};font-weight:600;line-height:1.2;">
@@ -1576,22 +1555,22 @@ function renderCards(keywordSearched) {
                 </p>
                 <div><span style="color:var(--primary);font-weight:600;">⭐ ${p.rating || 'ใหม่'}</span></div>
                 <div class="action-buttons">
-                    <button class="btn-action btn-nav" data-action="navigate"
-                            data-lat="${p.geometry.location.lat()}" data-lng="${p.geometry.location.lng()}"
-                            data-navurl="${navUrl}" data-storename="${p.name.replace(/"/g, '&quot;')}">
+                    <button class="btn-action btn-nav"
+                            onclick="window.open('${navUrl}','_blank'); trackAction('${p.name.replace(/'/g,"\\'")}','dir'); event.stopPropagation();">
                         นำทาง
                     </button>
-                    <button class="btn-action btn-call" data-action="call" data-placeid="${p.place_id}">โทร</button>
-                    ${hasLine ? `<button class="btn-action btn-line" data-action="openurl" data-url="${store.lineUrl.startsWith('http') ? store.lineUrl : 'https://' + store.lineUrl}">LINE</button>` : ''}
-                    ${hasFb   ? `<button class="btn-action btn-fb"   data-action="openurl" data-url="${store.fbUrl.startsWith('http')   ? store.fbUrl   : 'https://' + store.fbUrl}">FB</button>` : ''}
-                    <button class="btn-action btn-share" data-action="share"
-                            data-name="${safeName}" data-lat="${p.geometry.location.lat()}" data-lng="${p.geometry.location.lng()}">
+                    <button class="btn-action btn-call"
+                            onclick="callPlace('${p.place_id}',event)">โทร</button>
+                    ${hasLine ? `<button class="btn-action btn-line" onclick="window.open('${store.lineUrl.startsWith('http') ? store.lineUrl : 'https://' + store.lineUrl}','_blank'); event.stopPropagation();">LINE</button>` : ''}
+                    ${hasFb   ? `<button class="btn-action btn-fb"   onclick="window.open('${store.fbUrl.startsWith('http')   ? store.fbUrl   : 'https://' + store.fbUrl  }','_blank'); event.stopPropagation();">FB</button>` : ''}
+                    <button class="btn-action btn-share"
+                            onclick="sharePlace('${safeName}',${p.geometry.location.lat()},${p.geometry.location.lng()},event)">
                         แชร์
                     </button>
                 </div>
                 <div style="margin-top:15px;text-align:right;">
-                    <span class="report-closed-btn" data-placeid="${p.place_id}"
-                          style="color:var(--danger);font-size:11px;cursor:pointer;opacity:0.6;border-bottom:1px dotted var(--danger);">
+                    <span style="color:var(--danger);font-size:11px;cursor:pointer;opacity:0.6;border-bottom:1px dotted var(--danger);"
+                          onclick="event.stopPropagation(); reportClosed('${p.place_id}')">
                         🚩 แจ้งร้านปิดถาวร
                     </span>
                 </div>
@@ -1725,45 +1704,13 @@ setInterval(() => {
 // ⚙️ Store Management
 // ==========================================
 function reportClosed(placeId) {
-    // หาชื่อร้านจาก googlePlaces แทนการรับผ่าน onclick (ป้องกัน HTML parse error)
     const place = googlePlaces.find(p => p.place_id === placeId);
-    const n = place ? place.name : placeId;
-
-    const existing = document.getElementById('reportClosedModal');
-    if (existing) existing.remove();
-
-    const modal = document.createElement('div');
-    modal.id = 'reportClosedModal';
-    modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.75);z-index:9999999;display:flex;justify-content:center;align-items:center;padding:20px;box-sizing:border-box;';
-    modal.innerHTML = `
-        <div style="background:#1A1D23;border:2px solid var(--danger);border-radius:16px;padding:25px;width:100%;max-width:340px;text-align:center;">
-            <p style="font-size:28px;margin:0 0 8px;">🚩</p>
-            <h3 style="color:var(--danger);margin:0 0 10px;font-size:17px;">แจ้งปิดร้านถาวร</h3>
-            <p style="color:#ddd;font-size:14px;margin:0 0 20px;line-height:1.6;">
-                ยืนยันการแจ้งว่าร้านนี้<br><b style="color:#FFF;">ปิดถาวรแล้ว?</b><br>
-                <span style="font-size:12px;color:#888;">แอดมินจะตรวจสอบและลบออกจากระบบครับ</span>
-            </p>
-            <div style="display:flex;gap:10px;">
-                <button onclick="document.getElementById('reportClosedModal').remove()"
-                        style="flex:1;padding:12px;border-radius:10px;border:1px solid #555;background:transparent;color:#aaa;font-family:'Kanit';font-size:14px;cursor:pointer;">
-                    ยกเลิก
-                </button>
-                <button id="btnConfirmReport"
-                        style="flex:1;padding:12px;border-radius:10px;border:none;background:var(--danger);color:#FFF;font-family:'Kanit';font-size:14px;font-weight:600;cursor:pointer;">
-                    ✅ ยืนยัน
-                </button>
-            </div>
-        </div>`;
-    document.body.appendChild(modal);
-
-    // ผูก event แยกต่างหาก ไม่ใช้ inline onclick
-    document.getElementById('btnConfirmReport').addEventListener('click', async () => {
-        modal.remove();
-        if (!appData.closedReports) appData.closedReports = [];
-        appData.closedReports.push({ placeId, storeName: n, date: new Date().toLocaleString() });
-        try { await saveToCloud(); } catch(e) {}
-        showPointToast('🚩 ส่งรายงานแล้ว ขอบคุณครับ!');
-    });
+    const n = place ? place.name : '';
+    if (!confirm('ยืนยันแจ้งปิดร้าน "' + n + '" ถาวร?')) return;
+    if (!appData.closedReports) appData.closedReports = [];
+    appData.closedReports.push({ placeId, storeName: n, date: new Date().toLocaleString() });
+    saveToCloud().catch(() => {});
+    alert('ขอบคุณครับ แอดมินจะตรวจสอบครับ');
 }
 
 function searchRegStore() {
