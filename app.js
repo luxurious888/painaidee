@@ -1348,7 +1348,7 @@ function focusPlace(placeId) {
     activeMarker = new google.maps.Marker({
         position: place.geometry.location, map, animation: google.maps.Animation.DROP,
     });
-    window.scrollTo({ top: document.getElementById('map').offsetTop - 20, behavior: 'smooth' });
+    // ไม่ scroll อัตโนมัติ — ให้ infoWindow popup ขึ้นแทน
 
     service.getDetails({ placeId, fields: ['name', 'opening_hours'] }, (details, status) => {
         let timeText     = 'ทางร้านไม่ได้ระบุเวลาเปิด-ปิด';
