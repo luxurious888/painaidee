@@ -1550,7 +1550,7 @@ function renderCards(keywordSearched) {
 
         return `
         <div class="place-card ${isVIP ? 'card-vip' + vipEffectClass : ''}"
-             onclick="if(!event.target.closest('button,.tag-btn')) { focusPlace('${p.place_id}'); trackAction('${p.name.replace(/'/g,"\\'")}','view'); }"
+             onclick="const _el=event.composedPath().find(function(n){return n instanceof Element&&(n.tagName==='BUTTON'||n.classList.contains('tag-btn'));}); if(!_el){focusPlace('${p.place_id}');trackAction('${p.name.replace(/'/g,"\\'")}','view');}"
              style="cursor:pointer;">
             ${isVIP ? '<div class="vip-crown-badge">👑 VIP RECOMMEND</div>' : ''}
             <div class="distance-badge">${distKm} กม.</div>
