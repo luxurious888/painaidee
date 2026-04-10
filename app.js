@@ -1537,11 +1537,12 @@ function renderCards(keywordSearched) {
 
         return `
         <div class="place-card ${isVIP ? 'card-vip' + vipEffectClass : ''}"
-             onclick="focusPlace('${p.place_id}'); trackAction('${p.name}','view')">
+             data-placeid="${p.place_id}"
+             data-storename="${p.name.replace(/"/g, '&quot;')}"
+             style="cursor:pointer;">
             ${isVIP ? '<div class="vip-crown-badge">👑 VIP RECOMMEND</div>' : ''}
             <div class="distance-badge">${distKm} กม.</div>
-            <img src="${imgUrl}" class="main-img"
-                 onclick="event.stopPropagation(); openImageModal(this.src)">
+            <img src="${imgUrl}" class="main-img" data-action="viewImage">
             <div class="place-info">
                 <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:8px;">
                     <h3 style="margin:0;font-size:16px;flex:1;color:${isVIP ? 'var(--prev-vip)' : 'var(--primary)'};font-weight:600;line-height:1.2;">
@@ -1555,22 +1556,22 @@ function renderCards(keywordSearched) {
                 </p>
                 <div><span style="color:var(--primary);font-weight:600;">⭐ ${p.rating || 'ใหม่'}</span></div>
                 <div class="action-buttons">
-                    <button class="btn-action btn-nav"
-                            onclick="window.open('${navUrl}','_blank'); trackAction('${p.name}','dir'); event.stopPropagation();">
+                    <button class="btn-action btn-nav" data-action="navigate"
+                            data-lat="${p.geometry.location.lat()}" data-lng="${p.geometry.location.lng()}"
+                            data-navurl="${navUrl}" data-storename="${p.name.replace(/"/g, '&quot;')}">
                         นำทาง
                     </button>
-                    <button class="btn-action btn-call"
-                            onclick="callPlace('${p.place_id}',event)">โทร</button>
-                    ${hasLine ? `<button class="btn-action btn-line" onclick="window.open('${store.lineUrl.startsWith('http') ? store.lineUrl : 'https://' + store.lineUrl}','_blank'); event.stopPropagation();">LINE</button>` : ''}
-                    ${hasFb   ? `<button class="btn-action btn-fb"   onclick="window.open('${store.fbUrl.startsWith('http')   ? store.fbUrl   : 'https://' + store.fbUrl  }','_blank'); event.stopPropagation();">FB</button>` : ''}
-                    <button class="btn-action btn-share"
-                            onclick="sharePlace('${safeName}',${p.geometry.location.lat()},${p.geometry.location.lng()},event)">
+                    <button class="btn-action btn-call" data-action="call" data-placeid="${p.place_id}">โทร</button>
+                    ${hasLine ? `<button class="btn-action btn-line" data-action="openurl" data-url="${store.lineUrl.startsWith('http') ? store.lineUrl : 'https://' + store.lineUrl}">LINE</button>` : ''}
+                    ${hasFb   ? `<button class="btn-action btn-fb"   data-action="openurl" data-url="${store.fbUrl.startsWith('http')   ? store.fbUrl   : 'https://' + store.fbUrl}">FB</button>` : ''}
+                    <button class="btn-action btn-share" data-action="share"
+                            data-name="${safeName}" data-lat="${p.geometry.location.lat()}" data-lng="${p.geometry.location.lng()}">
                         แชร์
                     </button>
                 </div>
                 <div style="margin-top:15px;text-align:right;">
-                    <span style="color:var(--danger);font-size:11px;cursor:pointer;opacity:0.6;border-bottom:1px dotted var(--danger);"
-                          onclick="event.stopPropagation(); reportClosed('${p.place_id}');">
+                    <span class="report-closed-btn" data-placeid="${p.place_id}"
+                          style="color:var(--danger);font-size:11px;cursor:pointer;opacity:0.6;border-bottom:1px dotted var(--danger);">
                         🚩 แจ้งร้านปิดถาวร
                     </span>
                 </div>
@@ -1587,7 +1588,49 @@ function renderCards(keywordSearched) {
 
     list.innerHTML = html;
     renderPromos();
-    refreshVIPMarkers(); // ปักหมุด VIP ทอง
+    refreshVIPMarkers();
+
+    // ── Event Delegation (ป้องกันปัญหา inline onclick ใน LINE Browser) ──
+    list.addEventListener('click', function(e) {
+        const reportBtn  = e.target.closest('.report-closed-btn');
+        const actionBtn  = e.target.closest('[data-action]');
+        const card       = e.target.closest('.place-card[data-placeid]');
+
+        // 1. ปุ่มแจ้งปิดร้าน
+        if (reportBtn) {
+            e.stopPropagation();
+            reportClosed(reportBtn.dataset.placeid);
+            return;
+        }
+
+        // 2. ปุ่มต่างๆ ภายในการ์ด
+        if (actionBtn) {
+            e.stopPropagation();
+            const action = actionBtn.dataset.action;
+            if (action === 'viewImage') {
+                openImageModal(actionBtn.src);
+            } else if (action === 'navigate') {
+                window.open(actionBtn.dataset.navurl, '_blank');
+                trackAction(actionBtn.dataset.storename, 'dir');
+            } else if (action === 'call') {
+                callPlace(actionBtn.dataset.placeid, e);
+            } else if (action === 'openurl') {
+                window.open(actionBtn.dataset.url, '_blank');
+            } else if (action === 'share') {
+                sharePlace(actionBtn.dataset.name, parseFloat(actionBtn.dataset.lat), parseFloat(actionBtn.dataset.lng), e);
+            }
+            return;
+        }
+
+        // 3. กดที่การ์ด (ไม่ใช่ปุ่ม) → ปักหมุดแผนที่ + scroll ขึ้นไป
+        if (card) {
+            focusPlace(card.dataset.placeid);
+            trackAction(card.dataset.storename, 'view');
+            const mapEl = document.getElementById('map');
+            if (mapEl) mapEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    });
+ // ปักหมุด VIP ทอง
 }
 
 function renderPromos() {
