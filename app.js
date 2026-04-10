@@ -198,6 +198,15 @@ function openImageModal(src) {
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
     initSystem();
+
+    // ── listener สำหรับปุ่มแจ้งปิดร้าน ──
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest('.report-closed-btn');
+        if (!btn) return;
+        e.stopPropagation();
+        reportClosed(btn.dataset.pid);
+    });
+
     // Fallback: show login card after 6s if LIFF is slow
     setTimeout(() => {
         if (!isAppReady) {
@@ -1574,7 +1583,8 @@ function renderCards(keywordSearched) {
                     </button>
                 </div>
                 <div style="margin-top:12px;text-align:right;">
-                    <button onclick="event.stopPropagation(); reportClosed('${p.place_id}');"
+                    <button class="report-closed-btn"
+                            data-pid="${p.place_id}"
                             style="background:none;border:none;color:var(--danger);font-size:11px;cursor:pointer;opacity:0.7;border-bottom:1px dotted var(--danger);font-family:'Kanit';padding:4px 2px;">
                         🚩 แจ้งร้านปิดถาวร
                     </button>
@@ -1759,12 +1769,38 @@ function showStoreDealsModal(storeName) {
 
 function reportClosed(placeId) {
     const place = googlePlaces.find(p => p.place_id === placeId);
-    const n = place ? place.name : '';
-    if (!confirm('ยืนยันแจ้งปิดร้าน "' + n + '" ถาวร?')) return;
-    if (!appData.closedReports) appData.closedReports = [];
-    appData.closedReports.push({ placeId, storeName: n, date: new Date().toLocaleString() });
-    saveToCloud().catch(() => {});
-    alert('ขอบคุณครับ แอดมินจะตรวจสอบครับ');
+    const n = place ? place.name : placeId;
+
+    // ใช้ modal แทน confirm() เพราะ browser บางตัว block confirm()
+    const existing = document.getElementById('_reportModal');
+    if (existing) existing.remove();
+
+    const modal = document.createElement('div');
+    modal.id = '_reportModal';
+    modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:9999999;display:flex;justify-content:center;align-items:center;padding:20px;box-sizing:border-box;';
+    modal.innerHTML = `
+        <div style="background:#1A1D23;border:2px solid #D9534F;border-radius:16px;padding:24px;width:100%;max-width:320px;text-align:center;">
+            <p style="font-size:26px;margin:0 0 10px;">🚩</p>
+            <h3 style="color:#D9534F;margin:0 0 12px;font-size:17px;">แจ้งร้านปิดถาวร</h3>
+            <p style="color:#ddd;font-size:14px;margin:0 0 20px;line-height:1.6;">
+                <b style="color:#FFF;">"${n}"</b><br>ปิดถาวรแล้วใช่ไหม?<br>
+                <span style="font-size:11px;color:#888;">แอดมินจะตรวจสอบและนำออกจากระบบครับ</span>
+            </p>
+            <div style="display:flex;gap:10px;">
+                <button id="_reportCancel" style="flex:1;padding:12px;border-radius:10px;border:1px solid #555;background:transparent;color:#aaa;font-family:'Kanit';font-size:14px;cursor:pointer;">ยกเลิก</button>
+                <button id="_reportConfirm" style="flex:1;padding:12px;border-radius:10px;border:none;background:#D9534F;color:#FFF;font-family:'Kanit';font-size:14px;font-weight:700;cursor:pointer;">✅ ยืนยัน</button>
+            </div>
+        </div>`;
+    document.body.appendChild(modal);
+
+    document.getElementById('_reportCancel').onclick  = () => modal.remove();
+    document.getElementById('_reportConfirm').onclick = async () => {
+        modal.remove();
+        if (!appData.closedReports) appData.closedReports = [];
+        appData.closedReports.push({ placeId, storeName: n, date: new Date().toLocaleString() });
+        try { await saveToCloud(); } catch(e) {}
+        showPointToast('🚩 ส่งรายงานแล้ว ขอบคุณครับ!');
+    };
 }
 
 function searchRegStore() {
