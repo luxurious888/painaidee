@@ -1565,7 +1565,23 @@ function renderCards(keywordSearched) {
 
         const hasLine = !!(store?.lineUrl?.trim());
         const hasFb   = !!(store?.fbUrl?.trim());
-        const imgUrl  = p.photos ? p.photos[0].getUrl({ maxWidth: 400 }) : 'https://via.placeholder.com/400x200?text=Painaidee';
+        const mainImg = p.photos ? p.photos[0].getUrl({ maxWidth: 400 }) : '';
+        const galleryImgs = store?.gallery?.length > 0 ? store.gallery : [];
+        // รวมรูปแกลลอรี่เข้าก่อน แล้วตามด้วยรูป Google
+        const allImgs = galleryImgs.length > 0
+            ? [...galleryImgs, ...(mainImg ? [mainImg] : [])]
+            : (mainImg ? [mainImg] : ['https://via.placeholder.com/400x200?text=Painaidee']);
+        const sliderUid = p.place_id.slice(-6);
+        const imgSliderHtml = allImgs.length === 1
+            ? `<img src="${allImgs[0]}" class="main-img" onclick="event.stopPropagation(); openImageModal(this.src)">`
+            : `<div style="position:relative;overflow:hidden;">
+                <div id="gslide_${sliderUid}" style="display:flex;transition:transform 0.3s ease;">
+                    ${allImgs.map(img => `<img src="${img}" style="min-width:100%;height:200px;object-fit:cover;" onclick="event.stopPropagation(); openImageModal(this.src)">`).join('')}
+                </div>
+                <div style="position:absolute;bottom:6px;right:8px;background:rgba(0,0,0,0.6);color:#FFF;font-size:10px;padding:2px 7px;border-radius:10px;" id="gind_${sliderUid}">1/${allImgs.length} 📸</div>
+                <button onclick="event.stopPropagation(); cardSlide('${sliderUid}',${allImgs.length},-1)" style="position:absolute;left:4px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.5);color:#FFF;border:none;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:14px;">‹</button>
+                <button onclick="event.stopPropagation(); cardSlide('${sliderUid}',${allImgs.length},1)"  style="position:absolute;right:4px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.5);color:#FFF;border:none;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:14px;">›</button>
+               </div>`;
         const safeName = p.name.replace(/'/g, "\\'");
 
         // ดึงดีลที่ active ของร้านนี้
@@ -1592,8 +1608,7 @@ function renderCards(keywordSearched) {
              style="cursor:pointer;">
             ${isVIP ? '<div class="vip-crown-badge">👑 VIP RECOMMEND</div>' : ''}
             <div class="distance-badge">${distKm} กม.</div>
-            <img src="${imgUrl}" class="main-img"
-                 onclick="event.stopPropagation(); openImageModal(this.src)">
+            ${imgSliderHtml}
             <div class="place-info">
                 <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:8px;">
                     <h3 style="margin:0;font-size:16px;flex:1;color:${isVIP ? 'var(--prev-vip)' : 'var(--primary)'};font-weight:600;line-height:1.2;">
@@ -1606,14 +1621,6 @@ function renderCards(keywordSearched) {
                     ${p.vicinity}
                 </p>
                 <div><span style="color:var(--primary);font-weight:600;">⭐ ${p.rating || 'ใหม่'}</span></div>
-                ${store?.gallery?.length > 0 ? `
-                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin:8px 0;">
-                    ${store.gallery.slice(0,6).map(img => `
-                        <img src="${img}"
-                             onclick="event.stopPropagation(); openImageModal(this.src);"
-                             style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:6px;cursor:pointer;">
-                    `).join('')}
-                </div>` : ''}
                 <div class="action-buttons">
                     <button class="btn-action btn-nav"
                             onclick="event.stopPropagation(); window.open('${navUrl}','_blank'); trackAction('${p.name.replace(/'/g,"\\'")}','dir');">
@@ -1659,7 +1666,18 @@ function renderCards(keywordSearched) {
  // ปักหมุด VIP ทอง
 }
 
-function renderPromos() {
+function cardSlide(uid, total, dir) {
+    const track = document.getElementById('gslide_' + uid);
+    const indEl = document.getElementById('gind_'   + uid);
+    if (!track) return;
+    const cur = parseInt(track.dataset.cur || '0');
+    const next = (cur + dir + total) % total;
+    track.dataset.cur = next;
+    track.style.transform = `translateX(-${next * 100}%)`;
+    if (indEl) indEl.innerText = `${next + 1}/${total} 📸`;
+}
+
+
     let curProv = document.getElementById('provinceSelect').value;
     const now   = Date.now();
     const activePromos = (appData.activePromotions || []).filter(p => {
