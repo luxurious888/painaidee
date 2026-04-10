@@ -30,8 +30,12 @@
             margin-bottom: 20px;
         }
         .gold-logo, .custom-logo-img {
-            display: block !important;
+            display: block;
             margin: 0 auto !important;
+        }
+        /* ซ่อนโลโก้ SVG เมื่อมีโลโก้ custom */
+        .gold-logo.hidden-logo {
+            display: none !important;
         }
         #loginCard {
             margin: 0 auto !important;
@@ -881,7 +885,7 @@
 
 </div><!-- /appContent -->
 
-<script src="app.js?v=76"></script>
+<script src="app.js?v=86"></script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD7Qqf1Z9KQBuvipDzgIc5laJLz9SiOBH8&libraries=places,geometry&callback=initMap" async defer></script>
 </body>
 </html>
