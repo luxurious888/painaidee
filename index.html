@@ -37,7 +37,19 @@
             display: block !important;
             margin: 0 auto !important;
         }
-        /* ซ่อน SVG โลโก้เมื่อมี custom logo — ต้องชนะทุก rule */
+        /* ป้องกัน VIP animation overlay บัง click บน content ข้างใน */
+        .card-vip::after,
+        .vip-shimmer::after {
+            pointer-events: none !important;
+        }
+        /* ให้ปุ่มและ tag ข้างในการ์ดกดได้เสมอ */
+        .place-card button,
+        .place-card .tag-btn,
+        .place-card .report-btn {
+            position: relative;
+            z-index: 10;
+        }
+        /* ซ่อน SVG โลโก้เมื่อมี custom logo */
         .gold-logo.hidden-logo,
         svg.hidden-logo {
             display: none !important;
@@ -891,7 +903,7 @@
 
 </div><!-- /appContent -->
 
-<script src="app.js?v=80"></script>
+<script src="app.js?v=106"></script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD7Qqf1Z9KQBuvipDzgIc5laJLz9SiOBH8&libraries=places,geometry&callback=initMap" async defer></script>
 </body>
 </html>
