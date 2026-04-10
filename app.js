@@ -1773,8 +1773,76 @@ setInterval(() => {
 }, 3500);
 
 // ==========================================
-// ⚙️ Store Management
+// 🖼️ VIP Store Gallery
 // ==========================================
+function renderGalleryManager(store) {
+    const images = store.gallery || [];
+    const el = document.getElementById('galleryManagerContent');
+    if (!el) return;
+
+    el.innerHTML = `
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;">
+            ${images.map((img, i) => `
+                <div style="position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;border:1px solid #333;">
+                    <img src="${img}" style="width:100%;height:100%;object-fit:cover;">
+                    <button onclick="deleteGalleryImage(${i})"
+                            style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.7);color:#FFF;border:none;border-radius:50%;width:22px;height:22px;font-size:12px;cursor:pointer;line-height:22px;text-align:center;">×</button>
+                </div>`).join('')}
+            ${images.length < 6 ? `
+                <label style="aspect-ratio:1;border-radius:8px;border:2px dashed #444;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:4px;color:#666;font-size:12px;">
+                    <span style="font-size:24px;">+</span>
+                    เพิ่มรูป
+                    <input type="file" accept="image/*" multiple style="display:none" onchange="uploadGalleryImages(this)">
+                </label>` : ''}
+        </div>
+        <p style="font-size:11px;color:#666;text-align:center;margin:0;">${images.length}/6 รูป</p>`;
+}
+
+async function uploadGalleryImages(input) {
+    const pin   = document.getElementById('storePinInput').value;
+    const idx   = appData.registeredStores.findIndex(s => s.pin === pin);
+    if (idx === -1) return;
+
+    const store = appData.registeredStores[idx];
+    if (!store.gallery) store.gallery = [];
+
+    const remaining = 6 - store.gallery.length;
+    const files = Array.from(input.files).slice(0, remaining);
+    if (files.length === 0) return;
+
+    const btn = document.getElementById('btnGalleryUpload');
+    if (btn) { btn.innerText = 'กำลังอัปโหลด...'; btn.disabled = true; }
+
+    try {
+        for (const file of files) {
+            const dataUrl = await resizeImg(file);
+            const url = await uploadImageToStorage(dataUrl, 'gallery');
+            store.gallery.push(url);
+        }
+        await saveToCloud();
+        renderGalleryManager(store);
+    } catch(e) {
+        alert('❌ อัปโหลดไม่สำเร็จ กรุณาลองใหม่');
+    } finally {
+        if (btn) { btn.innerText = '📤 อัปโหลดรูป'; btn.disabled = false; }
+        input.value = '';
+    }
+}
+
+async function deleteGalleryImage(index) {
+    const pin = document.getElementById('storePinInput').value;
+    const idx = appData.registeredStores.findIndex(s => s.pin === pin);
+    if (idx === -1) return;
+
+    const store = appData.registeredStores[idx];
+    store.gallery.splice(index, 1);
+    try {
+        await saveToCloud();
+        renderGalleryManager(store);
+    } catch(e) { store.gallery.splice(index, 0, store.gallery[index]); }
+}
+
+
 // ── แสดงดีลทั้งหมดของร้าน (ฝั่งลูกค้า) ──
 function showStoreDealsModal(storeName) {
     const activeDeals = (appData.deals || []).filter(d =>
@@ -2002,6 +2070,7 @@ function verifyStore(silent = false) {
             document.getElementById('vipLineInput').value = store.lineUrl || '';
             document.getElementById('vipFbInput').value   = store.fbUrl   || '';
             renderHoursGrid(store);
+            renderGalleryManager(store);
         }
     } else {
         document.getElementById('vipHoursSection').style.display   = 'none';
