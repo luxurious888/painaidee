@@ -768,33 +768,41 @@ function spinRestaurantWheel() {
     isSpinning = true;
     const btn   = document.getElementById('btn-spin-wheel');
     const wheel = document.getElementById('wheel-spinner');
-    btn.innerText = 'กำลังสุ่ม... 🎡'; btn.disabled = true;
+    if (btn) { btn.innerText = 'กำลังสุ่ม... 🎡'; btn.disabled = true; }
 
-    // Weighted random — VIP มีน้ำหนัก 3 เท่า
-    const weights     = wheelRestaurants.map(item => item.isVIP ? 3 : 1);
-    const totalWeight = weights.reduce((a, b) => a + b, 0);
-    let   rand        = Math.random() * totalWeight;
-    let   selectedIdx = wheelRestaurants.length - 1;
-    for (let i = 0; i < weights.length; i++) {
-        rand -= weights[i];
-        if (rand <= 0) { selectedIdx = i; break; }
-    }
+    // ✅ Reset rotation ก่อนหมุนทุกครั้ง
+    wheel.style.transition = 'none';
+    wheel.style.transform  = 'rotate(0deg)';
 
-    const segDeg    = 360 / wheelRestaurants.length;
-    const targetDeg = 3600 + (360 - selectedIdx * segDeg) - segDeg / 2;
-    wheel.style.transition = 'transform 4s cubic-bezier(0.25,0.1,0.15,1)';
-    wheel.style.transform  = `rotate(${targetDeg}deg)`;
-
+    // รอ 1 frame ให้ reset มีผล
     setTimeout(() => {
-        isSpinning   = false;
-        btn.innerText = '🔄 หมุนใหม่!'; btn.disabled = false;
-        wheel.style.transition = 'none';
-        wheel.style.transform  = `rotate(${targetDeg % 360}deg)`;
+        // Weighted random — VIP น้ำหนัก 2 เท่า
+        const weights     = wheelRestaurants.map(item => item.isVIP ? 2 : 1);
+        const totalWeight = weights.reduce((a, b) => a + b, 0);
+        let   rand        = Math.random() * totalWeight;
+        let   selectedIdx = wheelRestaurants.length - 1;
+        for (let i = 0; i < weights.length; i++) {
+            rand -= weights[i];
+            if (rand <= 0) { selectedIdx = i; break; }
+        }
 
-        selectedWheelItem = wheelRestaurants[selectedIdx];
-        document.getElementById('luckyWheelModal').style.display = 'none';
-        showSpinResult(selectedWheelItem);
-    }, 4000);
+        const segDeg    = 360 / wheelRestaurants.length;
+        const targetDeg = 3600 + (360 - selectedIdx * segDeg) - segDeg / 2;
+
+        wheel.style.transition = 'transform 4s cubic-bezier(0.25,0.1,0.15,1)';
+        wheel.style.transform  = `rotate(${targetDeg}deg)`;
+
+        setTimeout(() => {
+            isSpinning = false;
+            if (btn) { btn.innerText = '🎯 หมุนเลย!'; btn.disabled = false; }
+            wheel.style.transition = 'none';
+            wheel.style.transform  = `rotate(${targetDeg % 360}deg)`;
+
+            selectedWheelItem = wheelRestaurants[selectedIdx];
+            document.getElementById('luckyWheelModal').style.display = 'none';
+            showSpinResult(selectedWheelItem);
+        }, 4000);
+    }, 50);
 }
 
 function showSpinResult(item) {
