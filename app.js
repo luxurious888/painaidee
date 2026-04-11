@@ -1677,8 +1677,7 @@ function cardSlide(uid, total, dir) {
     if (indEl) indEl.innerText = `${next + 1}/${total} 📸`;
 }
 
-
-    let curProv = document.getElementById('provinceSelect').value;
+function renderPromos() {
     const now   = Date.now();
     const activePromos = (appData.activePromotions || []).filter(p => {
         if (p.expireTimestamp && now > p.expireTimestamp && !p.autoRenew) return false;
