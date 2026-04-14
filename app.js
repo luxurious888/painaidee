@@ -1,4 +1,5 @@
-// ==========================================
+let curProv = 'ubon';   // 👈 เพิ่มบรรทัดนี้เหนือ currentCoords
+let currentCoords = { lat: 15.2287, lng: 104.8564 };
 // 🛡️ Global Error Handler
 // ==========================================
 window.addEventListener('error', function (event) {
@@ -1526,6 +1527,7 @@ function executeSearch(type) {
 }
 
 function renderCards(keywordSearched) {
+    resolveCurrentProvince();
     const list        = document.getElementById('placeList');
     const originPoint = new google.maps.LatLng(currentCoords.lat, currentCoords.lng);
     const stores      = appData.registeredStores || [];
@@ -1676,6 +1678,33 @@ function cardSlide(uid, total, dir) {
     track.style.transform = `translateX(-${next * 100}%)`;
     if (indEl) indEl.innerText = `${next + 1}/${total} 📸`;
 }
+function resolveCurrentProvince() {
+    if (typeof curProv === 'undefined' || curProv == null || curProv === '') {
+        curProv = 'ubon';
+    }
+    if (curProv !== 'current') return curProv;
+
+    const ready =
+        currentCoords &&
+        typeof currentCoords.lat === 'number' &&
+        typeof currentCoords.lng === 'number' &&
+        Array.isArray(provinces) && provinces.length > 0 &&
+        window.google?.maps?.geometry?.spherical;
+
+    if (!ready) { curProv = 'ubon'; return curProv; }
+
+    const origin = new google.maps.LatLng(currentCoords.lat, currentCoords.lng);
+    let minDist = Infinity, nearestId = 'ubon';
+    for (const p of provinces) {
+        if (typeof p?.lat !== 'number' || typeof p?.lng !== 'number') continue;
+        const d = google.maps.geometry.spherical.computeDistanceBetween(
+            origin, new google.maps.LatLng(p.lat, p.lng)
+        );
+        if (d < minDist) { minDist = d; nearestId = p.id; }
+    }
+    curProv = nearestId;
+    return curProv;
+}
 
 function renderPromos() {
     const now   = Date.now();
@@ -1684,20 +1713,20 @@ function renderPromos() {
         return true;
     });
 
-    if (curProv === 'current') {
-        if (currentCoords && window.google?.maps?.geometry) {
-            const originPoint = new google.maps.LatLng(currentCoords.lat, currentCoords.lng);
-            let minDist = Infinity;
-            provinces.forEach(p => {
-                const dist = google.maps.geometry.spherical.computeDistanceBetween(
-                    originPoint, new google.maps.LatLng(p.lat, p.lng)
-                );
-                if (dist < minDist) { minDist = dist; curProv = p.id; }
-            });
-        } else {
-            curProv = 'ubon';
-        }
+   if (curProv === 'current') {
+    if (currentCoords && window.google?.maps?.geometry) {
+        const originPoint = new google.maps.LatLng(currentCoords.lat, currentCoords.lng);
+        let minDist = Infinity;
+        provinces.forEach(p => {
+            const dist = google.maps.geometry.spherical.computeDistanceBetween(
+                originPoint, new google.maps.LatLng(p.lat, p.lng)
+            );
+            if (dist < minDist) { minDist = dist; curProv = p.id; }
+        });
+    } else {
+        curProv = 'ubon';
     }
+}
 
     const promos = activePromos.filter(p => p.province === curProv).sort(() => Math.random() - 0.5);
     const banner = document.getElementById('promoBanner');
