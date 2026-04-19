@@ -164,3 +164,201 @@ select:focus, input:focus, textarea:focus { border-color: var(--primary); box-sh
     transition: 0.3s;
 }
 .wheel-spinning { pointer-events: none; opacity: 0.8; }
+
+/* ══════════════════════════════════════════
+   🌤️ TRAVEL THEME
+   ══════════════════════════════════════════ */
+bodybody[data-theme="travel"] { background-color:#F0F7FF !important; color:#1A2A3A !important; }
+
+body[data-theme="travel"] header {
+    background:linear-gradient(160deg,#00BFFF 0%,#0090D0 50%,#006FAB 100%) !important;
+    border:none !important; border-radius:0 0 28px 28px !important;
+    box-shadow:0 8px 32px rgba(0,100,200,0.25) !important;
+    position:relative; overflow:hidden;
+}
+body[data-theme="travel"] header::before {
+    content:'';position:absolute;top:-50px;right:-50px;width:200px;height:200px;
+    border-radius:50%;background:radial-gradient(circle,rgba(255,220,80,0.3),transparent 65%);
+    pointer-events:none;
+}
+body[data-theme="travel"] header::after {
+    content:'';position:absolute;bottom:0;left:0;right:0;height:24px;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 24'%3E%3Cpath d='M0,12 C200,0 400,24 600,12 C800,0 1000,24 1200,12 L1200,24 L0,24 Z' fill='rgba(255,255,255,0.12)'/%3E%3C/svg%3E") repeat-x;
+    background-size:600px 24px; animation:header-wave 5s linear infinite; pointer-events:none;
+}
+@keyframes header-wave { to { background-position:600px 0; } }
+body[data-theme="travel"] header h1 { color:#fff !important; font-family:'Mitr',sans-serif; }
+body[data-theme="travel"] header p  { color:rgba(255,255,255,0.88) !important; letter-spacing:1.5px; }
+body[data-theme="travel"] #header-profile {
+    border-color:rgba(255,255,255,0.7) !important;
+    background:rgba(255,255,255,0.2) !important;
+    box-shadow:0 4px 16px rgba(0,0,0,0.15) !important;
+}
+body[data-theme="travel"] #points-widget {
+    background:rgba(255,255,255,0.2) !important;
+    border-color:rgba(255,255,255,0.5) !important;
+    backdrop-filter:blur(8px);
+}
+body[data-theme="travel"] #user-points-display { color:#fff !important; }
+
+body[data-theme="travel"] nav { background:#fff !important; border-bottom:1px solid #D8EAF6 !important; box-shadow:0 2px 16px rgba(0,100,200,0.08) !important; }
+body[data-theme="travel"] nav div { color:#8AA0B8 !important; }
+body[data-theme="travel"] nav div.active { color:#0090D0 !important; font-weight:600; }
+body[data-theme="travel"] nav div.active::after { background:linear-gradient(90deg,#00BFFF,#0090D0) !important; box-shadow:none !important; }
+
+body[data-theme="travel"] .search-area { background:#fff !important; border:1.5px solid #D8EAF6 !important; box-shadow:0 6px 24px rgba(0,100,200,0.08) !important; border-radius:20px !important; }
+body[data-theme="travel"] select,body[data-theme="travel"] input[type="text"],body[data-theme="travel"] input[type="password"],body[data-theme="travel"] input[type="number"],body[data-theme="travel"] textarea {
+    background:#F0F7FF !important; color:#1A2A3A !important; border-color:#D8EAF6 !important;
+}
+body[data-theme="travel"] select:focus,body[data-theme="travel"] input:focus,body[data-theme="travel"] textarea:focus {
+    background:#fff !important; border-color:#00BFFF !important; box-shadow:0 0 0 4px rgba(0,191,255,0.12) !important;
+}
+body[data-theme="travel"] .btn-primary { background:linear-gradient(135deg,#00BFFF,#0090D0) !important; color:#fff !important; box-shadow:0 4px 16px rgba(0,144,208,0.32) !important; }
+body[data-theme="travel"] .btn-secondary { background:#fff !important; color:#0090D0 !important; border-color:#0090D0 !important; }
+body[data-theme="travel"] .btn-enter-glow { background:linear-gradient(135deg,#00BFFF,#0090D0) !important; color:#fff !important; }
+
+body[data-theme="travel"] .place-card { background:#fff !important; border-color:#D8EAF6 !important; box-shadow:0 4px 16px rgba(0,100,200,0.08),0 1px 4px rgba(0,0,0,0.04) !important; border-radius:18px !important; }
+body[data-theme="travel"] .place-card:hover { border-color:#00BFFF !important; box-shadow:0 12px 32px rgba(0,100,200,0.15) !important; }
+body[data-theme="travel"] .place-info { background:#fff !important; }
+body[data-theme="travel"] .place-card img.main-img { background-color:#E0F7FF !important; }
+body[data-theme="travel"] .distance-badge { background:rgba(255,255,255,0.92) !important; color:#0090D0 !important; border-color:rgba(0,191,255,0.2) !important; }
+body[data-theme="travel"] .card-vip { border-color:#FFB300 !important; box-shadow:0 4px 20px rgba(255,179,0,0.18) !important; }
+body[data-theme="travel"] .vip-crown-badge { background:linear-gradient(135deg,#FFB300,#FF8C00) !important; color:#fff !important; border-radius:0 0 12px 0 !important; }
+
+body[data-theme="travel"] .dashboard-card { background:#fff !important; border-color:#D8EAF6 !important; }
+body[data-theme="travel"] .dashboard-card h3 { color:#0090D0 !important; border-bottom-color:#D8EAF6 !important; }
+body[data-theme="travel"] .highlight-banner { background:linear-gradient(135deg,#E0F7FF,#fff) !important; border-color:rgba(0,191,255,0.25) !important; }
+body[data-theme="travel"] .glass-card { background:rgba(255,255,255,0.92) !important; border-color:rgba(0,191,255,0.2) !important; color:#1A2A3A !important; }
+body[data-theme="travel"] .feature-modal-content { background:#fff !important; border-color:#00BFFF !important; color:#1A2A3A !important; }
+body[data-theme="travel"] #loginOverlay { background:linear-gradient(160deg,#00BFFF 0%,#0090D0 50%,#006FAB 100%) !important; }
+body[data-theme="travel"] .spinner { border-color:rgba(0,191,255,0.2) !important; border-top-color:#00BFFF !important; border-right-color:#FFB300 !important; }
+body[data-theme="travel"] #loadingText { background:linear-gradient(90deg,rgba(255,255,255,0.7),#fff,rgba(255,220,80,0.9),#fff,rgba(255,255,255,0.7)) !important; -webkit-background-clip:text !important; -webkit-text-fill-color:transparent !important; background-size:250% auto !important; }
+body[data-theme="travel"] .vip-lock-box { background:#E0F7FF !important; border-color:rgba(0,191,255,0.3) !important; }
+body[data-theme="travel"] .slide-indicator { background:rgba(255,255,255,0.9) !important; color:#0090D0 !important; }
+body[data-theme="travel"] #dynamic-category-container select.input-dark {
+    background:#fff !important; border:1.5px solid #D8EAF6 !important;
+    border-radius:100px !important; color:#1A2A3A !important;
+    padding:8px 16px !important; font-size:12px !important;
+}
+
+/* ══════════════════════════════════════════
+   🔮 NEON NIGHT THEME
+   ══════════════════════════════════════════ */
+bodybody[data-theme="neon"] { background-color:#08001A !important; color:#E0C0FF !important; }
+
+body[data-theme="neon"] header {
+    background:linear-gradient(180deg,#0D001F,#08001A) !important;
+    border-bottom:1px solid rgba(150,0,255,0.3) !important;
+    box-shadow:0 4px 20px rgba(150,0,255,0.15) !important;
+    border-radius:0 !important;
+}
+body[data-theme="neon"] header h1 {
+    background:linear-gradient(90deg,#FF00FF,#CC00FF,#00FFFF);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    background-clip:text; font-size:22px !important; letter-spacing:2px;
+}
+body[data-theme="neon"] header p { color:#8060C0 !important; letter-spacing:3px; text-transform:uppercase; font-size:11px !important; }
+body[data-theme="neon"] #header-profile { border-color:#CC00FF !important; background:rgba(150,0,255,0.2) !important; box-shadow:0 0 20px rgba(200,0,255,0.3) !important; }
+body[data-theme="neon"] #points-widget { background:rgba(150,0,255,0.2) !important; border-color:rgba(200,0,255,0.5) !important; }
+body[data-theme="neon"] #user-points-display { color:#FF00FF !important; }
+
+body[data-theme="neon"] nav { background:#0D001F !important; border-bottom:1px solid rgba(150,0,255,0.2) !important; }
+body[data-theme="neon"] nav div { color:#504080 !important; }
+body[data-theme="neon"] nav div.active { color:#CC00FF !important; }
+body[data-theme="neon"] nav div.active::after { background:linear-gradient(90deg,#FF00FF,#CC00FF) !important; box-shadow:0 -2px 10px rgba(200,0,255,0.5) !important; }
+
+body[data-theme="neon"] .search-area { background:rgba(150,0,255,0.1) !important; border:1px solid rgba(150,0,255,0.35) !important; border-radius:16px !important; }
+body[data-theme="neon"] select,body[data-theme="neon"] input[type="text"],body[data-theme="neon"] input[type="password"],body[data-theme="neon"] input[type="number"],body[data-theme="neon"] textarea {
+    background:rgba(13,0,31,0.8) !important; color:#E0C0FF !important; border-color:rgba(150,0,255,0.3) !important;
+}
+body[data-theme="neon"] select:focus,body[data-theme="neon"] input:focus,body[data-theme="neon"] textarea:focus {
+    border-color:#CC00FF !important; box-shadow:0 0 0 3px rgba(200,0,255,0.2) !important;
+}
+body[data-theme="neon"] .btn-primary { background:linear-gradient(135deg,#9600FF,#FF00FF) !important; color:#fff !important; box-shadow:0 4px 16px rgba(150,0,255,0.4) !important; }
+body[data-theme="neon"] .btn-enter-glow { background:linear-gradient(135deg,#9600FF,#FF00FF) !important; color:#fff !important; }
+
+body[data-theme="neon"] .place-card { background:#0D001F !important; border:1px solid rgba(150,0,255,0.25) !important; border-radius:16px !important; box-shadow:none !important; }
+body[data-theme="neon"] .place-card:hover { border-color:#CC00FF !important; box-shadow:0 0 20px rgba(200,0,255,0.2) !important; }
+body[data-theme="neon"] .place-info { background:#0D001F !important; }
+body[data-theme="neon"] .place-card img.main-img { background-color:rgba(150,0,255,0.15) !important; }
+body[data-theme="neon"] .distance-badge { background:rgba(13,0,31,0.9) !important; color:#CC00FF !important; border-color:rgba(150,0,255,0.4) !important; }
+body[data-theme="neon"] .card-vip { border-color:#CC00FF !important; box-shadow:0 0 15px rgba(200,0,255,0.3) !important; }
+body[data-theme="neon"] .vip-crown-badge { background:linear-gradient(135deg,#9600FF,#FF00FF) !important; color:#fff !important; }
+
+body[data-theme="neon"] .dashboard-card { background:#0D001F !important; border-color:rgba(150,0,255,0.25) !important; }
+body[data-theme="neon"] .dashboard-card h3 { color:#CC00FF !important; border-bottom-color:rgba(150,0,255,0.2) !important; }
+body[data-theme="neon"] .glass-card { background:rgba(13,0,31,0.85) !important; border-color:rgba(150,0,255,0.3) !important; color:#E0C0FF !important; }
+body[data-theme="neon"] .feature-modal-content { background:#0D001F !important; border-color:#CC00FF !important; color:#E0C0FF !important; }
+body[data-theme="neon"] #loginOverlay { background:radial-gradient(ellipse at 50% 0%,#1A003A,#08001A) !important; }
+body[data-theme="neon"] .spinner { border-color:rgba(150,0,255,0.2) !important; border-top-color:#CC00FF !important; border-right-color:#FF00FF !important; }
+body[data-theme="neon"] .highlight-banner { background:linear-gradient(135deg,#0D001F,#1A003A) !important; border-color:rgba(150,0,255,0.3) !important; }
+body[data-theme="neon"] .vip-lock-box { background:rgba(150,0,255,0.1) !important; border-color:rgba(150,0,255,0.3) !important; }
+body[data-theme="neon"] .slide-indicator { background:rgba(13,0,31,0.9) !important; color:#CC00FF !important; }
+body[data-theme="neon"] .btn-outline { border-color:rgba(150,0,255,0.4) !important; color:#CC00FF !important; }
+body[data-theme="neon"] .btn-outline:hover { background:rgba(150,0,255,0.1) !important; }
+
+/* ══════════════════════════════════════════
+   🌅 OCEAN SUNSET THEME
+   ══════════════════════════════════════════ */
+bodybody[data-theme="ocean"] { background-color:#FFF8F0 !important; color:#3D1A08 !important; }
+
+body[data-theme="ocean"] header {
+    background:linear-gradient(160deg,#FF6B35 0%,#FF8C5A 45%,#FFB347 100%) !important;
+    border:none !important; border-radius:0 0 28px 28px !important;
+    box-shadow:0 8px 32px rgba(255,100,50,0.25) !important;
+    position:relative; overflow:hidden;
+}
+body[data-theme="ocean"] header::before {
+    content:'';position:absolute;top:-30px;right:-30px;width:150px;height:150px;
+    border-radius:50%;background:radial-gradient(circle,rgba(255,255,150,0.35),transparent 65%);
+    pointer-events:none;
+}
+body[data-theme="ocean"] header::after {
+    content:'';position:absolute;bottom:0;left:0;right:0;height:20px;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 20'%3E%3Cpath d='M0,10 C200,0 400,20 600,10 C800,0 1000,20 1200,10 L1200,20 L0,20 Z' fill='%23FFF8F0'/%3E%3C/svg%3E") repeat-x;
+    background-size:600px 20px; animation:header-wave 6s linear infinite; pointer-events:none;
+}
+body[data-theme="ocean"] header h1 { color:#fff !important; text-shadow:0 2px 8px rgba(0,0,0,0.2) !important; }
+body[data-theme="ocean"] header p  { color:rgba(255,255,255,0.88) !important; }
+body[data-theme="ocean"] #header-profile { border-color:rgba(255,255,255,0.7) !important; background:rgba(255,255,255,0.25) !important; }
+body[data-theme="ocean"] #points-widget { background:rgba(255,255,255,0.22) !important; border-color:rgba(255,255,255,0.5) !important; }
+body[data-theme="ocean"] #user-points-display { color:#fff !important; }
+
+body[data-theme="ocean"] nav { background:#fff !important; border-bottom:1px solid #FFD8C0 !important; box-shadow:0 2px 12px rgba(255,100,50,0.08) !important; }
+body[data-theme="ocean"] nav div { color:#C0907A !important; }
+body[data-theme="ocean"] nav div.active { color:#FF6B35 !important; font-weight:600; }
+body[data-theme="ocean"] nav div.active::after { background:linear-gradient(90deg,#FF8C5A,#FF6B35) !important; box-shadow:none !important; }
+
+body[data-theme="ocean"] .search-area { background:#fff !important; border:1.5px solid #FFD8C0 !important; box-shadow:0 6px 24px rgba(255,100,50,0.08) !important; border-radius:20px !important; }
+body[data-theme="ocean"] select,body[data-theme="ocean"] input[type="text"],body[data-theme="ocean"] input[type="password"],body[data-theme="ocean"] input[type="number"],body[data-theme="ocean"] textarea {
+    background:#FFF8F0 !important; color:#3D1A08 !important; border-color:#FFD8C0 !important;
+}
+body[data-theme="ocean"] select:focus,body[data-theme="ocean"] input:focus,body[data-theme="ocean"] textarea:focus {
+    background:#fff !important; border-color:#FF6B35 !important; box-shadow:0 0 0 4px rgba(255,107,53,0.12) !important;
+}
+body[data-theme="ocean"] .btn-primary { background:linear-gradient(135deg,#FF6B35,#FF8C5A) !important; color:#fff !important; box-shadow:0 4px 16px rgba(255,107,53,0.32) !important; }
+body[data-theme="ocean"] .btn-enter-glow { background:linear-gradient(135deg,#FF6B35,#FF8C5A) !important; color:#fff !important; }
+body[data-theme="ocean"] .btn-secondary { background:#fff !important; color:#FF6B35 !important; border-color:#FF6B35 !important; }
+body[data-theme="ocean"] .btn-outline { border-color:#FFD8C0 !important; color:#FF6B35 !important; }
+body[data-theme="ocean"] .btn-outline:hover { background:#FFF0E0 !important; border-color:#FF6B35 !important; }
+
+body[data-theme="ocean"] .place-card { background:#fff !important; border-color:#FFD8C0 !important; box-shadow:0 4px 16px rgba(255,100,50,0.08) !important; border-radius:18px !important; }
+body[data-theme="ocean"] .place-card:hover { border-color:#FF6B35 !important; box-shadow:0 12px 32px rgba(255,107,53,0.15) !important; }
+body[data-theme="ocean"] .place-info { background:#fff !important; }
+body[data-theme="ocean"] .place-card img.main-img { background-color:#FFF0E0 !important; }
+body[data-theme="ocean"] .distance-badge { background:rgba(255,255,255,0.92) !important; color:#FF6B35 !important; border-color:rgba(255,107,53,0.2) !important; }
+body[data-theme="ocean"] .card-vip { border-color:#FFB300 !important; box-shadow:0 4px 20px rgba(255,179,0,0.18) !important; }
+body[data-theme="ocean"] .vip-crown-badge { background:linear-gradient(135deg,#FFB300,#FF8C00) !important; color:#fff !important; }
+
+body[data-theme="ocean"] .dashboard-card { background:#fff !important; border-color:#FFD8C0 !important; }
+body[data-theme="ocean"] .dashboard-card h3 { color:#FF6B35 !important; border-bottom-color:#FFD8C0 !important; }
+body[data-theme="ocean"] .glass-card { background:rgba(255,255,255,0.9) !important; border-color:rgba(255,107,53,0.2) !important; color:#3D1A08 !important; }
+body[data-theme="ocean"] .feature-modal-content { background:#fff !important; border-color:#FF6B35 !important; color:#3D1A08 !important; }
+body[data-theme="ocean"] #loginOverlay { background:linear-gradient(160deg,#FF6B35 0%,#FF8C5A 45%,#FFB347 100%) !important; }
+body[data-theme="ocean"] .spinner { border-color:rgba(255,107,53,0.2) !important; border-top-color:#FF6B35 !important; border-right-color:#FFB300 !important; }
+body[data-theme="ocean"] .highlight-banner { background:linear-gradient(135deg,#FFF0E0,#fff) !important; border-color:rgba(255,107,53,0.2) !important; }
+body[data-theme="ocean"] .vip-lock-box { background:#FFF0E0 !important; border-color:rgba(255,107,53,0.3) !important; }
+body[data-theme="ocean"] .slide-indicator { background:rgba(255,255,255,0.92) !important; color:#FF6B35 !important; }
+
+/* sun pulse for ocean/travel login */
+@keyframes sun-pulse { 0%,100%{transform:scale(1);opacity:.8}50%{transform:scale(1.12);opacity:1} }
