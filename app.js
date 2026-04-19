@@ -89,12 +89,24 @@ function applyThemeToApp(data) {
     if (!data) return;
     currentTheme = { ...currentTheme, ...data };
     const root = document.documentElement;
-    root.style.setProperty('--primary',      currentTheme.primaryColor  || '#C5A059');
-    root.style.setProperty('--prev-primary', currentTheme.primaryColor  || '#C5A059');
-    root.style.setProperty('--bg-light',     currentTheme.bgColor       || '#121418');
-    root.style.setProperty('--dark',         currentTheme.bgColor       || '#121418');
-    root.style.setProperty('--surface',      adjustColor(currentTheme.bgColor || '#121418', 15));
-    root.style.setProperty('--prev-vip',     currentTheme.vipBorderColor || '#FFD700');
+    const preset = currentTheme.themePreset || 'dark';
+    document.body.setAttribute('data-theme', preset);
+    const themeVars = {
+        travel: {'--primary':'#0090D0','--prev-primary':'#0090D0','--primary-light':'#00BFFF','--primary-hover':'#006FAB','--bg-light':'#F0F7FF','--dark':'#F0F7FF','--dark-light':'#FFFFFF','--dark-muted':'#D8EAF6','--surface':'#FFFFFF','--border':'rgba(0,144,208,0.18)','--text-main':'#1A2A3A','--text-gold':'#0090D0','--text-muted':'#7A94B0','--prev-vip':currentTheme.vipBorderColor||'#FFB300'},
+        neon:   {'--primary':'#CC00FF','--prev-primary':'#CC00FF','--primary-light':'#FF00FF','--primary-hover':'#9600FF','--bg-light':'#08001A','--dark':'#08001A','--dark-light':'#0D001F','--dark-muted':'#1A003A','--surface':'#0D001F','--border':'rgba(150,0,255,0.3)','--text-main':'#E0C0FF','--text-gold':'#CC00FF','--text-muted':'#8060C0','--prev-vip':currentTheme.vipBorderColor||'#FF00FF'},
+        ocean:  {'--primary':'#FF6B35','--prev-primary':'#FF6B35','--primary-light':'#FF8C5A','--primary-hover':'#E05020','--bg-light':'#FFF8F0','--dark':'#FFF8F0','--dark-light':'#FFFFFF','--dark-muted':'#FFE8D0','--surface':'#FFFFFF','--border':'rgba(255,107,53,0.2)','--text-main':'#3D1A08','--text-gold':'#FF6B35','--text-muted':'#C0907A','--prev-vip':currentTheme.vipBorderColor||'#FFB300'},
+    };
+    if (themeVars[preset]) {
+        Object.entries(themeVars[preset]).forEach(([k,v]) => root.style.setProperty(k, typeof v === 'string' ? v : v));
+    } else {
+        document.body.setAttribute('data-theme','dark');
+        root.style.setProperty('--primary',      currentTheme.primaryColor  || '#C5A059');
+        root.style.setProperty('--prev-primary', currentTheme.primaryColor  || '#C5A059');
+        root.style.setProperty('--bg-light',     currentTheme.bgColor       || '#121418');
+        root.style.setProperty('--dark',         currentTheme.bgColor       || '#121418');
+        root.style.setProperty('--surface',      adjustColor(currentTheme.bgColor || '#121418', 15));
+        root.style.setProperty('--prev-vip',     currentTheme.vipBorderColor || '#FFD700');
+    }
 
     document.querySelectorAll('.gold-logo').forEach(logo => {
         const parent   = logo.parentElement;
