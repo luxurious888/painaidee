@@ -35,7 +35,7 @@
         .btn-secondary:hover{border-color:#D9534F;color:#D9534F;}
         .btn-tool{padding:9px 14px;border-radius:8px;border:1px solid #444;background:#121418;color:#FFF;font-family:'Kanit';font-size:13px;cursor:pointer;transition:.2s;margin-top:6px;margin-right:6px;}
         .btn-tool:hover{border-color:var(--primary);color:var(--primary);}
-        .preset-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:15px;}
+        .preset-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:15px;grid-auto-rows:auto;}
         @media(max-width:500px){.preset-grid{grid-template-columns:repeat(2,1fr);}}
         .btn-preset{padding:10px 6px;border-radius:10px;border:1px solid #444;font-family:'Kanit';font-size:12px;font-weight:600;cursor:pointer;transition:.3s;display:flex;flex-direction:column;align-items:center;gap:3px;line-height:1.4;}
         .btn-preset:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.6);}
@@ -362,12 +362,17 @@ const themes=[
     {name:'🌸 พาสเทล',     sub:'ชมพู/ม่วง/ฟ้า',    bg:'#1A0F1A',primary:'#CE93D8',vip:'#80DEEA',ve:'float',   le:'swing', pe:'pulse-ring'},
     {name:'🏆 แชมป์',      sub:'ทอง/เงิน/ทองแดง',  bg:'#0D0A00',primary:'#FFC107',vip:'#FFD700',ve:'gold',    le:'shine', pe:'glow-gold'},
     {name:'🤍 มินิมอล',    sub:'ขาว/เทา',          bg:'#F0F0F0',primary:'#424242',vip:'#9E9E9E',ve:'none',    le:'none',  pe:'none'},
+    {name:'🌤️ Bright Travel',sub:'ฟ้าสว่าง/ส้มทอง',  bg:'#F0F7FF',primary:'#0090D0',vip:'#FFB300',ve:'float',   le:'shine', pe:'pulse-ring', preset:'travel'},
+    {name:'🔮 Neon Night',   sub:'ดำ/ม่วง/นีออน',    bg:'#08001A',primary:'#CC00FF',vip:'#FF00FF',ve:'neon',    le:'glitch',pe:'rainbow-spin', preset:'neon'},
+    {name:'🌅 Ocean Sunset', sub:'ส้มแดง/ครีม/อบอุ่น',bg:'#FFF8F0',primary:'#FF6B35',vip:'#FFB300',ve:'glow',    le:'shine', pe:'glow-gold',  preset:'ocean'},
 ];
 
 function buildPresetGrid(){
-    document.getElementById('presetGrid').innerHTML=themes.map((t,i)=>
-        `<button class="btn-preset" onclick="applyPreset(${i})" style="background:${t.bg};color:${t.primary};border-color:${t.vip};">${t.name}<span>${t.sub}</span></button>`
-    ).join('');
+    document.getElementById('presetGrid').innerHTML=themes.map((t,i)=>{
+        const isNew = t.preset && t.preset !== 'dark';
+        const extra = isNew ? 'border-width:2px;box-shadow:0 0 8px '+t.primary+'66;' : '';
+        return `<button class="btn-preset" onclick="applyPreset(${i})" style="background:${t.bg};color:${t.primary};border-color:${t.vip};${extra}">${t.name}${isNew?'<span style=\'color:'+t.primary+'80\'>✨ Layout</span>':'<span>'+t.sub+'</span>'}</button>`;
+    }).join('');
 }
 
 let currentLogoUrl='';
