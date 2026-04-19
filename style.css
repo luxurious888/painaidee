@@ -422,6 +422,36 @@ body[data-theme="neon"] header {
 body[data-theme="travel"] .place-grid,
 body[data-theme="ocean"] .place-grid,
 body[data-theme="neon"] .place-grid {
-    grid-template-columns:repeat(auto-fill,minmax(160px,1fr)) !important;
-    gap:12px !important;
+    grid-template-columns:repeat(2,1fr) !important;
+    gap:14px !important;
+}
+body[data-theme="travel"] .place-card .place-info h3,
+body[data-theme="ocean"] .place-card .place-info h3,
+body[data-theme="neon"] .place-card .place-info h3 {
+    display:-webkit-box !important;
+    -webkit-line-clamp:2 !important;
+    -webkit-box-orient:vertical !important;
+    overflow:hidden !important;
+    font-size:13px !important;
+    line-height:1.4 !important;
+}
+body[data-theme="travel"] .place-card .place-info p,
+body[data-theme="ocean"] .place-card .place-info p,
+body[data-theme="neon"] .place-card .place-info p {
+    font-size:11px !important;
+    white-space:nowrap !important;
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
+}
+body[data-theme="travel"] .action-buttons,
+body[data-theme="ocean"] .action-buttons,
+body[data-theme="neon"] .action-buttons {
+    gap:5px !important;
+}
+body[data-theme="travel"] .btn-action,
+body[data-theme="ocean"] .btn-action,
+body[data-theme="neon"] .btn-action {
+    font-size:11px !important;
+    padding:8px 4px !important;
+    border-radius:8px !important;
 }
