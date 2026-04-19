@@ -830,7 +830,7 @@ function showSpinResult(item) {
     const now    = Date.now();
     const isVIP  = item.isVIP;
     const navUrl = `https://www.google.com/maps/search/?api=1&query=${p.geometry.location.lat()},${p.geometry.location.lng()}`;
-    const imgUrl = p.photos ? p.photos[0].getUrl({ maxWidth: 500 }) : 'https://via.placeholder.com/500x250?text=Painaidee';
+    const imgUrl = p.photos ? p.photos[0].getUrl({ maxWidth: 500 }) : 'https://placehold.co/500x250?text=Painaidee';
 
     // สถานะเปิด-ปิด
     let statusHtml = '';
@@ -1583,7 +1583,7 @@ function renderCards(keywordSearched) {
         // รวมรูปแกลลอรี่เข้าก่อน แล้วตามด้วยรูป Google
         const allImgs = galleryImgs.length > 0
             ? [...galleryImgs, ...(mainImg ? [mainImg] : [])]
-            : (mainImg ? [mainImg] : ['https://via.placeholder.com/400x200?text=Painaidee']);
+            : (mainImg ? [mainImg] : ['https://placehold.co/400x200?text=Painaidee']);
         const sliderUid = p.place_id.slice(-6);
         const imgSliderHtml = allImgs.length === 1
             ? `<img src="${allImgs[0]}" class="main-img" onclick="event.stopPropagation(); openImageModal(this.src)">`

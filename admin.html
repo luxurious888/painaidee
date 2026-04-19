@@ -8,6 +8,7 @@
     
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap');
@@ -106,6 +107,7 @@
         <div class="tab-btn active" onclick="switchAdminPage('dashboard', this)">🎛️ แผงควบคุมหลัก</div>
         <div class="tab-btn" onclick="switchAdminPage('affiliate', this)">🤝 จัดการระบบ Affiliate</div>
         <div class="tab-btn" onclick="switchAdminPage('storeinfo', this)">📂 ข้อมูลเชิงลึก & LINE ID</div>
+        <div class="tab-btn" onclick="switchAdminPage('stats', this)">📊 สถิติการใช้งาน</div>
     </div>
 
     <div id="page-dashboard" class="admin-page active">
@@ -317,6 +319,36 @@
     </div>
 </div>
 
+    <div id="page-stats" class="admin-page">
+        <div class="card border-l-4 border-emerald-500 p-5">
+            <h2 class="text-xl font-bold mb-4 text-emerald-400">📊 สถิติการใช้งาน (Real-time)</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div class="bg-[#2A2E36] p-4 rounded-xl text-center border border-gray-700">
+                    <p class="text-gray-400 text-sm">ผู้ใช้งานทั้งหมด</p>
+                    <h3 id="statTotalUsers" class="text-3xl font-bold text-white">0</h3>
+                </div>
+                <div class="bg-[#2A2E36] p-4 rounded-xl text-center border border-gray-700">
+                    <p class="text-gray-400 text-sm">ผู้ใช้งาน 24 ชั่วโมง</p>
+                    <h3 id="statActiveUsers" class="text-3xl font-bold text-emerald-500">0</h3>
+                </div>
+                <div class="bg-[#2A2E36] p-4 rounded-xl text-center border border-gray-700">
+                    <p class="text-gray-400 text-sm">เข้าผ่าน LINE App</p>
+                    <h3 id="statLineApp" class="text-3xl font-bold text-cyan-400">0</h3>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-[#1A1D23] p-4 rounded-xl border border-gray-700">
+                    <h3 class="text-center text-sm text-gray-300 mb-2">📱 สัดส่วน OS</h3>
+                    <div style="position:relative;height:250px;width:100%;"><canvas id="osChart"></canvas></div>
+                </div>
+                <div class="bg-[#1A1D23] p-4 rounded-xl border border-gray-700">
+                    <h3 class="text-center text-sm text-gray-300 mb-2">📍 Top 5 จังหวัด</h3>
+                    <div style="position:relative;height:250px;width:100%;"><canvas id="provinceChart"></canvas></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 <script>
     // ==========================================
     // ⚡ 1. การตั้งค่าระบบ (Configuration)
@@ -359,6 +391,7 @@
         btnElement.classList.add('active');
         if(pageId === 'affiliate') renderAffiliate();
         if(pageId === 'storeinfo') renderStoreInfo();
+        if(pageId === 'stats') loadStatistics();
     }
 
     function checkAdminLogin() {

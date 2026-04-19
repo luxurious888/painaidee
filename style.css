@@ -447,6 +447,7 @@ body[data-theme="travel"] .action-buttons,
 body[data-theme="ocean"] .action-buttons,
 body[data-theme="neon"] .action-buttons {
     gap:5px !important;
+    flex-wrap:wrap !important;
 }
 body[data-theme="travel"] .btn-action,
 body[data-theme="ocean"] .btn-action,
@@ -454,4 +455,13 @@ body[data-theme="neon"] .btn-action {
     font-size:11px !important;
     padding:8px 4px !important;
     border-radius:8px !important;
+    min-width:28% !important;
+    flex:1 !important;
+}
+
+/* ══ MAP hidden in new themes — show via modal ══ */
+body[data-theme="travel"] #map,
+body[data-theme="ocean"] #map,
+body[data-theme="neon"] #map {
+    display:none !important;
 }
