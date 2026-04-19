@@ -362,3 +362,66 @@ body[data-theme="ocean"] .slide-indicator { background:rgba(255,255,255,0.92) !i
 
 /* sun pulse for ocean/travel login */
 @keyframes sun-pulse { 0%,100%{transform:scale(1);opacity:.8}50%{transform:scale(1.12);opacity:1} }
+
+/* ══ CATEGORY LAYOUT per theme ══ */
+body[data-theme="travel"] #dynamic-category-container,
+body[data-theme="ocean"] #dynamic-category-container {
+    display:flex !important;
+    overflow-x:auto !important;
+    gap:8px !important;
+    padding:4px 0 12px !important;
+    scrollbar-width:none !important;
+    grid-template-columns:unset !important;
+}
+body[data-theme="travel"] #dynamic-category-container select,
+body[data-theme="ocean"] #dynamic-category-container select {
+    flex-shrink:0 !important;
+    width:auto !important;
+    border-radius:100px !important;
+    padding:8px 16px !important;
+    font-size:12px !important;
+    background:#fff !important;
+    border:1.5px solid #D8EAF6 !important;
+    color:#1A2A3A !important;
+    appearance:none !important;
+    -webkit-appearance:none !important;
+    cursor:pointer !important;
+    white-space:nowrap !important;
+}
+
+body[data-theme="neon"] #dynamic-category-container {
+    display:flex !important;
+    overflow-x:auto !important;
+    gap:8px !important;
+    padding:4px 0 12px !important;
+    scrollbar-width:none !important;
+    grid-template-columns:unset !important;
+}
+body[data-theme="neon"] #dynamic-category-container select {
+    flex-shrink:0 !important;
+    width:auto !important;
+    border-radius:100px !important;
+    padding:8px 16px !important;
+    font-size:12px !important;
+    background:rgba(13,0,31,0.8) !important;
+    border:1px solid rgba(150,0,255,0.4) !important;
+    color:#E0C0FF !important;
+    appearance:none !important;
+    -webkit-appearance:none !important;
+    cursor:pointer !important;
+}
+
+/* ══ HERO HEADER layout per theme ══ */
+body[data-theme="travel"] header,
+body[data-theme="ocean"] header,
+body[data-theme="neon"] header {
+    border-radius:0 0 28px 28px !important;
+}
+
+/* ══ PLACE CARD grid ══ */
+body[data-theme="travel"] .place-grid,
+body[data-theme="ocean"] .place-grid,
+body[data-theme="neon"] .place-grid {
+    grid-template-columns:repeat(auto-fill,minmax(160px,1fr)) !important;
+    gap:12px !important;
+}
