@@ -401,7 +401,7 @@ function applyPreset(i){
     document.getElementById('logoPreview').style.display='none';
     document.getElementById('btnClearLogo').style.display='none';
     document.getElementById('preview-logo-img').src=defaultSvg;
-    applyValuesToForm({bgColor:t.bg,primaryColor:t.primary,vipBorderColor:t.vip,vipEffect:t.ve,logoEffect:t.le,profileEffect:t.pe,logoUrl:''});
+    applyValuesToForm({bgColor:t.bg,primaryColor:t.primary,vipBorderColor:t.vip,vipEffect:t.ve,logoEffect:t.le,profileEffect:t.pe,logoUrl:'',themePreset:t.preset||'dark'});
 }
 
 async function loadCurrentSettings(){
@@ -417,6 +417,7 @@ function applyValuesToForm(d){
     document.getElementById('logoEffect').value     =d.logoEffect     ||defaultTheme.logoEffect;
     document.getElementById('profileEffect').value  =d.profileEffect  ||defaultTheme.profileEffect;
     currentLogoUrl=d.logoUrl||'';
+    window._currentThemePreset=d.themePreset||'dark';
     const prev=document.getElementById('preview-logo-img');
     const lpv=document.getElementById('logoPreview');
     const clr=document.getElementById('btnClearLogo');
@@ -508,6 +509,7 @@ async function saveThemeSettings(){
             logoEffect:document.getElementById('logoEffect').value,
             profileEffect:document.getElementById('profileEffect').value,
             logoUrl:finalLogoUrl,
+            themePreset:window._currentThemePreset||'dark',
             updatedAt:new Date().toLocaleString()
         });
         currentLogoUrl=finalLogoUrl;
