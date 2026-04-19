@@ -2488,3 +2488,65 @@ async function submitEditPromo() {
         btn.disabled  = false;
     }
 }
+
+// ══════════════════════════════════════════
+// 🗺️ Map Modal (สำหรับธีมใหม่)
+// ══════════════════════════════════════════
+function openMapModal(place) {
+    const lat = place.geometry.location.lat();
+    const lng = place.geometry.location.lng();
+    const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+    const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+
+    // สร้าง modal ถ้ายังไม่มี
+    let modal = document.getElementById('mapViewModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'mapViewModal';
+        modal.style.cssText = 'display:none;position:fixed;inset:0;z-index:99998;flex-direction:column;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);';
+        modal.innerHTML = `
+            <div style="margin-top:auto;background:var(--surface);border-radius:24px 24px 0 0;overflow:hidden;max-height:90vh;">
+                <div id="mapModalMap" style="width:100%;height:55vh;background:var(--dark-muted);"></div>
+                <div style="padding:16px;">
+                    <div style="width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 14px;"></div>
+                    <h3 id="mapModalName" style="margin:0 0 4px;font-size:16px;font-weight:700;color:var(--text-main);"></h3>
+                    <p id="mapModalAddr" style="margin:0 0 14px;font-size:12px;color:var(--text-muted);"></p>
+                    <div style="display:flex;flex-direction:column;gap:8px;">
+                        <button id="mapModalNav" style="width:100%;padding:14px;border:none;border-radius:14px;background:linear-gradient(135deg,var(--primary-light,#00BFFF),var(--primary));color:#fff;font-family:'Kanit';font-size:15px;font-weight:700;cursor:pointer;">🧭 นำทางไปเลย!</button>
+                        <button onclick="document.getElementById('mapViewModal').style.display='none';" style="width:100%;padding:12px;border:none;border-radius:14px;background:var(--dark-muted);color:var(--text-muted);font-family:'Kanit';font-size:14px;cursor:pointer;">✕ ปิด</button>
+                    </div>
+                </div>
+            </div>`;
+        modal.onclick = (e) => { if(e.target===modal) modal.style.display='none'; };
+        document.body.appendChild(modal);
+    }
+
+    // ใส่ข้อมูล
+    document.getElementById('mapModalName').innerText = place.name || '';
+    document.getElementById('mapModalAddr').innerText = place.vicinity || '';
+    document.getElementById('mapModalNav').onclick = () => window.open(navUrl, '_blank');
+
+    // แสดง modal
+    modal.style.display = 'flex';
+
+    // init mini map ใน modal
+    setTimeout(() => {
+        const mapDiv = document.getElementById('mapModalMap');
+        if (!mapDiv._mapInit) {
+            const miniMap = new google.maps.Map(mapDiv, {
+                center: place.geometry.location,
+                zoom: 16,
+                mapTypeControl: false,
+                streetViewControl: false,
+                fullscreenControl: false,
+                zoomControl: true,
+            });
+            new google.maps.Marker({ position: place.geometry.location, map: miniMap, animation: google.maps.Animation.DROP });
+            mapDiv._mapInit = true;
+            mapDiv._miniMap = miniMap;
+        } else {
+            mapDiv._miniMap.panTo(place.geometry.location);
+            mapDiv._miniMap.setZoom(16);
+        }
+    }, 100);
+}
