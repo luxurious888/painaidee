@@ -1250,7 +1250,6 @@ const provinces = [
 ];
 
 let map, service, infoWindow;
-let currentCoords    = { lat: 15.2287, lng: 104.8564 };
 let googlePlaces     = [];
 let currentPagination = null;
 let gpsMarker        = null;
