@@ -465,3 +465,29 @@ body[data-theme="ocean"] #map,
 body[data-theme="neon"] #map {
     display:none !important;
 }
+
+/* ══ ปุ่มใน card สำหรับธีมสว่าง ══ */
+body[data-theme="travel"] .btn-share,
+body[data-theme="ocean"] .btn-share {
+    background:#F0F7FF !important;
+    color:#0090D0 !important;
+    border:1.5px solid #D8EAF6 !important;
+}
+body[data-theme="ocean"] .btn-share {
+    background:#FFF0E0 !important;
+    color:#FF6B35 !important;
+    border:1.5px solid #FFD8C0 !important;
+}
+body[data-theme="travel"] .btn-action[style*="danger"],
+body[data-theme="ocean"] .btn-action[style*="danger"],
+body[data-theme="travel"] .btn-action[data-pid],
+body[data-theme="ocean"] .btn-action[data-pid] {
+    background:rgba(239,68,68,0.08) !important;
+    color:#DC2626 !important;
+    border:1px solid rgba(239,68,68,0.25) !important;
+}
+body[data-theme="neon"] .btn-share {
+    background:rgba(150,0,255,0.12) !important;
+    color:#CC00FF !important;
+    border:1px solid rgba(150,0,255,0.3) !important;
+}
