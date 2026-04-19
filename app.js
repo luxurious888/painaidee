@@ -1,3 +1,5 @@
+let curProv = 'ubon';
+let currentCoords = { lat: 15.2287, lng: 104.8564 };
 // 🛡️ Global Error Handler
 // ==========================================
 window.addEventListener('error', function (event) {
