@@ -194,21 +194,6 @@
             color: #C85A1A !important;
         }
 
-        /* ═══════════════════════════════════════
-           MAP SECTION
-        ═══════════════════════════════════════ */
-        .home-map-wrap {
-            position: relative;
-            background: #F7F4EF;
-            padding: 0 16px 14px;
-        }
-        #map {
-            width: 100% !important;
-            height: 220px !important;
-            border-radius: 16px !important;
-            overflow: hidden;
-            border: 0.5px solid #e0d8cc;
-        }
 
         /* ═══════════════════════════════════════
            PROMO BANNER OVERRIDE
@@ -239,19 +224,51 @@
         }
 
         /* ═══════════════════════════════════════
-           NAV OVERRIDE  (top nav stays, just restyle)
+           NAV OVERRIDE  (force over style.css)
         ═══════════════════════════════════════ */
-        nav {
+        body nav,
+        #appContent nav {
             background: #1A1208 !important;
-            border-bottom: 0.5px solid rgba(245,156,58,0.25) !important;
+            border-bottom: 1px solid rgba(245,156,58,0.25) !important;
+            box-shadow: none !important;
         }
-        nav div {
+        body nav div,
+        #appContent nav div {
             color: rgba(255,255,255,0.45) !important;
-            font-size: 13px !important; font-weight: 600 !important;
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            border-bottom: 2px solid transparent !important;
         }
-        nav div.active {
+        body nav div.active,
+        #appContent nav div.active {
             color: #F59C3A !important;
             border-bottom-color: #F59C3A !important;
+            background: transparent !important;
+        }
+        body nav div:hover,
+        #appContent nav div:hover {
+            color: rgba(255,255,255,0.75) !important;
+            background: rgba(255,255,255,0.05) !important;
+        }
+
+        /* ═══════════════════════════════════════
+           MAP — force show with height
+        ═══════════════════════════════════════ */
+        .home-map-wrap {
+            display: block !important;
+            padding: 0 16px 14px !important;
+            background: #F7F4EF !important;
+        }
+        #page-home #map,
+        .home-map-wrap #map {
+            display: block !important;
+            width: 100% !important;
+            height: 220px !important;
+            min-height: 220px !important;
+            border-radius: 16px !important;
+            overflow: hidden !important;
+            border: 0.5px solid #e0d8cc !important;
+            margin: 0 !important;
         }
     </style>
 </head>
@@ -985,7 +1002,7 @@
 
 </div><!-- /appContent -->
 
-<script src="app.js?v=217"></script>
+<script src="app.js?v=218"></script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD7Qqf1Z9KQBuvipDzgIc5laJLz9SiOBH8&libraries=places,geometry&callback=initMap" async defer></script>
 </body>
 </html>
