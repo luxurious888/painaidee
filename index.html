@@ -270,6 +270,112 @@
             border: 0.5px solid #e0d8cc !important;
             margin: 0 !important;
         }
+    
+        /* ═══════════════════════════════════════
+           PLACE LIST & CARD REDESIGN
+        ═══════════════════════════════════════ */
+        #page-home #placeList,
+        #placeList.place-grid {
+            background: #F0EDE6 !important;
+            padding: 12px 14px 80px !important;
+            gap: 14px !important;
+        }
+        #placeList .place-card {
+            background: #FFFFFF !important;
+            border: 0.5px solid #E8E2D9 !important;
+            border-radius: 18px !important;
+            overflow: hidden !important;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07) !important;
+            transition: transform 0.15s, box-shadow 0.15s !important;
+            position: relative !important;
+            margin-bottom: 0 !important;
+        }
+        #placeList .place-card:active {
+            transform: scale(0.985) !important;
+        }
+        #placeList .place-card.card-vip {
+            border: 1.5px solid #F59C3A !important;
+            box-shadow: 0 4px 20px rgba(245,156,58,0.15) !important;
+            background: #FFFCF7 !important;
+        }
+        #placeList .vip-crown-badge {
+            background: linear-gradient(90deg, #1A1208, #3D2810) !important;
+            color: #F59C3A !important;
+            font-size: 11px !important;
+            font-weight: 800 !important;
+            letter-spacing: 0.8px !important;
+            padding: 6px 14px !important;
+            text-align: center !important;
+            border-bottom: 1px solid rgba(245,156,58,0.3) !important;
+        }
+        #placeList .distance-badge {
+            position: absolute !important;
+            top: 10px !important; left: 10px !important;
+            background: rgba(26,18,8,0.72) !important;
+            color: #F59C3A !important;
+            font-size: 11px !important; font-weight: 700 !important;
+            padding: 3px 9px !important;
+            border-radius: 20px !important;
+            z-index: 5 !important; border: none !important;
+        }
+        #placeList .card-vip .distance-badge { top: 42px !important; }
+        #placeList .place-card .main-img {
+            width: 100% !important; height: 185px !important;
+            object-fit: cover !important; display: block !important;
+            border-radius: 0 !important;
+        }
+        #placeList .place-card [id^="gslide_"] img {
+            height: 185px !important; object-fit: cover !important;
+        }
+        #placeList .place-info {
+            padding: 12px 14px 14px !important;
+            background: transparent !important;
+        }
+        #placeList .place-info h3 {
+            font-size: 15px !important; font-weight: 800 !important;
+            line-height: 1.3 !important; margin: 0 !important;
+        }
+        #placeList .status-tag {
+            font-size: 11px !important; font-weight: 700 !important;
+            padding: 3px 9px !important; border-radius: 20px !important;
+            white-space: nowrap !important;
+        }
+        #placeList .action-buttons {
+            display: flex !important; flex-wrap: wrap !important;
+            gap: 7px !important; margin-top: 12px !important;
+        }
+        #placeList .btn-action {
+            padding: 8px 12px !important;
+            border-radius: 10px !important;
+            font-size: 12px !important; font-weight: 700 !important;
+            font-family: 'Sarabun', 'Kanit', sans-serif !important;
+            cursor: pointer !important; border: none !important;
+            flex-shrink: 0 !important; line-height: 1 !important;
+        }
+        #placeList .btn-nav {
+            background: #C85A1A !important; color: #fff !important;
+            flex: 1 !important; min-width: 72px !important;
+        }
+        #placeList .btn-call {
+            background: #F0EDE6 !important; color: #444 !important;
+            border: 0.5px solid #ddd !important;
+        }
+        #placeList .btn-line {
+            background: #06C755 !important; color: #fff !important;
+        }
+        #placeList .btn-fb {
+            background: #1877F2 !important; color: #fff !important;
+        }
+        #placeList .btn-share {
+            background: #F0EDE6 !important; color: #555 !important;
+            border: 0.5px solid #ddd !important;
+        }
+        #placeList [id^="gind_"] {
+            background: rgba(0,0,0,0.55) !important;
+            color: #fff !important; font-size: 10px !important;
+            padding: 2px 8px !important; border-radius: 20px !important;
+        }
+
     </style>
 </head>
 <body>
@@ -1002,7 +1108,8 @@
 
 </div><!-- /appContent -->
 
-<script src="app.js?v=218"></script>
+<script src="app.js?v=219"></script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD7Qqf1Z9KQBuvipDzgIc5laJLz9SiOBH8&libraries=places,geometry&callback=initMap" async defer></script>
 </body>
 </html>
+<!-- THIS IS A MARKER, REMOVE BEFORE READING -->
