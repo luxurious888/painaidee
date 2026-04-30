@@ -220,6 +220,85 @@
     .c-btn-line   { background:#06C755; color:#fff; }
     .c-btn-fb     { background:#1877F2; color:#fff; }
     .c-btn-report { background:rgba(192,57,43,.08); color:#C0392B; border:.5px solid rgba(192,57,43,.3)!important; }
+
+    /* ════════════════════════════════════════════
+       LIGHT THEME OVERRIDE — matches mockup exactly
+    ════════════════════════════════════════════ */
+
+    /* Page background */
+    html, body {
+        background: #F0EDE6 !important;
+        color: #1A1208 !important;
+    }
+
+    /* App content background */
+    #appContent,
+    #page-home,
+    #page-map,
+    #page-affiliate,
+    #page-partner {
+        background: #F0EDE6 !important;
+    }
+
+    /* ── Category chips section ── */
+    .cats-section {
+        background: #F7F4EF !important;
+    }
+
+    /* ── Promo banner: keep existing style, just fix margin ── */
+    #promoBanner {
+        background: linear-gradient(135deg,#1A1208,#3D2810) !important;
+        margin: 0 0 0 0 !important;
+        border-radius: 0 !important;
+    }
+    #promoBanner h3, #promoBanner p { color: #fff !important; }
+
+    /* ── Place list background ── */
+    #placeList.place-grid {
+        background: #EDE9E2 !important;
+    }
+
+    /* ── Bottom nav light ── */
+    #bottom-nav {
+        background: #fff !important;
+        border-top: 0.5px solid #E8E2D9 !important;
+    }
+    .bn-lb { color: #bbb !important; font-family:'Sarabun',sans-serif !important; }
+    .bn.active .bn-lb { color: #C85A1A !important; }
+
+    /* ── Map sheet light ── */
+    .map-sheet {
+        background: #fff !important;
+        border-radius: 20px 20px 0 0 !important;
+    }
+    .sheet-title { color: #1A1208 !important; }
+
+    /* ── Page topbar ── */
+    .page-topbar { background: #1A1208 !important; }
+
+    /* ── Kill dark backgrounds from style.css on main body ── */
+    body, .page {
+        --bg-light: #F0EDE6 !important;
+        --dark: #F0EDE6 !important;
+        --dark-light: #F7F4EF !important;
+        --dark-muted: #E8E2D9 !important;
+        --surface: #fff !important;
+        --text-main: #1A1208 !important;
+        --text-muted: #666 !important;
+        --border: rgba(26,18,8,0.1) !important;
+    }
+
+    /* Kill dark body background override from style.css */
+    body { min-height: 100vh; }
+
+    /* Place list items text colors */
+    .c-name { color: #1A1208 !important; }
+    .c-meta  { color: #888 !important; }
+    .h-card-name { color: #1A1208 !important; }
+    .h-card-meta { color: #888 !important; }
+    .sheet-title { color: #1A1208 !important; }
+    .cats-label  { color: #999 !important; }
+
     </style>
 </head>
 <body>
@@ -621,8 +700,8 @@
     </div>
 </div>
 
-<script src="app.js?v=223"></script>
-<script src="override.js?v=223"></script>
+<script src="app.js?v=224"></script>
+<script src="override.js?v=224"></script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD7Qqf1Z9KQBuvipDzgIc5laJLz9SiOBH8&libraries=places,geometry&callback=initMap" async defer></script>
 </body>
 </html>
