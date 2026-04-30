@@ -1612,50 +1612,7 @@ function renderCards(keywordSearched) {
         if (store?.event?.trim())
             extraTags += `<span class="tag-btn" onclick="event.stopPropagation(); showCustomerDetail('event','${safeName}');" style="background:rgba(23,162,184,0.1);color:var(--info);padding:4px 10px;border-radius:10px;font-size:11px;font-weight:bold;display:inline-block;margin-bottom:5px;cursor:pointer;border:1px solid rgba(23,162,184,0.3);">🎉 กิจกรรม</span>`;
 
-        const vipEffectClass = isVIP && currentTheme.vipEffect && currentTheme.vipEffect !== 'none'
-            ? ' vip-' + currentTheme.vipEffect : '';
-
-        return `
-        <div class="place-card ${isVIP ? 'card-vip' + vipEffectClass : ''}"
-             onclick="const _el=event.composedPath().find(function(n){return n instanceof Element&&(n.tagName==='BUTTON'||n.classList.contains('tag-btn'));}); if(!_el){focusPlace('${p.place_id}');trackAction('${p.name.replace(/'/g,"\\'")}','view');}"
-             style="cursor:pointer;">
-            ${isVIP ? '<div class="vip-crown-badge">👑 VIP RECOMMEND</div>' : ''}
-            <div class="distance-badge">${distKm} กม.</div>
-            ${imgSliderHtml}
-            <div class="place-info">
-                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:8px;">
-                    <h3 style="margin:0;font-size:16px;flex:1;color:${isVIP ? 'var(--prev-vip)' : 'var(--primary)'};font-weight:600;line-height:1.2;">
-                        ${p.name}
-                    </h3>
-                    <div style="text-align:right;flex-shrink:0;">${statusHtml}</div>
-                </div>
-                <div style="margin-bottom:5px;">${extraTags}</div>
-                <p style="font-size:13px;color:var(--text-muted);margin:0 0 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-                    ${p.vicinity}
-                </p>
-                <div><span style="color:var(--primary);font-weight:600;">⭐ ${p.rating || 'ใหม่'}</span></div>
-                <div class="action-buttons">
-                    <button class="btn-action btn-nav"
-                            onclick="event.stopPropagation(); window.open('${navUrl}','_blank'); trackAction('${p.name.replace(/'/g,"\\'")}','dir');">
-                        นำทาง
-                    </button>
-                    <button class="btn-action btn-call"
-                            onclick="event.stopPropagation(); callPlace('${p.place_id}',event);">โทร</button>
-                    ${hasLine ? `<button class="btn-action btn-line" onclick="event.stopPropagation(); window.open('${store.lineUrl.startsWith('http') ? store.lineUrl : 'https://' + store.lineUrl}','_blank');">LINE</button>` : ''}
-                    ${hasFb   ? `<button class="btn-action btn-fb"   onclick="event.stopPropagation(); window.open('${store.fbUrl.startsWith('http')   ? store.fbUrl   : 'https://' + store.fbUrl  }','_blank');">FB</button>` : ''}
-                    <button class="btn-action btn-share"
-                            onclick="event.stopPropagation(); sharePlace('${safeName}',${p.geometry.location.lat()},${p.geometry.location.lng()},event);">
-                        แชร์
-                    </button>
-                    <button class="btn-action"
-                            onclick="event.stopPropagation(); reportClosed(this.dataset.pid);"
-                            data-pid="${p.place_id}"
-                            style="background:rgba(217,83,79,0.15);color:var(--danger);border:1px solid rgba(217,83,79,0.4);font-size:11px;">
-                        🚩 ปิดถาวร
-                    </button>
-                </div>
-            </div>
-        </div>`;
+        const vipEffectClass = isVIP
     }).join('');
 
     if (currentPagination?.hasNextPage && googlePlaces.length < 80)
