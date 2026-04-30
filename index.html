@@ -155,40 +155,68 @@
             text-transform: uppercase; letter-spacing: 0.6px;
             margin-bottom: 10px;
         }
-        /* Override the grid layout from search-area for dynamic-category-container */
+        /* Category container — horizontal scroll */
         #dynamic-category-container {
             display: flex !important;
             flex-direction: row !important;
             gap: 8px !important;
             overflow-x: auto !important;
             scrollbar-width: none !important;
-            padding-bottom: 4px !important;
+            -ms-overflow-style: none !important;
+            padding-bottom: 6px !important;
             margin-bottom: 0 !important;
         }
         #dynamic-category-container::-webkit-scrollbar { display: none; }
-        /* Style the JS-generated category buttons */
-        #dynamic-category-container button,
-        #dynamic-category-container .category-btn {
+
+        /* JS renders <select> elements — style them as pill chips */
+        #dynamic-category-container select {
+            -webkit-appearance: none !important;
+            -moz-appearance: none !important;
+            appearance: none !important;
+            display: inline-block !important;
+            flex-shrink: 0 !important;
+            background: #fff !important;
+            border: 1px solid #e4ddd3 !important;
+            border-radius: 20px !important;
+            padding: 8px 14px !important;
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            color: #333 !important;
+            font-family: 'Sarabun', sans-serif !important;
+            cursor: pointer !important;
+            white-space: nowrap !important;
+            width: auto !important;
+            min-width: 0 !important;
+            box-shadow: none !important;
+            outline: none !important;
+            line-height: 1 !important;
+            background-image: none !important;
+        }
+        #dynamic-category-container select:focus {
+            border-color: #C85A1A !important;
+            color: #C85A1A !important;
+        }
+
+        /* Also style if JS uses button */
+        #dynamic-category-container button {
             display: inline-flex !important;
             align-items: center !important;
             gap: 5px !important;
             background: #fff !important;
-            border: 1px solid #e8e8e8 !important;
+            border: 1px solid #e4ddd3 !important;
             border-radius: 20px !important;
             padding: 8px 14px !important;
             white-space: nowrap !important;
             cursor: pointer !important;
             font-size: 13px !important;
             font-weight: 600 !important;
-            color: #444 !important;
+            color: #333 !important;
             font-family: 'Sarabun', sans-serif !important;
             flex-shrink: 0 !important;
-            transition: all 0.15s !important;
             box-shadow: none !important;
         }
         #dynamic-category-container button.active,
-        #dynamic-category-container button:active,
-        #dynamic-category-container .category-btn.active {
+        #dynamic-category-container select:focus {
             background: #FFF3E8 !important;
             border-color: #C85A1A !important;
             color: #C85A1A !important;
@@ -1151,7 +1179,7 @@
 
 </div><!-- /appContent -->
 
-<script src="app.js?v=230"></script>
+<script src="app.js?v=221"></script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD7Qqf1Z9KQBuvipDzgIc5laJLz9SiOBH8&libraries=places,geometry&callback=initMap" async defer></script>
 </body>
 </html>
